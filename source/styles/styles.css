@@ -1,0 +1,142 @@
+/* Page */
+body {
+  color: #000000;
+  background-color: #c1d2e3;
+  margin: 0px;
+  padding: 1em;
+  min-height: 100vh;
+}
+
+
+/* Titles */
+h1 {
+  margin-top: 0px;
+  color: #effc84;
+  background-color: #202a0e;
+  font-size: 2em;
+  text-align: center;
+  border: 3px solid #effc84;
+  padding: 0.3em;
+}
+h1 .letter {
+  font-size: 0.5em;
+  display: inline-block;
+}
+h2 {
+  color: #effc84;
+  background-color: #202a0e;
+  font-size: 1.2em;
+  text-align: center;
+  margin: 1em 2em;
+  border: 2px solid #effc84;
+  padding: 0.6em;
+}
+
+
+/* Tables */
+table {
+  border-collapse: collapse;
+  border: 0px solid #000000;
+}
+th {
+  text-align: left;
+}
+th, td {
+  padding: 0.2em;
+  vertical-align: top;
+}
+.table {
+  border: 2px solid #000000;
+}
+.table > thead > tr {
+  color: #effc84;
+  background-color: #335372;
+}
+.table > tbody > tr:nth-child(even) {
+  background-color: #b3c8dd;
+}
+.table > tbody > tr:nth-child(odd) {
+  background-color: #9eb9d3;
+}
+.table > tbody > tr {
+  border-top: 1px solid #000000;
+  border-bottom: 1px solid #000000;
+}
+.enchants > tbody > tr > td {
+  padding-top: 0px;
+  padding-left: 0px;
+}
+
+
+/* Lists */
+ul {
+  padding-left: 1em;
+}
+
+
+/* Templates */
+.template {
+  display: none;
+}
+
+
+/* Form elements */
+input[type=number] {
+  width: 3em;
+}
+#serialized {
+  width: 95%;
+  height: 3em;
+  padding: 0.3em;
+}
+
+
+/* Links */
+a {
+  font-weight: bold;
+  text-decoration: none;
+  border-bottom: 1px solid #000000;
+  border-radius: 4px;
+}
+a,
+a:link {
+  color: #535c02;
+}
+a:hover {
+  color: #879704;
+}
+a:visited {
+  color: #02245c;
+}
+
+
+/* Errors */
+.error {
+  margin-top: 0.1em;
+  padding: 0.2em 0.4em;
+  font-weight: bold;
+  border: 1px solid #300000;
+  border-radius: 0em 0.5em 0.5em 0.5em;
+  color: #ffffff;
+  background-color: #802020;
+}
+
+
+/* Special content */
+.indented {
+  margin-left: 2em;
+}
+.footnote {
+  font-style: italic;
+  font-size: 0.8em;
+}
+.keepTogether :first-child {
+  margin-bottom: 0px;
+}
+.keepTogether :last-child {
+  margin-top: 0px;
+}
+.keepTogether * {
+  margin-top: 0px;
+  margin-bottom: 0px;
+}
