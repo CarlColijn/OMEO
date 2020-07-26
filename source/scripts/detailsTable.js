@@ -9,16 +9,21 @@
   - DetailsTable
 */
 class DetailsTable {
-  constructor(rootElemJQ) {
+  constructor(tableElemJQ) {
     // note the elements
-    this.rootElemJQ = rootElemJQ
+    this.tableElemJQ = tableElemJQ
+    this.templateRowElemJQ = tableElemJQ.find('.template').first()
   }
 
 
   // clears us
   Clear() {
-    this.rootElemJQ.find('ul').remove()
-    this.rootElemJQ.find('li').remove()
+    this.tableElemJQ.find('.item').each((rowNr, rowElem) => {
+      let rowElemJQ = $(rowElem)
+      if (rowElemJQ.data('real') != 0)
+        rowElemJQ.remove()
+      return true
+    })
   }
 
 
@@ -28,58 +33,67 @@ class DetailsTable {
     this.Clear()
 
     // and spell out the new details
-    this.AddItemToNode(item, this.rootElemJQ)
+    this.AddItem(item, 0)
   }
 
 
-  // adds the given item's details to the given node
-  AddItemToNode(item, nodeJQ) {
-    // start the node
-    let nodeHTML = '<li>'
+  // adds the given item's details
+  AddItem(item, indent) {
+    // start the item row
+    let newRowElemJQ = this.templateRowElemJQ.clone()
+    let rowParentElemJQ = this.templateRowElemJQ.parent()
+    newRowElemJQ.appendTo(rowParentElemJQ)
 
-    // spell out the item set
+    // make sure it is not a template row anymore
+    newRowElemJQ.removeClass('template')
+    newRowElemJQ.data('real', 1)
+
+    // spell out the item description
+    let description = ''
     if (item.set == g_combined)
-      nodeHTML += 'Combined '
+      description += 'Combined '
     else if (item.set == g_source)
-      nodeHTML += 'Source '
+      description += 'Source '
     else if (item.set == g_extra)
-      nodeHTML += 'Extra '
+      description += 'Extra '
     else if (item.set == g_desired)
-      nodeHTML += 'Desired '
-
-    // add the item id
-    nodeHTML += `${item.details.name} nr. ${item.nr}`
-
-    // add costs, if appropriate
-    if (item.set == g_combined) {
-      nodeHTML += `; costs ${item.cost}`
-      if (item.cost != item.totalCost)
-        nodeHTML += ` (${item.totalCost} in total)`
-    }
+      description += 'Desired '
+    description += `${item.details.name} nr. ${item.nr}`
+    let descriptionElemJQ = newRowElemJQ.find('.description')
+    descriptionElemJQ.text(description)
+    descriptionElemJQ.css('padding-left', `+=${indent}em`)
 
     // add enchants
+    let enchants = ''
     let isFirstEnchant = true
     for (let enchantNr = 0; enchantNr < g_numEnchants; ++enchantNr) {
       let enchant = item.enchantsByID[g_enchantDetails[enchantNr].id]
       if (enchant !== undefined) {
-        nodeHTML += isFirstEnchant ? ':<br>' : ', '
+        enchants += isFirstEnchant ? '' : '<br>'
         isFirstEnchant = false
-        nodeHTML += `${enchant.details.name} ${enchant.level}`
+        enchants += `${enchant.details.name} ${enchant.level}`
       }
     }
+    newRowElemJQ.find('.enchants').html(enchants)
 
-    // close off the node
-    nodeHTML += '</li>'
+    // add costs, if appropriate
+    let cost = ''
+    if (item.set != g_combined)
+      cost = '-'
+    else {
+      cost = item.cost
+      if (item.cost != item.totalCost)
+        cost += ` (${item.totalCost} in total)`
+    }
+    newRowElemJQ.find('.cost').text(cost)
 
-    // add it
-    nodeJQ.append(nodeHTML)
+    // add prior work
+    newRowElemJQ.find('.priorWork').text(item.priorWork)
 
-    // and also add subnodes, if needed
+    // and also add sub items, if needed
     if (item.set == g_combined) {
-      nodeJQ.append('<ul/>')
-      let subNodeJQ = nodeJQ.find('ul')
-      this.AddItemToNode(item.targetItem, subNodeJQ)
-      this.AddItemToNode(item.sacrificeItem, subNodeJQ)
+      this.AddItem(item.targetItem, indent + 1)
+      this.AddItem(item.sacrificeItem, indent + 1)
     }
   }
 }
