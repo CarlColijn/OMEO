@@ -44,6 +44,20 @@ class Item {
   }
 
 
+  // gets a hash of our state
+  Hash() {
+    // add out type
+    let allData = `${this.id}`
+
+    // add our enchants in a standard order
+    for (let enchantNr = 0; enchantNr < g_numEnchants; ++enchantNr) {
+      let enchant = this.enchantsByID[g_enchantDetails[enchantNr].id]
+      if (enchant !== undefined)
+        allData += `|${enchant.id}|${enchant.level}`
+    }
+  }
+
+
   // validates the item
   // returns if the item is valid
   Validate(form) {

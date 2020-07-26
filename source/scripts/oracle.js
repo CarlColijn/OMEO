@@ -138,26 +138,25 @@ class Oracle {
 
 
   // combines the given items
-  // returns the combined item, or undefined if the items are not compatible
-  CombineItems(targetItem, sacrificeItem, desiredItem, newItemNr) {
+  // returns the combined item, or undefined if they couldn't be combined
+  CombineItems(targetItem, sacrificeItem, desiredItem) {
     // look if the target item is compatible with the desired item
     let combinedItem = undefined
-    let canCombine =
+    if (
       targetItem.details.isBook ||
       targetItem.details === desiredItem.details
-    if (canCombine) {
+    ) {
       // yes -> look if the target and sacrifice items are compatible
-      canCombine =
+      if (
         targetItem.details.isBook ? (
           sacrificeItem.details.isBook // we can only add books to books
         ) : (
           sacrificeItem.details.isBook || // we can always add books to anything
           sacrificeItem.details === targetItem.details // or combine items of the same type
-        );
-      if (canCombine) {
+        )
+      ) {
         // yes -> look if the items have an origin conflict
-        canCombine = !targetItem.origin.ConflictsWith(sacrificeItem.origin)
-        if (canCombine) {
+        if (!targetItem.origin.ConflictsWith(sacrificeItem.origin)) {
           // no -> combine their enchants
           let enchantCombine = this.CombineEnchants(targetItem, sacrificeItem)
 
@@ -172,21 +171,19 @@ class Oracle {
             // ... tool-on-tool or book-on-book; if either didn't get used it's
             // just a waste of that item (book or tool)
             wastefull = !enchantCombine.targetUsed || !enchantCombine.sacrificeUsed
-          canCombine = !wastefull
-          if (canCombine) {
+          if (!wastefull) {
             // no -> look if this item is too expensive
             let cost =
               enchantCombine.cost +
               this.PriorWorkToCost(targetItem.priorWork) +
               this.PriorWorkToCost(sacrificeItem.priorWork)
-            canCombine = cost <= 39
-            if (canCombine) {
+            if (cost <= 39) {
               // no -> build the combine item
               let priorWork = Math.max(targetItem.priorWork, sacrificeItem.priorWork) + 1
               combinedItem = new Item(
                 g_combined,
                 targetItem.details.id,
-                newItemNr,
+                -1, // nr to be determined later
                 priorWork
               )
               combinedItem.enchantsByID = enchantCombine.enchantsByID
@@ -205,8 +202,8 @@ class Oracle {
       }
     }
 
-    // and return the combined item
-    return canCombine ? combinedItem : undefined
+    // and return the combined item, if any
+    return combinedItem
   }
 
 
@@ -231,45 +228,58 @@ class Oracle {
 
     // start the combined items
     let combinedItems = []
-    let nextCombinedItemNr = data.sourceItems.length + 1
 
     // start with the source items as the first pool
     let allItems = data.sourceItems.slice()
-    let prevItems = data.sourceItems
+    let lastPoolStartItemNr = 0
 
-    // determine all combinations
+    // determine all combinations (forced max of 10 rounds; should never reach it though)
     let addedCombinedItem = true
-    for (let createPoolNr = 1; createPoolNr < 10 && addedCombinedItem; ++createPoolNr) {
-      // make a start with this pool's new items
-      let newItems = []
-
-      // combine all of the previous pool's items with all other items in existance
-      for (let prevItemNr = 0; prevItemNr < prevItems.length; ++prevItemNr) {
+    for (let poolNr = 0; poolNr < 10 && addedCombinedItem; ++poolNr) {
+      // process all currently known items
+      let lastItemNr = allItems.length
+      for (let allItemNr = 0; allItemNr < lastItemNr; ++allItemNr) {
         // get this item
-        let prevItem = prevItems[prevItemNr]
+        let allItem = allItems[allItemNr]
 
-        // and combine it to all other existing items
-        for (let allItemNr = 0; allItemNr < allItems.length; ++allItemNr) {
-          // get this old item
-          let allItem = allItems[allItemNr]
+        // and combine it with the items we added in the last pool,
+        // skipping items we already combined
+        for (let lastPoolItemNr = Math.max(allItemNr + 1, lastPoolStartItemNr); lastPoolItemNr < lastItemNr; ++lastPoolItemNr) {
+          // get this item
+          let lastPoolItem = allItems[lastPoolItemNr]
 
-          // and combine them
-          let newItem = this.CombineItems(prevItem, allItem, data.desiredItem, nextCombinedItemNr)
-          if (newItem !== undefined) {
-            // done -> use it
-            newItems.push(newItem)
-            combinedItems.push(newItem)
-            ++nextCombinedItemNr
+          // combine them in both ways
+          let newItem1 = this.CombineItems(lastPoolItem, allItem, data.desiredItem)
+          let newItem2 = this.CombineItems(allItem, lastPoolItem, data.desiredItem)
+
+          // look if there's 2 ways to combine them
+          if (newItem1 !== undefined && newItem2 !== undefined) {
+            // yes -> look if they end up in the same thing
+            if (newItem1.Hash() == newItem2.Hash()) {
+              // yes -> only take the less costly route
+              if (newItem1.cost < newItem2.cost)
+                newItem2 = undefined
+              else
+                newItem1 = undefined
+            }
+          }
+
+          // and add any surviving items
+          if (newItem1 !== undefined) {
+            newItem1.nr = allItems.length + 1
+            allItems.push(newItem1)
+            combinedItems.push(newItem1)
+          }
+          if (newItem2 !== undefined) {
+            newItem2.nr = allItems.length + 1
+            allItems.push(newItem2)
+            combinedItems.push(newItem2)
           }
         }
       }
 
-      // add the new items now that we processed all items
-      for (let itemNr = 0; itemNr < newItems.length; ++itemNr)
-        allItems.push(newItems[itemNr])
-
-      // and note which items we just created
-      prevItems = newItems
+      // and the next pool starts where this one left off
+      lastPoolStartItemNr = lastItemNr
     }
 
     // and return all combined items
