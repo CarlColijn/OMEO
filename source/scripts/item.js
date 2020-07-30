@@ -13,10 +13,7 @@
     - nr: int
     - details: itemDetails
     - enchantsByID: map(id -> enchant)
-    - priorWork:
-      - string for freshly form-grabbed items
-      - int for computed and validated items
-    - priorWorkElemJQ: jQuery elem (only on form-grabbed items)
+    - priorWork: int
     - cost: int
     - totalCost: int
     combined items only:
@@ -26,13 +23,12 @@
     - origin: effectively an array(bool)
 */
 class Item {
-  constructor(set, id, nr, priorWork, priorWorkElemJQ) {
+  constructor(set, id, nr, priorWork) {
     // note our details
     this.id = id
     this.set = set
     this.nr = nr
     this.priorWork = priorWork
-    this.priorWorkElemJQ = priorWorkElemJQ
 
     // fetch further details
     this.details = g_itemDetailsByID[id]
@@ -55,32 +51,9 @@ class Item {
       if (enchant !== undefined)
         allData += `|${enchant.id}|${enchant.level}`
     }
-  }
 
-
-  // validates the item
-  // returns if the item is valid
-  Validate(form) {
-    // validate our own data
-    let allOK = true
-    this.priorWork = parseInt(this.priorWork)
-    if (this.set == g_source && isNaN(this.priorWork)) {
-      // prior work in error -> tell
-      form.NoteError(this.priorWorkElemJQ, 'This is not a number')
-      allOK = false
-    }
-    else {
-      // done -> validate all our enchants too
-      for (let enchantID in this.enchantsByID) {
-        let enchant = this.enchantsByID[enchantID]
-        if (!enchant.Validate())
-          // failed -> note
-          allOK = false
-      }
-    }
-
-    // and return the verdict
-    return allOK
+    // and that'll do
+    return allData
   }
 
 

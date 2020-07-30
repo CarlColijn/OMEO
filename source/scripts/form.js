@@ -39,34 +39,14 @@ class Form {
       // get the form data
       let data = this.GetData()
 
-      // validate them all
-      let allOK = data.desiredItem.Validate(this)
-      for (let itemNr = 0; itemNr < data.sourceItems.length; ++itemNr) {
-        // access this source item
-        let sourceItem = data.sourceItems[itemNr]
+      // do the divination with it
+      let combinedItems = oracle.Divine(data)
 
-        // and look if this item is usable
-        if (!sourceItem.Validate(this))
-          // no -> note
-          allOK = false
-      }
-      let errorText = ''
-      let combinedItems = []
-      if (!allOK)
-        // error -> note
-        errorText = 'There are errors in your data.'
-      else {
-        // do the divination with it
-        combinedItems = oracle.Divine(data)
+      // show the created items
+      this.ShowCombinedItems(combinedItems)
 
-        // and show the created items
-        this.ShowCombinedItems(combinedItems)
-      }
-
-      // and show our status
-      if (errorText.length != 0)
-        alert(errorText)
-      else if (combinedItems.length == 0)
+      // and show we're done
+      if (combinedItems.length == 0)
         alert('All possible combinations are too expensive or wasteful!')
       else
         alert('The divination is complete!')
@@ -84,6 +64,11 @@ class Form {
       let itemDetails = g_itemDetails[itemNr]
       itemSelectElemJQs.append(`<option value="${itemDetails.id}">${itemDetails.name}</option>`)
     }
+
+    // fill in the prior work options
+    let priorWorkSelectElemJQs = $('select[name="priorWork"]')
+    for (let priorWork = 0; priorWork <= 6; ++priorWork)
+      priorWorkSelectElemJQs.append(`<option value="${priorWork}">${priorWork}</option>`)
 
     // and fill in the enchant options
     let enchantSelectElemJQs = $('select[name="enchantID"]')

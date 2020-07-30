@@ -27,7 +27,7 @@ class ItemRow {
       this.typeElemJQ = rowElemJQ.find('.type')
     this.enchantTemplateRowElemJQ = this.rowElemJQ.find('.template').first()
     if (set == g_source)
-      this.priorWorkElemJQ = rowElemJQ.find('input[name="priorWork"]')
+      this.priorWorkElemJQ = rowElemJQ.find('select[name="priorWork"]')
     else if (set == g_combined) {
       this.priorWorkElemJQ = rowElemJQ.find('.priorWork')
       this.costElemJQ = rowElemJQ.find('.cost')
@@ -125,13 +125,15 @@ class ItemRow {
 
   // gets the item on the row
   GetItem() {
-    let withPriorWork = this.set == g_source
+    let priorWork =
+      this.set == g_source ?
+      parseInt(this.priorWorkElemJQ.val()) :
+      0
     let item = new Item(
       this.set,
       this.idElemJQ.val(),
       parseInt(this.rowElemJQ.data('nr')),
-      withPriorWork ? this.priorWorkElemJQ.val() : 0,
-      withPriorWork ? this.priorWorkElemJQ : undefined
+      priorWork
     )
     item.enchantsByID = this.GetEnchants()
     return item
