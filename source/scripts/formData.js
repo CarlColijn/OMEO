@@ -10,18 +10,34 @@
   - FormData
     - desiredItem: Item
     - sourceItems: array(Item)
+    - sourceItemsMerged: bool
+    - withErrors: bool
 */
 class FormData {
   constructor() {
     // start our subobjects
     this.desiredItem = undefined
     this.sourceItems = []
+    this.sourceItemsMerged = false
+    this.withErrors = false
   }
 
 
   // adds the given source item
   AddSourceItem(item) {
     this.sourceItems.push(item)
+  }
+
+
+  // notes whether source items were merged
+  SetSourceItemsMerged(sourceItemsMerged) {
+    this.sourceItemsMerged = sourceItemsMerged
+  }
+
+
+  // notes whether there were errors
+  SetWithErrors(withErrors) {
+    this.withErrors = withErrors
   }
 
 
@@ -76,6 +92,7 @@ class FormData {
 
   // serializes an item
   SerializeItem(item, stream) {
+    stream.Add(item.count)
     stream.Add(item.id)
     stream.Add(item.priorWork)
     this.SerializeEnchants(item.enchantsByID, stream)
@@ -104,6 +121,7 @@ class FormData {
   DeserializeItem(stream, set, itemNr) {
     // get the item
     let item = new Item(
+      stream.Get(),
       set,
       stream.Get(),
       itemNr,

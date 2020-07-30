@@ -21,6 +21,10 @@ class ItemRow {
 
     // note our elements
     this.rowElemJQ = rowElemJQ
+    if (set == g_source)
+      this.countElemJQ = rowElemJQ.find('input[name="count"]')
+    else if (set == g_combined)
+      this.countElemJQ = rowElemJQ.find('.count')
     if (set == g_source || set == g_desired)
       this.idElemJQ = rowElemJQ.find('select[name="itemID"]')
     else if (set == g_combined)
@@ -104,6 +108,12 @@ class ItemRow {
   }
 
 
+  // sets a new count value on the row
+  SetCount(newCount) {
+    this.countElemJQ.val(newCount)
+  }
+
+
   // adds an enchant row
   // returns the new row
   AddEnchant(enchant) {
@@ -124,24 +134,39 @@ class ItemRow {
 
 
   // gets the item on the row
-  GetItem() {
-    let priorWork =
-      this.set == g_source ?
-      parseInt(this.priorWorkElemJQ.val()) :
-      0
+  // returns { item, withErrors }
+  GetItem(validate, form) {
+    let isSourceItem = this.set == g_source
+    let count = 1
+    let withErrors = false
+    if (isSourceItem) {
+      count = this.countElemJQ.val()
+      if (validate) {
+        count = parseInt(count)
+        if (isNaN(count)) {
+          form.NoteError(this.countElemJQ, 'This is not a number')
+          withErrors = true
+        }
+      }
+    }
     let item = new Item(
+      count,
       this.set,
       this.idElemJQ.val(),
       parseInt(this.rowElemJQ.data('nr')),
-      priorWork
+      isSourceItem ? parseInt(this.priorWorkElemJQ.val()) : 0
     )
     item.enchantsByID = this.GetEnchants()
-    return item
+    return { 'item': item, 'withErrors': withErrors }
   }
 
 
   // sets the item on the row
   SetItem(item) {
+    if (this.set == g_source)
+      this.countElemJQ.val(item.count)
+    else if (this.set == g_combined)
+      this.countElemJQ.text(item.count)
     if (this.set == g_source || this.set == g_desired)
       this.idElemJQ.val(item.id)
     else if (this.set == g_combined)

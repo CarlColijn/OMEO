@@ -112,6 +112,7 @@
         <thead>
           <tr>
             <th>Nr</th>
+            <th>Count</th>
             <th>Type</th>
             <th>Prior work</th>
             <th>Enchantments</th>
@@ -121,13 +122,14 @@
         <tbody>
           <tr class="template item" data-real="0" data-nr="0">
             <td><span class="nr"></span></td>
-            <td><select name="itemID"></select></td> <!-- filled in by javascript -->
+            <td><input name="count" type="number" min="1" value="1"></td>
+            <td><select name="itemID"></select></td>
             <td><select name="priorWork" class="priorWork"></select></td>
             <td>
               <table class="enchants">
                 <tbody>
                   <tr class="template enchant" data-real="0">
-                    <td><select name="enchantID"></select></td> <!-- filled in by javascript -->
+                    <td><select name="enchantID"></select></td>
                     <td><select name="level"></select></td>
                     <td><button type="button" name="removeEnchant">Remove enchantment</button></td>
                   </tr>
@@ -156,12 +158,12 @@
         </thead>
         <tbody>
           <tr class="item" data-real="1">
-            <td><select name="itemID"></select></td> <!-- filled in by javascript -->
+            <td><select name="itemID"></select></td>
             <td>
               <table class="enchants">
                 <tbody>
                   <tr class="template enchant" data-real="0">
-                    <td><select name="enchantID"></select></td> <!-- filled in by javascript -->
+                    <td><select name="enchantID"></select></td>
                     <td><select name="level"></select></td>
                     <td><button type="button" name="removeEnchant">Remove enchantment</button></td>
                   </tr>
@@ -184,6 +186,7 @@
           <tr>
             <th>Nr</th>
             <th>Cost</th>
+            <th>Count</th>
             <th>Type</th>
             <th>Prior work</th>
             <th>Enchantments</th>
@@ -194,6 +197,7 @@
           <tr class="template item" data-real="0" data-nr="0">
             <td><span class="nr"></span></td>
             <td><span class="cost"></span></td>
+            <td><span class="count"></span></td>
             <td><span class="type"></span></td>
             <td><span class="priorWork"></span></td>
             <td>

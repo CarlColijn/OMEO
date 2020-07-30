@@ -37,19 +37,27 @@ class Form {
       this.ClearResult()
 
       // get the form data
-      let data = this.GetData()
+      let data = this.GetData(true, true)
+      if (data.sourceItemsMerged)
+        alert('I\'ve taken the liberty to merge identical item rows.')
 
-      // do the divination with it
-      let combinedItems = oracle.Divine(data)
+      // look if the data is ok
+      if (data.withErrors)
+        // some is invalid -> tell
+        alert('There are errors in your data.')
+      else {
+        // yes -> do the divination with it
+        let combinedItems = oracle.Divine(data)
 
-      // show the created items
-      this.ShowCombinedItems(combinedItems)
+        // show the created items
+        this.ShowCombinedItems(combinedItems)
 
-      // and show we're done
-      if (combinedItems.length == 0)
-        alert('All possible combinations are too expensive or wasteful!')
-      else
-        alert('The divination is complete!')
+        // and show we're done
+        if (combinedItems.length == 0)
+          alert('All possible combinations are too expensive or wasteful!')
+        else
+          alert('The divination is complete!')
+      }
     })
     $('#load').click(() => {
       this.Load()
@@ -112,19 +120,25 @@ class Form {
 
 
   // gets the data in the form
-  GetData() {
+  GetData(mergeSourceItems, validate) {
     // start the data
     let data = new FormData()
 
     // collect all source items
-    let sourceItems = this.sourceItemTable.GetItems()
-    for (let itemNr = 0; itemNr < sourceItems.length; ++itemNr)
-      data.AddSourceItem(sourceItems[itemNr])
+    let sourceItemsResult = this.sourceItemTable.GetItems(mergeSourceItems, validate, this)
+    let withErrors = sourceItemsResult.withErrors
+    for (let itemNr = 0; itemNr < sourceItemsResult.items.length; ++itemNr)
+      data.AddSourceItem(sourceItemsResult.items[itemNr])
 
     // collect the desired item
-    data.SetDesiredItem(this.desiredItemRow.GetItem())
+    let desiredItemResult = this.desiredItemRow.GetItem(true, this)
+    if (desiredItemResult.withErrors)
+      withErrors = true
+    data.SetDesiredItem(desiredItemResult.item)
 
     // and return the found data
+    data.SetSourceItemsMerged(sourceItemsResult.mergedItems)
+    data.SetWithErrors(withErrors)
     return data
   }
 
@@ -173,7 +187,7 @@ class Form {
   // saves data
   Save() {
     // get the form data
-    let data = this.GetData()
+    let data = this.GetData(false, false)
 
     // serialize the data
     let stream = new DataStream()

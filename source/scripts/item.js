@@ -8,6 +8,7 @@
   Defined classes:
   - Item
     all items:
+    - count: int
     - set: char (s=source/e=extra/c=combined/d=desired)
     - id: char
     - nr: int
@@ -23,8 +24,9 @@
     - origin: effectively an array(bool)
 */
 class Item {
-  constructor(set, id, nr, priorWork) {
+  constructor(count, set, id, nr, priorWork) {
     // note our details
+    this.count = count
     this.id = id
     this.set = set
     this.nr = nr
@@ -42,8 +44,8 @@ class Item {
 
   // gets a hash of our state
   Hash() {
-    // add out type
-    let allData = `${this.id}`
+    // add out type and prior work
+    let allData = `${this.id}|${this.priorWork}`
 
     // add our enchants in a standard order
     for (let enchantNr = 0; enchantNr < g_numEnchants; ++enchantNr) {

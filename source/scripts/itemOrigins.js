@@ -1,8 +1,5 @@
 /*
   Trackers for item ancestry, used to prevent duplicate item use conflicts.
-  Since we'll have oodles of these (one for each item), and since we don't
-  want to blow up the user's memory, we internally uses bit fiddling instead
-  of arrays, maps or strings to keep track of the item nrs used.
 
   Prerequisites:
   - none
@@ -16,12 +13,16 @@
 
 // ZeroOrigins; starting point for ItemOrigins
 class ZeroOrigin {
-  constructor(numItems) {
-    // set up the parts
-    this.numParts = Math.ceil(numItems / 32) // max 32 bits per part
-    this.parts = Array(this.numParts)
-    for (let partNr = 0; partNr < this.numParts; ++partNr)
-      this.parts[partNr] = 0|0 // 0 as real int
+  constructor(items) {
+    // set up the uses
+    let numItems = items.length
+    this.maxUses = new Array(numItems)
+    this.itemUses = new Array(numItems)
+    for (let itemNr = 0; itemNr < numItems; ++itemNr) {
+      let item = items[itemNr]
+      this.maxUses[itemNr] = item.count
+      this.itemUses[itemNr] = 0
+    }
   }
 
 
@@ -33,21 +34,16 @@ class ZeroOrigin {
 }
 
 
-
-  // single item origin
+// single item origin
 class ItemOrigin {
   constructor(otherOrigin, itemNr) {
     // use the otherOrigin as a template
-    this.numParts = otherOrigin.numParts
-    this.finalPartSize = otherOrigin.finalPartSize
-    this.parts = otherOrigin.parts.slice()
+    this.maxUses = otherOrigin.maxUses // noone is modifying it; by ref is fine
+    this.itemUses = otherOrigin.itemUses.slice()
 
-    // and mark our item, if possible
-    if (itemNr !== undefined) {
-      let partNr = Math.floor(itemNr / 32)
-      let bitNr = itemNr - partNr * 32
-      this.parts[partNr] |= 1 << bitNr
-    }
+    // and mark the item use, if possible
+    if (itemNr !== undefined)
+      this.itemUses[itemNr] += 1
   }
 
 
@@ -56,20 +52,26 @@ class ItemOrigin {
     // base a new origin on us
     let combinedOrigin = new ItemOrigin(this)
 
-    // mark the parts from the other origin as well
-    for (let partNr = 0; partNr < this.numParts; ++partNr)
-      combinedOrigin.parts[partNr] |= otherOrigin.parts[partNr]
+    // tally up the uses
+    for (let itemNr = 0; itemNr < this.itemUses.length; ++itemNr)
+      combinedOrigin.itemUses[itemNr] += otherOrigin.itemUses[itemNr]
 
     // and we combined them
     return combinedOrigin
   }
 
 
-  // checks for conflicts between origins
-  ConflictsWith(otherOrigin) {
-    let conflicts = false
-    for (let partNr = 0; partNr < this.numParts && !conflicts; ++partNr)
-      conflicts = (this.parts[partNr] & otherOrigin.parts[partNr]) != 0
-    return conflicts
+  // determines how many times we and the given origin can be combined
+  DetermineMaxCombineCount(otherOrigin) {
+    let numCombines = 9e9 // should be enough
+    for (let itemNr = 0; itemNr < this.itemUses.length; ++itemNr) {
+      let combinedItemUses = this.itemUses[itemNr] + otherOrigin.itemUses[itemNr]
+      if (combinedItemUses > 0) {
+        let thisItemNumCombines = Math.trunc(this.maxUses[itemNr] / combinedItemUses)
+        if (numCombines > thisItemNumCombines)
+          numCombines = thisItemNumCombines
+      }
+    }
+    return numCombines
   }
 }

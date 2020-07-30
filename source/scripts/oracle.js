@@ -28,6 +28,7 @@ class Oracle {
       if (!unenchantedVersionPresent) {
         // no -> add one now
         let extraItem = new Item(
+          1,
           g_extra,
           desiredItem.details.id,
           sourceItems.length + 1,
@@ -104,8 +105,10 @@ class Oracle {
             }
             else {
               enchantLevel = Math.min(targetLevel + 1, enchantDetails.maxLevel)
-              result.targetUsed = enchantLevel > targetLevel
-              result.sacrificeUsed = enchantLevel > sacrificeLevel
+              if (enchantLevel > targetLevel)
+                result.targetUsed = true
+              if (enchantLevel > sacrificeLevel)
+                result.sacrificeUsed = true
               multiplierItem = targetItem
             }
 
@@ -155,9 +158,10 @@ class Oracle {
           sacrificeItem.details === targetItem.details // or combine items of the same type
         )
       ) {
-        // yes -> look if the items have an origin conflict
-        if (!targetItem.origin.ConflictsWith(sacrificeItem.origin)) {
-          // no -> combine their enchants
+        // yes -> look how many of the combined item we could make
+        let combinedItemCount = targetItem.origin.DetermineMaxCombineCount(sacrificeItem.origin)
+        if (combinedItemCount > 0) {
+          // enough -> combine their enchants
           let enchantCombine = this.CombineEnchants(targetItem, sacrificeItem)
 
           // look if that was wastefull
@@ -181,6 +185,7 @@ class Oracle {
               // no -> build the combine item
               let priorWork = Math.max(targetItem.priorWork, sacrificeItem.priorWork) + 1
               combinedItem = new Item(
+                combinedItemCount,
                 g_combined,
                 targetItem.details.id,
                 -1, // nr to be determined later
@@ -218,12 +223,12 @@ class Oracle {
     }
 
     // set up the zero origin
-    let zeroOrigin = new ZeroOrigin(data.sourceItems.length)
+    let zeroOrigin = new ZeroOrigin(data.sourceItems)
 
-    // mark their origins
+    // mark the item's origins
     for (let itemNr = 0; itemNr < data.sourceItems.length; ++itemNr) {
       let item = data.sourceItems[itemNr]
-      item.origin = zeroOrigin.CreateOrigin(itemNr)
+      item.origin = zeroOrigin.CreateOrigin(itemNr, item.count)
     }
 
     // start the combined items
@@ -244,7 +249,7 @@ class Oracle {
 
         // and combine it with the items we added in the last pool,
         // skipping items we already combined
-        for (let lastPoolItemNr = Math.max(allItemNr + 1, lastPoolStartItemNr); lastPoolItemNr < lastItemNr; ++lastPoolItemNr) {
+        for (let lastPoolItemNr = Math.max(allItemNr, lastPoolStartItemNr); lastPoolItemNr < lastItemNr; ++lastPoolItemNr) {
           // get this item
           let lastPoolItem = allItems[lastPoolItemNr]
 
