@@ -174,12 +174,14 @@ class Form {
       let stream = new DataStream()
       stream.Load()
 
-      // deserialize the data
+      // and deserialize the data
       let data = new FormData()
-      data.Deserialize(stream)
-
-      // and restore the form with the data
-      this.SetData(data)
+      if (!data.Deserialize(stream))
+        // error -> tell
+        alert('There was an error reading the data.')
+      else
+        // done -> restore the form with the data
+        this.SetData(data)
     }
   }
 

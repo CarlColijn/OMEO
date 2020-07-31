@@ -49,6 +49,9 @@ class FormData {
 
   // serializes the data
   Serialize(stream) {
+    // start with the data version
+    stream.Add(1)
+
     // serialize all source items
     let numSources = this.sourceItems.length
     stream.Add(numSources)
@@ -63,18 +66,34 @@ class FormData {
 
 
   // deserializes the data
+  // returns if the data was OK
   Deserialize(stream) {
-    // deserialize all source items
-    this.sourceItems = []
-    let numSources = stream.Get()
-    for (let sourceNr = 1; sourceNr <= numSources; ++sourceNr) {
-      let sourceItem = this.DeserializeItem(stream, g_source, sourceNr)
-      sourceItem.nr = sourceNr
-      this.sourceItems.push(sourceItem)
+    // get the data version
+    let dataVersion = parseInt(stream.Get())
+    let dataOK = true
+    switch (dataVersion) {
+      case 1:
+        // known version -> deserialize all source items
+        this.sourceItems = []
+        let numSources = stream.Get()
+        for (let sourceNr = 1; sourceNr <= numSources; ++sourceNr) {
+          let sourceItem = this.DeserializeItem(stream, g_source, sourceNr)
+          sourceItem.nr = sourceNr
+          this.sourceItems.push(sourceItem)
+        }
+
+        // and deserialize the desired item
+        this.desiredItem = this.DeserializeItem(stream, g_desired, 0)
+        break
+      default:
+        // unknown version -> note
+        dataOK = false
+        this.withErrors = true
+        break
     }
 
-    // and deserialize the desired item
-    this.desiredItem = this.DeserializeItem(stream, g_desired, 0)
+    // and tell what just happened
+    return dataOK
   }
 
 
