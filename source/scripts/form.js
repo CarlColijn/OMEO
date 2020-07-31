@@ -171,7 +171,7 @@ class Form {
     // ask if the user is sure
     if (true || window.confirm("Are you sure you want to load new data? Any unsaved changes will be lost!")) {
       // start the stream
-      let stream = new DataStream()
+      let stream = new DataStream(false)
       stream.Load()
 
       // and deserialize the data
@@ -197,7 +197,7 @@ class Form {
       alert('There are errors in your data.')
     else {
       // yes -> serialize the data
-      let stream = new DataStream()
+      let stream = new DataStream(true)
       data.Serialize(stream)
 
       // and store the complete data set
