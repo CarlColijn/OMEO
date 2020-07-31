@@ -37,7 +37,7 @@ class Form {
       this.ClearResult()
 
       // get the form data
-      let data = this.GetData(true, true)
+      let data = this.GetData(true)
       if (data.sourceItemsMerged)
         alert('I\'ve taken the liberty to merge identical item rows.')
 
@@ -120,12 +120,12 @@ class Form {
 
 
   // gets the data in the form
-  GetData(mergeSourceItems, validate) {
+  GetData(mergeSourceItems) {
     // start the data
     let data = new FormData()
 
     // collect all source items
-    let sourceItemsResult = this.sourceItemTable.GetItems(mergeSourceItems, validate, this)
+    let sourceItemsResult = this.sourceItemTable.GetItems(mergeSourceItems, this)
     let withErrors = sourceItemsResult.withErrors
     for (let itemNr = 0; itemNr < sourceItemsResult.items.length; ++itemNr)
       data.AddSourceItem(sourceItemsResult.items[itemNr])
@@ -189,14 +189,20 @@ class Form {
   // saves data
   Save() {
     // get the form data
-    let data = this.GetData(false, false)
+    let data = this.GetData(false)
 
-    // serialize the data
-    let stream = new DataStream()
-    data.Serialize(stream)
+    // look if the data is ok
+    if (data.withErrors)
+      // some is invalid -> tell
+      alert('There are errors in your data.')
+    else {
+      // yes -> serialize the data
+      let stream = new DataStream()
+      data.Serialize(stream)
 
-    // and store the complete data set
-    stream.Save()
+      // and store the complete data set
+      stream.Save()
+    }
   }
 
 

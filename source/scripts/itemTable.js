@@ -52,7 +52,7 @@ class ItemTable {
 
   // gets all items from the table
   // returns { items, mergedItems, withErrors }
-  GetItems(mergeItems, validate, form) {
+  GetItems(mergeItems, form) {
     // scrape all items
     let result = {
       'items': [],
@@ -74,7 +74,7 @@ class ItemTable {
         ++newRowNr
 
         // get the source item
-        let itemResult = itemRow.GetItem(validate, form)
+        let itemResult = itemRow.GetItem(form)
         let item = itemResult.item
         if (itemResult.withErrors)
           result.withErrors = true

@@ -135,18 +135,15 @@ class ItemRow {
 
   // gets the item on the row
   // returns { item, withErrors }
-  GetItem(validate, form) {
+  GetItem(form) {
     let isSourceItem = this.set == g_source
     let count = 1
     let withErrors = false
     if (isSourceItem) {
-      count = this.countElemJQ.val()
-      if (validate) {
-        count = parseInt(count)
-        if (isNaN(count)) {
-          form.NoteError(this.countElemJQ, 'This is not a number')
-          withErrors = true
-        }
+      count = parseInt(this.countElemJQ.val())
+      if (isNaN(count)) {
+        form.NoteError(this.countElemJQ, 'This is not a number')
+        withErrors = true
       }
     }
     let item = new Item(
