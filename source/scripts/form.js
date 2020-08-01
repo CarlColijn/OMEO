@@ -85,6 +85,31 @@ class Form {
       enchantSelectElemJQs.append(`<option value="${enchantDetails.id}">${enchantDetails.name}</option>`)
     }
 
+    // load the instructions hide/unhide preference
+    let notesElemJQ = $('#notes')
+    let hideNotesElemJQ = $('#hideNotes')
+    let showNotesElemJQ = $('#showNotes')
+    let hideNotes = localStorage.getItem('hideNotes') != null
+    if (hideNotes) {
+      notesElemJQ.hide()
+      showNotesElemJQ.show()
+    }
+
+    // link up the notes hiding/unhiding buttons
+    let showHideOptions = {
+      'duration': 400
+    }
+    hideNotesElemJQ.click(function() {
+      notesElemJQ.hide(showHideOptions)
+      showNotesElemJQ.show(showHideOptions)
+      localStorage.setItem('hideNotes', '1')
+    })
+    showNotesElemJQ.click(function() {
+      notesElemJQ.show(showHideOptions)
+      showNotesElemJQ.hide(showHideOptions)
+      localStorage.removeItem('hideNotes')
+    })
+
     // load our data
     if (!this.Load())
       // error -> tell
