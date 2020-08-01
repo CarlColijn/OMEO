@@ -59,11 +59,11 @@ class Form {
           alert('The divination is complete!')
       }
     })
-    $('#load').click(() => {
-      this.Load()
-    })
-    $('#save').click(() => {
-      this.Save()
+    $('#makeBookmark').click(() => {
+      // save the data
+      if (!this.Save(true))
+        // error -> tell
+        alert('There are errors in your data; please fix these first.')
     })
 
     // fill in the item options
@@ -78,12 +78,25 @@ class Form {
     for (let priorWork = 0; priorWork <= 6; ++priorWork)
       priorWorkSelectElemJQs.append(`<option value="${priorWork}">${priorWork}</option>`)
 
-    // and fill in the enchant options
+    // fill in the enchant options
     let enchantSelectElemJQs = $('select[name="enchantID"]')
     for (let enchantNr = 0; enchantNr < g_numEnchants; ++enchantNr) {
       let enchantDetails = g_enchantDetails[enchantNr]
       enchantSelectElemJQs.append(`<option value="${enchantDetails.id}">${enchantDetails.name}</option>`)
     }
+
+    // load our data
+    if (!this.Load())
+      // error -> tell
+      alert('Sorry, but there was an issue loading your data back in...')
+
+    // and ensure the data gets saved again too
+    $(window).on('beforeunload', (event) => {
+      if (!this.Save(false)) {
+        event.preventDefault()
+        event.returnValue = 'Your data has issues and could not be saved.\n\nAre you sure you want to leave now?  Any unsaved changes will be lost!'
+      }
+    })
   }
 
 
@@ -167,42 +180,47 @@ class Form {
 
 
   // loads the form state
+  // returns if loading was successful
   Load() {
     // ask if the user is sure
+    let allOK = true
     if (true || window.confirm("Are you sure you want to load new data? Any unsaved changes will be lost!")) {
       // start the stream
       let stream = new DataStream(false)
-      stream.Load()
-
-      // and deserialize the data
-      let data = new FormData()
-      if (!data.Deserialize(stream))
-        // error -> tell
-        alert('There was an error reading the data.')
-      else
-        // done -> restore the form with the data
-        this.SetData(data)
+      if (stream.Load()) {
+        // done -> deserialize the data
+        let data = new FormData()
+        allOK = data.Deserialize(stream)
+        if (allOK)
+          // done -> restore the form with the data
+          this.SetData(data)
+      }
     }
+
+    // and return our status
+    return allOK
   }
 
 
   // saves data
-  Save() {
+  // returns if saving was successful
+  Save(toURL) {
+    // clear old data errors
+    this.ClearErrors()
+
     // get the form data
     let data = this.GetData(false)
-
-    // look if the data is ok
-    if (data.withErrors)
-      // some is invalid -> tell
-      alert('There are errors in your data.')
-    else {
-      // yes -> serialize the data
+    if (!data.withErrors) {
+      // done -> serialize the data
       let stream = new DataStream(true)
       data.Serialize(stream)
 
       // and store the complete data set
-      stream.Save()
+      stream.Save(toURL)
     }
+
+    // and return our status
+    return !data.withErrors
   }
 
 

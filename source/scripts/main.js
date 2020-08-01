@@ -22,9 +22,4 @@ let g_form = new Form()
 $(() => {
   // initialize the form
   g_form.Initialize(g_oracle)
-
-  // and ensure users won't lose their work when accidentally browsing away
-  $(window).on('beforeunload', () => {
-    return "Are you sure you want to leave? Any unsaved changes will be lost!"
-  })
 })

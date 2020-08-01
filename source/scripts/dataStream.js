@@ -126,9 +126,6 @@ class DataStream {
       this.storer = new BitStorer()
     else
       this.restorer = new BitRestorer()
-
-    // and ref our backing form element
-    this.streamElemJQ = $('#serialized')
   }
 
 
@@ -160,13 +157,62 @@ class DataStream {
 
 
   // loads the data stream
+  // returns whether any data was there
   Load() {
-    this.restorer.Start(this.streamElemJQ.val())
+    // get the serialized data to load from both places
+    let serializedLS = localStorage.getItem('form') || ''
+    let urlDataMatches = RegExp('[?&]form=([^&#]*)').exec(location.search)
+    let serializedURL = urlDataMatches ? urlDataMatches[1] : ''
+
+    // look which one to use
+    let serialized = ''
+    if (serializedURL.length == 0 && serializedLS.length > 0)
+      // localStorage
+      serialized = serializedLS
+    else if (serializedURL.length > 0 && serializedLS.length == 0)
+      // url
+      serialized = serializedURL
+    else if (serializedURL.length > 0 && serializedLS.length > 0) {
+      if (serializedURL == serializedLS)
+        // either (they're the same)
+        serialized = serializedURL
+      else {
+        // conflict -> ask
+        let useLS = confirm('You\'re attempting to restore the data from a bookmark.  This will PERMANENTLY overwrite your stored data.  If you want to keep your stored data, please bookmark your data first.\n\nDo you want to ignore the bookmark and use your stored data for now?')
+        serialized = useLS ? serializedLS : serializedURL
+        if (useLS)
+          // he chose for LS -> get rid of the bookmark part keeping the old link
+          // with the bookmark in the history
+          location.href = location.href.replace(location.search, '')
+      }
+    }
+
+    // look if we got data
+    let gotData = serialized.length > 0
+    if (gotData)
+      // yes -> load it
+      this.restorer.Start(serialized)
+
+    // and return if we loaded anything
+    return gotData
   }
 
 
   // saves the data stream
-  Save() {
-    this.streamElemJQ.val(this.storer.Finalize())
+  Save(toURL) {
+    // get the serialized data to save
+    let serialized = this.storer.Finalize()
+
+    // and save it
+    if (toURL) {
+      let addressBase = location.href.replace(location.search, '')
+      let bookmarkLink = `${addressBase}?form=${serialized}`
+      let bookmarkElemJQ = $('#bookmark')
+      bookmarkElemJQ.show()
+      let bookmarkLinkElemJQ = bookmarkElemJQ.find('a')
+      bookmarkLinkElemJQ.attr('href', bookmarkLink)
+    }
+    else
+      localStorage.setItem('form', serialized)
   }
 }

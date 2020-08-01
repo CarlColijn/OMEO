@@ -84,10 +84,8 @@ ul {
 input[type=number] {
   width: 3em;
 }
-#serialized {
-  width: 95%;
-  height: 3em;
-  padding: 0.3em;
+#bookmark {
+  display: none;
 }
 
 
