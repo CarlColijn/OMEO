@@ -19,10 +19,10 @@ class Form {
   // initializes the form
   Initialize(oracle) {
     // set up our elements
-    this.sourceItemTable = new ItemTable(this, $('#sources'), g_source)
-    this.combineItemTable = new ItemTable(this, $('#combines'), g_combined)
+    this.sourceItemTable = new ItemTable(this, $('#sources .items'), g_source)
+    this.combineItemTable = new ItemTable(this, $('#combines .items'), g_combined)
     this.desiredItemRow = new ItemRow(this, $('#desired .item'), g_desired)
-    this.detailsTable = new DetailsTable($('#details'))
+    this.detailsTable = new DetailsTable($('#details .items'))
 
     // link up the buttons
     $('#addSourceItem').click(() => {
