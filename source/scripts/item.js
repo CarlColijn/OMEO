@@ -3,74 +3,78 @@
 
   Prerequisites:
   - dataSets.js
-  - itemDetails.js
+  - enchant.js
+  - enchantInfo.js
+  - itemInfo.js
 
   Defined classes:
   - Item
     all items:
     - count: int
-    - set: char (s=source/e=extra/c=combined/d=desired)
-    - id: char
+    - set: DataSet
+    - id: int
     - nr: int
-    - details: itemDetails
-    - enchantsByID: map(id -> enchant)
+    - info: ItemInfo
+    - enchantsByID: Map(int -> Enchant)
     - priorWork: int
     - cost: int
     - totalCost: int
     combined items only:
-    - targetItem: item
-    - sacrificeItem: item
+    - targetItem: Item
+    - sacrificeItem: Item
     all items except desired items:
     - origin: effectively an array(bool)
 */
+
+
+// ======== PUBLIC ========
+
+
 class Item {
   constructor(count, set, id, nr, priorWork) {
-    // note our details
+    // ==== PUBLIC ====
     this.count = count
-    this.id = id
     this.set = set
+    this.id = id
     this.nr = nr
+    this.info = g_itemInfosByID.get(id)
+    this.enchantsByID = new Map()
     this.priorWork = priorWork
-
-    // fetch further details
-    this.details = g_itemDetailsByID[id]
-
-    // and start the derived data
-    this.enchantsByID = {}
     this.cost = 0
     this.totalCost = 0
   }
 
 
-  // gets a hash of our state
+  SetEnchant(enchant) {
+    this.enchantsByID.set(enchant.info.id, enchant)
+  }
+
+
+  // returns string
   Hash() {
-    // add out type and prior work
+    // note: no fancy stuff for now with bit fiddling, just a big 'ol string concat
+
     let allData = `${this.id}|${this.priorWork}`
 
-    // add our enchants in a standard order
-    for (let enchantNr = 0; enchantNr < g_numEnchants; ++enchantNr) {
-      let enchant = this.enchantsByID[g_enchantDetails[enchantNr].id]
+    for (let enchantNr = 0; enchantNr < g_numDifferentEnchants; ++enchantNr) {
+      let enchant = this.enchantsByID.get(g_enchantInfos[enchantNr].id)
       if (enchant !== undefined)
         allData += `|${enchant.id}|${enchant.level}`
     }
 
-    // and that'll do
     return allData
   }
 
 
-  // drops any unused enchants
   DropUnusedEnchants() {
-    // find all unused enchants
     let enchantIDsToDrop = []
-    for (let enchantID in this.enchantsByID) {
-      let enchant = this.enchantsByID[enchantID]
-      if (enchant.level == 0)
-        enchantIDsToDrop.push(enchantID)
-    }
 
-    // and drop all unused enchants
+    this.enchantsByID.forEach((enchant, id) => {
+      if (enchant.level == 0)
+        enchantIDsToDrop.push(id)
+    })
+
     for (let enchantIDNr = 0; enchantIDNr < enchantIDsToDrop.length; ++enchantIDNr)
-      delete this.enchantsByID[enchantIDsToDrop[enchantIDNr]]
+      this.enchantsByID.delete(enchantIDsToDrop[enchantIDNr])
   }
 }

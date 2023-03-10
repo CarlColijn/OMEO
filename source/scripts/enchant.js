@@ -2,20 +2,24 @@
   Single enchant.
 
   Prerequisites:
-  - enchantDetails.js
+  - enchantInfo.js
 
   Defined classes:
   - Enchant
     - id: char
     - level: int
+    - info: EnchantInfo
 */
+
+
+// ======== PUBLIC ========
+
+
 class Enchant {
   constructor(id, level) {
-    // note our details
+    // ==== PUBLIC ====
     this.id = id
     this.level = level
-
-    // and get the extended details for us
-    this.details = g_enchantDetailsByID[id]
+    this.info = g_enchantInfosByID.get(id)
   }
 }

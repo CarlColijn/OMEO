@@ -3,129 +3,117 @@
 
   Prerequisites:
   - dataSets.js
-  - enchantDetails.js
+  - enchantInfo.js
   - enchantRow.js
   - item.js
 
   Defined classes:
   - ItemRow
-    - set: char (s=source, d=desired, c=combined)
+    - set: DataSet
+    - nr: int
 */
+
+
+// ======== PUBLIC ========
+
+
 class ItemRow {
-  constructor(form, rowElemJQ, set) {
-    // note our set
+  constructor(ShowCountInputError, ShowDetails, rowElemJQ, set, hookUpGUI) {
+    // ==== PUBLIC ====
     this.set = set
+    this.nr = -1 // to be filled in later
 
-    // note who the form is
-    this.form = form
+    // ==== PRIVATE ====
+    this.ShowCountInputError = ShowCountInputError
+    this.ShowDetails = ShowDetails
 
-    // note our elements
     this.rowElemJQ = rowElemJQ
-    if (set == g_source)
-      this.countElemJQ = rowElemJQ.find('input[name="count"]')
-    else if (set == g_combined)
-      this.countElemJQ = rowElemJQ.find('.count')
-    if (set == g_source || set == g_desired)
-      this.idElemJQ = rowElemJQ.find('select[name="itemID"]')
-    else if (set == g_combined)
-      this.typeElemJQ = rowElemJQ.find('.type')
-    this.enchantTemplateRowElemJQ = this.rowElemJQ.find('.template').first()
-    if (set == g_source)
-      this.priorWorkElemJQ = rowElemJQ.find('select[name="priorWork"]')
-    else if (set == g_combined) {
-      this.priorWorkElemJQ = rowElemJQ.find('.priorWork')
-      this.costElemJQ = rowElemJQ.find('.cost')
+    this.isReal = rowElemJQ.attr('data-real') != 0
+
+    let enchantTemplateRowElemJQ = this.rowElemJQ.find('.template').first()
+    this.enchantTemplateRow = new EnchantRow(enchantTemplateRowElemJQ, this.set)
+
+    switch (set) {
+      case g_source:
+        this.countElemJQ = rowElemJQ.find('input[name="count"]')
+        this.idElemJQ = rowElemJQ.find('select[name="itemID"]')
+        this.priorWorkElemJQ = rowElemJQ.find('select[name="priorWork"]')
+
+        // only once set up the item options in the template row;
+        // all created rows will inherit the options.
+        if (!this.isReal) {
+          this.SetupItemOptions()
+          this.SetupPriorWorkOptions()
+        }
+        break
+      case g_desired:
+        this.idElemJQ = rowElemJQ.find('select[name="itemID"]')
+        this.SetupItemOptions()
+        break
+      case g_combined:
+        this.countElemJQ = rowElemJQ.find('.count')
+        this.typeElemJQ = rowElemJQ.find('.type')
+        this.priorWorkElemJQ = rowElemJQ.find('.priorWork')
+        this.costElemJQ = rowElemJQ.find('.cost')
+        this.totalCostElemJQ = rowElemJQ.find('.totalCost')
+        break
     }
 
-    // and note whether we're real
-    this.isReal = rowElemJQ.data('real') != 0
+    if (hookUpGUI)
+      this.HookUpGUI(undefined)
   }
 
 
-  // numbers the row
-  Number(nr) {
-    this.rowElemJQ.data('nr', nr)
-    this.rowElemJQ.find('.nr').text(nr)
-  }
-
-
-  // creates a new row based on us
-  // returns the new row
+  // returns ItemRow
   CreateNew(nr, item) {
-    // create the new row
-    let newRowElemJQ = this.rowElemJQ.clone()
-    let rowParentElemJQ = this.rowElemJQ.parent()
-    newRowElemJQ.appendTo(rowParentElemJQ)
+    let newItemRow = this.MakeExtraRealRow()
 
-    // make sure it is not a template row anymore
-    newRowElemJQ.removeClass('template')
-    newRowElemJQ.data('real', 1)
+    newItemRow.SetNumber(nr)
 
-    // wrap it as a proper ItemRow
-    let newItemRow = new ItemRow(this.form, newRowElemJQ, this.set)
+    newItemRow.HookUpGUI(item)
 
-    // number it correctly
-    newItemRow.Number(nr)
-
-    // link up it's buttons, if needed
-    if (this.set == g_source) {
-      newRowElemJQ.find('button[name="removeItem"]').click(() => {
-        // make our row go away
-        newRowElemJQ.remove()
-
-        // and renumber all other rows
-        rowParentElemJQ.find('.item').each((rowNr, rowElem) => {
-          new ItemRow(this.form, $(rowElem), g_source).Number(rowNr)
-        })
-      })
-      newRowElemJQ.find('button[name="addEnchant"]').click(() => {
-        newItemRow.AddEnchant()
-      })
-    }
-    else if (this.set == g_combined)
-      newRowElemJQ.find('button[name="showDetails"]').click(() => {
-        this.form.ShowDetails(item)
-      })
-
-    // set it's item, if needed
     if (item !== undefined)
       newItemRow.SetItem(item)
 
-    // and hand over the row
     return newItemRow
   }
 
 
-  // whether the row is real
   IsReal() {
     return this.isReal
   }
 
 
-  // removes us
   Remove() {
     this.rowElemJQ.remove()
   }
 
 
-  // sets a new count value on the row
+  SetNumber(nr) {
+    this.nr = nr
+    this.rowElemJQ.attr('data-nr', nr)
+    this.rowElemJQ.find('.nr').text(nr)
+  }
+
+
+  // only for source and desired
   SetCount(newCount) {
     this.countElemJQ.val(newCount)
   }
 
 
-  // adds an enchant row
-  // returns the new row
   AddEnchant(enchant) {
-    let templateRow = new EnchantRow(this.enchantTemplateRowElemJQ, this.set)
-    return templateRow.CreateNew(enchant)
+    let itemID =
+      this.set === g_source || this.set === g_desired ?
+      parseInt(this.idElemJQ.val()) :
+      undefined
+    this.enchantTemplateRow.CreateNew(enchant, itemID)
   }
 
 
-  // removes all enchants
   RemoveEnchants() {
-    this.rowElemJQ.find('.enchant').each((rowNr, enchantRowElem) => {
-      let enchantRow = new EnchantRow($(enchantRowElem))
+    this.rowElemJQ.find('.enchants .enchant').each((rowNr, enchantRowElem) => {
+      let enchantRow = new EnchantRow($(enchantRowElem), this.set)
       if (enchantRow.IsReal())
         enchantRow.Remove()
       return true
@@ -133,79 +121,166 @@ class ItemRow {
   }
 
 
-  // gets the item on the row
-  // returns { item, withErrors }
-  GetItem(form) {
-    let isSourceItem = this.set == g_source
-    let count = 1
-    let withErrors = false
-    if (isSourceItem) {
-      count = parseInt(this.countElemJQ.val())
-      if (isNaN(count)) {
-        form.NoteError(this.countElemJQ, 'This is not a number')
-        withErrors = true
-      }
-    }
+  // only for source and desired
+  // returns object:
+  // - item: Item
+  // - withErrors: bool
+  GetItem() {
+    let countResult = this.GetValidatedCount()
+
     let item = new Item(
-      count,
+      countResult.count,
       this.set,
-      this.idElemJQ.val(),
-      parseInt(this.rowElemJQ.data('nr')),
-      isSourceItem ? parseInt(this.priorWorkElemJQ.val()) : 0
+      parseInt(this.idElemJQ.val()),
+      parseInt(this.rowElemJQ.attr('data-nr')),
+      this.set === g_source ? parseInt(this.priorWorkElemJQ.val()) : 0
     )
-    item.enchantsByID = this.GetEnchants()
-    return { 'item': item, 'withErrors': withErrors }
+    this.AddItemEnchants(item)
+
+    return {
+      item: item,
+      withErrors: countResult.withErrors
+    }
   }
 
 
-  // sets the item on the row
   SetItem(item) {
-    if (this.set == g_source)
-      this.countElemJQ.val(item.count)
-    else if (this.set == g_combined)
-      this.countElemJQ.text(item.count)
-    if (this.set == g_source || this.set == g_desired)
-      this.idElemJQ.val(item.id)
-    else if (this.set == g_combined)
-      this.typeElemJQ.text(item.details.name)
-    if (this.set == g_source)
-      this.priorWorkElemJQ.val(item.priorWork)
-    else if (this.set == g_combined)
-      this.priorWorkElemJQ.text(item.priorWork)
-    if (this.set == g_combined)
-      this.costElemJQ.text(item.cost)
+    switch (this.set) {
+      case g_source:
+        this.countElemJQ.val(item.count)
+        this.idElemJQ.val(item.id)
+        this.priorWorkElemJQ.val(item.priorWork)
+        break
+      case g_desired:
+        this.idElemJQ.val(item.id)
+        break
+      case g_combined:
+        this.countElemJQ.text(item.count)
+        this.typeElemJQ.text(item.info.name)
+        this.priorWorkElemJQ.text(item.priorWork)
+        this.costElemJQ.text(item.cost)
+        this.totalCostElemJQ.text(item.totalCost)
+        break
+    }
+
     this.SetEnchants(item.enchantsByID)
   }
 
 
-  // gets the enchants on the row
-  GetEnchants() {
-    // add all enchants
-    let enchantsByID = {}
-    this.rowElemJQ.find('.enchants .enchant').each((rowNr, enchantRowElem) => {
-      // look if this is a real data row
-      let enchantRowElemJQ = $(enchantRowElem)
-      let enchantRow = new EnchantRow(enchantRowElemJQ, this.set)
-      if (enchantRow.IsReal()) {
-        // yes -> get the data
-        let enchant = enchantRow.GetEnchant()
+  // ======== PRIVATE ========
 
-        // and we got another one
-        enchantsByID[enchant.id] = enchant
-      }
-      return true
-    })
 
-    // and return what we found
-    return enchantsByID
+  SetupItemOptions() {
+    let itemSelectElemJQs = this.rowElemJQ.find('select[name="itemID"]')
+    for (let itemNr = 0; itemNr < g_numDifferentItems; ++itemNr) {
+      let itemInfo = g_itemInfos[itemNr]
+      itemSelectElemJQs.append(`<option value="${itemInfo.id}">${itemInfo.name}</option>`)
+    }
   }
 
 
-  // sets the enchants on the row
+  SetupPriorWorkOptions() {
+    let priorWorkSelectElemJQs = this.rowElemJQ.find('select[name="priorWork"]')
+    for (let priorWork = 0; priorWork <= 6; ++priorWork)
+      priorWorkSelectElemJQs.append(`<option value="${priorWork}">${priorWork}</option>`)
+  }
+
+
+  RenumberAllRows(tbodyElemJQ) {
+    tbodyElemJQ.find('.item').each((rowNr, rowElem) => {
+      new ItemRow(this.ShowCountInputError, this.ShowDetails, $(rowElem), g_source, false).SetNumber(rowNr)
+    })
+  }
+
+
+  SyncEnchantOptions() {
+    this.RemoveEnchants()
+
+    let itemID = parseInt(this.idElemJQ.val())
+    this.enchantTemplateRow.UpdateEnchantOptions(itemID)
+  }
+
+
+  HookUpGUI(item) {
+    if (this.set === g_source) {
+      this.rowElemJQ.find('button[name="removeItem"]').click(() => {
+        let tbodyElemJQ = this.rowElemJQ.parent()
+
+        this.rowElemJQ.remove()
+
+        this.RenumberAllRows(tbodyElemJQ)
+      })
+    }
+
+    if (this.set === g_source || this.set === g_desired) {
+      this.idElemJQ.change(() => {
+        this.SyncEnchantOptions()
+      })
+
+      this.rowElemJQ.find('button[name="addEnchant"]').click(() => {
+        this.AddEnchant()
+      })
+    }
+
+    if (this.set === g_combined) {
+      this.rowElemJQ.find('button[name="showDetails"]').click(() => {
+        this.ShowDetails(item)
+      })
+    }
+  }
+
+
+  // returns ItemRow
+  MakeExtraRealRow() {
+    let newRowElemJQ = this.rowElemJQ.clone()
+    newRowElemJQ.appendTo(this.rowElemJQ.parent())
+
+    newRowElemJQ.removeClass('template')
+    newRowElemJQ.attr('data-real', 1)
+
+    return new ItemRow(this.ShowCountInputError, this.ShowDetails, newRowElemJQ, this.set, false)
+  }
+
+
+  // returns object:
+  // - count: int / NaN
+  // - withErrors: bool
+  GetValidatedCount() {
+    let count = 1
+    let withErrors = false
+    if (this.set === g_source) {
+      count = parseInt(this.countElemJQ.val())
+      if (isNaN(count)) {
+        this.ShowCountInputError(this.countElemJQ)
+        withErrors = true
+      }
+    }
+    return {
+      count: count,
+      withErrors: withErrors
+    }
+  }
+
+
+  AddItemEnchants(item) {
+    this.rowElemJQ.find('.enchants .enchant').each((rowNr, enchantRowElem) => {
+      let enchantRowElemJQ = $(enchantRowElem)
+      let enchantRow = new EnchantRow(enchantRowElemJQ, this.set)
+      if (enchantRow.IsReal()) {
+        let enchant = enchantRow.GetEnchant()
+
+        item.SetEnchant(enchant)
+      }
+      return true
+    })
+  }
+
+
   SetEnchants(enchantsByID) {
-    // load 'em all, in the order of the g_enchantDetails list
-    for (let enchantNr = 0; enchantNr < g_numEnchants; ++enchantNr) {
-      let enchant = enchantsByID[g_enchantDetails[enchantNr].id]
+    this.RemoveEnchants()
+
+    for (let enchantNr = 0; enchantNr < g_numDifferentEnchants; ++enchantNr) {
+      let enchant = enchantsByID.get(g_enchantInfos[enchantNr].id)
       if (enchant !== undefined)
         this.AddEnchant(enchant)
     }

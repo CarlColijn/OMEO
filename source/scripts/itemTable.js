@@ -4,30 +4,86 @@
   Prerequisites:
   - dataSets.js
   - itemRow.js
+  - itemCollector.js
 
   Defined classes:
   - ItemTable
-    - set: char (s=source, d=desired, c=combined)
+    - set: DataSet
     - tableElemJQ: the main table's jQuery element
 */
+
+
+// ======== PUBLIC ========
+
+
 class ItemTable {
-  constructor(form, tableElemJQ, set) {
-    // note our set
+  constructor(ShowCountInputError, ShowDetails, tableElemJQ, set) {
+    // ==== PUBLIC ====
     this.set = set
-
-    // note who the form is
-    this.form = form
-
-    // and get our elements
     this.tableElemJQ = tableElemJQ
+
+    // ==== PRIVATE ====
+    this.ShowCountInputError = ShowCountInputError
+    this.ShowDetails = ShowDetails
+
+    if (this.set === g_desired) {
+      let itemRowElemJQ = this.tableElemJQ.find('.item').first()
+      this.itemRow = new ItemRow(this.ShowCountInputError, this.ShowDetails, itemRowElemJQ, this.set, true)
+    }
+    else {
+      let templateRowElemJQ = this.tableElemJQ.find('.template').first()
+      this.templateRow = new ItemRow(this.ShowCountInputError, this.ShowDetails, templateRowElemJQ, this.set, false)
+    }
   }
 
 
-  // clears the table
+  // returns ItemRow
+  AddRow() {
+    let newNr = this.tableElemJQ.find('.item').length
+    return this.templateRow.CreateNew(newNr, undefined)
+  }
+
+
+  // note: for g_desired tables, only the 1st item is used.
+  SetItems(items) {
+    if (this.set === g_desired)
+      this.itemRow.SetItem(items[0])
+    else {
+      this.Clear()
+
+      for (let itemNr = 0; itemNr < items.length; ++itemNr) {
+        let item = items[itemNr]
+        this.templateRow.CreateNew(item.nr, item)
+      }
+    }
+  }
+
+
+  // returns ItemCollectionResult
+  GetItems(itemCollector) {
+    let itemRows = this.GetItemRows()
+
+    for (let rowNr = 0; rowNr < itemRows.length; ++rowNr)
+      itemCollector.ProcessRow(itemRows[rowNr])
+
+    let result = itemCollector.Finalize()
+
+    if (result.mergedItems) {
+      this.UpdateRowNrs(itemRows, result)
+      this.UpdateRowCounts(itemRows, result)
+      this.RemoveMergedRows(itemRows, result)
+    }
+
+    return result
+  }
+
+
+  // ======== PRIVATE ========
+
+
   Clear() {
-    let form = this.form
-    this.tableElemJQ.find('.item').each((rowNr, rowElem) =>{
-      let itemRow = new ItemRow(form, $(rowElem), g_combined)
+    this.tableElemJQ.find('.item').each((rowNr, rowElem) => {
+      let itemRow = new ItemRow(this.ShowCountInputError, this.ShowDetails, $(rowElem), this.set, false)
       if (itemRow.IsReal())
         itemRow.Remove()
       return true
@@ -35,88 +91,40 @@ class ItemTable {
   }
 
 
-  // adds an item row to the table
-  // returns the new row
-  AddRow(item) {
-    // look what number the row will get
-    let newNr = item !== undefined ? item.nr : this.tableElemJQ.find('.item').length
-
-    // access the template row
-    let templateRowElemJQ = this.tableElemJQ.find('.template').first()
-    let templateRow = new ItemRow(this.form, templateRowElemJQ, this.set)
-
-    // and create the new item row from it
-    return templateRow.CreateNew(newNr, item)
+  UpdateRowNrs(itemRows, mergeResult) {
+    for (let rowNr = 0; rowNr < mergeResult.rowsToUpdateNr.length; ++rowNr) {
+      let itemRow = mergeResult.rowsToUpdateNr[rowNr]
+      itemRow.SetNumber(itemRow.nr)
+    }
   }
 
 
-  // gets all items from the table
-  // returns { items, mergedItems, withErrors }
-  GetItems(mergeItems, form) {
-    // scrape all items
-    let result = {
-      'items': [],
-      'mergedItems': false,
-      'withErrors': false
+  UpdateRowCounts(itemRows, mergeResult) {
+    for (let rowNr = 0; rowNr < mergeResult.rowsToUpdateCount.length; ++rowNr) {
+      let itemRow = mergeResult.rowsToUpdateCount[rowNr]
+      let item = mergeResult.itemsByRow.get(itemRow)
+      itemRow.SetCount(item.count)
     }
-    let itemRowsToRemove = []
-    let itemsByHash = {}
-    let sourceRowsByHash = {}
-    let newRowNr = 1
+  }
+
+
+  RemoveMergedRows(itemRows, mergeResult) {
+    for (let rowNr = 0; rowNr < mergeResult.rowsToRemove.length; ++rowNr)
+      mergeResult.rowsToRemove[rowNr].Remove()
+  }
+
+
+  // returns ItemRow[]
+  GetItemRows() {
+    let itemRows = []
     this.tableElemJQ.find('.item').each((rowNr, itemRowElem) => {
-      // look if this is a real data row
-      let itemRow = new ItemRow(form, $(itemRowElem), g_source)
+      let itemRow = new ItemRow(this.ShowCountInputError, this.ShowDetails, $(itemRowElem), this.set, false)
       if (itemRow.IsReal()) {
-        // yes -> look if to renumber the row
-        if (newRowNr != rowNr)
-          // yes -> do so first
-          itemRow.Number(newRowNr)
-        ++newRowNr
-
-        // get the source item
-        let itemResult = itemRow.GetItem(form)
-        let item = itemResult.item
-        if (itemResult.withErrors)
-          result.withErrors = true
-
-        // look if we need to merge it with another item
-        if (!result.withErrors && mergeItems) {
-          let itemHash = item.Hash()
-          let prevItem = itemsByHash[itemHash]
-          if (prevItem === undefined) {
-            // no -> remember this new item+row
-            itemsByHash[itemHash] = item
-            sourceRowsByHash[itemHash] = itemRow
-          }
-          else {
-            // yes -> adjust the count of the other item
-            prevItem.count += item.count
-            sourceRowsByHash[itemHash].SetCount(prevItem.count)
-
-            // remember to kill this row
-            itemRowsToRemove.push(itemRow)
-
-            // and let the upcoming row get a lower number
-            --newRowNr
-          }
-        }
-
-        // denote which row we got it from, if needed
-        if (mergeItems)
-          item.sourceRow = itemRow
-
-        // and we got another one
-        result.items.push(item)
+        itemRow.nr = itemRows.length
+        itemRows.push(itemRow)
       }
       return true
     })
-
-    // remove all rows to be removed
-    result.mergedItems = itemRowsToRemove.length > 0
-    for (let rowNr = 0; rowNr < itemRowsToRemove.length; ++rowNr)
-      itemRowsToRemove[rowNr].Remove()
-
-    // and return the result
-    return result
+    return itemRows
   }
 }

@@ -22,21 +22,26 @@
 
     <!-- own content -->
     <link href="styles/styles.css" rel="stylesheet">
-    <script src="scripts/enchantDetails.js"></script>
+    <script src="scripts/enchantInfo.js"></script>
     <script src="scripts/enchantConflicts.js"></script>
-    <script src="scripts/itemDetails.js"></script>
+    <script src="scripts/itemInfo.js"></script>
     <script src="scripts/dataSets.js"></script>
     <script src="scripts/itemOrigins.js"></script>
     <script src="scripts/enchant.js"></script>
     <script src="scripts/item.js"></script>
+    <script src="scripts/bitSerializer.js"></script>
     <script src="scripts/dataStream.js"></script>
     <script src="scripts/formData.js"></script>
     <script src="scripts/enchantRow.js"></script>
     <script src="scripts/itemRow.js"></script>
+    <script src="scripts/itemCollector.js"></script>
     <script src="scripts/itemTable.js"></script>
     <script src="scripts/detailsTable.js"></script>
     <script src="scripts/form.js"></script>
-    <script src="scripts/oracle.js"></script>
+    <script src="scripts/enchantCombiner.js"></script>
+    <script src="scripts/itemCombineTester.js"></script>
+    <script src="scripts/itemNrGenerator.js"></script>
+    <script src="scripts/itemCombiner.js"></script>
     <script src="scripts/main.js"></script>
 
     <title>OMEO - Online Minecraft Enchantment Oracle</title>
@@ -192,7 +197,8 @@
         <thead>
           <tr>
             <th>Nr</th>
-            <th>Cost</th>
+            <th>Total cost</th>
+            <th>Step cost</th>
             <th>Count</th>
             <th>Type</th>
             <th>Prior work</th>
@@ -203,6 +209,7 @@
         <tbody>
           <tr class="template item" data-real="0" data-nr="0">
             <td><span class="nr"></span></td>
+            <td><span class="totalCost"></span></td>
             <td><span class="cost"></span></td>
             <td><span class="count"></span></td>
             <td><span class="type"></span></td>

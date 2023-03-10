@@ -1,17 +1,35 @@
 /*
   Data sets.  Used to keep track of the data set of all objects (e.g. Item,
-  ItemTable, Enchant etc.).
+  ItemTable, Enchant etc.).  Just === compare anyone's set with one of the
+  defined global main set types.
 
   Prerequisites:
   - none
 
+  Defined classes:
+  - DataSet
+    - id: char
+
   Defined globals:
-  - g_source: source items
-  - g_desired: desired items
-  - g_combined: combined items
-  - g_extra: extra inserted items
+  - g_source: source DataSet
+  - g_desired: desired DataSet
+  - g_combined: combined DataSet
+  - g_extra: extra inserted DataSet
 */
-let g_source = 's'
-let g_desired = 'd'
-let g_combined = 'c'
-let g_extra = 'e'
+
+
+// ======== PUBLIC ========
+
+
+class DataSet {
+  constructor(id) {
+    // ==== PUBLIC ====
+    this.id = id
+  }
+}
+
+
+let g_source = new DataSet('s');
+let g_desired = new DataSet('d');
+let g_combined = new DataSet('c');
+let g_extra = new DataSet('e');

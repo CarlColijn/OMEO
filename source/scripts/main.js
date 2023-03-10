@@ -1,25 +1,60 @@
-// logs the given text
-let g_logElemJQ = undefined
-function Log(text) {
-  if (true) {
-    if (g_logElemJQ === undefined) {
-      $('#divine').after('<br><textarea id="log" rows="15" cols="80"></textarea>')
-      g_logElemJQ = $('#log')
-    }
-    g_logElemJQ.val(`${g_logElemJQ.val()}${text}\n`)
+/*
+  Main javascript module.
+
+  Prerequisites:
+  - form.js
+
+  Defined classes:
+  - FormHandler
+
+  Defined globals:
+  - g_form: Form
+*/
+
+
+class FormHandler {
+  NoteCountError(inputElemJQ) {
+    inputElemJQ.after('<br><span class="error">This is not a number</span>')
+  }
+
+
+  FailedToLoad() {
+    alert('Sorry, but there was an issue loading your data back in...')
+  }
+
+
+  FailedToSaveOnUnload(unloadEvent) {
+    unloadEvent.preventDefault()
+    unloadEvent.returnValue = 'Your data has issues and could not be saved.\n\nAre you sure you want to leave now?  Any unsaved changes will be lost!'
+  }
+
+
+  FailedToSaveOnRequest() {
+    alert('I cannot create the bookmark; there are errors in your data.  Please fix these first.')
+  }
+
+
+  TellDataInError() {
+    alert('I cannot combine these items; there are errors in your data.  Please fix these first.')
+  }
+
+
+  TellItemsGotMerged() {
+    alert('I\'ve taken the liberty to merge identical source item rows.')
+  }
+
+
+  TellNoCombinesPossible() {
+    alert('All possible combinations are too expensive or wasteful!')
+  }
+
+
+  TellCombiningDone() {
+    alert('The divination is complete!')
   }
 }
 
 
-// start the oracle
-let g_oracle = new Oracle()
-
-// start the form
-let g_form = new Form()
 
 
-// execute when the DOM is fully loaded
-$(() => {
-  // initialize the form
-  g_form.Initialize(g_oracle)
-})
+let g_form = new Form(new FormHandler())

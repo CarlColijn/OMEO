@@ -3,95 +3,108 @@
 
   Prerequisites:
   - dataSets.js
-  - enchantDetails.js
+  - enchantInfo.js
 
   Defined classes:
   - DetailsTable
 */
+
+
+// ======== PUBLIC ========
+
+
 class DetailsTable {
   constructor(tableElemJQ) {
-    // note the elements
+    // ==== PRIVATE ====
     this.tableElemJQ = tableElemJQ
     this.templateRowElemJQ = tableElemJQ.find('.template').first()
   }
 
 
-  // clears us
   Clear() {
     this.tableElemJQ.find('.item').each((rowNr, rowElem) => {
       let rowElemJQ = $(rowElem)
-      if (rowElemJQ.data('real') != 0)
+      if (rowElemJQ.attr('data-real') != 0)
         rowElemJQ.remove()
       return true
     })
   }
 
 
-  // shows the details for the given item
   ShowItem(item) {
-    // remove any old details
     this.Clear()
-
-    // and spell out the new details
-    this.AddItem(item, 0)
+    this.AddItem(item, 0) // adds the whole tree recursively
   }
 
 
-  // adds the given item's details
-  AddItem(item, indent) {
-    // start the item row
+  // ======== PRIVATE ========
+
+
+  // returns jQueryElem
+  AddNewRow() {
     let newRowElemJQ = this.templateRowElemJQ.clone()
     let rowParentElemJQ = this.templateRowElemJQ.parent()
     newRowElemJQ.appendTo(rowParentElemJQ)
 
-    // make sure it is not a template row anymore
     newRowElemJQ.removeClass('template')
-    newRowElemJQ.data('real', 1)
+    newRowElemJQ.attr('data-real', 1)
 
-    // spell out the item description
-    let description = ''
-    if (item.set == g_combined)
-      description += 'Combined '
-    else if (item.set == g_source)
-      description += 'Source '
-    else if (item.set == g_extra)
-      description += 'Extra '
-    else if (item.set == g_desired)
-      description += 'Desired '
-    description += `${item.details.name} nr. ${item.nr}`
-    let descriptionElemJQ = newRowElemJQ.find('.description')
-    descriptionElemJQ.text(description)
-    descriptionElemJQ.css('padding-left', `+=${indent}em`)
+    return newRowElemJQ
+  }
 
-    // add enchants
+
+  // returns string
+  GetItemDescription(item) {
+    let set = ''
+    switch (item.set) {
+      case g_combined: set = 'Combined'; break
+      case g_source:   set = 'Source'; break
+      case g_extra:    set = 'Extra'; break
+      case g_desired:  set = 'Desired'; break
+    }
+
+    return `${set} ${item.info.name} nr. ${item.nr}`
+  }
+
+
+  // returns string
+  GetItemEnchants(item) {
     let enchants = ''
     let isFirstEnchant = true
-    for (let enchantNr = 0; enchantNr < g_numEnchants; ++enchantNr) {
-      let enchant = item.enchantsByID[g_enchantDetails[enchantNr].id]
+    for (let enchantNr = 0; enchantNr < g_numDifferentEnchants; ++enchantNr) {
+      let enchant = item.enchantsByID.get(g_enchantInfos[enchantNr].id)
       if (enchant !== undefined) {
         enchants += isFirstEnchant ? '' : '<br>'
         isFirstEnchant = false
-        enchants += `${enchant.details.name} ${enchant.level}`
+        enchants += `${enchant.info.name} ${enchant.level}`
       }
     }
-    newRowElemJQ.find('.enchants').html(enchants)
+    return enchants
+  }
 
-    // add costs, if appropriate
-    let cost = ''
-    if (item.set != g_combined)
-      cost = '-'
-    else {
-      cost = item.cost
-      if (item.cost != item.totalCost)
-        cost += ` (${item.totalCost} in total)`
-    }
-    newRowElemJQ.find('.cost').text(cost)
 
-    // add prior work
-    newRowElemJQ.find('.priorWork').text(item.priorWork)
+  // returns string
+  GetItemCost(item) {
+    if (item.set !== g_combined)
+      return '-'
+    else if (item.cost == item.totalCost)
+      return `${item.cost}`
+    else
+      return `${item.cost} (${item.totalCost} in total)`
+  }
 
-    // and also add sub items, if needed
-    if (item.set == g_combined) {
+
+  AddItem(item, indent) {
+    if (item !== undefined) {
+      let newRowElemJQ = this.AddNewRow()
+
+      let descriptionElemJQ = newRowElemJQ.find('.description')
+      descriptionElemJQ.css('padding-left', `+=${indent}em`)
+      descriptionElemJQ.text(this.GetItemDescription(item))
+      newRowElemJQ.find('.enchants').html(this.GetItemEnchants(item))
+      newRowElemJQ.find('.cost').text(this.GetItemCost(item))
+      newRowElemJQ.find('.priorWork').text(item.priorWork)
+
       this.AddItem(item.targetItem, indent + 1)
       this.AddItem(item.sacrificeItem, indent + 1)
     }
