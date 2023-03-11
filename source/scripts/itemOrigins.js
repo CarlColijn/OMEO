@@ -44,8 +44,12 @@ class ItemOrigin {
     this.maxUses = otherOrigin.maxUses // noone is modifying it; by ref is fine
     this.itemUses = otherOrigin.itemUses.slice()
 
-    if (itemNr !== undefined)
+    if (itemNr !== undefined) {
+      if (itemNr >= this.itemUses.length)
+        throw 'Illegal item nr used for origin.'
+
       this.itemUses[itemNr] += 1
+    }
   }
 
 

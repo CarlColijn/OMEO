@@ -42,7 +42,7 @@ class DataStream {
 
   AddCount(intValue) {
     let numBits = intValue.toString(2).length
-    this.AddSizedInt(numBits, 5)
+    this.AddSizedInt(numBits, 5) // 5 bits is more than we ever need to count
     this.AddSizedInt(intValue, numBits)
   }
 
@@ -72,13 +72,11 @@ class DataStream {
   // returns bool (whether any data was there)
   Load(conflictSolver) {
     let serializedOptions = this.GetSerializedDataToLoad()
-    let serialized = this.SelectSerializedOptionToUse(serializedOptions, conflictSolver)
+    let serialized = String(this.SelectSerializedOptionToUse(serializedOptions, conflictSolver))
 
-    let gotData = serialized.length > 0
-    if (gotData)
-      this.restorer = new BitRestorer(serialized)
+    this.restorer = new BitRestorer(serialized)
 
-    return gotData
+    return serialized.length > 0
   }
 
 
