@@ -36,11 +36,9 @@ function RegisterConflictingEnchants(enchantNames) {
 }
 
 
-// Java: protection conflict dropped in 1.14
-// Bedrock: these are still conflicts there
-//['Blast Protection', 'Fire Protection', 'Projectile Protection', 'Protection'],
-// chopping is not yet enabled
-RegisterConflictingEnchants(['Bane of Arthropods', 'Sharpness', 'Smite'/*, 'Chopping'*/])
+RegisterConflictingEnchants(['Blast Protection', 'Fire Protection', 'Projectile Protection', 'Protection'])
+// Cleaving is not yet enabled
+RegisterConflictingEnchants(['Bane of Arthropods', 'Sharpness', 'Smite'/*, 'Cleaving'*/])
 RegisterConflictingEnchants(['Infinity', 'Mending'])
 RegisterConflictingEnchants(['Multishot', 'Piercing'])
 // Fortune & Silk Touch can be combined with commands only
