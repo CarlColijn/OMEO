@@ -37,7 +37,32 @@
         </Folder>
     </Project>
     <Project name="project">
+        <File name=".gitmodules" />
         <File name="LICENSE" />
         <File name="README.md" />
+    </Project>
+    <Project name="testing">
+        <File name="testing\bitSerializer.js" />
+        <File name="testing\dataSets.js" />
+        <File name="testing\dataStream.js" />
+        <File name="testing\detailsTable.js" />
+        <File name="testing\enchant.js" />
+        <File name="testing\enchantCombiner.js" />
+        <File name="testing\enchantConflicts.js" />
+        <File name="testing\enchantInfo.js" />
+        <File name="testing\enchantRow.js" />
+        <File name="testing\formData.js" />
+        <File name="testing\helpers.js" />
+        <File name="testing\item.js" />
+        <File name="testing\itemCollector.js" />
+        <File name="testing\itemCombiner.js" />
+        <File name="testing\itemCombineTester.js" />
+        <File name="testing\itemInfo.js" />
+        <File name="testing\itemNrGenerator.js" />
+        <File name="testing\itemOrigins.js" />
+        <File name="testing\itemRow.js" />
+        <File name="testing\itemTable.js" />
+        <File name="testing\test.html" />
+        <File name="startTests.py" />
     </Project>
 </NotepadPlus>
