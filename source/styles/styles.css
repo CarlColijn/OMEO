@@ -53,7 +53,7 @@ th {
   text-align: left;
 }
 th, td {
-  padding: 0.2em;
+  padding: 0.2em 0.5em;
   vertical-align: top;
 }
 .table {
@@ -73,8 +73,23 @@ th, td {
 
 
 /* Lists */
+dl,
+dt,
+dd,
+ul {
+  padding: 0px;
+  margin: 0px;
+}
+
+dl,
+dd,
 ul {
   padding-left: 1em;
+}
+
+dt {
+  margin-top: 0.4em;
+  font-weight: bold;
 }
 
 
