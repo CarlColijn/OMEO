@@ -38,6 +38,7 @@
     </Project>
     <Project name="project">
         <File name=".gitmodules" />
+        <File name="colors.html" />
         <File name="LICENSE" />
         <File name="README.md" />
     </Project>

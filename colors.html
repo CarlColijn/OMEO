@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <!-- https://developer.mozilla.org/en-US/docs/Web/HTML/Element/meta -->
+    <meta charset="utf-8">
+    <meta content="initial-scale=1, width=device-width" name="viewport">
+
+    <!-- http://jquery.com/ -->
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+
+    <!-- own content -->
+    <link href="source/styles/styles.css" rel="stylesheet">
+
+    <title>Color mixer</title>
+
+    <script>
+      function Hex(val) {
+        return Math.round(val * 255).toString(16).padStart(2, '0')
+      }
+
+      function HueToRgb(p, q, t) {
+        if (t < 0)
+          t += 1
+        if (t > 1)
+          t -= 1
+
+        if (t < 1/6)
+          return p + (q - p) * 6 * t
+        if (t < 1/2)
+          return q
+        if (t < 2/3)
+          return p + (q - p) * (2/3 - t) * 6
+        return p
+      }
+
+      function HslToRgbText(h, s, l) {
+        let r, g, b
+
+        if (s == 0)
+          r = g = b = l // achromatic
+        else {
+          const q = l < 0.5 ? l * (1 + s) : l + s - l * s
+          const p = 2 * l - q
+          r = HueToRgb(p, q, h + 1/3)
+          g = HueToRgb(p, q, h)
+          b = HueToRgb(p, q, h - 1/3)
+        }
+
+        return `#${Hex(r)}${Hex(g)}${Hex(b)}`
+      }
+
+      function UpdateCSS(idSuffix, colorText) {
+        if (idSuffix == 'b')
+          $('.newColor').css('background', colorText)
+        else if (idSuffix == 'h')
+          $('.newColor h1, .newColor h2').css('background', colorText)
+        else if (idSuffix == 't')
+          $('.newColor em, .newColor thead tr').css('background', colorText)
+        else if (idSuffix == 'o')
+          $('.newColor tbody tr:nth-child(odd)').css('background', colorText)
+        else if (idSuffix == 'e')
+          $('.newColor tbody tr:nth-child(even)').css('background', colorText)
+      }
+
+      function ChangeColorGroup(idSuffix) {
+        let hue = $('#hue')[0].value
+        let sat = $(`#sat_${idSuffix}`)[0].value
+        let lum = $(`#lum_${idSuffix}`)[0].value
+        let colorText = HslToRgbText(hue / 255.0, sat / 255.0, lum / 255.0)
+
+        $(`#${idSuffix}_val`).text(colorText)
+
+        UpdateCSS(idSuffix, colorText)
+      }
+
+      function ShowSliderValue(sliderElem) {
+        $(`#${sliderElem.id}_val`).text(sliderElem.value)
+      }
+
+      function ChangeColor(elem) {
+        ShowSliderValue(elem)
+
+        let hueChanged = elem.id == 'hue'
+        if (hueChanged) {
+          ChangeColorGroup('b')
+          ChangeColorGroup('h')
+          ChangeColorGroup('t')
+          ChangeColorGroup('o')
+          ChangeColorGroup('e')
+        }
+        else {
+          let idSuffix = elem.id[4]
+          ChangeColorGroup(idSuffix)
+        }
+      }
+
+      $('document').ready(() => {
+        $('.slider').each(function() {
+          this.oninput = () => {
+            ChangeColor(this)
+          }
+          ChangeColor(this)
+        })
+      })
+    </script>
+
+    <style>
+      form {
+        padding: 1em;
+        position: sticky;
+        top: 0;
+        display: inline-block;
+        background-color: #ffffffa0;
+        white-space: nowrap;
+      }
+
+      form table,
+      form table tr,
+      form table td {
+        padding: 0px;
+        margin: 0px;
+      }
+
+      form table td {
+        padding: 0em 0.2em;
+      }
+
+      .slider {
+        width: 10em;
+      }
+    </style>
+  </head>
+
+  <body>
+    <form>
+      <table>
+        <tr>
+          <td>Hue:</td><td><input type="range" min="0" max="255" value="190" class="slider" id="hue"></td><td><span id="hue_val"></span></td>
+        </tr>
+        <tr>
+          <td>Sat:</td><td><input type="range" min="0" max="255" value="255" class="slider" id="sat_b"></td><td><span id="sat_b_val"></span></td>
+          <td>Sat:</td><td><input type="range" min="0" max="255" value="130" class="slider" id="sat_h"></td><td><span id="sat_h_val"></span></td>
+          <td>Sat:</td><td><input type="range" min="0" max="255" value="100" class="slider" id="sat_t"></td><td><span id="sat_t_val"></span></td>
+          <td>Sat:</td><td><input type="range" min="0" max="255" value="160" class="slider" id="sat_o"></td><td><span id="sat_o_val"></span></td>
+          <td>Sat:</td><td><input type="range" min="0" max="255" value="160" class="slider" id="sat_e"></td><td><span id="sat_e_val"></span></td>
+        </tr>
+        <tr>
+          <td>Lum:</td><td><input type="range" min="0" max="255" value="230" class="slider" id="lum_b"></td><td><span id="lum_b_val"></span></td>
+          <td>Lum:</td><td><input type="range" min="0" max="255" value="60" class="slider" id="lum_h"></td><td><span id="lum_h_val"></span></td>
+          <td>Lum:</td><td><input type="range" min="0" max="255" value="80" class="slider" id="lum_t"></td><td><span id="lum_t_val"></span></td>
+          <td>Lum:</td><td><input type="range" min="0" max="255" value="210" class="slider" id="lum_o"></td><td><span id="lum_o_val"></span></td>
+          <td>Lum:</td><td><input type="range" min="0" max="255" value="190" class="slider" id="lum_e"></td><td><span id="lum_e_val"></span></td>
+        </tr>
+        <tr>
+          <td colspan="3">Background: <span id="b_val"></span></td>
+          <td colspan="3">Headers: <span id="h_val"></span></td>
+          <td colspan="3">Table headers/em: <span id="t_val"></span></td>
+          <td colspan="3">Table odd: <span id="o_val"></span></td>
+          <td colspan="3">Table even: <span id="e_val"></span></td>
+        </tr>
+      </table>
+    </form>
+
+    <div class="content firstContent newColor">
+      <h1>
+        <div class="letter"><img src="source/images/o1.png"></div>
+        <div class="letter"><img src="source/images/m.png"></div>
+        <div class="letter"><img src="source/images/e.png"></div>
+        <div class="letter"><img src="source/images/o2.png"></div><br>
+        <i>-- COLORIZED --</i>
+      </h1>
+
+      <p>Nunc arcu diam, tincidunt vel tincidunt eget, dapibus sed nisi. Fusce non libero semper, dapibus nisi varius, imperdiet neque. Nulla nibh urna, pellentesque eu faucibus id, dapibus vitae neque. Fusce auctor rutrum augue sit amet egestas. Etiam tempus aliquet laoreet. Etiam ultricies interdum velit, at lobortis magna luctus id. Quisque molestie aliquam ante a sagittis. Ut rhoncus elit vitae ante maximus laoreet. Vivamus ligula tellus, aliquam ut justo sit amet, lacinia suscipit sem. Aenean non nisl varius, facilisis eros in, hendrerit orci.</p>
+
+      <p>Maecenas et purus lacinia, sodales augue at, tincidunt ex. Praesent rutrum ultrices ex, sed vehicula est <em>molestie</em> eget. Nam diam lorem, rhoncus ut mauris porta, porta eleifend libero.</p>
+    </div>
+
+    <div class="content newColor">
+      <h2>Integer felis ex</h2>
+
+      <p>Suspendisse vestibulum turpis magna, quis laoreet dui tempor tempus. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Integer venenatis imperdiet tempor.</p>
+
+      <dl>
+        <dt>Donec a pellentesque ante</dt>
+          <dd>Praesent lobortis malesuada felis, id suscipit eros luctus id. Maecenas vestibulum at felis eu sodales.
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Sed&nbsp;est<br>felis</th><th><em>Consectetur<br>nibh</em></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td>0</td><td><em>0</em></td></tr>
+                <tr><td>1</td><td><em>1</em></td></tr>
+                <tr><td>2</td><td><em>3</em></td></tr>
+                <tr><td>3</td><td><em>7</em></td></tr>
+                <tr><td>4</td><td><em>15</em></td></tr>
+                <tr><td>5</td><td><em>31</em></td></tr>
+              </tbody>
+            </table>
+          </dd>
+        <dt>Nulla facilisi</dt>
+          <dd>Nulla accumsan dolor eget turpis sollicitudin tristique. Cras non faucibus enim. Donec laoreet dolor sem, id <em>tempus</em> diam fermentum tempor. Sed laoreet risus id leo vulputate, non <em>tempus</em> tellus fringilla. Nullam quis ante leo. Cras convallis mauris eu mattis porttitor;
+            <ul>
+              <li>Fusce ultrices ante quis ante maximus viverra.</li>
+              <li>Nam sit amet dapibus sem. Duis sodales accumsan felis, vel vestibulum magna aliquam facilisis.</li>
+              <li>Sed est felis, elementum venenatis neque nec, laoreet sollicitudin tortor. Sed volutpat nulla nec sapien convallis tempus.</li>
+            </ul>
+          </dd>
+      </dl>
+    </div>
+  </body>
+</html>
