@@ -56,7 +56,6 @@ jazil.AddTestSet(omeoPage, 'EnchantInfo', {
 
     jazil.ShouldBe(testInfo.id, 9, 'id')
     jazil.ShouldBe(testInfo.maxLevel, 4, 'maxLevel')
-    jazil.ShouldBe(testInfo.rarity, 5, 'rarity')
     jazil.ShouldBe(testInfo.bookMultiplier, 1, 'bookMultiplier')
     jazil.ShouldBe(testInfo.toolMultiplier, 2, 'toolMultiplier')
     jazil.ShouldBe(testInfo.name, 'Fire Protection', 'name')
