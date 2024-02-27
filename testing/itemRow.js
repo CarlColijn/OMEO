@@ -25,7 +25,7 @@ function CreateTestSet(setDescription, testContainerID, setLetter) {
       jazil.ShouldBe(details.nr, 6, 'nr is off!')
       jazil.ShouldBe(details.cost, set === g_combined ? undefined : undefined, 'cost is off!')
       jazil.ShouldBe(details.count, set === g_source ? 1 : undefined, 'count is off!')
-      jazil.ShouldBe(details.type, set !== g_combined ? 'Book' : undefined, 'type is off!')
+      jazil.ShouldBe(details.type, set !== g_combined ? 'Axe' : undefined, 'type is off!')
       jazil.ShouldBe(details.priorWork, set === g_source ? 0 : undefined, 'priorWork is off!')
       jazil.ShouldBe(details.enchantNames, set !== g_combined ? '' : undefined, 'enchant names are off!')
       jazil.ShouldBe(details.enchantLevels, set !== g_combined ? '' : undefined, 'enchant levels are off!')

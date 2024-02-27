@@ -36,13 +36,12 @@ function RegisterConflictingEnchants(enchantNames) {
 }
 
 
-RegisterConflictingEnchants(['Blast Protection', 'Fire Protection', 'Projectile Protection', 'Protection'])
-// Cleaving is not yet enabled
-RegisterConflictingEnchants(['Bane of Arthropods', 'Sharpness', 'Smite'/*, 'Cleaving'*/])
-RegisterConflictingEnchants(['Infinity', 'Mending'])
-RegisterConflictingEnchants(['Multishot', 'Piercing'])
-// Fortune & Silk Touch can be combined with commands only
-RegisterConflictingEnchants(['Fortune', 'Silk Touch'])
-RegisterConflictingEnchants(['Channeling', 'Loyalty'])
-RegisterConflictingEnchants(['Channeling', 'Riptide'])
+RegisterConflictingEnchants(['Protection', 'Blast Protection', 'Fire Protection', 'Projectile Protection'])
 RegisterConflictingEnchants(['Depth Strider', 'Frost Walker'])
+RegisterConflictingEnchants(['Sharpness', 'Smite', 'Bane of Arthropods'])
+// Silk Touch & Fortune can be combined with commands
+RegisterConflictingEnchants(['Silk Touch', 'Fortune'])
+RegisterConflictingEnchants(['Infinity', 'Mending'])
+RegisterConflictingEnchants(['Riptide', 'Loyalty'])
+RegisterConflictingEnchants(['Riptide', 'Channeling'])
+RegisterConflictingEnchants(['Multishot', 'Piercing'])

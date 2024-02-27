@@ -128,7 +128,7 @@ jazil.AddTestSet(omeoPage, 'FormData', {
     storedData.Serialize(storeStream)
     storeStream.SaveToLocalStorage()
 
-    jazil.ShouldBe(dataState.GetLocalStorage(), 'cefG_WyAFhXkxjckykvpZb')
+    jazil.ShouldBe(dataState.GetLocalStorage(), 'cefG_Wzsji5kxjcrykvpYH')
 
     let restoreStream = new DataStream(false)
     let conflictSolver = new DataStreamConflictSolverMock(true)
