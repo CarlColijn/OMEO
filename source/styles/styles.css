@@ -106,6 +106,10 @@ input[type=number] {
 #bookmark {
   display: none;
 }
+.enchantInput {
+  /* Note: needs to be adjusted if longer enchant names come along... */
+  width: 11em;
+}
 
 
 /* Links */
