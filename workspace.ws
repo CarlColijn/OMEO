@@ -10,6 +10,7 @@
         </Folder>
         <Folder name="javascript">
             <File name="source\scripts\bitSerializer.js" />
+            <File name="source\scripts\combineResultFilter.js" />
             <File name="source\scripts\dataSets.js" />
             <File name="source\scripts\dataStream.js" />
             <File name="source\scripts\detailsTable.js" />
@@ -44,6 +45,7 @@
     </Project>
     <Project name="testing">
         <File name="testing\bitSerializer.js" />
+        <File name="testing\combineResultFilter.js" />
         <File name="testing\dataSets.js" />
         <File name="testing\dataStream.js" />
         <File name="testing\detailsTable.js" />

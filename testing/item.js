@@ -21,10 +21,10 @@ jazil.AddTestSet(omeoPage, 'Item', {
     let pickaxe2_a = BuildItem({ name:'Pickaxe', nr:44, count:33, priorWork:88, set:g_combined })
     let pickaxe2_b = BuildItem({ name:'Pickaxe', nr:55, count:44, priorWork:88, set:g_desired })
 
-    jazil.ShouldBe(pickaxe1_a.Hash(), pickaxe1_b.Hash(), 'like items have different hash!')
-    jazil.ShouldBe(pickaxe2_a.Hash(), pickaxe2_b.Hash(), 'like items have different hash!')
-    jazil.ShouldNotBe(pickaxe2_a.Hash(), pickaxe1_a.Hash(), 'unlike items have same hash!')
-    jazil.ShouldNotBe(pickaxe2_b.Hash(), pickaxe1_b.Hash(), 'unlike items have same hash!')
+    jazil.ShouldBe(pickaxe1_a.Hash(true), pickaxe1_b.Hash(true), 'like items have different hash!')
+    jazil.ShouldBe(pickaxe2_a.Hash(true), pickaxe2_b.Hash(true), 'like items have different hash!')
+    jazil.ShouldNotBe(pickaxe2_a.Hash(true), pickaxe1_a.Hash(true), 'unlike items have same hash!')
+    jazil.ShouldNotBe(pickaxe2_b.Hash(true), pickaxe1_b.Hash(true), 'unlike items have same hash!')
   },
 
   'Set enchants get set': (jazil) => {

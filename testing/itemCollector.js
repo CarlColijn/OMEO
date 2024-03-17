@@ -61,11 +61,11 @@ jazil.AddTestSet(omeoPage, 'ItemCollector', {
 
     jazil.ShouldBe(result.rowsToUpdateNr[0], itemRows[1], 'Wrong updated row for 2nd row!')
     jazil.ShouldBe(result.rowsToUpdateNr[0].nr, 2, 'Wrong updated row nr for 2nd row!')
-    jazil.ShouldBe(result.itemsByRow.get(result.rowsToUpdateNr[0]).Hash(), testItems[1].Hash(), 'Wrong updated item for 2nd row!')
+    jazil.ShouldBe(result.itemsByRow.get(result.rowsToUpdateNr[0]).Hash(true), testItems[1].Hash(true), 'Wrong updated item for 2nd row!')
     jazil.ShouldBe(result.itemsByRow.get(result.rowsToUpdateNr[0]).nr, 2, 'Wrong updated item nr for 2nd row!')
     jazil.ShouldBe(result.rowsToUpdateNr[1], itemRows[2], 'Wrong updated row for 3rd row!')
     jazil.ShouldBe(result.rowsToUpdateNr[1].nr, 3, 'Wrong updated row nr for 3rd row!')
-    jazil.ShouldBe(result.itemsByRow.get(result.rowsToUpdateNr[1]).Hash(), testItems[2].Hash(), 'Wrong updated item for 3rd row!')
+    jazil.ShouldBe(result.itemsByRow.get(result.rowsToUpdateNr[1]).Hash(true), testItems[2].Hash(true), 'Wrong updated item for 3rd row!')
     jazil.ShouldBe(result.itemsByRow.get(result.rowsToUpdateNr[1]).nr, 3, 'Wrong updated item nr for 3rd row!')
   },
 
@@ -106,20 +106,20 @@ jazil.AddTestSet(omeoPage, 'ItemCollector', {
 
     jazil.ShouldBe(result.rowsToUpdateNr[0], itemRows[3], 'Wrong updated row for 3rd row!')
     jazil.ShouldBe(result.rowsToUpdateNr[0].nr, 3, 'Wrong updated row nr for 3rd row!')
-    jazil.ShouldBe(result.itemsByRow.get(result.rowsToUpdateNr[0]).Hash(), mergedTestItems[2].Hash(), 'Wrong updated item for 3rd row!')
+    jazil.ShouldBe(result.itemsByRow.get(result.rowsToUpdateNr[0]).Hash(true), mergedTestItems[2].Hash(true), 'Wrong updated item for 3rd row!')
     jazil.ShouldBe(result.itemsByRow.get(result.rowsToUpdateNr[0]).nr, 3, 'Wrong updated item nr for 3rd row!')
 
     jazil.ShouldBe(result.rowsToUpdateCount[0], itemRows[0], 'Wrong 1st item row marked to update!')
-    jazil.ShouldBe(result.itemsByRow.get(result.rowsToUpdateCount[0]).Hash(), result.items[0].Hash(), 'Wrong 1st item marked to update!')
+    jazil.ShouldBe(result.itemsByRow.get(result.rowsToUpdateCount[0]).Hash(true), result.items[0].Hash(true), 'Wrong 1st item marked to update!')
     jazil.ShouldBe(result.items[0].count, mergedTestItems[0].count, 'Wrong 1st merged item count!')
     jazil.ShouldBe(result.rowsToUpdateCount[1], itemRows[1], 'Wrong 2nd item row marked to update!')
-    jazil.ShouldBe(result.itemsByRow.get(result.rowsToUpdateCount[1]).Hash(), result.items[1].Hash(), 'Wrong 2nd item marked to update!')
+    jazil.ShouldBe(result.itemsByRow.get(result.rowsToUpdateCount[1]).Hash(true), result.items[1].Hash(true), 'Wrong 2nd item marked to update!')
     jazil.ShouldBe(result.items[1].count, mergedTestItems[1].count, 'Wrong 2nd merged item count!')
 
     jazil.ShouldBe(result.rowsToRemove[0], itemRows[2], 'Wrong 1st item row marked to remove!')
-    jazil.ShouldBe(result.itemsByRow.get(result.rowsToRemove[0]).Hash(), testItems[2].Hash(), 'Wrong 1st item marked to remove!')
+    jazil.ShouldBe(result.itemsByRow.get(result.rowsToRemove[0]).Hash(true), testItems[2].Hash(true), 'Wrong 1st item marked to remove!')
     jazil.ShouldBe(result.rowsToRemove[1], itemRows[4], 'Wrong 2nd item row marked to remove!')
-    jazil.ShouldBe(result.itemsByRow.get(result.rowsToRemove[1]).Hash(), testItems[4].Hash(), 'Wrong 2nd item marked to remove!')
+    jazil.ShouldBe(result.itemsByRow.get(result.rowsToRemove[1]).Hash(true), testItems[4].Hash(true), 'Wrong 2nd item marked to remove!')
 
     TestItemListsMatch(jazil, mergedTestItems, 'test', result.items, 'retrieved', g_source)
   },

@@ -89,7 +89,7 @@ class ItemCombiner {
   // - item2: Item (or undefined)
   PickBestItemCombinations(item1, item2) {
     if (item1 !== undefined && item2 !== undefined) {
-      if (item1.Hash() == item2.Hash()) {
+      if (item1.Hash(true) == item2.Hash(true)) {
         if (item1.cost < item2.cost)
           item2 = undefined
         else

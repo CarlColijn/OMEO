@@ -11,6 +11,8 @@
   - detailsTable.js
   - formData.js
   - dataStream.js
+  - itemCombiner.js
+  - combineResultFilter.js
 
   Defined classes:
   - Form
@@ -98,12 +100,12 @@ class Form {
       let itemCombiner = new ItemCombiner()
       let combinedItems = itemCombiner.GetAllItemCombinations(dataInContext.data.sourceItems, dataInContext.data.desiredItem)
 
-      this.ShowCombinedItems(combinedItems)
+      let combineResultFilter = new CombineResultFilter(dataInContext.data.desiredItem)
+      let cleanedUpItemsResult = combineResultFilter.GetCleanedUpItemList(combinedItems)
 
-      if (combinedItems.length == 0)
-        this.formHandler.TellNoCombinesPossible()
-      else
-        this.formHandler.TellCombiningDone()
+      this.ShowCombinedItems(cleanedUpItemsResult.items)
+
+      this.formHandler.TellCombiningDone(cleanedUpItemsResult.level)
     }
   }
 

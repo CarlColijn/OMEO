@@ -51,10 +51,13 @@ class Item {
 
 
   // returns string
-  Hash() {
+  Hash(withPriorWork) {
     // note: no fancy stuff for now with bit fiddling, just a big 'ol string concat
 
-    let allData = `${this.id}|${this.priorWork}`
+    let allData = this.id
+
+    if (withPriorWork)
+      allData += `|${this.priorWork}`
 
     for (let enchantNr = 0; enchantNr < g_numDifferentEnchants; ++enchantNr) {
       let enchant = this.enchantsByID.get(g_enchantInfos[enchantNr].id)

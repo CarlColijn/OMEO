@@ -57,7 +57,7 @@ class ItemCollector {
     if (itemResult.withErrors)
       this.result.withErrors = true
     let item = itemResult.item
-    let itemHash = item.Hash()
+    let itemHash = item.Hash(true)
 
     if (item.nr != this.nextRowNr)
       item.nr = this.nextRowNr

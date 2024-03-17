@@ -14,6 +14,7 @@ let omeoAccessObjectNames = [
   'EnchantIDsConflict',
   'BitRestorer',
   'BitStorer',
+  'CombineResultFilter',
   'DataStream',
   'DetailsTable',
   'Enchant',
@@ -36,6 +37,11 @@ let omeoAccessObjectNames = [
   'g_extra',
   'g_itemInfos',
   'g_itemInfosByID',
+  'g_noCombines',
+  'g_onlyImperfectCombines',
+  'g_onlyPerfectCombines',
+  'g_onlyPerfectWithExtrasCombines',
+  'g_perfectAndPerfectWithExtrasCombines',
   'g_source'
 ]
 let omeoTrackObjectNames = [
