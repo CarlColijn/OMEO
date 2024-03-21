@@ -10,7 +10,7 @@ function CreateTestSet(setDescription, testContainerID, setLetter) {
     'New row is real': (jazil) => {
       let set = GetSet(setLetter)
       let templateRowDetails = GetItemTemplateRow(testContainerID, set)
-      let itemRow = CreateItemRow(templateRowDetails, undefined, 2)
+      let itemRow = CreateItemRow(templateRowDetails, undefined)
 
       jazil.ShouldBe(itemRow.IsReal(), true)
     },
@@ -22,7 +22,8 @@ function CreateTestSet(setDescription, testContainerID, setLetter) {
 
       let details = GetItemRowDetails(itemRow.rowElemJQ, set)
       jazil.ShouldBe(itemRow.set, set, 'set is off!')
-      jazil.ShouldBe(details.nr, 6, 'nr is off!')
+      if (set === g_source)
+        jazil.ShouldBe(details.nr, 6, 'nr is off!')
       jazil.ShouldBe(details.cost, set === g_combined ? undefined : undefined, 'cost is off!')
       jazil.ShouldBe(details.count, set === g_source ? 1 : undefined, 'count is off!')
       jazil.ShouldBe(details.type, set !== g_combined ? 'Axe' : undefined, 'type is off!')
@@ -34,12 +35,13 @@ function CreateTestSet(setDescription, testContainerID, setLetter) {
     'Create new row with item from template': (jazil) => {
       let set = GetSet(setLetter)
       let templateRowDetails = GetItemTemplateRow(testContainerID, set)
-      let item = BuildItem({ name:'Pickaxe', nr:5, count:9, priorWork:2, cost:15 })
-      let itemRow = CreateItemRow(templateRowDetails, item)
+      let item = BuildItem({ name:'Pickaxe', count:9, priorWork:2, cost:15 })
+      let itemRow = CreateItemRow(templateRowDetails, item, 5)
 
       let details = GetItemRowDetails(itemRow.rowElemJQ, set)
       jazil.ShouldBe(itemRow.set, set, 'set is off!')
-      jazil.ShouldBe(details.nr, 5, 'nr is off!')
+      if (set === g_source)
+        jazil.ShouldBe(details.nr, 5, 'nr is off!')
       jazil.ShouldBe(details.cost, set === g_combined ? 15 : undefined, 'cost is off!')
       jazil.ShouldBe(details.count, set !== g_desired ? 9 : undefined, 'count is off!')
       jazil.ShouldBe(details.type, 'Pickaxe', 'type is off!')
@@ -53,12 +55,13 @@ function CreateTestSet(setDescription, testContainerID, setLetter) {
       let set = GetSet(setLetter)
       let templateRowDetails = GetItemTemplateRow(testContainerID, set)
       // Note: enchantments are re-ordered in alphabetical order
-      let item = BuildItem({ name:'Turtle Shell', nr:15, count:1, priorWork:4, cost:9, enchants:[{ name:'Unbreaking', level:3 }, { name:'Mending', level:1 }] })
-      let itemRow = CreateItemRow(templateRowDetails, item)
+      let item = BuildItem({ name:'Turtle Shell', count:1, priorWork:4, cost:9, enchants:[{ name:'Unbreaking', level:3 }, { name:'Mending', level:1 }] })
+      let itemRow = CreateItemRow(templateRowDetails, item, 15)
 
       let details = GetItemRowDetails(itemRow.rowElemJQ, set)
       jazil.ShouldBe(itemRow.set, set, 'set is off!')
-      jazil.ShouldBe(details.nr, 15, 'nr is off!')
+      if (set === g_source)
+        jazil.ShouldBe(details.nr, 15, 'nr is off!')
       jazil.ShouldBe(details.cost, set === g_combined ? 9 : undefined, 'cost is off!')
       jazil.ShouldBe(details.count, set !== g_desired ? 1 : undefined, 'count is off!')
       jazil.ShouldBe(details.type, 'Turtle Shell', 'type is off!')
@@ -75,8 +78,8 @@ function CreateTestSet(setDescription, testContainerID, setLetter) {
 
       let templateRowDetails = GetItemTemplateRow(testContainerID, set)
       // Note: enchantments are re-ordered in alphabetical order
-      let item = BuildItem({ name:'Shears', nr:31, count:2, priorWork:5, cost:3, enchants:[{ name:'Unbreaking', level:1 }, { name:'Efficiency', level:2 }] })
-      let itemRow = CreateItemRow(templateRowDetails, item)
+      let item = BuildItem({ name:'Shears', count:2, priorWork:5, cost:3, enchants:[{ name:'Unbreaking', level:1 }, { name:'Efficiency', level:2 }] })
+      let itemRow = CreateItemRow(templateRowDetails, item, 31)
 
       let itemDetails = itemRow.GetItem()
       let retrievedItem = itemDetails.item
@@ -92,7 +95,8 @@ function CreateTestSet(setDescription, testContainerID, setLetter) {
       jazil.ShouldBe(itemDetails.withErrors, false, 'row says there were count errors!')
       jazil.ShouldBe(templateRowDetails.ShowCountInputError.called, false, 'count error callback is called!')
       jazil.ShouldBe(retrievedItem.set, set, 'set is off!')
-      jazil.ShouldBe(retrievedItem.nr, item.nr, 'nr is off!')
+      if (set === g_source)
+        jazil.ShouldBe(retrievedItem.nr, 31, 'nr is off!')
       jazil.ShouldBe(retrievedItem.cost, 0, 'cost is set!')
       jazil.ShouldBe(retrievedItem.count, set === g_source ? item.count : 1, 'count is off!')
       jazil.ShouldBe(retrievedItem.info.name, item.info.name, 'type is off!')
@@ -108,8 +112,8 @@ function CreateTestSet(setDescription, testContainerID, setLetter) {
         jazil.SkipTest()
 
       let templateRowDetails = GetItemTemplateRow(testContainerID, set)
-      let item = BuildItem({ name:'Book', nr:25, count:23, priorWork:5, cost:3, enchants:[{ name:'Projectile Protection', level:1 }] })
-      let itemRow = CreateItemRow(templateRowDetails, item)
+      let item = BuildItem({ name:'Book', count:23, priorWork:5, cost:3, enchants:[{ name:'Projectile Protection', level:1 }] })
+      let itemRow = CreateItemRow(templateRowDetails, item, 25)
 
       // Update the item row's count to something non-numeric.
       // Just empty is the most cross-browser way to do so.
@@ -129,7 +133,8 @@ function CreateTestSet(setDescription, testContainerID, setLetter) {
       jazil.ShouldBe(itemDetails.withErrors, true, 'row says there were no count errors!')
       jazil.ShouldBe(templateRowDetails.ShowCountInputError.called, true, 'count error callback is not called!')
       jazil.ShouldBe(retrievedItem.set, set, 'set is off!')
-      jazil.ShouldBe(retrievedItem.nr, item.nr, 'nr is off!')
+      if (set === g_source)
+        jazil.ShouldBe(retrievedItem.nr, 25, 'nr is off!')
       jazil.ShouldBe(retrievedItem.cost, 0, 'cost is set!')
       jazil.ShouldBe(retrievedItem.count, set === g_source ? NaN : 1, 'count is off!')
       jazil.ShouldBe(retrievedItem.info.name, item.info.name, 'type is off!')
@@ -143,9 +148,9 @@ function CreateTestSet(setDescription, testContainerID, setLetter) {
       let set = GetSet(setLetter)
       let templateRowDetails = GetItemTemplateRow(testContainerID, set)
       let numRowsPre = $(`#${testContainerID} tr.item`).length
-      let item1 = BuildItem({ name:'Chestplate', nr:10, count:14, priorWork:4, cost:3 })
-      let item2 = BuildItem({ name:'Shovel', nr:11, count:15, priorWork:5, cost:4 })
-      let item3 = BuildItem({ name:'Bow', nr:12, count:16, priorWork:6, cost:5 })
+      let item1 = BuildItem({ name:'Chestplate', count:14, priorWork:4, cost:3 })
+      let item2 = BuildItem({ name:'Shovel', count:15, priorWork:5, cost:4 })
+      let item3 = BuildItem({ name:'Bow', count:16, priorWork:6, cost:5 })
       let itemRow1 = CreateItemRow(templateRowDetails, item1)
       let itemRow2 = CreateItemRow(templateRowDetails, item2)
       let itemRow3 = CreateItemRow(templateRowDetails, item3)
@@ -156,9 +161,9 @@ function CreateTestSet(setDescription, testContainerID, setLetter) {
     'Rows can be removed': (jazil) => {
       let set = GetSet(setLetter)
       let templateRowDetails = GetItemTemplateRow(testContainerID, set)
-      let item1 = BuildItem({ name:'Elytra', nr:20, count:19, priorWork:3, cost:13 })
-      let item2 = BuildItem({ name:'Trident', nr:21, count:18, priorWork:2, cost:14 })
-      let item3 = BuildItem({ name:'Shield', nr:22, count:17, priorWork:1, cost:15 })
+      let item1 = BuildItem({ name:'Elytra', count:19, priorWork:3, cost:13 })
+      let item2 = BuildItem({ name:'Trident', count:18, priorWork:2, cost:14 })
+      let item3 = BuildItem({ name:'Shield', count:17, priorWork:1, cost:15 })
       let itemRow1 = CreateItemRow(templateRowDetails, item1)
       let itemRow2 = CreateItemRow(templateRowDetails, item2)
       let itemRow3 = CreateItemRow(templateRowDetails, item3)
@@ -174,13 +179,14 @@ function CreateTestSet(setDescription, testContainerID, setLetter) {
       let set = GetSet(setLetter)
       let templateRowDetails = GetItemTemplateRow(testContainerID, set)
       // Note: enchantments are re-ordered in alphabetical order
-      let item = BuildItem({ name:'Chestplate', nr:1, count:4, priorWork:5, cost:3, enchants:[{ name:'Protection', level:2 }, { name:'Thorns', level:3 }] })
-      let itemRow = CreateItemRow(templateRowDetails, item)
+      let item = BuildItem({ name:'Chestplate', count:4, priorWork:5, cost:3, enchants:[{ name:'Protection', level:2 }, { name:'Thorns', level:3 }] })
+      let itemRow = CreateItemRow(templateRowDetails, item, 1)
       itemRow.SetNumber(8)
       let details = GetItemRowDetails(itemRow.rowElemJQ, set)
 
       jazil.ShouldBe(itemRow.set, set, 'set is off!')
-      jazil.ShouldBe(details.nr, 8, 'nr is off!')
+      if (set === g_source)
+        jazil.ShouldBe(details.nr, 8, 'nr is off!')
       jazil.ShouldBe(details.cost, set === g_combined ? 3 : undefined, 'cost is off!')
       jazil.ShouldBe(details.count, set !== g_desired ? 4 : undefined, 'count is off!')
       jazil.ShouldBe(details.type, 'Chestplate', 'type is off!')
@@ -197,13 +203,14 @@ function CreateTestSet(setDescription, testContainerID, setLetter) {
 
       let templateRowDetails = GetItemTemplateRow(testContainerID, set)
       // Note: enchantments are re-ordered in alphabetical order
-      let item = BuildItem({ name:'Crossbow', nr:31, count:1, priorWork:3, cost:6 })
-      let itemRow = CreateItemRow(templateRowDetails, item)
+      let item = BuildItem({ name:'Crossbow', count:1, priorWork:3, cost:6 })
+      let itemRow = CreateItemRow(templateRowDetails, item, 31)
       itemRow.SetCount(5)
       let details = GetItemRowDetails(itemRow.rowElemJQ, set)
 
       jazil.ShouldBe(itemRow.set, set, 'set is off!')
-      jazil.ShouldBe(details.nr, 31, 'nr is off!')
+      if (set === g_source)
+        jazil.ShouldBe(details.nr, 31, 'nr is off!')
       jazil.ShouldBe(details.cost, set === g_combined ? 6 : undefined, 'cost is off!')
       jazil.ShouldBe(details.count, set !== g_desired ? 5 : undefined, 'count is off!')
       jazil.ShouldBe(details.type, 'Crossbow', 'type is off!')
@@ -216,15 +223,16 @@ function CreateTestSet(setDescription, testContainerID, setLetter) {
     'Item can get extra enchants': (jazil) => {
       let set = GetSet(setLetter)
       let templateRowDetails = GetItemTemplateRow(testContainerID, set)
-      let item = BuildItem({ name:'Flint & Steel', nr:28, count:1, priorWork:0, cost:8 })
-      let itemRow = CreateItemRow(templateRowDetails, item)
+      let item = BuildItem({ name:'Flint & Steel', count:1, priorWork:0, cost:8 })
+      let itemRow = CreateItemRow(templateRowDetails, item, 28)
       // Note: enchantments are ordered in addition order
       itemRow.AddEnchant(BuildEnchant('Unbreaking', 2))
       itemRow.AddEnchant(BuildEnchant('Mending', 1))
       let details = GetItemRowDetails(itemRow.rowElemJQ, set)
 
       jazil.ShouldBe(itemRow.set, set, 'set is off!')
-      jazil.ShouldBe(details.nr, 28, 'nr is off!')
+      if (set === g_source)
+        jazil.ShouldBe(details.nr, 28, 'nr is off!')
       jazil.ShouldBe(details.cost, set === g_combined ? 8 : undefined, 'cost is off!')
       jazil.ShouldBe(details.count, set !== g_desired ? 1 : undefined, 'count is off!')
       jazil.ShouldBe(details.type, 'Flint & Steel', 'type is off!')
@@ -237,8 +245,8 @@ function CreateTestSet(setDescription, testContainerID, setLetter) {
     'Item enchants can be removed': (jazil) => {
       let set = GetSet(setLetter)
       let templateRowDetails = GetItemTemplateRow(testContainerID, set)
-      let item = BuildItem({ name:'Fishing Rod', nr:26, count:3, priorWork:2, cost:1 })
-      let itemRow = CreateItemRow(templateRowDetails, item)
+      let item = BuildItem({ name:'Fishing Rod', count:3, priorWork:2, cost:1 })
+      let itemRow = CreateItemRow(templateRowDetails, item, 26)
       // Note: enchantments are ordered in addition order
       itemRow.AddEnchant(BuildEnchant('Unbreaking', 2))
       itemRow.AddEnchant(BuildEnchant('Lure', 3))
@@ -246,7 +254,8 @@ function CreateTestSet(setDescription, testContainerID, setLetter) {
       let details = GetItemRowDetails(itemRow.rowElemJQ, set)
 
       jazil.ShouldBe(itemRow.set, set, 'set is off!')
-      jazil.ShouldBe(details.nr, 26, 'nr is off!')
+      if (set === g_source)
+        jazil.ShouldBe(details.nr, 26, 'nr is off!')
       jazil.ShouldBe(details.cost, set === g_combined ? 1 : undefined, 'cost is off!')
       jazil.ShouldBe(details.count, set !== g_desired ? 3 : undefined, 'count is off!')
       jazil.ShouldBe(details.type, 'Fishing Rod', 'type is off!')
@@ -259,15 +268,14 @@ function CreateTestSet(setDescription, testContainerID, setLetter) {
     'Item can be changed': (jazil) => {
       let set = GetSet(setLetter)
       let templateRowDetails = GetItemTemplateRow(testContainerID, set)
-      let item = BuildItem({ name:'Hoe', nr:3, count:2, priorWork:1, cost:7, enchants:[{ name:'Unbreaking', level:2 }, { name:'Fortune', level:3 }] })
-      let itemRow = CreateItemRow(templateRowDetails, item)
+      let item = BuildItem({ name:'Hoe', count:2, priorWork:1, cost:7, enchants:[{ name:'Unbreaking', level:2 }, { name:'Fortune', level:3 }] })
+      let itemRow = CreateItemRow(templateRowDetails, item, 3)
       // Note: enchantments are re-ordered in alphabetical order
-      let updatedItem = BuildItem({ name:'Helmet', nr:3, count:6, priorWork:4, cost:5, enchants:[{ name:'Blast Protection', level:4 }, { name:'Aqua Affinity', level:1 }] })
+      let updatedItem = BuildItem({ name:'Helmet', count:6, priorWork:4, cost:5, enchants:[{ name:'Blast Protection', level:4 }, { name:'Aqua Affinity', level:1 }] })
       itemRow.SetItem(updatedItem)
       let details = GetItemRowDetails(itemRow.rowElemJQ, set)
 
       jazil.ShouldBe(itemRow.set, set, 'set is off!')
-      jazil.ShouldBe(details.nr, 3, 'nr is off!')
       jazil.ShouldBe(details.cost, set === g_combined ? 5 : undefined, 'cost is off!')
       jazil.ShouldBe(details.count, set !== g_desired ? 6 : undefined, 'count is off!')
       jazil.ShouldBe(details.type, 'Helmet', 'type is off!')

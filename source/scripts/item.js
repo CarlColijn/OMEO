@@ -12,13 +12,14 @@
     all items:
     - count: int
     - set: DataSet
-    - id: int
     - nr: int
     - info: ItemInfo
     - enchantsByID: Map(int -> Enchant)
     - priorWork: int
     - cost: int
     - totalCost: int
+    source items retrieved from a source table only:
+    - id: int
     combined items only:
     - targetItem: Item
     - sacrificeItem: Item
@@ -31,12 +32,11 @@
 
 
 class Item {
-  constructor(count, set, id, nr, priorWork) {
+  constructor(count, set, id, priorWork) {
     // ==== PUBLIC ====
     this.count = count
     this.set = set
     this.id = id
-    this.nr = nr
     this.info = g_itemInfosByID.get(id)
     this.enchantsByID = new Map()
     this.priorWork = priorWork

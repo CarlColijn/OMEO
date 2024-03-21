@@ -84,17 +84,16 @@ class FormData {
     let dataOK = true
     let numSources = stream.GetCount()
     for (let sourceNr = 1; sourceNr <= numSources; ++sourceNr) {
-      let sourceItem = this.DeserializeItem(stream, g_source, sourceNr)
+      let sourceItem = this.DeserializeItem(stream, g_source)
       if (sourceItem === undefined) {
         dataOK = false
         break
       }
-      sourceItem.nr = sourceNr
       this.sourceItems.push(sourceItem)
     }
 
     if (dataOK) {
-      this.desiredItem = this.DeserializeItem(stream, g_desired, 0)
+      this.desiredItem = this.DeserializeItem(stream, g_desired)
       dataOK = this.desiredItem !== undefined
     }
 
@@ -136,12 +135,11 @@ class FormData {
 
 
   // returns Item, or undefined on error
-  DeserializeItem(stream, set, itemNr) {
+  DeserializeItem(stream, set) {
     let item = new Item(
       stream.GetCount(),
       set,
       stream.GetSizedInt(g_numItemIDBits),
-      itemNr,
       stream.GetSizedInt(3)
     )
     this.DeserializeEnchants(stream, item)

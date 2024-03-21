@@ -6,7 +6,6 @@
   - enchantConflicts.js
   - enchantInfo.js
   - item.js
-  - itemNrGenerator.js
   - enchant.js
   - itemOrigins.js
   - enchantCombiner.js
@@ -38,17 +37,15 @@ class ItemCombiner {
   GetAllItemCombinations(sourceItems, desiredItem) {
     let tester = new ItemCombineTester()
 
-    let itemNrGenerator = new ItemNrGenerator(sourceItems)
-
     let filteredSourceItems = this.DropNonMatchingSourceItems(tester, sourceItems, desiredItem)
 
     this.DropUnusedEnchantsFromItems(filteredSourceItems, desiredItem)
 
-    this.InsertExtraUnenchantedItem(tester, filteredSourceItems, desiredItem, itemNrGenerator)
+    this.InsertExtraUnenchantedItem(tester, filteredSourceItems, desiredItem)
 
     this.SetupItemOrigins(filteredSourceItems)
 
-    return this.MakeAllCombinations(tester, filteredSourceItems, desiredItem, itemNrGenerator)
+    return this.MakeAllCombinations(tester, filteredSourceItems, desiredItem)
   }
 
 
@@ -104,7 +101,7 @@ class ItemCombiner {
   }
 
 
-  RegisterItemCombinations(tester, item1, item2, desiredItem, allItems, combinedItems, itemNrGenerator) {
+  RegisterItemCombinations(tester, item1, item2, desiredItem, allItems, combinedItems) {
     let combination1 = this.CombineItems(tester, item1, item2, desiredItem)
     let combination2 =
       item1 === item2?
@@ -113,12 +110,10 @@ class ItemCombiner {
     let newItems = this.PickBestItemCombinations(combination1, combination2)
 
     if (newItems.item1 !== undefined) {
-      newItems.item1.nr = itemNrGenerator.Next()
       allItems.push(newItems.item1)
       combinedItems.push(newItems.item1)
     }
     if (newItems.item2 !== undefined) {
-      newItems.item2.nr = itemNrGenerator.Next()
       allItems.push(newItems.item2)
       combinedItems.push(newItems.item2)
     }
@@ -126,7 +121,7 @@ class ItemCombiner {
 
 
   // returns Item[] (the combined items)
-  MakeAllCombinations(tester, sourceItems, desiredItem, itemNrGenerator) {
+  MakeAllCombinations(tester, sourceItems, desiredItem) {
     /*
       Strategy: we process all items, combining them with all items that
       come before them.  New items are added at the back so that they
@@ -145,7 +140,7 @@ class ItemCombiner {
       for (let item2Nr = 0; item2Nr <= item1Nr; ++item2Nr) {
         let item2 = allItems[item2Nr]
 
-        this.RegisterItemCombinations(tester, item1, item2, desiredItem, allItems, combinedItems, itemNrGenerator)
+        this.RegisterItemCombinations(tester, item1, item2, desiredItem, allItems, combinedItems)
       }
     }
 
@@ -153,7 +148,7 @@ class ItemCombiner {
   }
 
 
-  InsertExtraUnenchantedItem(tester, sourceItems, desiredItem, itemNrGenerator) {
+  InsertExtraUnenchantedItem(tester, sourceItems, desiredItem) {
     let hasEnchants = desiredItem.enchantsByID.size > 0
     if (
       !desiredItem.info.isBook &&
@@ -164,7 +159,6 @@ class ItemCombiner {
         1,
         g_extra,
         desiredItem.info.id,
-        itemNrGenerator.Next(),
         0
       )
       sourceItems.push(extraItem)
@@ -232,7 +226,6 @@ class ItemCombiner {
             numCombines,
             g_combined,
             targetItem.info.id,
-            -1, // nr to be determined later
             combinedPriorWork
           )
 

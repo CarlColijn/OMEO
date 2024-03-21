@@ -16,10 +16,10 @@ jazil.AddTestSet(omeoPage, 'Item', {
   },
 
   'Like items (id & prior work) get same hash': (jazil) => {
-    let pickaxe1_a = BuildItem({ name:'Pickaxe', nr:22, count:11, priorWork:77, set:g_source })
-    let pickaxe1_b = BuildItem({ name:'Pickaxe', nr:33, count:22, priorWork:77, set:g_extra })
-    let pickaxe2_a = BuildItem({ name:'Pickaxe', nr:44, count:33, priorWork:88, set:g_combined })
-    let pickaxe2_b = BuildItem({ name:'Pickaxe', nr:55, count:44, priorWork:88, set:g_desired })
+    let pickaxe1_a = BuildItem({ name:'Pickaxe', count:11, priorWork:77, set:g_source })
+    let pickaxe1_b = BuildItem({ name:'Pickaxe', count:22, priorWork:77, set:g_extra })
+    let pickaxe2_a = BuildItem({ name:'Pickaxe', count:33, priorWork:88, set:g_combined })
+    let pickaxe2_b = BuildItem({ name:'Pickaxe', count:44, priorWork:88, set:g_desired })
 
     jazil.ShouldBe(pickaxe1_a.Hash(true), pickaxe1_b.Hash(true), 'like items have different hash!')
     jazil.ShouldBe(pickaxe2_a.Hash(true), pickaxe2_b.Hash(true), 'like items have different hash!')
@@ -28,7 +28,7 @@ jazil.AddTestSet(omeoPage, 'Item', {
   },
 
   'Set enchants get set': (jazil) => {
-    let pickaxe = BuildItem({ name:'Pickaxe', nr:22, enchants:[{ name:'Smite', level:40 }, { name:'Sharpness', level:0 }, { name:'Mending', level:10 }, { name:'Flame', level:0 }] })
+    let pickaxe = BuildItem({ name:'Pickaxe', enchants:[{ name:'Smite', level:40 }, { name:'Sharpness', level:0 }, { name:'Mending', level:10 }, { name:'Flame', level:0 }] })
 
     let smiteInfo = g_enchantInfosByID.get(g_enchantIDsByName.get('Smite'))
     let foundSmite = false
@@ -59,7 +59,7 @@ jazil.AddTestSet(omeoPage, 'Item', {
   },
 
   'Unused enchants (lvl 0) get dropped': (jazil) => {
-    let pickaxe = BuildItem({ name:'Pickaxe', nr:22, enchants:[{ name:'Smite', level:40 }, { name:'Sharpness', level:0 }, { name:'Mending', level:10 }, { name:'Flame', level:0 }] })
+    let pickaxe = BuildItem({ name:'Pickaxe', enchants:[{ name:'Smite', level:40 }, { name:'Sharpness', level:0 }, { name:'Mending', level:10 }, { name:'Flame', level:0 }] })
 
     pickaxe.DropUnusedEnchants()
 

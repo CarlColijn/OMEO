@@ -53,7 +53,7 @@ class ItemTable {
 
       for (let itemNr = 0; itemNr < items.length; ++itemNr) {
         let item = items[itemNr]
-        this.templateRow.CreateNew(item.nr, item)
+        this.templateRow.CreateNew(itemNr + 1, item)
       }
     }
   }

@@ -26,9 +26,10 @@ function CreateTestSet(setDescription, testContainerID, setLetter) {
       let numRowsPost = table.tableElemJQ.find('tr.item').length
       jazil.ShouldBe(numRowsPost - numRowsPre, 1, 'wrong number of rows added!')
 
-      let newRowDetails = GetItemRowDetails(newRow.rowElemJQ, set)
-      jazil.ShouldBe(newRowDetails.nr, 1, 'wrong row nrs assigned!')
-      jazil.ShouldBe(newRowDetails.nr, 1, 'wrong row nrs assigned!')
+      if (set != g_combined) {
+        let newRowDetails = GetItemRowDetails(newRow.rowElemJQ, set)
+        jazil.ShouldBe(newRowDetails.nr, 1, 'wrong row nrs assigned!')
+      }
     },
 
     'Setting items works': (jazil) => {
@@ -37,9 +38,9 @@ function CreateTestSet(setDescription, testContainerID, setLetter) {
       let table = tableDetails.table
 
       let testItems = [
-        BuildItem({ name:'Shield', nr:1, count:2, priorWork:3, set:set }),
-        BuildItem({ name:'Helmet', nr:2, count:3, priorWork:4, set:set, enchants:[{ name:'Aqua Affinity', level:1 }, { name:'Unbreaking', level:3 }] }),
-        BuildItem({ name:'Boots', nr:3, count:4, priorWork:5, set:set }),
+        BuildItem({ name:'Shield', count:2, priorWork:3, set:set }),
+        BuildItem({ name:'Helmet', count:3, priorWork:4, set:set, enchants:[{ name:'Aqua Affinity', level:1 }, { name:'Unbreaking', level:3 }] }),
+        BuildItem({ name:'Boots', count:4, priorWork:5, set:set }),
       ]
 
       let numRowsPre = table.tableElemJQ.find('tr.item').length
@@ -83,7 +84,6 @@ function CreateTestSet(setDescription, testContainerID, setLetter) {
 
         // augment the retrieved item's data since g_desired item tables only
         // return a subset of the data
-        retrievedItem.nr = testItem.nr
         retrievedItem.count = testItem.count
         retrievedItem.priorWork = testItem.priorWork
 
@@ -100,9 +100,9 @@ function CreateTestSet(setDescription, testContainerID, setLetter) {
       let table = tableDetails.table
 
       let testItems = [
-        BuildItem({ name:'Chestplate', nr:11, count:12, priorWork:1, set:set }),
-        BuildItem({ name:'Sword', nr:12, count:13, priorWork:2, set:set, enchants:[{ name:'Smite', level:2 }, { name:'Looting', level:3 }] }),
-        BuildItem({ name:'Leggings', nr:13, count:14, priorWork:3, set:set }),
+        BuildItem({ name:'Chestplate', count:12, priorWork:1, set:set }),
+        BuildItem({ name:'Sword', count:13, priorWork:2, set:set, enchants:[{ name:'Smite', level:2 }, { name:'Looting', level:3 }] }),
+        BuildItem({ name:'Leggings', count:14, priorWork:3, set:set }),
       ]
 
       table.SetItems(testItems)
@@ -118,7 +118,6 @@ function CreateTestSet(setDescription, testContainerID, setLetter) {
         // return a subset of the data
         let retrievedItem = collectedItemDetails.items[0]
         let testItem = testItems[0]
-        retrievedItem.nr = testItem.nr
         retrievedItem.count = testItem.count
         retrievedItem.priorWork = testItem.priorWork
 
@@ -135,13 +134,13 @@ function CreateTestSet(setDescription, testContainerID, setLetter) {
       let table = tableDetails.table
 
       let testItems = [
-        BuildItem({ name:'Book', nr:1, count:1, priorWork:2, set:set }),
-        BuildItem({ name:'Book', nr:2, count:5, priorWork:3, set:set, enchants:[{ name:'Smite', level:2 }, { name:'Looting', level:3 }] }),
+        BuildItem({ name:'Book', count:1, priorWork:2, set:set }),
+        BuildItem({ name:'Book', count:5, priorWork:3, set:set, enchants:[{ name:'Smite', level:2 }, { name:'Looting', level:3 }] }),
         // 3 to be merged with 1
-        BuildItem({ name:'Book', nr:3, count:10, priorWork:2, set:set }),
-        BuildItem({ name:'Book', nr:4, count:50, priorWork:1, set:set }),
+        BuildItem({ name:'Book', count:10, priorWork:2, set:set }),
+        BuildItem({ name:'Book', count:50, priorWork:1, set:set }),
         // 5 to be merged with 2; reversed enchant order as extra test
-        BuildItem({ name:'Book', nr:5, count:5, priorWork:3, set:set, enchants:[{ name:'Looting', level:3 }, { name:'Smite', level:2 }] }),
+        BuildItem({ name:'Book', count:5, priorWork:3, set:set, enchants:[{ name:'Looting', level:3 }, { name:'Smite', level:2 }] }),
       ]
 
       table.SetItems(testItems)
@@ -170,13 +169,13 @@ function CreateTestSet(setDescription, testContainerID, setLetter) {
       let table = tableDetails.table
 
       let testItems = [
-        BuildItem({ name:'Sword', nr:1, count:1, priorWork:2, set:set }),
-        BuildItem({ name:'Sword', nr:2, count:5, priorWork:3, set:set, enchants:[{ name:'Smite', level:1 }, { name:'Mending', level:1 }] }),
+        BuildItem({ name:'Sword', count:1, priorWork:2, set:set }),
+        BuildItem({ name:'Sword', count:5, priorWork:3, set:set, enchants:[{ name:'Smite', level:1 }, { name:'Mending', level:1 }] }),
         // 3 can be merged with 1
-        BuildItem({ name:'Sword', nr:3, count:10, priorWork:2, set:set }),
-        BuildItem({ name:'Sword', nr:4, count:50, priorWork:1, set:set }),
+        BuildItem({ name:'Sword', count:10, priorWork:2, set:set }),
+        BuildItem({ name:'Sword', count:50, priorWork:1, set:set }),
         // 5 can be merged with 2; reversed enchant order as extra test
-        BuildItem({ name:'Sword', nr:5, count:5, priorWork:3, set:set, enchants:[{ name:'Mending', level:1 }, { name:'Smite', level:1 }] }),
+        BuildItem({ name:'Sword', count:5, priorWork:3, set:set, enchants:[{ name:'Mending', level:1 }, { name:'Smite', level:1 }] }),
       ]
 
       table.SetItems(testItems)
@@ -197,9 +196,9 @@ function CreateTestSet(setDescription, testContainerID, setLetter) {
       let table = tableDetails.table
 
       let testItems = [
-        BuildItem({ name:'Boots', nr:1, count:1, priorWork:1, set:set }),
-        BuildItem({ name:'Boots', nr:2, count:2, priorWork:1, set:set, enchants:[{ name:'Protection', level:3 }, { name:'Feather Falling', level:1 }] }),
-        BuildItem({ name:'Boots', nr:3, count:5, priorWork:1, set:set }),
+        BuildItem({ name:'Boots', count:1, priorWork:1, set:set }),
+        BuildItem({ name:'Boots', count:2, priorWork:1, set:set, enchants:[{ name:'Protection', level:3 }, { name:'Feather Falling', level:1 }] }),
+        BuildItem({ name:'Boots', count:5, priorWork:1, set:set }),
       ]
 
       table.SetItems(testItems)

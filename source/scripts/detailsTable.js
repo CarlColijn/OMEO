@@ -55,15 +55,18 @@ class DetailsTable {
 
   // returns string
   GetItemDescription(item) {
-    let set = ''
+    let description = ''
     switch (item.set) {
-      case g_combined: set = 'Combined'; break
-      case g_source:   set = 'Source'; break
-      case g_extra:    set = 'Extra'; break
-      case g_desired:  set = 'Desired'; break
+      case g_combined: description = 'Combined '; break
+      case g_source:   description = 'Source '; break
+      case g_extra:    description = 'Extra '; break
+      case g_desired:  description = 'Desired '; break
     }
 
-    return `${set} ${item.info.name} nr. ${item.nr}`
+    description += item.info.name
+    if (item.set == g_source)
+      description += ` nr. ${item.nr}`
+    return description
   }
 
 

@@ -91,7 +91,8 @@ class ItemRow {
   SetNumber(nr) {
     this.nr = nr
     this.rowElemJQ.attr('data-nr', nr)
-    this.rowElemJQ.find('.nr').text(nr)
+    if (this.set != g_combined)
+      this.rowElemJQ.find('.nr').text(nr)
   }
 
 
@@ -131,10 +132,11 @@ class ItemRow {
       countResult.count,
       this.set,
       parseInt(this.idElemJQ.val()),
-      parseInt(this.rowElemJQ.attr('data-nr')),
       this.set === g_source ? parseInt(this.priorWorkElemJQ.val()) : 0
     )
     this.AddItemEnchants(item)
+    if (this.set === g_source)
+      item.nr = parseInt(this.rowElemJQ.attr('data-nr'))
 
     return {
       item: item,

@@ -25,7 +25,6 @@ let omeoAccessObjectNames = [
   'ItemCollector',
   'ItemCombiner',
   'ItemCombineTester',
-  'ItemNrGenerator',
   'ItemRow',
   'ItemTable',
   'ZeroOrigin',
@@ -79,10 +78,11 @@ function BuildEnchant(name, level) {
 
 
 // info should be a hasmap with:
+// - tag (for testing)
 // - name
-// - nr
 // - count (default: 1)
 // - cost (default: 0)
+// - nr (for g_source only, no default)
 // - totalCost (default: cost)
 // - priorWork (default: 0)
 // - set (default: g_source)
@@ -95,13 +95,16 @@ function BuildItem(info) {
   if (itemInfo === undefined)
     throw Error(`Unknown item name: ${info.name}`)
 
+  let set = info.set ?? g_source
   let item = new Item(
     info.count ?? 1,
-    info.set ?? g_source,
+    set,
     itemInfo.id,
-    info.nr,
     info.priorWork ?? 0
   )
+  item.tag = info.tag
+  if (set === g_source)
+    item.nr = info.nr
   item.cost = info.cost ?? 0
   item.totalCost = info.totalCost ?? item.cost
 
@@ -121,7 +124,7 @@ function BuildItem(info) {
 }
 
 
-function GetAbbrItemDesciption(item, addNr, addSet) {
+function GetAbbrItemDesciption(item, addSet) {
   let description = `na:${item.info.name}|pw:${item.priorWork}`
 
   for (let enchantNr = 0; enchantNr < g_numDifferentEnchants; ++enchantNr) {
@@ -129,9 +132,6 @@ function GetAbbrItemDesciption(item, addNr, addSet) {
     if (enchant !== undefined)
       description += `|en:${enchant.info.name}|lv:${enchant.level}`
   }
-
-  if (addNr)
-    description += `|nr:${item.nr}`
 
   if (addSet)
     description += `|se:${item.set.id}`
@@ -149,7 +149,7 @@ function IndexItemsByHash(items) {
 
   for (let itemNr = 0; itemNr < items.length; ++itemNr) {
     let item = items[itemNr]
-    let hash = GetAbbrItemDesciption(item, false, false)
+    let hash = GetAbbrItemDesciption(item, false)
     if (itemsByHash.has(hash))
       itemsByHash.get(hash).items.push(item)
     else
@@ -234,10 +234,7 @@ function GetItemTemplateRow(testContainerID, set) {
 
 
 function CreateItemRow(templateRowDetails, item, nr) {
-  if (nr === undefined)
-    nr = item === undefined ? 1 : item.nr
-
-  return templateRowDetails.row.CreateNew(nr, item)
+  return templateRowDetails.row.CreateNew(nr ?? 1, item)
 }
 
 
@@ -625,10 +622,11 @@ jazil.AddTestSet(omeoPage, 'own BuildItem', {
   },
 
   'BuildItem returns correct item with defaults': (jazil) => {
-    let leggings = BuildItem({ name:'Leggings', nr:3 })
+    let leggings = BuildItem({ tag:'x', name:'Leggings', nr:3 })
     let leggingsInfo = GetItemInfo('Leggings')
 
     jazil.ShouldBe(leggings.info, leggingsInfo, 'info is wrong!')
+    jazil.ShouldBe(leggings.tag, 'x', 'tag is wrong!')
     jazil.ShouldBe(leggings.nr, 3, 'nr is wrong!')
     jazil.ShouldBe(leggings.count, 1, 'default count is wrong!')
     jazil.ShouldBe(leggings.cost, 0, 'default cost is wrong!')
@@ -639,11 +637,12 @@ jazil.AddTestSet(omeoPage, 'own BuildItem', {
   },
 
   'BuildItem returns correct item': (jazil) => {
-    let leggings = BuildItem({ name:'Leggings', nr:3, count:5, cost:7, priorWork:9, set:g_extra })
+    let leggings = BuildItem({ tag:'t', name:'Leggings', nr:4, count:5, cost:7, priorWork:9, set:g_extra })
     let leggingsInfo = GetItemInfo('Leggings')
 
     jazil.ShouldBe(leggings.info, leggingsInfo, 'info is wrong!')
-    jazil.ShouldBe(leggings.nr, 3, 'nr is wrong!')
+    jazil.ShouldBe(leggings.tag, 't', 'tag is wrong!')
+    jazil.ShouldBe(leggings.nr, undefined, 'nr is set!')
     jazil.ShouldBe(leggings.count, 5, 'count is wrong!')
     jazil.ShouldBe(leggings.cost, 7, 'cost is wrong!')
     jazil.ShouldBe(leggings.totalCost, 7, 'totalCost is wrong!')
@@ -653,7 +652,7 @@ jazil.AddTestSet(omeoPage, 'own BuildItem', {
   },
 
   'BuildItem returns correct item with enchants with defaults': (jazil) => {
-    let leggings = BuildItem({ name:'Leggings', nr:3, enchants:[{ name:'Protection', level:3 }, { name:'Unbreaking' }] })
+    let leggings = BuildItem({ name:'Leggings', enchants:[{ name:'Protection', level:3 }, { name:'Unbreaking' }] })
     let leggingsInfo = GetItemInfo('Leggings')
     let protectionInfo = g_enchantInfosByID.get(g_enchantIDsByName.get('Protection'))
     let unbreakingInfo = g_enchantInfosByID.get(g_enchantIDsByName.get('Unbreaking'))

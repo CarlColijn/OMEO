@@ -8,7 +8,6 @@ function CompareItemsEqual(jazil, item1, item2, itemDescription) {
   jazil.ShouldBe(item1.count, item2.count, `${itemDescription} count not equal!`)
   jazil.ShouldBe(item1.set, item2.set, `${itemDescription} set not equal!`)
   jazil.ShouldBe(item1.id, item2.id, `${itemDescription} id not equal!`)
-  jazil.ShouldBe(item1.nr, item2.nr, `${itemDescription} nr not equal!`)
   jazil.ShouldBe(item1.info, item2.info, `${itemDescription} info not equal!`)
   jazil.ShouldBe(item1.priorWork, item2.priorWork, `${itemDescription} priorWork not equal!`)
   jazil.ShouldBe(item1.cost, item2.cost, `${itemDescription} cost is not equal!`)
@@ -36,12 +35,12 @@ jazil.AddTestSet(omeoPage, 'FormData', {
   'Desired item gets set': (jazil) => {
     let data = new FormData
 
-    let axe = BuildItem({ name:'Axe', nr:22, set:g_desired })
+    let axe = BuildItem({ name:'Axe', set:g_desired })
     data.SetDesiredItem(axe)
 
     jazil.ShouldBe(data.desiredItem, axe, 'Initial desired item not set correctly!')
 
-    let sword = BuildItem({ name:'Sword', nr:11, set:g_desired })
+    let sword = BuildItem({ name:'Sword', set:g_desired })
     data.SetDesiredItem(sword)
 
     jazil.ShouldBe(data.desiredItem, sword, 'Updated desired item not set correctly!')
@@ -51,7 +50,7 @@ jazil.AddTestSet(omeoPage, 'FormData', {
     let data = new FormData
 
     for (let swordNr = 0; swordNr < 10; ++swordNr) {
-      let sword = BuildItem({ name:'Sword', nr:swordNr, count:44 })
+      let sword = BuildItem({ name:'Sword', count:44 })
       data.AddSourceItem(sword)
 
       jazil.ShouldBe(data.sourceItems.length, swordNr + 1, `Item ${swordNr} not added to source items!`)
@@ -65,7 +64,7 @@ jazil.AddTestSet(omeoPage, 'FormData', {
     let swords = []
     let numSwords = 10
     for (let swordNr = 0; swordNr < numSwords; ++swordNr)
-      swords.push(BuildItem({ name:'Sword', nr:swordNr, count:44 }))
+      swords.push(BuildItem({ name:'Sword', count:44 }))
 
     data.AddSourceItems(swords)
 
@@ -78,10 +77,10 @@ jazil.AddTestSet(omeoPage, 'FormData', {
     let dataState = new DataStateController(jazil)
     dataState.Reset()
 
-    let pickaxe = BuildItem({ name:'Pickaxe', nr:0, count:11, set:g_desired, priorWork:0 })
-    let axe = BuildItem({ name:'Axe', nr:1, count:22, set:g_source, priorWork:1 })
-    let sword = BuildItem({ name:'Sword', nr:2, count:33, set:g_source, priorWork:2 })
-    let helmet = BuildItem({ name:'Helmet', nr:3, count:44, set:g_source, priorWork:3 })
+    let pickaxe = BuildItem({ name:'Pickaxe', count:11, set:g_desired, priorWork:0 })
+    let axe = BuildItem({ name:'Axe', count:22, set:g_source, priorWork:1 })
+    let sword = BuildItem({ name:'Sword', count:33, set:g_source, priorWork:2 })
+    let helmet = BuildItem({ name:'Helmet', count:44, set:g_source, priorWork:3 })
 
     let storedData = new FormData
     storedData.SetDesiredItem(pickaxe)
@@ -115,9 +114,9 @@ jazil.AddTestSet(omeoPage, 'FormData', {
     let dataState = new DataStateController(jazil)
     dataState.Reset()
 
-    let sword = BuildItem({ name:'Sword', nr:0, count:11, set:g_desired, priorWork:1, enchants:[{ name:'Looting' }] })
-    let book = BuildItem({ name:'Book', nr:1, count:33, set:g_source, priorWork:3, enchants:[{ name:'Fortune', level:3 }, { name:'Smite', level:1 }, { name:'Efficiency', level:2 }] })
-    let axe = BuildItem({ name:'Axe', nr:2, count:22, set:g_source, priorWork:2, enchants:[{ name:'Fortune', level:3 }] })
+    let sword = BuildItem({ name:'Sword', count:11, set:g_desired, priorWork:1, enchants:[{ name:'Looting' }] })
+    let book = BuildItem({ name:'Book', count:33, set:g_source, priorWork:3, enchants:[{ name:'Fortune', level:3 }, { name:'Smite', level:1 }, { name:'Efficiency', level:2 }] })
+    let axe = BuildItem({ name:'Axe', count:22, set:g_source, priorWork:2, enchants:[{ name:'Fortune', level:3 }] })
 
     let storedData = new FormData
     storedData.SetDesiredItem(sword)
@@ -148,8 +147,8 @@ jazil.AddTestSet(omeoPage, 'FormData', {
 
   'Malformed form data gives error when deserializing': (jazil) => {
     /*
-    let sword = BuildItem({ name:'Sword', nr:0, count:11, set:g_desired, priorWork:1, enchants:[{ name:'Looting' }] })
-    let book = BuildItem({ name:'Book', nr:1, count:33, set:g_source, priorWork:3, enchants:[{ name:'Fortune', level:3 }] })
+    let sword = BuildItem({ name:'Sword', count:11, set:g_desired, priorWork:1, enchants:[{ name:'Looting' }] })
+    let book = BuildItem({ name:'Book', count:33, set:g_source, priorWork:3, enchants:[{ name:'Fortune', level:3 }] })
 
     // gives serialized data state ccmbaGKRKQhza_
     */

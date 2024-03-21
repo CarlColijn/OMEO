@@ -1,13 +1,13 @@
-function CheckItemFilterResultOK(id, jazil, desiredItem, combinedItems, expectedLevel, expectedItemNrs) {
+function CheckItemFilterResultOK(id, jazil, desiredItem, combinedItems, expectedLevel, expectedTags) {
   let filter = new CombineResultFilter(desiredItem)
   let filterResult = filter.GetCleanedUpItemList(combinedItems)
 
   jazil.ShouldBe(filterResult.level.id, expectedLevel.id, 'wrong level returned!')
 
-  jazil.ShouldBe(filterResult.items.length, expectedItemNrs.length, 'wrong number of items got returned!')
+  jazil.ShouldBe(filterResult.items.length, expectedTags.length, 'wrong number of items got returned!')
 
-  for (let itemNr = 0; itemNr < expectedItemNrs.length; ++itemNr)
-    jazil.ShouldBe(filterResult.items[itemNr].nr, expectedItemNrs[itemNr], `wrong item ${itemNr} got returned!`)
+  for (let itemNr = 0; itemNr < expectedTags.length; ++itemNr)
+    jazil.ShouldBe(filterResult.items[itemNr].tag, expectedTags[itemNr], `wrong item ${itemNr} got returned (${expectedTags[itemNr]})!`)
 }
 
 
@@ -20,11 +20,11 @@ class ItemCreatorForFilter {
     this.name = name
     this.enchants = enchants
 
-    this.nextNr = 1
+    this.nextTag = 1
   }
 
   GetDesired() {
-    return BuildItem({ name:this.name, nr:0, set:g_desired, enchants:this.enchants })
+    return BuildItem({ tag:0, name:this.name, set:g_desired, enchants:this.enchants })
   }
 
   // valid override options:
@@ -50,17 +50,17 @@ class ItemCreatorForFilter {
     let items = []
 
     // mid fitness
-    buildOptions.nr = this.nextNr++
+    buildOptions.tag = this.nextTag++
     buildOptions.totalCost = g_expectedTotalCosts[0]
     buildOptions.priorWork = g_expectedPriorWork[0]
     items.push(BuildItem(buildOptions))
     // high fitness
-    buildOptions.nr = this.nextNr++
+    buildOptions.tag = this.nextTag++
     buildOptions.totalCost = g_expectedTotalCosts[1]
     buildOptions.priorWork = g_expectedPriorWork[1]
     items.push(BuildItem(buildOptions))
     // low fitness
-    buildOptions.nr = this.nextNr++
+    buildOptions.tag = this.nextTag++
     buildOptions.totalCost = g_expectedTotalCosts[2]
     buildOptions.priorWork = g_expectedPriorWork[2]
     items.push(BuildItem(buildOptions))
@@ -102,7 +102,7 @@ jazil.AddTestSet(omeoPage, 'CombineResultFilter helpers', {
       let item = items[itemNr]
       jazil.ShouldBe(item.set, g_combined, `${itemNr}: wrong set returned!`)
       jazil.ShouldBe(item.info.name, 'Pickaxe', `${itemNr}: wrong item returned!`)
-      jazil.ShouldBe(item.nr, itemNr + 1, `${itemNr}: wrong nr returned!`)
+      jazil.ShouldBe(item.tag, itemNr + 1, `${itemNr}: wrong tag returned!`)
       jazil.ShouldBe(item.totalCost, g_expectedTotalCosts[itemNr], `${itemNr}: wrong totalCost returned!`)
       jazil.ShouldBe(item.priorWork, g_expectedPriorWork[itemNr], `${itemNr}: wrong priorWork returned!`)
       jazil.ShouldBe(item.enchantsByID.size, 0, `${itemNr}: enchants returned!`)
@@ -118,7 +118,7 @@ jazil.AddTestSet(omeoPage, 'CombineResultFilter helpers', {
       let item = items[itemNr]
       jazil.ShouldBe(item.set, g_combined, `${itemNr}: wrong set returned!`)
       jazil.ShouldBe(item.info.name, 'Pickaxe', `${itemNr}: wrong item returned!`)
-      jazil.ShouldBe(item.nr, itemNr + 1, `${itemNr}: wrong nr returned!`)
+      jazil.ShouldBe(item.tag, itemNr + 1, `${itemNr}: wrong tag returned!`)
       jazil.ShouldBe(item.totalCost, g_expectedTotalCosts[itemNr], `${itemNr}: wrong totalCost returned!`)
       jazil.ShouldBe(item.priorWork, g_expectedPriorWork[itemNr], `${itemNr}: wrong priorWork returned!`)
       jazil.ShouldBe(item.enchantsByID.size, 2, `${itemNr}: wrong number of enchants returned!`)
@@ -133,9 +133,9 @@ jazil.AddTestSet(omeoPage, 'CombineResultFilter helpers', {
     let items2 = creator.GetCombineds()
     let items3 = creator.GetCombineds()
 
-    jazil.ShouldBe(items1[0].nr, 1, 'wrong 1st nr returned!')
-    jazil.ShouldBe(items2[1].nr, 5, 'wrong 2nd nr returned!')
-    jazil.ShouldBe(items3[2].nr, 9, 'wrong 3rd nr returned!')
+    jazil.ShouldBe(items1[0].tag, 1, 'wrong 1st tag returned!')
+    jazil.ShouldBe(items2[1].tag, 5, 'wrong 2nd tag returned!')
+    jazil.ShouldBe(items3[2].tag, 9, 'wrong 3rd tag returned!')
   },
 
   'Own creator returns correctly name-tweaked combined item': (jazil) => {
@@ -144,7 +144,7 @@ jazil.AddTestSet(omeoPage, 'CombineResultFilter helpers', {
 
     jazil.ShouldBe(item.set, g_combined, 'wrong set returned!')
     jazil.ShouldBe(item.info.name, 'Axe', 'wrong item returned!')
-    jazil.ShouldBe(item.nr, 1, 'wrong nr returned!')
+    jazil.ShouldBe(item.tag, 1, 'wrong tag returned!')
     jazil.ShouldBe(item.totalCost, g_expectedTotalCosts[0], 'wrong totalCost returned!')
     jazil.ShouldBe(item.priorWork, g_expectedPriorWork[0], 'wrong priorWork returned!')
     jazil.ShouldBe(item.enchantsByID.size, 2, 'wrong number of enchants returned!')
@@ -158,7 +158,7 @@ jazil.AddTestSet(omeoPage, 'CombineResultFilter helpers', {
 
     jazil.ShouldBe(item.set, g_combined, 'wrong set returned!')
     jazil.ShouldBe(item.info.name, 'Pickaxe', 'wrong item returned!')
-    jazil.ShouldBe(item.nr, 1, 'wrong nr returned!')
+    jazil.ShouldBe(item.tag, 1, 'wrong tag returned!')
     jazil.ShouldBe(item.totalCost, g_expectedTotalCosts[0], 'wrong totalCost returned!')
     jazil.ShouldBe(item.priorWork, g_expectedPriorWork[0], 'wrong priorWork returned!')
     jazil.ShouldBe(item.enchantsByID.size, 1, 'wrong number of enchants returned!')
@@ -224,19 +224,19 @@ jazil.AddTestSet(omeoPage, 'CombineResultFilter', {
 
     CheckItemFilterResultOK('Minimal permutations of prior work and total cost',
       jazil,
-      BuildItem({ name:'Helmet', nr:0, set:g_desired }),
+      BuildItem({ tag:0, name:'Helmet', set:g_desired }),
       [
-        BuildItem({ name:'Helmet', nr:1,  set:g_combined, priorWork:1, totalCost:22 }),
-        BuildItem({ name:'Helmet', nr:2,  set:g_combined, priorWork:2, totalCost:21 }),
-        BuildItem({ name:'Helmet', nr:3,  set:g_combined, priorWork:1, totalCost:21 }),
-        BuildItem({ name:'Helmet', nr:4,  set:g_combined, priorWork:1, totalCost:23 }),
-        BuildItem({ name:'Helmet', nr:5,  set:g_combined, priorWork:5, totalCost:2  }),
-        BuildItem({ name:'Helmet', nr:6,  set:g_combined, priorWork:5, totalCost:1  }),
-        BuildItem({ name:'Helmet', nr:7,  set:g_combined, priorWork:5, totalCost:3  }),
-        BuildItem({ name:'Helmet', nr:8,  set:g_combined, priorWork:3, totalCost:12 }),
-        BuildItem({ name:'Helmet', nr:9,  set:g_combined, priorWork:4, totalCost:11 }),
-        BuildItem({ name:'Helmet', nr:10, set:g_combined, priorWork:3, totalCost:11 }),
-        BuildItem({ name:'Helmet', nr:11, set:g_combined, priorWork:3, totalCost:13 }),
+        BuildItem({ tag:1,  name:'Helmet', set:g_combined, priorWork:1, totalCost:22 }),
+        BuildItem({ tag:2,  name:'Helmet', set:g_combined, priorWork:2, totalCost:21 }),
+        BuildItem({ tag:3,  name:'Helmet', set:g_combined, priorWork:1, totalCost:21 }),
+        BuildItem({ tag:4,  name:'Helmet', set:g_combined, priorWork:1, totalCost:23 }),
+        BuildItem({ tag:5,  name:'Helmet', set:g_combined, priorWork:5, totalCost:2  }),
+        BuildItem({ tag:6,  name:'Helmet', set:g_combined, priorWork:5, totalCost:1  }),
+        BuildItem({ tag:7,  name:'Helmet', set:g_combined, priorWork:5, totalCost:3  }),
+        BuildItem({ tag:8,  name:'Helmet', set:g_combined, priorWork:3, totalCost:12 }),
+        BuildItem({ tag:9,  name:'Helmet', set:g_combined, priorWork:4, totalCost:11 }),
+        BuildItem({ tag:10, name:'Helmet', set:g_combined, priorWork:3, totalCost:11 }),
+        BuildItem({ tag:11, name:'Helmet', set:g_combined, priorWork:3, totalCost:13 }),
       ],
       g_onlyPerfectCombines,
       [3, 10, 6]

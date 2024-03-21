@@ -1,8 +1,10 @@
 // returns ItemRow[]
-function CreateItemRows(templateRowDetails, items) {
+function CreateItemRows(templateRowDetails, items, jumpNrs) {
   let itemRows = []
-  for (let itemNr = 0; itemNr < items.length; ++itemNr)
-    itemRows.push(CreateItemRow(templateRowDetails, items[itemNr]))
+  for (let itemNr = 0; itemNr < items.length; ++itemNr) {
+    let rowNr = 1 + (jumpNrs ? itemNr * 2 : itemNr)
+    itemRows.push(CreateItemRow(templateRowDetails, items[itemNr], rowNr))
+  }
 
   return itemRows
 }
@@ -22,12 +24,12 @@ jazil.AddTestSet(omeoPage, 'ItemCollector', {
     let templateRowDetails = GetItemTemplateRow('collectingItemRow', g_source)
 
     let testItems = [
-      BuildItem({ name:'Chestplate', nr:1, count:12, priorWork:1 }),
-      BuildItem({ name:'Sword', nr:2, count:13, priorWork:2, enchants:[{ name:'Smite', level:2 }, { name:'Looting', level:3 }] }),
-      BuildItem({ name:'Leggings', nr:3, count:14, priorWork:3 }),
+      BuildItem({ name:'Chestplate', count:12, priorWork:1 }),
+      BuildItem({ name:'Sword', count:13, priorWork:2, enchants:[{ name:'Smite', level:2 }, { name:'Looting', level:3 }] }),
+      BuildItem({ name:'Leggings', count:14, priorWork:3 }),
     ]
 
-    let itemRows = CreateItemRows(templateRowDetails, testItems)
+    let itemRows = CreateItemRows(templateRowDetails, testItems, false)
     let result = ProcessItemRows(itemRows, false)
 
     jazil.ShouldBe(templateRowDetails.ShowCountInputError.called, false, 'count error callback is called!')
@@ -43,12 +45,12 @@ jazil.AddTestSet(omeoPage, 'ItemCollector', {
     let templateRowDetails = GetItemTemplateRow('collectingItemRow', g_source)
 
     let testItems = [
-      BuildItem({ name:'Hoe', nr:1, count:3, priorWork:1 }),
-      BuildItem({ name:'Axe', nr:3, count:4, priorWork:2, enchants:[{ name:'Unbreaking', level:3 }, { name:'Mending', level:1 }] }),
-      BuildItem({ name:'Shield', nr:9, count:5, priorWork:3 }),
+      BuildItem({ name:'Hoe', count:3, priorWork:1 }),
+      BuildItem({ name:'Axe', count:4, priorWork:2, enchants:[{ name:'Unbreaking', level:3 }, { name:'Mending', level:1 }] }),
+      BuildItem({ name:'Shield', count:5, priorWork:3 }),
     ]
 
-    let itemRows = CreateItemRows(templateRowDetails, testItems)
+    let itemRows = CreateItemRows(templateRowDetails, testItems, true)
     let result = ProcessItemRows(itemRows, false)
 
     jazil.ShouldBe(templateRowDetails.ShowCountInputError.called, false, 'count error callback is called!')
@@ -73,21 +75,21 @@ jazil.AddTestSet(omeoPage, 'ItemCollector', {
     let templateRowDetails = GetItemTemplateRow('collectingItemRow', g_source)
 
     let testItems = [
-      BuildItem({ name:'Book', nr:1, count:1, priorWork:2 }),
-      BuildItem({ name:'Book', nr:2, count:5, priorWork:3, enchants:[{ name:'Smite', level:2 }, { name:'Looting', level:3 }] }),
+      BuildItem({ name:'Book', tag:1, count:1, priorWork:2 }),
+      BuildItem({ name:'Book', tag:2, count:5, priorWork:3, enchants:[{ name:'Smite', level:2 }, { name:'Looting', level:3 }] }),
       // 3 to be merged with 1
-      BuildItem({ name:'Book', nr:3, count:10, priorWork:2 }),
-      BuildItem({ name:'Book', nr:4, count:50, priorWork:1 }),
+      BuildItem({ name:'Book', tag:3, count:10, priorWork:2 }),
+      BuildItem({ name:'Book', tag:4, count:50, priorWork:1 }),
       // 5 to be merged with 2; reversed enchant order as extra test
-      BuildItem({ name:'Book', nr:5, count:100, priorWork:3, enchants:[{ name:'Looting', level:3 }, { name:'Smite', level:2 }] }),
+      BuildItem({ name:'Book', tag:5, count:100, priorWork:3, enchants:[{ name:'Looting', level:3 }, { name:'Smite', level:2 }] }),
     ]
 
-    let itemRows = CreateItemRows(templateRowDetails, testItems)
+    let itemRows = CreateItemRows(templateRowDetails, testItems, false)
 
     // mimick what the merge has done to compare the result
     testItems[0].count += testItems[2].count
     testItems[1].count += testItems[4].count
-    testItems[3].nr = 3
+    testItems[3].tag = 3
     mergedTestItems = [
       testItems[0],
       testItems[1],
@@ -128,16 +130,16 @@ jazil.AddTestSet(omeoPage, 'ItemCollector', {
     let templateRowDetails = GetItemTemplateRow('collectingItemRow', g_source)
 
     let testItems = [
-      BuildItem({ name:'Sword', nr:1, count:1, priorWork:2 }),
-      BuildItem({ name:'Sword', nr:2, count:5, priorWork:3, enchants:[{ name:'Smite', level:1 }, { name:'Mending', level:1 }] }),
+      BuildItem({ name:'Sword', tag:1, count:1, priorWork:2 }),
+      BuildItem({ name:'Sword', tag:2, count:5, priorWork:3, enchants:[{ name:'Smite', level:1 }, { name:'Mending', level:1 }] }),
       // 3 can be merged with 1
-      BuildItem({ name:'Sword', nr:3, count:10, priorWork:2 }),
-      BuildItem({ name:'Sword', nr:4, count:50, priorWork:1 }),
+      BuildItem({ name:'Sword', tag:3, count:10, priorWork:2 }),
+      BuildItem({ name:'Sword', tag:4, count:50, priorWork:1 }),
       // 5 can be merged with 2; reversed enchant order as extra test
-      BuildItem({ name:'Sword', nr:5, count:5, priorWork:3, enchants:[{ name:'Mending', level:1 }, { name:'Smite', level:1 }] }),
+      BuildItem({ name:'Sword', tag:5, count:5, priorWork:3, enchants:[{ name:'Mending', level:1 }, { name:'Smite', level:1 }] }),
     ]
 
-    let itemRows = CreateItemRows(templateRowDetails, testItems)
+    let itemRows = CreateItemRows(templateRowDetails, testItems, false)
     let result = ProcessItemRows(itemRows, false)
 
     jazil.ShouldBe(templateRowDetails.ShowCountInputError.called, false, 'count error callback is called!')
@@ -158,12 +160,12 @@ jazil.AddTestSet(omeoPage, 'ItemCollector', {
     let templateRowDetails = GetItemTemplateRow('collectingItemRow', g_source)
 
     let testItems = [
-      BuildItem({ name:'Boots', nr:1, count:1, priorWork:1 }),
-      BuildItem({ name:'Boots', nr:2, count:2, priorWork:1, enchants:[{ name:'Protection', level:3 }, { name:'Feather Falling', level:1 }] }),
-      BuildItem({ name:'Boots', nr:3, count:5, priorWork:1 }),
+      BuildItem({ name:'Boots', tag:1, count:1, priorWork:1 }),
+      BuildItem({ name:'Boots', tag:2, count:2, priorWork:1, enchants:[{ name:'Protection', level:3 }, { name:'Feather Falling', level:1 }] }),
+      BuildItem({ name:'Boots', tag:3, count:5, priorWork:1 }),
     ]
 
-    let itemRows = CreateItemRows(templateRowDetails, testItems)
+    let itemRows = CreateItemRows(templateRowDetails, testItems, false)
 
     // Update the middle item row's count to something non-numeric.
     // Just empty is the most cross-browser way to do so.

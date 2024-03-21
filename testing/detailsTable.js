@@ -8,7 +8,9 @@ function CheckItemInTable(jazil, item, tableElemJQ) {
       let listedCost = $(rowElemJQ.find('.cost')).text()
       let listedPriorWork = $(rowElemJQ.find('.priorWork')).text()
 
-      let neededDescription = `${GetSetName(item.set)} ${item.info.name} nr. ${item.nr}`
+      let neededDescription = `${GetSetName(item.set)} ${item.info.name}`
+      if (item.set == g_source)
+        neededDescription += ` nr. ${item.nr}`
       let neededEnchants = ''
       item.enchantsByID.forEach((enchant) => {
         neededEnchants += `${enchant.info.name} ${enchant.level}`
@@ -34,7 +36,7 @@ function CheckItemInTable(jazil, item, tableElemJQ) {
     return !itemFound
   })
 
-  jazil.Assert(itemFound, `Item ${GetAbbrItemDesciption(item, true, true)} not found in table!`)
+  jazil.Assert(itemFound, `Item ${GetAbbrItemDesciption(item, true)} not found in table!`)
 }
 
 
@@ -66,7 +68,7 @@ jazil.AddTestSet(omeoPage, 'DetailsTable - common', {
     let tableElemJQ = $('#detailsTable')
     let numRowsBefore = tableElemJQ.find('tr').length
     let table = new DetailsTable(tableElemJQ)
-    let item = BuildItem({ name:'Pickaxe', nr:1, count:4, cost:2, totalCost:7, priorWork:2, set:g_extra })
+    let item = BuildItem({ name:'Pickaxe', count:4, cost:2, totalCost:7, priorWork:2, set:g_extra })
     table.ShowItem(item)
     let numRowsAfter = tableElemJQ.find('tr').length
     let numRowsDiff = numRowsAfter - numRowsBefore
@@ -124,11 +126,11 @@ jazil.AddTestSet(omeoPage, 'DetailsTable - complex combined listings', {
     let table = new DetailsTable(tableElemJQ)
     let item0_s_t = BuildItem({ name:'Book', nr:1, count:4, cost:0, totalCost:0, priorWork:0, set:g_source, enchants:[{ name:'Unbreaking', level:3 }] })
     let item0_s_s = BuildItem({ name:'Book', nr:2, count:2, cost:0, totalCost:0, priorWork:0, set:g_source, enchants:[{ name:'Mending' }] })
-    let item0_s = BuildItem({ name:'Shovel', nr:3, count:6, cost:3, totalCost:12, priorWork:3, set:g_combined, enchants:[{ name:'Mending' }, { name:'Unbreaking', level:3 }] })
+    let item0_s = BuildItem({ name:'Shovel', count:6, cost:3, totalCost:12, priorWork:3, set:g_combined, enchants:[{ name:'Mending' }, { name:'Unbreaking', level:3 }] })
     item0_s.targetItem = item0_s_t
     item0_s.sacrificeItem = item0_s_s
-    let item0_t = BuildItem({ name:'Shovel', nr:4, count:1, cost:0, totalCost:0, priorWork:0, set:g_extra })
-    let item0 = BuildItem({ name:'Shovel', nr:5, count:8, cost:6, totalCost:22, priorWork:4, set:g_combined, enchants:[{ name:'Mending' }, { name:'Unbreaking', level:3 }]})
+    let item0_t = BuildItem({ name:'Shovel', count:1, cost:0, totalCost:0, priorWork:0, set:g_extra })
+    let item0 = BuildItem({ name:'Shovel', count:8, cost:6, totalCost:22, priorWork:4, set:g_combined, enchants:[{ name:'Mending' }, { name:'Unbreaking', level:3 }]})
     item0.targetItem = item0_t
     item0.sacrificeItem = item0_s
 
@@ -146,11 +148,11 @@ jazil.AddTestSet(omeoPage, 'DetailsTable - complex combined listings', {
     let table = new DetailsTable(tableElemJQ)
     let item0_t_t = BuildItem({ name:'Book', nr:1, count:4, cost:0, totalCost:0, priorWork:0, set:g_source, enchants:[{ name:'Unbreaking', level:3 }] })
     let item0_t_s = BuildItem({ name:'Book', nr:2, count:2, cost:0, totalCost:0, priorWork:0, set:g_source, enchants:[{ name:'Mending' }] })
-    let item0_t = BuildItem({ name:'Shovel', nr:3, count:1, cost:3, totalCost:12, priorWork:0, set:g_combined, enchants:[{ name:'Mending' }, { name:'Unbreaking', level:3 }] })
+    let item0_t = BuildItem({ name:'Shovel', count:1, cost:3, totalCost:12, priorWork:0, set:g_combined, enchants:[{ name:'Mending' }, { name:'Unbreaking', level:3 }] })
     item0_t.targetItem = item0_t_t
     item0_t.sacrificeItem = item0_t_s
-    let item0_s = BuildItem({ name:'Shovel', nr:4, count:6, cost:0, totalCost:0, priorWork:3, set:g_extra })
-    let item0 = BuildItem({ name:'Shovel', nr:5, count:8, cost:6, totalCost:22, priorWork:4, set:g_combined, enchants:[{ name:'Mending' }, { name:'Unbreaking', level:3 }]})
+    let item0_s = BuildItem({ name:'Shovel', count:6, cost:0, totalCost:0, priorWork:3, set:g_extra })
+    let item0 = BuildItem({ name:'Shovel', count:8, cost:6, totalCost:22, priorWork:4, set:g_combined, enchants:[{ name:'Mending' }, { name:'Unbreaking', level:3 }]})
     item0.targetItem = item0_t
     item0.sacrificeItem = item0_s
 
