@@ -99,8 +99,8 @@
             <th>Nr</th>
             <th>Count</th>
             <th>Type</th>
-            <th>Prior work</th>
             <th>Enchantments</th>
+            <th>Prior work</th>
             <th></th>
           </tr>
         </thead>
@@ -109,7 +109,6 @@
             <td><span class="nr"></span></td>
             <td><input name="count" type="number" min="1" value="1"></td>
             <td><select name="itemID"></select></td>
-            <td><select name="priorWork" class="priorWork"></select></td>
             <td>
               <table class="enchants">
                 <tbody>
@@ -122,6 +121,7 @@
               </table>
               <button type="button" name="addEnchant">Add enchantment</button>
             </td>
+            <td><select name="priorWork" class="priorWork"></select></td>
             <td><button type="button" name="removeItem">Remove item</button></td>
           </tr>
         </tbody>
@@ -170,23 +170,19 @@
         <thead>
           <tr>
             <th>Nr</th>
-            <th>Total cost</th>
-            <th>Step cost</th>
             <th>Count</th>
             <th>Type</th>
-            <th>Prior work</th>
             <th>Enchantments</th>
+            <th>Prior work</th>
+            <th>Cost</th>
             <th></th>
           </tr>
         </thead>
         <tbody>
           <tr class="template item" data-real="0" data-nr="0">
             <td><span class="nr"></span></td>
-            <td><span class="totalCost"></span></td>
-            <td><span class="cost"></span></td>
             <td><span class="count"></span></td>
             <td><span class="type"></span></td>
-            <td><span class="priorWork"></span></td>
             <td>
               <table class="enchants">
                 <tbody>
@@ -196,6 +192,8 @@
                 </tbody>
               </table>
             </td>
+            <td><span class="priorWork"></span></td>
+            <td><span class="cost"></span></td>
             <td><button type="button" name="showDetails">Show details</button></td>
           </tr>
         </tbody>
@@ -212,16 +210,16 @@
           <tr>
             <th>Item</th>
             <th>Enchantments</th>
-            <th>Cost</th>
             <th>Prior work</th>
+            <th>Cost</th>
           </tr>
         </thead>
         <tbody>
           <tr class="template item" data-real="0">
             <td><span class="description"></span></td>
             <td><span class="enchants"></span></td>
-            <td><span class="cost"></span></td>
             <td><span class="priorWork"></span></td>
+            <td><span class="cost"></span></td>
           </tr>
         </tbody>
       </table>

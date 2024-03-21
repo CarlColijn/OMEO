@@ -55,7 +55,6 @@ class ItemRow {
         this.typeElemJQ = rowElemJQ.find('.type')
         this.priorWorkElemJQ = rowElemJQ.find('.priorWork')
         this.costElemJQ = rowElemJQ.find('.cost')
-        this.totalCostElemJQ = rowElemJQ.find('.totalCost')
         break
     }
 
@@ -158,8 +157,7 @@ class ItemRow {
         this.countElemJQ.text(item.count)
         this.typeElemJQ.text(item.info.name)
         this.priorWorkElemJQ.text(item.priorWork)
-        this.costElemJQ.text(item.cost)
-        this.totalCostElemJQ.text(item.totalCost)
+        this.costElemJQ.text(item.totalCost)
         break
     }
 

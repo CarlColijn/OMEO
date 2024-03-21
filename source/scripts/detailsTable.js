@@ -102,8 +102,8 @@ class DetailsTable {
       descriptionElemJQ.css('padding-left', `+=${indent}em`)
       descriptionElemJQ.text(this.GetItemDescription(item))
       newRowElemJQ.find('.enchants').html(this.GetItemEnchants(item))
-      newRowElemJQ.find('.cost').text(this.GetItemCost(item))
       newRowElemJQ.find('.priorWork').text(item.priorWork)
+      newRowElemJQ.find('.cost').text(this.GetItemCost(item))
 
       this.AddItem(item.targetItem, indent + 1)
       this.AddItem(item.sacrificeItem, indent + 1)
