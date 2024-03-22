@@ -54,8 +54,9 @@ class CombineResultFilter {
   // returns object;
   // - level: CombineResultLevel
   // - items: Item[]
-  GetCleanedUpItemList(combinedItems) {
-    let itemGroups = this.SortItemsInGroups(combinedItems)
+  // - hasSources: bool
+  GetCleanedUpItemList(sourceItems, combinedItems) {
+    let itemGroups = this.SortItemsInGroups([...sourceItems, ...combinedItems])
 
     this.SortItemGroupsByFitness(itemGroups)
 
@@ -93,7 +94,8 @@ class CombineResultFilter {
 
     return {
       level: level,
-      items: items
+      items: items,
+      hasSources: this.ItemListContainsSources(items)
     }
   }
 
@@ -350,5 +352,17 @@ class CombineResultFilter {
     return items.filter((item, itemNr, array) => {
       return itemsToKeep.has(item)
     })
+  }
+
+
+  ItemListContainsSources(items) {
+    let hasSources = false
+    items.forEach((item) => {
+      if (item.set !== g_source)
+        return true
+      hasSources = true
+      return false
+    })
+    return hasSources
   }
 }

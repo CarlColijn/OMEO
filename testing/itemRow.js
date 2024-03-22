@@ -21,12 +21,13 @@ function CreateTestSet(setDescription, testContainerID, setLetter) {
       let itemRow = CreateItemRow(templateRowDetails, undefined, 6)
 
       let details = GetItemRowDetails(itemRow.rowElemJQ, set)
+
       jazil.ShouldBe(itemRow.set, set, 'set is off!')
       if (set === g_source)
         jazil.ShouldBe(details.nr, 6, 'nr is off!')
       jazil.ShouldBe(details.cost, set === g_combined ? undefined : undefined, 'cost is off!')
       jazil.ShouldBe(details.count, set === g_source ? 1 : undefined, 'count is off!')
-      jazil.ShouldBe(details.type, set !== g_combined ? 'Axe' : undefined, 'type is off!')
+      jazil.ShouldBe(details.type, set !== g_combined ? 'Axe' : undefined, 'name is off!')
       jazil.ShouldBe(details.priorWork, set === g_source ? 0 : undefined, 'priorWork is off!')
       jazil.ShouldBe(details.enchantNames, set !== g_combined ? '' : undefined, 'enchant names are off!')
       jazil.ShouldBe(details.enchantLevels, set !== g_combined ? '' : undefined, 'enchant levels are off!')
@@ -39,16 +40,18 @@ function CreateTestSet(setDescription, testContainerID, setLetter) {
       let itemRow = CreateItemRow(templateRowDetails, item, 5)
 
       let details = GetItemRowDetails(itemRow.rowElemJQ, set)
+      let description = GetDescriptionForItemInTable(set, item)
+
       jazil.ShouldBe(itemRow.set, set, 'set is off!')
       if (set === g_source)
         jazil.ShouldBe(details.nr, 5, 'nr is off!')
       jazil.ShouldBe(details.cost, set === g_combined ? 15 : undefined, 'cost is off!')
       jazil.ShouldBe(details.count, set !== g_desired ? 9 : undefined, 'count is off!')
-      jazil.ShouldBe(details.type, 'Pickaxe', 'type is off!')
+      jazil.ShouldBe(details.type, description, 'description is off!')
       jazil.ShouldBe(details.priorWork, set !== g_desired ? 2 : undefined, 'priorWork is off!')
       jazil.ShouldBe(details.enchantNames, set !== g_combined ? '' : undefined, 'enchant names are off!')
       jazil.ShouldBe(details.enchantLevels, set !== g_combined ? '' : undefined, 'enchant levels are off!')
-      jazil.ShouldBe(ItemRowInTable(testContainerID, 'Pickaxe', set), true, 'added row is not present!')
+      jazil.ShouldBe(ItemRowInTable(testContainerID, description, set), true, 'added row is not present!')
     },
 
     'Create new row with item+enchants from template': (jazil) => {
@@ -59,16 +62,18 @@ function CreateTestSet(setDescription, testContainerID, setLetter) {
       let itemRow = CreateItemRow(templateRowDetails, item, 15)
 
       let details = GetItemRowDetails(itemRow.rowElemJQ, set)
+      let description = GetDescriptionForItemInTable(set, item)
+
       jazil.ShouldBe(itemRow.set, set, 'set is off!')
       if (set === g_source)
         jazil.ShouldBe(details.nr, 15, 'nr is off!')
       jazil.ShouldBe(details.cost, set === g_combined ? 9 : undefined, 'cost is off!')
       jazil.ShouldBe(details.count, set !== g_desired ? 1 : undefined, 'count is off!')
-      jazil.ShouldBe(details.type, 'Turtle Shell', 'type is off!')
+      jazil.ShouldBe(details.type, description, 'description is off!')
       jazil.ShouldBe(details.priorWork, set !== g_desired ? 4 : undefined, 'priorWork is off!')
       jazil.ShouldBe(details.enchantNames, 'MendingUnbreaking', 'enchant names are off!')
       jazil.ShouldBe(details.enchantLevels, '13', 'enchant levels are off!')
-      jazil.ShouldBe(ItemRowInTable(testContainerID, 'Turtle Shell', set), true, 'added row is not present!')
+      jazil.ShouldBe(ItemRowInTable(testContainerID, description, set), true, 'added row is not present!')
     },
 
     'Retrieve item from row': (jazil) => {
@@ -91,6 +96,7 @@ function CreateTestSet(setDescription, testContainerID, setLetter) {
           enchantLevels += enchant.level
         }
       })
+      let description = GetDescriptionForItemInTable(set, item)
 
       jazil.ShouldBe(itemDetails.withErrors, false, 'row says there were count errors!')
       jazil.ShouldBe(templateRowDetails.ShowCountInputError.called, false, 'count error callback is called!')
@@ -99,11 +105,11 @@ function CreateTestSet(setDescription, testContainerID, setLetter) {
         jazil.ShouldBe(retrievedItem.nr, 31, 'nr is off!')
       jazil.ShouldBe(retrievedItem.cost, 0, 'cost is set!')
       jazil.ShouldBe(retrievedItem.count, set === g_source ? item.count : 1, 'count is off!')
-      jazil.ShouldBe(retrievedItem.info.name, item.info.name, 'type is off!')
+      jazil.ShouldBe(retrievedItem.info.name, item.info.name, 'name is off!')
       jazil.ShouldBe(retrievedItem.priorWork, set === g_source ? item.priorWork : 0, 'priorWork is off!')
       jazil.ShouldBe(enchantNames, 'EfficiencyUnbreaking', 'enchant names are off!')
       jazil.ShouldBe(enchantLevels, '21', 'enchant levels are off!')
-      jazil.ShouldBe(ItemRowInTable(testContainerID, 'Shears', set), true, 'added row is not present!')
+      jazil.ShouldBe(ItemRowInTable(testContainerID, description, set), true, 'added row is not present!')
     },
 
     'Count input errors get registered': (jazil) => {
@@ -129,6 +135,7 @@ function CreateTestSet(setDescription, testContainerID, setLetter) {
           enchantLevels += enchant.level
         }
       })
+      let description = GetDescriptionForItemInTable(set, item)
 
       jazil.ShouldBe(itemDetails.withErrors, true, 'row says there were no count errors!')
       jazil.ShouldBe(templateRowDetails.ShowCountInputError.called, true, 'count error callback is not called!')
@@ -137,11 +144,11 @@ function CreateTestSet(setDescription, testContainerID, setLetter) {
         jazil.ShouldBe(retrievedItem.nr, 25, 'nr is off!')
       jazil.ShouldBe(retrievedItem.cost, 0, 'cost is set!')
       jazil.ShouldBe(retrievedItem.count, set === g_source ? NaN : 1, 'count is off!')
-      jazil.ShouldBe(retrievedItem.info.name, item.info.name, 'type is off!')
+      jazil.ShouldBe(retrievedItem.info.name, item.info.name, 'name is off!')
       jazil.ShouldBe(retrievedItem.priorWork, set === g_source ? item.priorWork : 0, 'priorWork is off!')
       jazil.ShouldBe(enchantNames, 'Projectile Protection', 'enchant names are off!')
       jazil.ShouldBe(enchantLevels, '1', 'enchant levels are off!')
-      jazil.ShouldBe(ItemRowInTable(testContainerID, 'Book', set), true, 'added row is not present!')
+      jazil.ShouldBe(ItemRowInTable(testContainerID, description, set), true, 'added row is not present!')
     },
 
     'Added row count is OK': (jazil) => {
@@ -171,8 +178,10 @@ function CreateTestSet(setDescription, testContainerID, setLetter) {
       itemRow2.Remove()
       let numRowsPost = $(`#${testContainerID} tr.item`).length
 
+      let description = GetDescriptionForItemInTable(set, item2)
+
       jazil.ShouldBe(numRowsPost - numRowsPre, -1, 'amount of rows removed is off!')
-      jazil.ShouldBe(ItemRowInTable(testContainerID, 'Trident', set), false, 'removed row is still present!')
+      jazil.ShouldBe(ItemRowInTable(testContainerID, description, set), false, 'removed row is still present!')
     },
 
     'Item nr can be changed': (jazil) => {
@@ -182,18 +191,20 @@ function CreateTestSet(setDescription, testContainerID, setLetter) {
       let item = BuildItem({ name:'Chestplate', count:4, priorWork:5, cost:3, enchants:[{ name:'Protection', level:2 }, { name:'Thorns', level:3 }] })
       let itemRow = CreateItemRow(templateRowDetails, item, 1)
       itemRow.SetNumber(8)
+
       let details = GetItemRowDetails(itemRow.rowElemJQ, set)
+      let description = GetDescriptionForItemInTable(set, item)
 
       jazil.ShouldBe(itemRow.set, set, 'set is off!')
       if (set === g_source)
         jazil.ShouldBe(details.nr, 8, 'nr is off!')
       jazil.ShouldBe(details.cost, set === g_combined ? 3 : undefined, 'cost is off!')
       jazil.ShouldBe(details.count, set !== g_desired ? 4 : undefined, 'count is off!')
-      jazil.ShouldBe(details.type, 'Chestplate', 'type is off!')
+      jazil.ShouldBe(details.type, description, 'description is off!')
       jazil.ShouldBe(details.priorWork, set !== g_desired ? 5 : undefined, 'priorWork is off!')
       jazil.ShouldBe(details.enchantNames, 'ProtectionThorns', 'enchant names are off!')
       jazil.ShouldBe(details.enchantLevels, '23', 'enchant levels are off!')
-      jazil.ShouldBe(ItemRowInTable(testContainerID, 'Chestplate', set), true, 'changed row is not present anymore!')
+      jazil.ShouldBe(ItemRowInTable(testContainerID, description, set), true, 'changed row is not present anymore!')
     },
 
     'Item count can be changed': (jazil) => {
@@ -206,18 +217,20 @@ function CreateTestSet(setDescription, testContainerID, setLetter) {
       let item = BuildItem({ name:'Crossbow', count:1, priorWork:3, cost:6 })
       let itemRow = CreateItemRow(templateRowDetails, item, 31)
       itemRow.SetCount(5)
+
       let details = GetItemRowDetails(itemRow.rowElemJQ, set)
+      let description = GetDescriptionForItemInTable(set, item)
 
       jazil.ShouldBe(itemRow.set, set, 'set is off!')
       if (set === g_source)
         jazil.ShouldBe(details.nr, 31, 'nr is off!')
       jazil.ShouldBe(details.cost, set === g_combined ? 6 : undefined, 'cost is off!')
       jazil.ShouldBe(details.count, set !== g_desired ? 5 : undefined, 'count is off!')
-      jazil.ShouldBe(details.type, 'Crossbow', 'type is off!')
+      jazil.ShouldBe(details.type, description, 'description is off!')
       jazil.ShouldBe(details.priorWork, set !== g_desired ? 3 : undefined, 'priorWork is off!')
       jazil.ShouldBe(details.enchantNames, set !== g_combined ? '' : undefined, 'enchant names are off!')
       jazil.ShouldBe(details.enchantLevels, set !== g_combined ? '' : undefined, 'enchant levels are off!')
-      jazil.ShouldBe(ItemRowInTable(testContainerID, 'Crossbow', set), true, 'changed row is not present anymore!')
+      jazil.ShouldBe(ItemRowInTable(testContainerID, description, set), true, 'changed row is not present anymore!')
     },
 
     'Item can get extra enchants': (jazil) => {
@@ -228,18 +241,20 @@ function CreateTestSet(setDescription, testContainerID, setLetter) {
       // Note: enchantments are ordered in addition order
       itemRow.AddEnchant(BuildEnchant('Unbreaking', 2))
       itemRow.AddEnchant(BuildEnchant('Mending', 1))
+
       let details = GetItemRowDetails(itemRow.rowElemJQ, set)
+      let description = GetDescriptionForItemInTable(set, item)
 
       jazil.ShouldBe(itemRow.set, set, 'set is off!')
       if (set === g_source)
         jazil.ShouldBe(details.nr, 28, 'nr is off!')
       jazil.ShouldBe(details.cost, set === g_combined ? 8 : undefined, 'cost is off!')
       jazil.ShouldBe(details.count, set !== g_desired ? 1 : undefined, 'count is off!')
-      jazil.ShouldBe(details.type, 'Flint & Steel', 'type is off!')
+      jazil.ShouldBe(details.type, description, 'description is off!')
       jazil.ShouldBe(details.priorWork, set !== g_desired ? 0 : undefined, 'priorWork is off!')
       jazil.ShouldBe(details.enchantNames, 'UnbreakingMending', 'enchant names are off!')
       jazil.ShouldBe(details.enchantLevels, '21', 'enchant levels are off!')
-      jazil.ShouldBe(ItemRowInTable(testContainerID, 'Flint & Steel', set), true, 'changed row is not present anymore!')
+      jazil.ShouldBe(ItemRowInTable(testContainerID, description, set), true, 'changed row is not present anymore!')
     },
 
     'Item enchants can be removed': (jazil) => {
@@ -251,18 +266,20 @@ function CreateTestSet(setDescription, testContainerID, setLetter) {
       itemRow.AddEnchant(BuildEnchant('Unbreaking', 2))
       itemRow.AddEnchant(BuildEnchant('Lure', 3))
       itemRow.RemoveEnchants()
+
       let details = GetItemRowDetails(itemRow.rowElemJQ, set)
+      let description = GetDescriptionForItemInTable(set, item)
 
       jazil.ShouldBe(itemRow.set, set, 'set is off!')
       if (set === g_source)
         jazil.ShouldBe(details.nr, 26, 'nr is off!')
       jazil.ShouldBe(details.cost, set === g_combined ? 1 : undefined, 'cost is off!')
       jazil.ShouldBe(details.count, set !== g_desired ? 3 : undefined, 'count is off!')
-      jazil.ShouldBe(details.type, 'Fishing Rod', 'type is off!')
+      jazil.ShouldBe(details.type, description, 'description is off!')
       jazil.ShouldBe(details.priorWork, set !== g_desired ? 2 : undefined, 'priorWork is off!')
       jazil.ShouldBe(details.enchantNames, set !== g_combined ? '' : undefined, 'enchant names are off!')
       jazil.ShouldBe(details.enchantLevels, set !== g_combined ? '' : undefined, 'enchant levels are off!')
-      jazil.ShouldBe(ItemRowInTable(testContainerID, 'Fishing Rod', set), true, 'changed row is not present anymore!')
+      jazil.ShouldBe(ItemRowInTable(testContainerID, description, set), true, 'changed row is not present anymore!')
     },
 
     'Item can be changed': (jazil) => {
@@ -273,16 +290,18 @@ function CreateTestSet(setDescription, testContainerID, setLetter) {
       // Note: enchantments are re-ordered in alphabetical order
       let updatedItem = BuildItem({ name:'Helmet', count:6, priorWork:4, cost:5, enchants:[{ name:'Blast Protection', level:4 }, { name:'Aqua Affinity', level:1 }] })
       itemRow.SetItem(updatedItem)
+
       let details = GetItemRowDetails(itemRow.rowElemJQ, set)
+      let description = GetDescriptionForItemInTable(set, updatedItem)
 
       jazil.ShouldBe(itemRow.set, set, 'set is off!')
       jazil.ShouldBe(details.cost, set === g_combined ? 5 : undefined, 'cost is off!')
       jazil.ShouldBe(details.count, set !== g_desired ? 6 : undefined, 'count is off!')
-      jazil.ShouldBe(details.type, 'Helmet', 'type is off!')
+      jazil.ShouldBe(details.type, description, 'description is off!')
       jazil.ShouldBe(details.priorWork, set !== g_desired ? 4 : undefined, 'priorWork is off!')
       jazil.ShouldBe(details.enchantNames, 'Aqua AffinityBlast Protection', 'enchant names are off!')
       jazil.ShouldBe(details.enchantLevels, '14', 'enchant levels are off!')
-      jazil.ShouldBe(ItemRowInTable(testContainerID, 'Helmet', set), true, 'changed row is not present anymore!')
+      jazil.ShouldBe(ItemRowInTable(testContainerID, description, set), true, 'changed row is not present anymore!')
     },
 
   })

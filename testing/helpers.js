@@ -240,6 +240,18 @@ function CreateItemRow(templateRowDetails, item, nr) {
 
 
 
+function GetDescriptionForItemInTable(set, item) {
+  let name = item.info.name
+  if (set === g_combined) {
+    if (item.set === g_source)
+      name += ` (source nr. ${item.nr})`
+    else if (item.set === g_extra)
+      name += ` (extra)`
+  }
+  return name
+}
+
+
 function GetItemRowDetails(itemRowElemJQ, set) {
   let MakeNumberSafe = (className) => {
     let value = itemRowElemJQ.find(className).text()

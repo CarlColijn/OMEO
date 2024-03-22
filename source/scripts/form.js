@@ -101,11 +101,11 @@ class Form {
       let combinedItems = itemCombiner.GetAllItemCombinations(dataInContext.data.sourceItems, dataInContext.data.desiredItem)
 
       let combineResultFilter = new CombineResultFilter(dataInContext.data.desiredItem)
-      let cleanedUpItemsResult = combineResultFilter.GetCleanedUpItemList(combinedItems)
+      let cleanedUpItemsResult = combineResultFilter.GetCleanedUpItemList(dataInContext.data.sourceItems, combinedItems)
 
       this.ShowCombinedItems(cleanedUpItemsResult.items)
 
-      this.formHandler.TellCombiningDone(cleanedUpItemsResult.level)
+      this.formHandler.TellCombiningDone(cleanedUpItemsResult.level, cleanedUpItemsResult.hasSources)
     }
   }
 

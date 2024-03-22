@@ -1,10 +1,11 @@
-function CheckItemFilterResultOK(id, jazil, desiredItem, combinedItems, expectedLevel, expectedTags) {
+function CheckItemFilterResultOK(id, jazil, desiredItem, sourceItems, combinedItems, expectedLevel, expectedTags, expectedHasSources) {
   let filter = new CombineResultFilter(desiredItem)
-  let filterResult = filter.GetCleanedUpItemList(combinedItems)
+  let filterResult = filter.GetCleanedUpItemList(sourceItems, combinedItems)
 
   jazil.ShouldBe(filterResult.level.id, expectedLevel.id, 'wrong level returned!')
 
-  jazil.ShouldBe(filterResult.items.length, expectedTags.length, 'wrong number of items got returned!')
+  jazil.ShouldBe(filterResult.items.length, expectedTags.length, 'wrong number of items returned!')
+  jazil.ShouldBe(filterResult.hasSources, expectedHasSources, 'wrong hasSources returned!')
 
   for (let itemNr = 0; itemNr < expectedTags.length; ++itemNr)
     jazil.ShouldBe(filterResult.items[itemNr].tag, expectedTags[itemNr], `wrong item ${itemNr} got returned (${expectedTags[itemNr]})!`)
@@ -176,8 +177,10 @@ jazil.AddTestSet(omeoPage, 'CombineResultFilter', {
       jazil,
       undefined,
       [],
+      [],
       g_noCombines,
-      []
+      [],
+      false
     )
   },
 
@@ -187,6 +190,7 @@ jazil.AddTestSet(omeoPage, 'CombineResultFilter', {
     CheckItemFilterResultOK('Only non-matching plain item',
       jazil,
       creator.GetDesired(),
+      [],
       [
         // non-matching
         ...creator.GetCombineds({ name:'Axe' }),
@@ -196,7 +200,8 @@ jazil.AddTestSet(omeoPage, 'CombineResultFilter', {
         ...creator.GetCombineds({ name:'Book' }),
       ],
       g_noCombines,
-      []
+      [],
+      false
     )
   },
 
@@ -206,6 +211,7 @@ jazil.AddTestSet(omeoPage, 'CombineResultFilter', {
     CheckItemFilterResultOK('Only non-matching enchanted item',
       jazil,
       creator.GetDesired(),
+      [],
       [
         // non-matching with other enchants
         ...creator.GetCombineds({ name:'Axe', enchants:[{ name:'Aqua Affinity' }] }),
@@ -215,7 +221,8 @@ jazil.AddTestSet(omeoPage, 'CombineResultFilter', {
         ...creator.GetCombineds({ name:'Book', enchants:[] }),
       ],
       g_noCombines,
-      []
+      [],
+      false
     )
   },
 
@@ -225,6 +232,7 @@ jazil.AddTestSet(omeoPage, 'CombineResultFilter', {
     CheckItemFilterResultOK('Minimal permutations of prior work and total cost',
       jazil,
       BuildItem({ tag:0, name:'Helmet', set:g_desired }),
+      [],
       [
         BuildItem({ tag:1,  name:'Helmet', set:g_combined, priorWork:1, totalCost:22 }),
         BuildItem({ tag:2,  name:'Helmet', set:g_combined, priorWork:2, totalCost:21 }),
@@ -239,7 +247,8 @@ jazil.AddTestSet(omeoPage, 'CombineResultFilter', {
         BuildItem({ tag:11, name:'Helmet', set:g_combined, priorWork:3, totalCost:13 }),
       ],
       g_onlyPerfectCombines,
-      [3, 10, 6]
+      [3, 10, 6],
+      false
     )
   },
 
@@ -249,6 +258,7 @@ jazil.AddTestSet(omeoPage, 'CombineResultFilter', {
     CheckItemFilterResultOK('Only perfect matching plain items',
       jazil,
       creator.GetDesired(),
+      [],
       [
         // perfect
         ...creator.GetCombineds(),
@@ -260,7 +270,8 @@ jazil.AddTestSet(omeoPage, 'CombineResultFilter', {
       ],
       g_onlyPerfectCombines,
       // 2nd+1st of 1st set
-      [2,1]
+      [2,1],
+      false
     )
   },
 
@@ -270,6 +281,7 @@ jazil.AddTestSet(omeoPage, 'CombineResultFilter', {
     CheckItemFilterResultOK('Only perfect matching enchanted item',
       jazil,
       creator.GetDesired(),
+      [],
       [
         // perfect
         ...creator.GetCombineds(),
@@ -284,7 +296,8 @@ jazil.AddTestSet(omeoPage, 'CombineResultFilter', {
       ],
       g_onlyPerfectCombines,
       // 2nd+1st of 1st set
-      [2,1]
+      [2,1],
+      false
     )
   },
 
@@ -294,6 +307,7 @@ jazil.AddTestSet(omeoPage, 'CombineResultFilter', {
     CheckItemFilterResultOK('Only perfect+extra matching cost/work diffing plain items',
       jazil,
       creator.GetDesired(),
+      [],
       [
         // extra, mid fit @ 1.0
         ...creator.GetCombineds({ enchants:[{ name:'Unbreaking', level:3 /*1.00*/ }] }),
@@ -307,7 +321,8 @@ jazil.AddTestSet(omeoPage, 'CombineResultFilter', {
       ],
       g_onlyPerfectWithExtrasCombines,
       // 2nd+1st of 3rd set, 1st set, 4th set
-      [8,7, 2,1, 11,10]
+      [8,7, 2,1, 11,10],
+      false
     )
   },
 
@@ -317,6 +332,7 @@ jazil.AddTestSet(omeoPage, 'CombineResultFilter', {
     CheckItemFilterResultOK('Only perfect+extra matching enchanted item',
       jazil,
       creator.GetDesired(),
+      [],
       [
         // extra, most fit @ 0.25
         ...creator.GetCombineds({ enchants:[{ name:'Unbreaking', level:2 /*0.00*/ }, { name:'Protection', level:3 /*0.25*/ }] }),
@@ -333,7 +349,8 @@ jazil.AddTestSet(omeoPage, 'CombineResultFilter', {
       ],
       g_onlyPerfectWithExtrasCombines,
       // 2nd+1st of 1st set, 3rd set, 6th set
-      [2,1, 8,7, 17,16]
+      [2,1, 8,7, 17,16],
+      false
     )
   },
 
@@ -343,6 +360,7 @@ jazil.AddTestSet(omeoPage, 'CombineResultFilter', {
     CheckItemFilterResultOK('Perfect and perfect+extra matching cost/work diffing plain items',
       jazil,
       creator.GetDesired(),
+      [],
       [
         // extra, most fit @ 1.41
         ...creator.GetCombineds({ enchants:[{ name:'Unbreaking', level:2 /*0.66*/ }, { name:'Protection', level:3 /*0.75*/ }] }),
@@ -358,7 +376,8 @@ jazil.AddTestSet(omeoPage, 'CombineResultFilter', {
       ],
       g_perfectAndPerfectWithExtrasCombines,
       // 2nd+1st of 2nd set, 2nd+1st of 1st set, 3rd set, 5th set
-      [5,4, 2,1, 8,7, 14,13]
+      [5,4, 2,1, 8,7, 14,13],
+      false
     )
   },
 
@@ -368,6 +387,7 @@ jazil.AddTestSet(omeoPage, 'CombineResultFilter', {
     CheckItemFilterResultOK('Perfect and perfect+extra matching cost/work diffing enchanted items',
       jazil,
       creator.GetDesired(),
+      [],
       [
         // extra, least fit @ 1.00
         ...creator.GetCombineds({ enchants:[{ name:'Unbreaking', level:3 /*0.00*/ }, { name:'Protection', level:2 /*0.00*/ }, { name:'Mending', level:1 /*1.00*/ }] }),
@@ -384,7 +404,8 @@ jazil.AddTestSet(omeoPage, 'CombineResultFilter', {
       ],
       g_perfectAndPerfectWithExtrasCombines,
       // 2nd+1st of 2nd set, 2nd+1st of 3rd set, 6th set, 1st set
-      [5,4, 8,7, 17,16, 2,1]
+      [5,4, 8,7, 17,16, 2,1],
+      false
     )
   },
 
@@ -396,6 +417,7 @@ jazil.AddTestSet(omeoPage, 'CombineResultFilter', {
     CheckItemFilterResultOK('Imperfect matching cost/work diffing enchanted items',
       jazil,
       creator.GetDesired(),
+      [],
       [
         // imperfect, least fit @ 1.33
         ...creator.GetCombineds({ enchants:[{ name:'Unbreaking', level:2 /*0.33*/ }, { name:'Protection', level:2 /*0.00*/ }, { name:'Mending', level:1 /*1.00*/ }] }),
@@ -408,7 +430,8 @@ jazil.AddTestSet(omeoPage, 'CombineResultFilter', {
       ],
       g_onlyImperfectCombines,
       // 2nd+1st of 2nd set, 1st set, 4th set
-      [5,4, 2,1, 11,10]
+      [5,4, 2,1, 11,10],
+      false
     )
   },
 

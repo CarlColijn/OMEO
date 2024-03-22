@@ -55,6 +55,7 @@ class ItemRow {
         this.typeElemJQ = rowElemJQ.find('.type')
         this.priorWorkElemJQ = rowElemJQ.find('.priorWork')
         this.costElemJQ = rowElemJQ.find('.cost')
+        this.showDetailsElemJQ = rowElemJQ.find('[name=showDetails]')
         break
     }
 
@@ -156,10 +157,26 @@ class ItemRow {
         this.idElemJQ.val(item.id)
         break
       case g_combined:
+        let itemSuffix
+        let hideDetailsButton = false
+        switch (item.set) {
+          case g_source:
+            itemSuffix = ` (source nr. ${item.nr})`
+            hideDetailsButton = true
+            break
+          case g_extra:
+            itemSuffix = ' (extra)'
+            break
+          case g_combined:
+            itemSuffix = ''
+            break
+        }
         this.countElemJQ.text(item.count)
-        this.typeElemJQ.text(item.info.name)
+        this.typeElemJQ.text(item.info.name + itemSuffix)
         this.priorWorkElemJQ.text(item.priorWork)
         this.costElemJQ.text(item.totalCost)
+        if (hideDetailsButton)
+          this.showDetailsElemJQ.hide()
         break
     }
 
