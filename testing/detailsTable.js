@@ -1,8 +1,9 @@
-function CheckItemInTable(jazil, item, tableElemJQ) {
+function CheckItemInTable(jazil, item, tableElemJQ, neededPlacement) {
   let itemFound = false
   tableElemJQ.find('tr').each((rowNr, rowElem) => {
     let rowElemJQ = $(rowElem)
     if (!rowElemJQ.hasClass('template')) {
+      let listedPlacement = $(rowElemJQ.find('.placement')).text()
       let listedDescription = $(rowElemJQ.find('.description')).text()
       let listedEnchants = $(rowElemJQ.find('.enchants')).text()
       let listedCost = $(rowElemJQ.find('.cost')).text()
@@ -26,6 +27,7 @@ function CheckItemInTable(jazil, item, tableElemJQ) {
       let neededPriorWork = `${item.priorWork}`
 
       if (
+        listedPlacement == neededPlacement &&
         listedDescription.includes(neededDescription) &&
         listedEnchants == neededEnchants &&
         listedCost == neededCost &&
@@ -88,7 +90,7 @@ function CreateTestSet(setDescription, setLetter) {
       let item = BuildItem({ name:'Axe', nr:3, count:2, cost:4, totalCost:10, priorWork:3, set:set })
       table.ShowItem(item)
 
-      CheckItemInTable(jazil, item, tableElemJQ)
+      CheckItemInTable(jazil, item, tableElemJQ, 'Result')
     },
 
     'Simple item with enchants is shown OK': (jazil) => {
@@ -98,7 +100,7 @@ function CreateTestSet(setDescription, setLetter) {
       let item = BuildItem({ name:'Boots', nr:2, count:5, cost:2, totalCost:21, priorWork:1, set:set, enchants:[{ name:'Mending' }, { name:'Protection', level:3 }]})
       table.ShowItem(item)
 
-      CheckItemInTable(jazil, item, tableElemJQ)
+      CheckItemInTable(jazil, item, tableElemJQ, 'Result')
     },
 
     'Simple item with no extra costs is shown OK': (jazil) => {
@@ -108,7 +110,7 @@ function CreateTestSet(setDescription, setLetter) {
       let item = BuildItem({ name:'Leggings', nr:8, count:2, cost:5, totalCost:5, priorWork:4, set:set })
       table.ShowItem(item)
 
-      CheckItemInTable(jazil, item, tableElemJQ)
+      CheckItemInTable(jazil, item, tableElemJQ, 'Result')
     },
 
   })
@@ -136,11 +138,11 @@ jazil.AddTestSet(omeoPage, 'DetailsTable - complex combined listings', {
 
     table.ShowItem(item0)
 
-    CheckItemInTable(jazil, item0, tableElemJQ)
-    CheckItemInTable(jazil, item0_t, tableElemJQ)
-    CheckItemInTable(jazil, item0_s, tableElemJQ)
-    CheckItemInTable(jazil, item0_s_t, tableElemJQ)
-    CheckItemInTable(jazil, item0_s_s, tableElemJQ)
+    CheckItemInTable(jazil, item0, tableElemJQ, 'Result')
+    CheckItemInTable(jazil, item0_t, tableElemJQ, 'Left')
+    CheckItemInTable(jazil, item0_s, tableElemJQ, 'Right')
+    CheckItemInTable(jazil, item0_s_t, tableElemJQ, 'Left')
+    CheckItemInTable(jazil, item0_s_s, tableElemJQ, 'Right')
   },
 
   'Complex item tree is shown OK - v2': (jazil) => {
@@ -158,11 +160,11 @@ jazil.AddTestSet(omeoPage, 'DetailsTable - complex combined listings', {
 
     table.ShowItem(item0)
 
-    CheckItemInTable(jazil, item0, tableElemJQ)
-    CheckItemInTable(jazil, item0_t, tableElemJQ)
-    CheckItemInTable(jazil, item0_t_t, tableElemJQ)
-    CheckItemInTable(jazil, item0_t_s, tableElemJQ)
-    CheckItemInTable(jazil, item0_s, tableElemJQ)
+    CheckItemInTable(jazil, item0, tableElemJQ, 'Result')
+    CheckItemInTable(jazil, item0_t, tableElemJQ, 'Left')
+    CheckItemInTable(jazil, item0_t_t, tableElemJQ, 'Left')
+    CheckItemInTable(jazil, item0_t_s, tableElemJQ, 'Right')
+    CheckItemInTable(jazil, item0_s, tableElemJQ, 'Right')
   },
 
 })

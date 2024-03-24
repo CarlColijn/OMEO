@@ -33,7 +33,7 @@ class DetailsTable {
 
   ShowItem(item) {
     this.Clear()
-    this.AddItem(item, 0) // adds the whole tree recursively
+    this.AddItem(item, 0, 'Result') // adds the whole tree recursively
   }
 
 
@@ -56,6 +56,7 @@ class DetailsTable {
   // returns string
   GetItemDescription(item) {
     let description = ''
+
     switch (item.set) {
       case g_combined: description = 'Combined '; break
       case g_source:   description = 'Source '; break
@@ -97,19 +98,20 @@ class DetailsTable {
   }
 
 
-  AddItem(item, indent) {
+  AddItem(item, indent, placement) {
     if (item !== undefined) {
       let newRowElemJQ = this.AddNewRow()
 
-      let descriptionElemJQ = newRowElemJQ.find('.description')
-      descriptionElemJQ.css('padding-left', `+=${indent}em`)
-      descriptionElemJQ.text(this.GetItemDescription(item))
+      let placementElemJQ = newRowElemJQ.find('.placement')
+      placementElemJQ.css('padding-left', `+=${indent * 1.5}em`)
+      placementElemJQ.text(placement)
+      newRowElemJQ.find('.description').html(this.GetItemDescription(item))
       newRowElemJQ.find('.enchants').html(this.GetItemEnchants(item))
       newRowElemJQ.find('.priorWork').text(item.priorWork)
       newRowElemJQ.find('.cost').text(this.GetItemCost(item))
 
-      this.AddItem(item.targetItem, indent + 1)
-      this.AddItem(item.sacrificeItem, indent + 1)
+      this.AddItem(item.targetItem, indent + 1, 'Left')
+      this.AddItem(item.sacrificeItem, indent + 1, 'Right')
     }
   }
 }
