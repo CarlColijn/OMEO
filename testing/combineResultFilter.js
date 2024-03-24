@@ -309,15 +309,15 @@ jazil.AddTestSet(omeoPage, 'CombineResultFilter', {
       creator.GetDesired(),
       [],
       [
-        // extra, mid fit @ 1.0
-        ...creator.GetCombineds({ enchants:[{ name:'Unbreaking', level:3 /*1.00*/ }] }),
+        // extra, mid fit @ 3
+        ...creator.GetCombineds({ enchants:[{ name:'Unbreaking', level:3 /*3*/ }] }),
         // non-matching
         ...creator.GetCombineds({ name:'Chestplate' }),
-        // extra, most fit @ 0.25
-        ...creator.GetCombineds({ enchants:[{ name:'Protection', level:1 /*0.25*/ }] }),
+        // extra, most fit @ 1
+        ...creator.GetCombineds({ enchants:[{ name:'Protection', level:1 /*1*/ }] }),
         // imperfect: not able to create these
-        // extra, least fit @ 1.25
-        ...creator.GetCombineds({ enchants:[{ name:'Unbreaking', level:3 /*1.00*/ }, { name:'Protection', level:1 /*0.25*/ }] }),
+        // extra, least fit @ 4
+        ...creator.GetCombineds({ enchants:[{ name:'Unbreaking', level:3 /*3*/ }, { name:'Protection', level:1 /*1*/ }] }),
       ],
       g_onlyPerfectWithExtrasCombines,
       // 2nd+1st of 3rd set, 1st set, 4th set
@@ -334,18 +334,18 @@ jazil.AddTestSet(omeoPage, 'CombineResultFilter', {
       creator.GetDesired(),
       [],
       [
-        // extra, most fit @ 0.25
-        ...creator.GetCombineds({ enchants:[{ name:'Unbreaking', level:2 /*0.00*/ }, { name:'Protection', level:3 /*0.25*/ }] }),
+        // extra, most fit @ 1
+        ...creator.GetCombineds({ enchants:[{ name:'Unbreaking', level:2 /*0*/ }, { name:'Protection', level:3 /*1*/ }] }),
         // non-matching
         ...creator.GetCombineds({ name:'Chestplate' }),
-        // extra, mid fit @ 0.33
-        ...creator.GetCombineds({ enchants:[{ name:'Unbreaking', level:3 /*0.33*/ }, { name:'Protection', level:2 /*0.00*/ }] }),
+        // extra, mid fit @ 2
+        ...creator.GetCombineds({ enchants:[{ name:'Unbreaking', level:3 /*1*/ }, { name:'Protection', level:3 /*1*/ }] }),
         // non-matching
         ...creator.GetCombineds({ name:'Sword' }),
         // imperfect
         ...creator.GetCombineds({ enchants:[{ name:'Unbreaking', level:1 }, { name:'Protection', level:2 }, { name:'Mending', level:1 }] }),
-        // extra, least fit @ 1.33
-        ...creator.GetCombineds({ enchants:[{ name:'Unbreaking', level:3 /*0.33*/ }, { name:'Protection', level:2 /*0.00*/ }, { name:'Mending', level:1 /*1.00*/ }] }),
+        // extra, least fit @ 3
+        ...creator.GetCombineds({ enchants:[{ name:'Unbreaking', level:3 /*1*/ }, { name:'Protection', level:3 /*0*/ }, { name:'Mending', level:1 /*1*/ }] }),
       ],
       g_onlyPerfectWithExtrasCombines,
       // 2nd+1st of 1st set, 3rd set, 6th set
@@ -362,17 +362,17 @@ jazil.AddTestSet(omeoPage, 'CombineResultFilter', {
       creator.GetDesired(),
       [],
       [
-        // extra, most fit @ 1.41
-        ...creator.GetCombineds({ enchants:[{ name:'Unbreaking', level:2 /*0.66*/ }, { name:'Protection', level:3 /*0.75*/ }] }),
+        // extra, most fit @ 3
+        ...creator.GetCombineds({ enchants:[{ name:'Unbreaking', level:1 /*1*/ }, { name:'Protection', level:2 /*2*/ }] }),
         // perfect
         ...creator.GetCombineds({ name:'Helmet' }),
-        // extra, mid fit @ 1.50
-        ...creator.GetCombineds({ enchants:[{ name:'Unbreaking', level:3 /*1.00*/ }, { name:'Protection', level:2 /*0.50*/ }] }),
+        // extra, mid fit @ 5
+        ...creator.GetCombineds({ enchants:[{ name:'Unbreaking', level:3 /*3*/ }, { name:'Protection', level:2 /*2*/ }] }),
         // non-matching
         ...creator.GetCombineds({ name:'Sword' }),
         // imperfect: not able to create these
-        // extra, least fit @ 2.50
-        ...creator.GetCombineds({ enchants:[{ name:'Unbreaking', level:3 /*1.00*/ }, { name:'Protection', level:2 /*0.50*/ }, { name:'Mending', level:1 /*1.00*/ }] }),
+        // extra, least fit @ 6
+        ...creator.GetCombineds({ enchants:[{ name:'Unbreaking', level:3 /*3*/ }, { name:'Protection', level:2 /*2*/ }, { name:'Mending', level:1 /*1*/ }] }),
       ],
       g_perfectAndPerfectWithExtrasCombines,
       // 2nd+1st of 2nd set, 2nd+1st of 1st set, 3rd set, 5th set
@@ -389,18 +389,18 @@ jazil.AddTestSet(omeoPage, 'CombineResultFilter', {
       creator.GetDesired(),
       [],
       [
-        // extra, least fit @ 1.00
-        ...creator.GetCombineds({ enchants:[{ name:'Unbreaking', level:3 /*0.00*/ }, { name:'Protection', level:2 /*0.00*/ }, { name:'Mending', level:1 /*1.00*/ }] }),
+        // extra, least fit @ 3
+        ...creator.GetCombineds({ enchants:[{ name:'Unbreaking', level:3 /*0*/ }, { name:'Protection', level:4 /*2*/ }, { name:'Mending', level:1 /*1*/ }] }),
         // perfect
         ...creator.GetCombineds({ name:'Helmet' }),
-        // extra, most fit @ 0.25
-        ...creator.GetCombineds({ enchants:[{ name:'Unbreaking', level:3 /*0.00*/ }, { name:'Protection', level:3 /*0.25*/ }] }),
+        // extra, most fit @ 1
+        ...creator.GetCombineds({ enchants:[{ name:'Unbreaking', level:3 /*0*/ }, { name:'Protection', level:3 /*1*/ }] }),
         // non-matching
         ...creator.GetCombineds({ name:'Sword' }),
         // imperfect
         ...creator.GetCombineds({ enchants:[{ name:'Unbreaking', level:1 }, { name:'Protection', level:2 }, { name:'Mending', level:1 }] }),
-        // extra, mid fit @ 0.50
-        ...creator.GetCombineds({ enchants:[{ name:'Unbreaking', level:3 /*0.00*/ }, { name:'Protection', level:4 /*0.50*/ }] }),
+        // extra, mid fit @ 2
+        ...creator.GetCombineds({ enchants:[{ name:'Unbreaking', level:3 /*0*/ }, { name:'Protection', level:4 /*2*/ }] }),
       ],
       g_perfectAndPerfectWithExtrasCombines,
       // 2nd+1st of 2nd set, 2nd+1st of 3rd set, 6th set, 1st set
@@ -419,14 +419,14 @@ jazil.AddTestSet(omeoPage, 'CombineResultFilter', {
       creator.GetDesired(),
       [],
       [
-        // imperfect, least fit @ 1.33
-        ...creator.GetCombineds({ enchants:[{ name:'Unbreaking', level:2 /*0.33*/ }, { name:'Protection', level:2 /*0.00*/ }, { name:'Mending', level:1 /*1.00*/ }] }),
-        // imperfect, most fit @ 0.25
-        ...creator.GetCombineds({ enchants:[{ name:'Unbreaking', level:3 /*0.00*/ }, { name:'Protection', level:1 /*0.25*/ }] }),
+        // imperfect, mid fit @ 3
+        ...creator.GetCombineds({ enchants:[{ name:'Unbreaking', level:1 /*2*/ }, { name:'Protection', level:2 /*0*/ }, { name:'Mending', level:1 /*1*/ }] }),
+        // imperfect, most fit @ 1
+        ...creator.GetCombineds({ enchants:[{ name:'Unbreaking', level:3 /*0*/ }, { name:'Protection', level:1 /*1*/ }] }),
         // non-matching
         ...creator.GetCombineds({ name:'Sword' }),
-        // imperfect, mid fit @ 1.50
-        ...creator.GetCombineds({ enchants:[{ name:'Unbreaking', level:3 /*0.00*/ }, /* missing protection: 0.50 */ { name:'Mending', level:1 /*1.00*/ }] }),
+        // imperfect, least fit @ 4
+        ...creator.GetCombineds({ enchants:[{ name:'Unbreaking', level:2 /*1*/ }, /* missing protection: 2 */ { name:'Mending', level:1 /*1*/ }] }),
       ],
       g_onlyImperfectCombines,
       // 2nd+1st of 2nd set, 1st set, 4th set

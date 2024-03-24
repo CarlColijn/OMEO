@@ -132,9 +132,7 @@ class CombineResultFilter {
             hasExtraEnchants = true
         }
 
-        let levelDiff = Math.abs(combinedLevel - desiredEnchant.level)
-        let levelMax = desiredEnchant.info.maxLevel
-        rating += levelDiff / levelMax
+        rating += Math.abs(combinedLevel - desiredEnchant.level)
       })
 
       // all enchants missing on desired
@@ -142,9 +140,7 @@ class CombineResultFilter {
         if (!this.desiredItem.enchantsByID.has(id)) {
           hasExtraEnchants = true
 
-          let levelDiff = combinedEnchant.level
-          let levelMax = combinedEnchant.info.maxLevel
-          rating += levelDiff / levelMax
+          rating += combinedEnchant.level
         }
       })
     }
@@ -214,24 +210,18 @@ class CombineResultFilter {
 
     // all enchants on desired, missing or not on combined
     this.desiredItem.enchantsByID.forEach((desiredEnchant, id) => {
-      let combinedLevel = 0
       if (combinedItem.enchantsByID.has(id)) {
         let combinedEnchant = combinedItem.enchantsByID.get(id)
-        combinedLevel = combinedEnchant.level
+        rating += Math.abs(combinedEnchant.level - desiredEnchant.level)
       }
-
-      let levelDiff = Math.abs(combinedLevel - desiredEnchant.level)
-      let levelMax = desiredEnchant.info.maxLevel
-      rating += levelDiff / levelMax
+      else
+        rating += desiredEnchant.level
     })
 
     // all enchants missing on desired
     combinedItem.enchantsByID.forEach((combinedEnchant, id) => {
-      if (!this.desiredItem.enchantsByID.has(id)) {
-        let levelDiff = combinedEnchant.level
-        let levelMax = combinedEnchant.info.maxLevel
-        rating += levelDiff / levelMax
-      }
+      if (!this.desiredItem.enchantsByID.has(id))
+        rating += combinedEnchant.level
     })
 
     return rating
