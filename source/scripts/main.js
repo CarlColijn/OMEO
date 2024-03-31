@@ -14,7 +14,7 @@
 
 class FormHandler {
   NoteCountError(inputElemJQ) {
-    inputElemJQ.after('<br><span class="error">This is not a number</span>')
+    inputElemJQ.after('<div class="error">This is not a number</div>')
   }
 
 

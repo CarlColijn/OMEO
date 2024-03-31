@@ -139,7 +139,7 @@ a:visited {
 
 /* Errors */
 .error {
-  margin-top: 0.1em;
+  margin: 0px;
   padding: 0.2em 0.4em;
   font-weight: bold;
   border: 1px solid #300000;
