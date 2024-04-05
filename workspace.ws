@@ -37,10 +37,13 @@
         </Folder>
     </Project>
     <Project name="project">
+        <File name=".gitignore" />
         <File name=".gitmodules" />
         <File name="colors.html" />
         <File name="LICENSE" />
+        <File name="publish.py" />
         <File name="README.md" />
+        <File name="startTests.py" />
     </Project>
     <Project name="testing">
         <File name="testing\bitSerializer.js" />
