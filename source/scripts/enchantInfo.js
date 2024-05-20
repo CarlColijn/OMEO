@@ -29,6 +29,12 @@ let g_numDifferentEnchants = 0
 
 
 class EnchantInfo {
+  // returns one of the static EnchantInfo globals
+  static GetRehydrated(info) {
+    return g_enchantInfosByID.get(info.id)
+  }
+
+
   constructor(id, maxLevel, bookMultiplier, toolMultiplier, name) {
     // ==== PUBLIC ====
     this.id = id

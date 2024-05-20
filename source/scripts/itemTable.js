@@ -17,22 +17,21 @@
 
 
 class ItemTable {
-  constructor(ShowCountInputError, ShowDetails, tableElemJQ, set) {
+  constructor(ShowDetails, tableElemJQ, set) {
     // ==== PUBLIC ====
     this.set = set
     this.tableElemJQ = tableElemJQ
 
     // ==== PRIVATE ====
-    this.ShowCountInputError = ShowCountInputError
     this.ShowDetails = ShowDetails
 
     if (this.set === g_desired) {
       let itemRowElemJQ = this.tableElemJQ.find('.item').first()
-      this.itemRow = new ItemRow(this.ShowCountInputError, this.ShowDetails, itemRowElemJQ, this.set, true)
+      this.itemRow = new ItemRow(this.ShowDetails, itemRowElemJQ, this.set, true)
     }
     else {
       let templateRowElemJQ = this.tableElemJQ.find('.template').first()
-      this.templateRow = new ItemRow(this.ShowCountInputError, this.ShowDetails, templateRowElemJQ, this.set, false)
+      this.templateRow = new ItemRow(this.ShowDetails, templateRowElemJQ, this.set, false)
     }
   }
 
@@ -83,7 +82,7 @@ class ItemTable {
 
   Clear() {
     this.tableElemJQ.find('.item').each((rowNr, rowElem) => {
-      let itemRow = new ItemRow(this.ShowCountInputError, this.ShowDetails, $(rowElem), this.set, false)
+      let itemRow = new ItemRow(this.ShowDetails, $(rowElem), this.set, false)
       if (itemRow.IsReal())
         itemRow.Remove()
       return true
@@ -118,7 +117,7 @@ class ItemTable {
   GetItemRows() {
     let itemRows = []
     this.tableElemJQ.find('.item').each((rowNr, itemRowElem) => {
-      let itemRow = new ItemRow(this.ShowCountInputError, this.ShowDetails, $(itemRowElem), this.set, false)
+      let itemRow = new ItemRow(this.ShowDetails, $(itemRowElem), this.set, false)
       if (itemRow.IsReal()) {
         itemRow.nr = itemRows.length
         itemRows.push(itemRow)

@@ -1,6 +1,30 @@
-function TestCombineResult(jazil, sourceItems, desiredItem, expectedItems) {
+class FeedbackHandlerMock {
+  constructor() {
+    this.timeForFeedbackCalled = false
+    this.tellProgressCalled = false
+  }
+
+
+  TimeForFeedback() {
+    this.timeForFeedbackCalled = true
+    return true
+  }
+
+
+  TellProgress(progress, maxProgress) {
+    this.tellProgressCalled = true
+  }
+}
+
+
+function TestCombineResult(jazil, sourceItems, canCombine, desiredItem, expectedItems) {
+  let feedbackHandler = new FeedbackHandlerMock()
   let combiner = new ItemCombiner()
-  let combinedItems = combiner.GetAllItemCombinations(sourceItems, desiredItem)
+  let combinedItems = combiner.GetAllItemCombinations(sourceItems, desiredItem, feedbackHandler)
+
+  jazil.ShouldBe(feedbackHandler.timeForFeedbackCalled, canCombine, 'TimeForFeedback not called properly!')
+  jazil.ShouldBe(feedbackHandler.tellProgressCalled, canCombine, 'TellProgress not called properly!')
+
   TestItemListsMatch(jazil, expectedItems, 'expected', combinedItems, 'combined', g_combined)
 }
 
@@ -15,7 +39,7 @@ jazil.AddTestSet(omeoPage, 'ItemCombiner', {
     let expectedItems = [
     ]
 
-    TestCombineResult(jazil, sourceItems, desiredItem, expectedItems)
+    TestCombineResult(jazil, sourceItems, false, desiredItem, expectedItems)
   },
 
   'Too few unenchanted sources + matching desired => 0 combines': (jazil) => {
@@ -26,7 +50,7 @@ jazil.AddTestSet(omeoPage, 'ItemCombiner', {
     let expectedItems = [
     ]
 
-    TestCombineResult(jazil, sourceItems, desiredItem, expectedItems)
+    TestCombineResult(jazil, sourceItems, true, desiredItem, expectedItems)
   },
 
   'Too few enchanted sources + matching desired => 0 combines': (jazil) => {
@@ -37,7 +61,7 @@ jazil.AddTestSet(omeoPage, 'ItemCombiner', {
     let expectedItems = [
     ]
 
-    TestCombineResult(jazil, sourceItems, desiredItem, expectedItems)
+    TestCombineResult(jazil, sourceItems, true, desiredItem, expectedItems)
   },
 
   'Only loose wasteful unenchanted combines => 0 combines': (jazil) => {
@@ -52,7 +76,7 @@ jazil.AddTestSet(omeoPage, 'ItemCombiner', {
     let expectedItems = [
     ]
 
-    TestCombineResult(jazil, sourceItems, desiredItem, expectedItems)
+    TestCombineResult(jazil, sourceItems, true, desiredItem, expectedItems)
   },
 
   'Only stacked wasteful unenchanted combines => 0 combines': (jazil) => {
@@ -64,7 +88,7 @@ jazil.AddTestSet(omeoPage, 'ItemCombiner', {
     let expectedItems = [
     ]
 
-    TestCombineResult(jazil, sourceItems, desiredItem, expectedItems)
+    TestCombineResult(jazil, sourceItems, true, desiredItem, expectedItems)
   },
 
   'Only loose wasteful enchanted combines => 0 combines': (jazil) => {
@@ -76,7 +100,7 @@ jazil.AddTestSet(omeoPage, 'ItemCombiner', {
     let expectedItems = [
     ]
 
-    TestCombineResult(jazil, sourceItems, desiredItem, expectedItems)
+    TestCombineResult(jazil, sourceItems, true, desiredItem, expectedItems)
   },
 
   'Two incompatible sources + desired => 0 combines': (jazil) => {
@@ -88,7 +112,7 @@ jazil.AddTestSet(omeoPage, 'ItemCombiner', {
     let expectedItems = [
     ]
 
-    TestCombineResult(jazil, sourceItems, desiredItem, expectedItems)
+    TestCombineResult(jazil, sourceItems, true, desiredItem, expectedItems)
   },
 
   'Only stacked unenchanted sources + non-matching desired => 0 combines': (jazil) => {
@@ -100,7 +124,7 @@ jazil.AddTestSet(omeoPage, 'ItemCombiner', {
     let expectedItems = [
     ]
 
-    TestCombineResult(jazil, sourceItems, desiredItem, expectedItems)
+    TestCombineResult(jazil, sourceItems, false, desiredItem, expectedItems)
   },
 
   'Only stacked enchanted sources + non-matching desired => 0 combines': (jazil) => {
@@ -112,7 +136,7 @@ jazil.AddTestSet(omeoPage, 'ItemCombiner', {
     let expectedItems = [
     ]
 
-    TestCombineResult(jazil, sourceItems, desiredItem, expectedItems)
+    TestCombineResult(jazil, sourceItems, false, desiredItem, expectedItems)
   },
 
   'Only loose enchanted sources + non-matching desired => no combines': (jazil) => {
@@ -128,7 +152,7 @@ jazil.AddTestSet(omeoPage, 'ItemCombiner', {
     let expectedItems = [
     ]
 
-    TestCombineResult(jazil, sourceItems, desiredItem, expectedItems)
+    TestCombineResult(jazil, sourceItems, false, desiredItem, expectedItems)
   },
 
   'Two matching loose enchanted sources + unenchanted desired => higher-level enchant combine': (jazil) => {
@@ -147,7 +171,7 @@ jazil.AddTestSet(omeoPage, 'ItemCombiner', {
       BuildItem({ tag:2, name:'Pickaxe', cost:4, priorWork:1, enchants:[{ name:'Unbreaking', level:2 }]}),
     ]
 
-    TestCombineResult(jazil, sourceItems, desiredItem, expectedItems)
+    TestCombineResult(jazil, sourceItems, true, desiredItem, expectedItems)
   },
 
   'Two matching stacked enchanted sources + unenchanted desired => higher-level enchant combine': (jazil) => {
@@ -165,7 +189,7 @@ jazil.AddTestSet(omeoPage, 'ItemCombiner', {
       BuildItem({ tag:1, name:'Pickaxe', cost:4, priorWork:1, enchants:[{ name:'Unbreaking', level:2 }]}),
     ]
 
-    TestCombineResult(jazil, sourceItems, desiredItem, expectedItems)
+    TestCombineResult(jazil, sourceItems, true, desiredItem, expectedItems)
   },
 
   'Two matching loose enchanted sources + matching desired => higher-level enchant combine': (jazil) => {
@@ -183,7 +207,7 @@ jazil.AddTestSet(omeoPage, 'ItemCombiner', {
       BuildItem({ tag:2, name:'Pickaxe', cost:4, priorWork:1, enchants:[{ name:'Unbreaking', level:2 }]}),
     ]
 
-    TestCombineResult(jazil, sourceItems, desiredItem, expectedItems)
+    TestCombineResult(jazil, sourceItems, true, desiredItem, expectedItems)
   },
 
   'Two stacked enchanted sources + matching desired => higher-level enchant combine': (jazil) => {
@@ -200,7 +224,7 @@ jazil.AddTestSet(omeoPage, 'ItemCombiner', {
       BuildItem({ tag:1, name:'Pickaxe', cost:4, priorWork:1, enchants:[{ name:'Unbreaking', level:2 }]}),
     ]
 
-    TestCombineResult(jazil, sourceItems, desiredItem, expectedItems)
+    TestCombineResult(jazil, sourceItems, true, desiredItem, expectedItems)
   },
 
   'Two stacked enchanted sources + semi-matching desired => still higher-level enchant combine': (jazil) => {
@@ -218,7 +242,7 @@ jazil.AddTestSet(omeoPage, 'ItemCombiner', {
       BuildItem({ tag:1, name:'Pickaxe', cost:4, priorWork:1, enchants:[{ name:'Unbreaking', level:2 }]}),
     ]
 
-    TestCombineResult(jazil, sourceItems, desiredItem, expectedItems)
+    TestCombineResult(jazil, sourceItems, true, desiredItem, expectedItems)
   },
 
   'Lots of books combine in all possible ways': (jazil) => {
@@ -277,7 +301,7 @@ jazil.AddTestSet(omeoPage, 'ItemCombiner', {
       BuildItem({ tag:10, name:'Pickaxe', count:1, cost:6, totalCost:15, priorWork:3, enchants:[{ name:'Unbreaking', level:3 }]}),
     ]
 
-    TestCombineResult(jazil, sourceItems, desiredItem, expectedItems)
+    TestCombineResult(jazil, sourceItems, true, desiredItem, expectedItems)
   },
 
   'Prior work is taken up in cost and result - stacked version => 1 combine': (jazil) => {
@@ -294,7 +318,7 @@ jazil.AddTestSet(omeoPage, 'ItemCombiner', {
       BuildItem({ tag:1, name:'Pickaxe', cost:34, priorWork:5, enchants:[{ name:'Unbreaking', level:2 }]}),
     ]
 
-    TestCombineResult(jazil, sourceItems, desiredItem, expectedItems)
+    TestCombineResult(jazil, sourceItems, true, desiredItem, expectedItems)
   },
 
   'Prior work is taken up in cost and result - loose version => 1 combine': (jazil) => {
@@ -312,7 +336,7 @@ jazil.AddTestSet(omeoPage, 'ItemCombiner', {
       BuildItem({ tag:2, name:'Pickaxe', cost:19, priorWork:5, enchants:[{ name:'Unbreaking', level:2 }]}),
     ]
 
-    TestCombineResult(jazil, sourceItems, desiredItem, expectedItems)
+    TestCombineResult(jazil, sourceItems, true, desiredItem, expectedItems)
   },
 
   'Merging enchants where order matters for cost => correct combine': (jazil) => {
@@ -332,7 +356,7 @@ jazil.AddTestSet(omeoPage, 'ItemCombiner', {
       BuildItem({ tag:2, name:'Pickaxe', cost:2, priorWork:1, enchants:[{ name:'Unbreaking' }, { name:'Mending' }]}),
     ]
 
-    TestCombineResult(jazil, sourceItems, desiredItem, expectedItems)
+    TestCombineResult(jazil, sourceItems, true, desiredItem, expectedItems)
   },
 
   'Merging enchants where order matters for cost + one-sided prior work => correct combine': (jazil) => {
@@ -352,7 +376,7 @@ jazil.AddTestSet(omeoPage, 'ItemCombiner', {
       BuildItem({ tag:2, name:'Pickaxe', cost:17, priorWork:5, enchants:[{ name:'Unbreaking' }, { name:'Mending' }]}),
     ]
 
-    TestCombineResult(jazil, sourceItems, desiredItem, expectedItems)
+    TestCombineResult(jazil, sourceItems, true, desiredItem, expectedItems)
   },
 
   'Conflicting enchants have their cost & order matters => 2 combines + spin offs': (jazil) => {
@@ -391,7 +415,7 @@ jazil.AddTestSet(omeoPage, 'ItemCombiner', {
       BuildItem({ tag:5, name:'Boots', cost:4, totalCost:7, priorWork:2, enchants:[{ name:'Frost Walker' }, { name:'Feather Falling' }, { name:'Unbreaking' }]}),
     ]
 
-    TestCombineResult(jazil, sourceItems, desiredItem, expectedItems)
+    TestCombineResult(jazil, sourceItems, true, desiredItem, expectedItems)
   },
 
   'Merging appropriate + inappropriate enchants => correct combine + extra spin offs': (jazil) => {
@@ -424,7 +448,7 @@ jazil.AddTestSet(omeoPage, 'ItemCombiner', {
       BuildItem({ tag:4, name:'Pickaxe', cost:3, totalCost:4, priorWork:2, enchants:[{ name:'Unbreaking' }, { name:'Mending' }]}),
     ]
 
-    TestCombineResult(jazil, sourceItems, desiredItem, expectedItems)
+    TestCombineResult(jazil, sourceItems, true, desiredItem, expectedItems)
   },
 
   'Incompatibly enchanted source item + compatibly enchanted source book => correct combine via added extra + extra spin offs': (jazil) => {
@@ -455,7 +479,7 @@ jazil.AddTestSet(omeoPage, 'ItemCombiner', {
       BuildItem({ tag:4, name:'Pickaxe', cost:3, totalCost:4, priorWork:2, enchants:[{ name:'Unbreaking' }, { name:'Mending' }]}),
     ]
 
-    TestCombineResult(jazil, sourceItems, desiredItem, expectedItems)
+    TestCombineResult(jazil, sourceItems, true, desiredItem, expectedItems)
   },
 
   'Complex combine #1, order 1': (jazil) => {
@@ -478,7 +502,7 @@ jazil.AddTestSet(omeoPage, 'ItemCombiner', {
       BuildItem({ tag:2, name:'Sword', cost:16, priorWork:1, enchants:[{ name:'Sharpness', level:4 }, { name:'Knockback', level:2 }, { name:'Looting', level:3 }]}),
     ]
 
-    TestCombineResult(jazil, sourceItems, desiredItem, expectedItems)
+    TestCombineResult(jazil, sourceItems, true, desiredItem, expectedItems)
   },
 
   'Complex combine #1, order 2': (jazil) => {
@@ -501,7 +525,7 @@ jazil.AddTestSet(omeoPage, 'ItemCombiner', {
       BuildItem({ tag:2, name:'Sword', cost:16, priorWork:1, enchants:[{ name:'Sharpness', level:4 }, { name:'Knockback', level:2 }, { name:'Looting', level:3 }]}),
     ]
 
-    TestCombineResult(jazil, sourceItems, desiredItem, expectedItems)
+    TestCombineResult(jazil, sourceItems, true, desiredItem, expectedItems)
   },
 
   'Complex combine with many permutations': (jazil) => {
@@ -599,7 +623,7 @@ jazil.AddTestSet(omeoPage, 'ItemCombiner', {
       BuildItem({ tag:14, name:'Pickaxe', cost:35, totalCost:56, priorWork:6, enchants:[{ name:'Unbreaking', level:2 }, { name:'Mending' }]}),
     ]
 
-    TestCombineResult(jazil, sourceItems, desiredItem, expectedItems)
+    TestCombineResult(jazil, sourceItems, true, desiredItem, expectedItems)
   },
 
 })

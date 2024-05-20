@@ -6,7 +6,9 @@
   - bitSerializer.js
 
   Defined classes:
-  - DataStreamConflictSolver
+  - DataStreamLoadingOptions
+    - inConflict: bool
+    - serialized: string
   - DataStream
 */
 
@@ -14,16 +16,49 @@
 // ======== PUBLIC ========
 
 
-class DataStreamConflictSolver {
+class DataStreamLoadingOptions {
   constructor() {
+    // ==== PRIVATE ====
+    this.localStorage = localStorage.getItem('form') || ''
+    this.withLocalStorage = this.localStorage.length > 0
+
+    let urlDataMatches = RegExp('[?&]form=([^&#]*)').exec(location.search)
+    this.url = urlDataMatches ? urlDataMatches[1] : ''
+    this.withURL = this.url.length > 0
+
+    // ==== PUBLIC ====
+    this.inConflict = false
+    if (!this.withURL && !this.withLocalStorage)
+      this.serialized = ''
+    else if (this.withURL && !this.withLocalStorage)
+      this.serialized = this.url
+    else if (!this.withURL && this.withLocalStorage)
+      this.serialized = this.localStorage
+    else if (this.url == this.localStorage)
+      this.serialized = this.url
+    else {
+      this.inConflict = true
+      this.serialized = ''
+    }
   }
 
 
-  // returns bool
-  MustUseLocalStorageFromUser() {
-    return confirm('You\'re attempting to restore the data from a bookmark.  This will PERMANENTLY overwrite your stored data.  If you want to keep your stored data, please bookmark your data first.\n\nDo you want to ignore the bookmark and use your stored data for now?')
+  ChooseURL() {
+    this.inConflict = false
+    this.serialized = this.url
+  }
+
+
+  ChooseLocalStorage() {
+    this.inConflict = false
+    this.serialized = this.localStorage
+
+    // We're in conflict but the user chose for localStorage, so get rid of
+    // the bookmark part keeping the old link with the bookmark in the history.
+    window.history.replaceState(null, '', location.href.replace(location.search, ''))
   }
 }
+
 
 
 
@@ -69,14 +104,10 @@ class DataStream {
   }
 
 
-  // returns bool (whether any data was there)
-  Load(conflictSolver) {
-    let serializedOptions = this.GetSerializedDataToLoad()
-    let serialized = String(this.SelectSerializedOptionToUse(serializedOptions, conflictSolver))
+  Load(dataStreamLoadingOptions) {
+    this.restorer = new BitRestorer(dataStreamLoadingOptions.serialized)
 
-    this.restorer = new BitRestorer(serialized)
-
-    return serialized.length > 0
+    return dataStreamLoadingOptions.serialized.length > 0
   }
 
 
@@ -95,52 +126,5 @@ class DataStream {
   SaveToLocalStorage() {
     let serialized = this.storer.Finalize()
     localStorage.setItem('form', serialized)
-  }
-
-
-  // ======== PRIVATE ========
-
-
-  // returns object;
-  // - withLocalStorage: bool
-  // - localStorage: string
-  // - withURL: bool
-  // - url: string
-  GetSerializedDataToLoad() {
-    let serializedLocalStorage = localStorage.getItem('form') || ''
-    let urlDataMatches = RegExp('[?&]form=([^&#]*)').exec(location.search)
-    let serializedURL = urlDataMatches ? urlDataMatches[1] : ''
-
-    return {
-      withLocalStorage: serializedLocalStorage.length > 0,
-      localStorage: serializedLocalStorage,
-      withURL: serializedURL.length > 0,
-      url: serializedURL
-    }
-  }
-
-
-  // returns string
-  SelectSerializedOptionToUse(serializedOptions, conflictSolver) {
-    if (!serializedOptions.withURL && !serializedOptions.withLocalStorage)
-      return ''
-    if (!serializedOptions.withURL && serializedOptions.withLocalStorage)
-      return serializedOptions.localStorage
-    else if (serializedOptions.withURL && !serializedOptions.withLocalStorage)
-      return serializedOptions.url
-    else if (serializedOptions.url == serializedOptions.localStorage)
-      return serializedOptions.url
-    else {
-      let useLocalStorage = conflictSolver.MustUseLocalStorageFromUser()
-      if (useLocalStorage)
-        // he chose for localStorage, so get rid of the bookmark part keeping
-        // the old link with the bookmark in the history
-        window.history.replaceState(null, '', location.href.replace(location.search, ''))
-      return (
-        useLocalStorage ?
-        serializedOptions.localStorage :
-        serializedOptions.url
-      )
-    }
   }
 }

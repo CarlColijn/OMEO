@@ -7,7 +7,8 @@
 
   Defined classes:
   - ItemCollectionResult
-    - withErrors: bool
+    - withCountErrors: bool
+    - countErrorElemJQs: [] of JQuery wrapped DOM input elements
     - items: Item[]
     - mergedItems: bool
     - rowsToUpdateNr: ItemRow[]
@@ -27,7 +28,8 @@
 class ItemCollectionResult {
   constructor() {
     // ==== PUBLIC ====
-    this.withErrors = false
+    this.withCountErrors = false
+    this.countErrorElemJQs = []
     this.items = []
     this.mergedItems = false
     this.rowsToUpdateNr = []
@@ -54,8 +56,11 @@ class ItemCollector {
 
   ProcessRow(itemRow) {
     let itemResult = itemRow.GetItem()
-    if (itemResult.withErrors)
-      this.result.withErrors = true
+    if (itemResult.withCountError) {
+      this.result.withCountErrors = true
+      this.result.countErrorElemJQs.push(itemResult.countErrorElemJQ)
+    }
+
     let item = itemResult.item
     let itemHash = item.Hash(true)
 
@@ -69,7 +74,7 @@ class ItemCollector {
 
     let mayMergeRow =
       this.mergeItems &&
-      !this.result.withErrors
+      !this.result.withCountErrors
 
     let rowMerged = false
     if (mayMergeRow) {

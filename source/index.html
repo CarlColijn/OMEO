@@ -2,6 +2,8 @@
 
 <html lang="en">
   <head>
+    <meta http-equiv="Content-Security-Policy" content="default-src * 'self' blob: data: gap:; style-src * 'self' 'unsafe-inline' blob: data: gap:; script-src * 'self' 'unsafe-eval' 'unsafe-inline' blob: data: gap:; object-src * 'self' blob: data: gap:; img-src * 'self' 'unsafe-inline' blob: data: gap:; connect-src 'self' * 'unsafe-inline' blob: data: gap:; frame-src * 'self' blob: data: gap:; worker-src * 'self' 'unsafe-eval' 'unsafe-inline' blob:">
+
     <!-- https://developer.mozilla.org/en-US/docs/Web/HTML/Element/meta -->
     <meta charset="utf-8">
     <meta content="initial-scale=1, width=device-width" name="viewport">
@@ -48,6 +50,58 @@
   </head>
 
   <body>
+    <div id="urlVsLocalStorageConflict" class="dialog">
+      <div class="dialogBody">
+        <h1>Data conflict</h1>
+        <p>You're attempting to restore the data from a bookmark or link.<br>
+        This will <em>PERMANENTLY</em> overwrite your stored data.<br>
+        If you want to keep your stored data, ignore the bookmark for now so you can bookmark your data first.<br>
+        <br>
+        What do you want to do?</p>
+        <p><button class="useLocalStorage" type="button">Chuck the bookmark;<br>use my stored data</button><button class="useURL" type="button">Chuck my stored data;<br>use the bookmark</button></p>
+      </div>
+    </div>
+
+    <div id="dataInErrorForLoad" class="dialog">
+      <div class="dialogBody">
+        <h1>Errors detected</h1>
+        <p>Sorry, but there was an issue loading your data back in...</p>
+        <p><button class="exit" type="button">OK</button></p>
+      </div>
+    </div>
+
+    <div id="dataInErrorForSave" class="dialog">
+      <div class="dialogBody">
+        <h1>Errors detected</h1>
+        <p>I cannot create the bookmark; there are errors in your data.  Please fix these first.</p>
+        <p><button class="exit" type="button">OK</button></p>
+      </div>
+    </div>
+
+    <div id="dataInErrorForDivine" class="dialog">
+      <div class="dialogBody">
+        <h1>Errors detected</h1>
+        <p>I cannot start divining; there are errors in your data.  Please fix these first.</p>
+        <p><button class="exit" type="button">OK</button></p>
+      </div>
+    </div>
+
+    <div id="itemsMerged" class="dialog">
+      <div class="dialogBody">
+        <h1>Duplicate items detected</h1>
+        <p>For performance reasons, I've taken the liberty to merge identical source items.</p>
+        <p><button class="exit" type="button">OK</button></p>
+      </div>
+    </div>
+
+    <div id="divining" class="dialog">
+      <div class="dialogBody">
+        <h1 id="divineTitle">Divination is in progress</h1>
+        <p id="divineProgress">Starting up...</p>
+        <p><button class="exit" type="button">Stop</button></p>
+      </div>
+    </div>
+
     <div class="patreonIcon">
       <a href="https://patreon.com/OMEO" target="_blank">
         <img src="images/patreon.png"><br>

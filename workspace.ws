@@ -25,6 +25,7 @@
             <File name="source\scripts\itemCollector.js" />
             <File name="source\scripts\itemCombiner.js" />
             <File name="source\scripts\itemCombineTester.js" />
+            <File name="source\scripts\itemCombineWorker.js" />
             <File name="source\scripts\itemInfo.js" />
             <File name="source\scripts\itemOrigins.js" />
             <File name="source\scripts\itemRow.js" />
@@ -62,6 +63,7 @@
         <File name="testing\itemCollector.js" />
         <File name="testing\itemCombiner.js" />
         <File name="testing\itemCombineTester.js" />
+        <File name="testing\itemCombineWorker.js" />
         <File name="testing\itemInfo.js" />
         <File name="testing\itemOrigins.js" />
         <File name="testing\itemRow.js" />

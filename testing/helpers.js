@@ -16,6 +16,7 @@ let omeoAccessObjectNames = [
   'BitStorer',
   'CombineResultFilter',
   'DataStream',
+  'DataStreamLoadingOptions',
   'DetailsTable',
   'Enchant',
   'EnchantCombiner',
@@ -27,6 +28,7 @@ let omeoAccessObjectNames = [
   'ItemCombineTester',
   'ItemRow',
   'ItemTable',
+  'RehydrateItems',
   'ZeroOrigin',
   'g_combined',
   'g_desired',
@@ -218,7 +220,6 @@ function GetSetName(set) {
 class TemplateRowDetails {
   constructor() {
     this.row = undefined // ItemRow; to be filled in later
-    this.ShowCountInputError = MakeCallbackFunctionMock()
     this.ShowDetails = MakeCallbackFunctionMock()
   }
 }
@@ -228,7 +229,7 @@ class TemplateRowDetails {
 function GetItemTemplateRow(testContainerID, set) {
   let templateRowElemJQ = $(`#${testContainerID} .template.item`)
   let details = new TemplateRowDetails()
-  details.row = new ItemRow(details.ShowCountInputError, details.ShowDetails, templateRowElemJQ, set, false)
+  details.row = new ItemRow(details.ShowDetails, templateRowElemJQ, set, false)
   return details
 }
 
@@ -392,7 +393,6 @@ function MakeCallbackFunctionMock() {
 class ItemTableDetails {
   constructor() {
     this.table = undefined // ItemTable; to be filled in later
-    this.ShowCountInputError = MakeCallbackFunctionMock()
     this.ShowDetails = MakeCallbackFunctionMock()
   }
 }
@@ -403,7 +403,7 @@ function GetItemTable(testContainerID, set) {
   let tableElemJQ = $(`#${testContainerID}`)
   let details = new ItemTableDetails()
   details.tableElemJQ = tableElemJQ
-  details.table = new ItemTable(details.ShowCountInputError, details.ShowDetails, tableElemJQ, set)
+  details.table = new ItemTable(details.ShowDetails, tableElemJQ, set)
   return details
 }
 
@@ -480,22 +480,6 @@ class DataStateController {
   ExtractFromURL(url) {
     let urlDataMatches = RegExp('[?&]form=([^&#]*)').exec(url)
     return urlDataMatches ? urlDataMatches[1] : ''
-  }
-}
-
-
-
-
-class DataStreamConflictSolverMock {
-  constructor(shouldChooseLocalStorage) {
-    this.shouldChooseLocalStorage = shouldChooseLocalStorage
-    this.invoked = false
-  }
-
-
-  MustUseLocalStorageFromUser() {
-    this.invoked = true
-    return this.shouldChooseLocalStorage
   }
 }
 

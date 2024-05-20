@@ -34,7 +34,7 @@ class CombineResult {
 
 class ItemCombiner {
   // returns Item[]
-  GetAllItemCombinations(sourceItems, desiredItem) {
+  GetAllItemCombinations(sourceItems, desiredItem, feedbackHandler) {
     let tester = new ItemCombineTester()
 
     let filteredSourceItems = this.DropNonMatchingSourceItems(tester, sourceItems, desiredItem)
@@ -45,7 +45,7 @@ class ItemCombiner {
 
     this.SetupItemOrigins(filteredSourceItems)
 
-    return this.MakeAllCombinations(tester, filteredSourceItems, desiredItem)
+    return this.MakeAllCombinations(tester, filteredSourceItems, desiredItem, feedbackHandler)
   }
 
 
@@ -121,7 +121,7 @@ class ItemCombiner {
 
 
   // returns Item[] (the combined items)
-  MakeAllCombinations(tester, sourceItems, desiredItem) {
+  MakeAllCombinations(tester, sourceItems, desiredItem, feedbackHandler) {
     /*
       Strategy: we process all items, combining them with all items that
       come before them.  New items are added at the back so that they
@@ -134,11 +134,19 @@ class ItemCombiner {
     let allItems = sourceItems.slice()
     let combinedItems = []
 
+    let Progress = (value) => {
+      ++value
+      return value * (value + 1) / 2
+    }
+
     for (let item1Nr = 0; item1Nr < allItems.length; ++item1Nr) {
       let item1 = allItems[item1Nr]
 
       for (let item2Nr = 0; item2Nr <= item1Nr; ++item2Nr) {
         let item2 = allItems[item2Nr]
+
+        if (feedbackHandler.TimeForFeedback())
+          feedbackHandler.TellProgress(Progress(item1Nr) + item2Nr, Progress(allItems.length))
 
         this.RegisterItemCombinations(tester, item1, item2, desiredItem, allItems, combinedItems)
       }

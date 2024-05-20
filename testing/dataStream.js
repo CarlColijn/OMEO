@@ -1,3 +1,81 @@
+jazil.AddTestSet(omeoPage, 'DataStreamLoadingOptions', {
+  'Loading when nothing set': (jazil) => {
+    let dataState = new DataStateController(jazil)
+    dataState.Reset()
+
+    let loadingOptions = new DataStreamLoadingOptions()
+
+    jazil.ShouldBe(loadingOptions.inConflict, false, 'Marked in conflict!')
+    jazil.ShouldBe(loadingOptions.serialized, '', 'Wrong result returned!')
+  },
+
+  'Loading when only local storage set': (jazil) => {
+    let dataState = new DataStateController(jazil)
+    dataState.SetOnlyLocalStorage('localstorage')
+
+    let loadingOptions = new DataStreamLoadingOptions()
+
+    jazil.ShouldBe(loadingOptions.inConflict, false, 'Marked in conflict!')
+    jazil.ShouldBe(loadingOptions.serialized, 'localstorage', 'Wrong result returned!')
+  },
+
+  'Loading when only url set': (jazil) => {
+    let dataState = new DataStateController(jazil)
+    dataState.SetOnlyAddress('url')
+
+    let loadingOptions = new DataStreamLoadingOptions()
+
+    jazil.ShouldBe(loadingOptions.inConflict, false, 'Marked in conflict!')
+    jazil.ShouldBe(loadingOptions.serialized, 'url', 'Wrong result returned!')
+  },
+
+  'Loading when local storage and url identical': (jazil) => {
+    let dataState = new DataStateController(jazil)
+    dataState.SetAll('lsAndURL', '', 'lsAndURL')
+
+    let loadingOptions = new DataStreamLoadingOptions()
+
+    jazil.ShouldBe(loadingOptions.inConflict, false, 'Marked in conflict!')
+    jazil.ShouldBe(loadingOptions.serialized, 'lsAndURL', 'Wrong result returned!')
+  },
+
+  'Loading when local storage and url different': (jazil) => {
+    let dataState = new DataStateController(jazil)
+    dataState.SetAll('localstorage', '', 'url')
+
+    let loadingOptions = new DataStreamLoadingOptions()
+
+    jazil.ShouldBe(loadingOptions.inConflict, true, 'Marked not in conflict!')
+    jazil.ShouldBe(loadingOptions.serialized, '', 'Wrong result returned!')
+  },
+
+  'Choosing local storage works': (jazil) => {
+    let dataState = new DataStateController(jazil)
+    dataState.SetAll('localstorage', '', 'url')
+
+    let loadingOptions = new DataStreamLoadingOptions()
+    loadingOptions.ChooseLocalStorage()
+
+    jazil.ShouldBe(loadingOptions.inConflict, false, 'Marked in conflict!')
+    jazil.ShouldBe(loadingOptions.serialized, 'localstorage', 'Wrong result returned!')
+    jazil.ShouldBe(dataState.GetAddress(), '', 'Address still set!')
+  },
+
+  'Choosing url works': (jazil) => {
+    let dataState = new DataStateController(jazil)
+    dataState.SetAll('localstorage', '', 'url')
+
+    let loadingOptions = new DataStreamLoadingOptions()
+    loadingOptions.ChooseURL()
+
+    jazil.ShouldBe(loadingOptions.inConflict, false, 'Marked in conflict!')
+    jazil.ShouldBe(loadingOptions.serialized, 'url', 'Wrong result returned!')
+    jazil.ShouldBe(dataState.GetAddress(), 'url', 'Address not set anymore!')
+  },
+
+})
+
+
 jazil.AddTestSet(omeoPage, 'DataStream', {
   'Store to local storage': (jazil) => {
     let dataState = new DataStateController(jazil)
@@ -45,11 +123,11 @@ jazil.AddTestSet(omeoPage, 'DataStream', {
     dataStream.AddCount(1111)
     dataStream.SaveToLocalStorage()
 
-    let conflictSolver = new DataStreamConflictSolverMock(true)
+    let loadingOptions = new DataStreamLoadingOptions()
     dataStream = new DataStream(false)
-    jazil.ShouldBe(dataStream.Load(conflictSolver), true)
-    jazil.Assert(!conflictSolver.invoked, 'Conflict solver got invoked!')
+    let loadedOK = dataStream.Load(loadingOptions)
 
+    jazil.ShouldBe(loadedOK, true)
     jazil.ShouldBe(dataStream.GetSizedInt(6), 63)
     jazil.ShouldBe(dataStream.GetCount(), 47)
     jazil.ShouldBe(dataStream.GetSizedInt(3), 2)
@@ -60,11 +138,11 @@ jazil.AddTestSet(omeoPage, 'DataStream', {
     let dataState = new DataStateController(jazil)
     dataState.SetOnlyLocalStorage('x')
 
-    let conflictSolver = new DataStreamConflictSolverMock(true)
+    let loadingOptions = new DataStreamLoadingOptions()
     let dataStream = new DataStream(false)
-    jazil.ShouldBe(dataStream.Load(conflictSolver), true)
-    jazil.Assert(!conflictSolver.invoked, 'Conflict solver got invoked!')
+    let loadedOK = dataStream.Load(loadingOptions)
 
+    jazil.ShouldBe(loadedOK, true)
     jazil.ShouldBe(dataStream.GetSizedInt(6), 24)
   },
 
@@ -72,45 +150,23 @@ jazil.AddTestSet(omeoPage, 'DataStream', {
     let dataState = new DataStateController(jazil)
     dataState.SetOnlyAddress('y')
 
-    let conflictSolver = new DataStreamConflictSolverMock(false)
+    let loadingOptions = new DataStreamLoadingOptions()
     let dataStream = new DataStream(false)
-    jazil.ShouldBe(dataStream.Load(conflictSolver), true)
-    jazil.Assert(!conflictSolver.invoked, 'Conflict solver got invoked!')
+    let loadedOK = dataStream.Load(loadingOptions)
 
+    jazil.ShouldBe(loadedOK, true)
     jazil.ShouldBe(dataStream.GetSizedInt(6), 25)
-  },
-  'Restore from URL before local storage': (jazil) => {
-    let dataState = new DataStateController(jazil)
-    dataState.SetAll('q', 'r', 's')
-
-    let conflictSolver = new DataStreamConflictSolverMock(false)
-    let dataStream = new DataStream(false)
-    jazil.ShouldBe(dataStream.Load(conflictSolver), true)
-    jazil.Assert(conflictSolver.invoked, 'Conflict solver didn\'t get invoked!')
-
-    jazil.ShouldBe(dataStream.GetSizedInt(6), 19)
-  },
-  'Restore from local storage before URL': (jazil) => {
-    let dataState = new DataStateController(jazil)
-    dataState.SetAll('e', 'f', 'g')
-
-    let conflictSolver = new DataStreamConflictSolverMock(true)
-    let dataStream = new DataStream(false)
-    jazil.ShouldBe(dataStream.Load(conflictSolver), true)
-    jazil.Assert(conflictSolver.invoked, 'Conflict solver didn\'t get invoked!')
-
-    jazil.ShouldBe(dataStream.GetSizedInt(6), 5)
   },
 
   'Restore nothing': (jazil) => {
     let dataState = new DataStateController(jazil)
     dataState.Reset()
 
-    let conflictSolver = new DataStreamConflictSolverMock(true)
+    let loadingOptions = new DataStreamLoadingOptions()
     let dataStream = new DataStream(false)
-    jazil.ShouldBe(dataStream.Load(conflictSolver), false)
-    jazil.Assert(!conflictSolver.invoked, 'Conflict solver got invoked!')
+    let loadedOK = dataStream.Load(loadingOptions)
 
+    jazil.ShouldBe(loadedOK, false)
     jazil.ShouldBe(dataStream.GetSizedInt(6), 0)
   },
 

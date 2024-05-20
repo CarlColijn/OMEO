@@ -69,7 +69,7 @@ function CreateTestSet(setDescription, testContainerID, setLetter) {
         tableDetails.tableElemJQ.find('tr.item').each((rowNr, rowElem) => {
           let rowElemJQ = $(rowElem)
           if (!rowElemJQ.hasClass('template')) {
-            let itemRow = new ItemRow(undefined, undefined, rowElemJQ, set, false)
+            let itemRow = new ItemRow(undefined, rowElemJQ, set, false)
             retrievedItems.push(itemRow.GetItem().item)
           }
         })
@@ -78,7 +78,7 @@ function CreateTestSet(setDescription, testContainerID, setLetter) {
       }
       else if (set === g_desired) {
         let rowElemJQ = $(tableDetails.tableElemJQ.find('tr.item')[0])
-        let itemRow = new ItemRow(undefined, undefined, rowElemJQ, set, false)
+        let itemRow = new ItemRow(undefined, rowElemJQ, set, false)
         let retrievedItem = itemRow.GetItem().item
         let testItem = testItems[0]
 
@@ -107,8 +107,8 @@ function CreateTestSet(setDescription, testContainerID, setLetter) {
 
       table.SetItems(testItems)
       let collectedItemDetails = table.GetItems(new ItemCollector(false))
-      jazil.ShouldBe(collectedItemDetails.withErrors, false, 'table says there were count errors!')
-      jazil.ShouldBe(tableDetails.ShowCountInputError.called, false, 'count error callback is called!')
+      jazil.ShouldBe(collectedItemDetails.withCountErrors, false, 'table says there were count errors!')
+      jazil.ShouldBe(collectedItemDetails.countErrorElemJQs.length, 0, 'count error elements are reported!')
       jazil.ShouldBe(collectedItemDetails.mergedItems, false, 'Items marked as merged!')
 
       if (set === g_source)
@@ -145,8 +145,8 @@ function CreateTestSet(setDescription, testContainerID, setLetter) {
 
       table.SetItems(testItems)
       let collectedItemDetails = table.GetItems(new ItemCollector(true))
-      jazil.ShouldBe(collectedItemDetails.withErrors, false, 'table says there were count errors!')
-      jazil.ShouldBe(tableDetails.ShowCountInputError.called, false, 'count error callback is called!')
+      jazil.ShouldBe(collectedItemDetails.withCountErrors, false, 'table says there were count errors!')
+      jazil.ShouldBe(collectedItemDetails.countErrorElemJQs.length, 0, 'count error elements are reported!')
       jazil.ShouldBe(collectedItemDetails.mergedItems, true, 'Items not marked as merged!')
 
       // merge the mergeable items ourselves first to compare them properly
@@ -180,8 +180,8 @@ function CreateTestSet(setDescription, testContainerID, setLetter) {
 
       table.SetItems(testItems)
       let collectedItemDetails = table.GetItems(new ItemCollector(false))
-      jazil.ShouldBe(collectedItemDetails.withErrors, false, 'table says there were count errors!')
-      jazil.ShouldBe(tableDetails.ShowCountInputError.called, false, 'count error callback is called!')
+      jazil.ShouldBe(collectedItemDetails.withCountErrors, false, 'table says there were count errors!')
+      jazil.ShouldBe(collectedItemDetails.countErrorElemJQs.length, 0, 'count error elements are reported!')
       jazil.ShouldBe(collectedItemDetails.mergedItems, false, 'Items marked as merged!')
 
       TestItemListsMatch(jazil, testItems, 'test', collectedItemDetails.items, 'retrieved', set)
@@ -207,8 +207,8 @@ function CreateTestSet(setDescription, testContainerID, setLetter) {
       // (note: index 0 is the template row)
       $(tableDetails.tableElemJQ.find('[name=count]')[2]).val('')
       let collectedItemDetails = table.GetItems(new ItemCollector(false))
-      jazil.ShouldBe(collectedItemDetails.withErrors, true, 'table says there were no count errors!')
-      jazil.ShouldBe(tableDetails.ShowCountInputError.called, true, 'count error callback is not called!')
+      jazil.ShouldBe(collectedItemDetails.withCountErrors, true, 'table says there were no count errors!')
+      jazil.ShouldBe(collectedItemDetails.countErrorElemJQs.length, 1, 'incorrect count error elements are reported!')
       jazil.ShouldBe(collectedItemDetails.mergedItems, false, 'Items marked as merged!')
 
       // Update the test item to reflect the NaN state.

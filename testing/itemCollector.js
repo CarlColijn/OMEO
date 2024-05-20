@@ -32,8 +32,8 @@ jazil.AddTestSet(omeoPage, 'ItemCollector', {
     let itemRows = CreateItemRows(templateRowDetails, testItems, false)
     let result = ProcessItemRows(itemRows, false)
 
-    jazil.ShouldBe(templateRowDetails.ShowCountInputError.called, false, 'count error callback is called!')
-    jazil.ShouldBe(result.withErrors, false, 'collector says there were count errors!')
+    jazil.ShouldBe(result.withCountErrors, false, 'collector says there were count errors!')
+    jazil.ShouldBe(result.countErrorElemJQs.length, 0, 'count error elements are reported!')
     jazil.ShouldBe(result.mergedItems, false, 'Items marked as merged!')
     jazil.ShouldBe(result.rowsToUpdateNr.length, 0, 'Wrong number of rows marked to update nr!')
     jazil.ShouldBe(result.rowsToUpdateCount.length, 0, 'Wrong number of rows marked to update count!')
@@ -53,8 +53,8 @@ jazil.AddTestSet(omeoPage, 'ItemCollector', {
     let itemRows = CreateItemRows(templateRowDetails, testItems, true)
     let result = ProcessItemRows(itemRows, false)
 
-    jazil.ShouldBe(templateRowDetails.ShowCountInputError.called, false, 'count error callback is called!')
-    jazil.ShouldBe(result.withErrors, false, 'collector says there were count errors!')
+    jazil.ShouldBe(result.withCountErrors, false, 'collector says there were count errors!')
+    jazil.ShouldBe(result.countErrorElemJQs.length, 0, 'count error elements are reported!')
     jazil.ShouldBe(result.mergedItems, false, 'Items marked as merged!')
     jazil.ShouldBe(result.rowsToUpdateNr.length, 2, 'Wrong number of rows marked to update nr!')
     jazil.ShouldBe(result.rowsToUpdateCount.length, 0, 'Wrong number of rows marked to update count!')
@@ -98,8 +98,8 @@ jazil.AddTestSet(omeoPage, 'ItemCollector', {
 
     let result = ProcessItemRows(itemRows, true)
 
-    jazil.ShouldBe(templateRowDetails.ShowCountInputError.called, false, 'count error callback is called!')
-    jazil.ShouldBe(result.withErrors, false, 'collector says there were count errors!')
+    jazil.ShouldBe(result.withCountErrors, false, 'collector says there were count errors!')
+    jazil.ShouldBe(result.countErrorElemJQs.length, 0, 'count error elements are reported!')
     jazil.ShouldBe(result.mergedItems, true, 'Items not marked as merged!')
     jazil.ShouldBe(result.rowsToUpdateNr.length, 1, 'Wrong number of rows marked to update nr!')
     jazil.ShouldBe(result.rowsToUpdateCount.length, 2, 'Wrong number of rows marked to update count!')
@@ -142,8 +142,8 @@ jazil.AddTestSet(omeoPage, 'ItemCollector', {
     let itemRows = CreateItemRows(templateRowDetails, testItems, false)
     let result = ProcessItemRows(itemRows, false)
 
-    jazil.ShouldBe(templateRowDetails.ShowCountInputError.called, false, 'count error callback is called!')
-    jazil.ShouldBe(result.withErrors, false, 'collector says there were count errors!')
+    jazil.ShouldBe(result.withCountErrors, false, 'collector says there were count errors!')
+    jazil.ShouldBe(result.countErrorElemJQs.length, 0, 'count error elements are reported!')
     jazil.ShouldBe(result.mergedItems, false, 'Items marked as merged!')
     jazil.ShouldBe(result.rowsToUpdateNr.length, 0, 'Wrong number of rows marked to update nr!')
     jazil.ShouldBe(result.rowsToUpdateCount.length, 0, 'Wrong number of rows marked to update!')
@@ -177,8 +177,8 @@ jazil.AddTestSet(omeoPage, 'ItemCollector', {
 
     let result = ProcessItemRows(itemRows, false)
 
-    jazil.ShouldBe(templateRowDetails.ShowCountInputError.called, true, 'count error callback is not called!')
-    jazil.ShouldBe(result.withErrors, true, 'table says there were no count errors!')
+    jazil.ShouldBe(result.withCountErrors, true, 'collector says there were no count errors!')
+    jazil.ShouldBe(result.countErrorElemJQs.length, 1, 'incorrect count error elements are reported!')
     jazil.ShouldBe(result.mergedItems, false, 'Items marked as merged!')
     jazil.ShouldBe(result.rowsToUpdateNr.length, 0, 'Wrong number of rows marked to update nr!')
     jazil.ShouldBe(result.rowsToUpdateCount.length, 0, 'Wrong number of rows marked to update!')

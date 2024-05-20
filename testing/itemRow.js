@@ -98,8 +98,8 @@ function CreateTestSet(setDescription, testContainerID, setLetter) {
       })
       let description = GetDescriptionForItemInTable(set, item)
 
-      jazil.ShouldBe(itemDetails.withErrors, false, 'row says there were count errors!')
-      jazil.ShouldBe(templateRowDetails.ShowCountInputError.called, false, 'count error callback is called!')
+      jazil.ShouldBe(itemDetails.withCountError, false, 'row says there were count errors!')
+      jazil.ShouldBe(itemDetails.countErrorElemJQ, undefined, 'row reports a DOM element in error!')
       jazil.ShouldBe(retrievedItem.set, set, 'set is off!')
       if (set === g_source)
         jazil.ShouldBe(retrievedItem.nr, 31, 'nr is off!')
@@ -137,8 +137,8 @@ function CreateTestSet(setDescription, testContainerID, setLetter) {
       })
       let description = GetDescriptionForItemInTable(set, item)
 
-      jazil.ShouldBe(itemDetails.withErrors, true, 'row says there were no count errors!')
-      jazil.ShouldBe(templateRowDetails.ShowCountInputError.called, true, 'count error callback is not called!')
+      jazil.ShouldBe(itemDetails.withCountError, true, 'row says there were no count errors!')
+      jazil.ShouldNotBe(itemDetails.countErrorElemJQ, undefined, 'row reports no DOM element in error!')
       jazil.ShouldBe(retrievedItem.set, set, 'set is off!')
       if (set === g_source)
         jazil.ShouldBe(retrievedItem.nr, 25, 'nr is off!')

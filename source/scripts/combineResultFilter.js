@@ -29,6 +29,19 @@
 
 
 class CombineResultLevel {
+  // returns one of the predefined CombineResultLevel globals
+  static GetRehydrated(level) {
+    switch (level.id) {
+      case 'p': return g_onlyPerfectCombines
+      case 'pe': return g_perfectAndPerfectWithExtrasCombines
+      case 'e': return g_onlyPerfectWithExtrasCombines
+      case 'i': return g_onlyImperfectCombines
+      case 'n': return g_noCombines
+    }
+    return undefined
+  }
+
+
   constructor(id) {
     this.id = id
   }

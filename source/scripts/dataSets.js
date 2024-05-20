@@ -22,6 +22,19 @@
 
 
 class DataSet {
+  // returns one of the predefined DataSet globals
+  static GetRehydrated(set) {
+    switch (set.id) {
+      case 's': return g_source
+      case 'd': return g_desired
+      case 'c': return g_combined
+      case 'e': return g_extra
+    }
+
+    return undefined
+  }
+
+
   constructor(id) {
     // ==== PUBLIC ====
     this.id = id

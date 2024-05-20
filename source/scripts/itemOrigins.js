@@ -15,6 +15,11 @@
 
 // ======== PUBLIC ========
 class ZeroOrigin {
+  static Rehydrate(origin) {
+    Object.setPrototypeOf(origin, ZeroOrigin.prototype);
+  }
+
+
   constructor(items) {
     // ==== PRIVATE ====
     let numItems = items.length
@@ -40,6 +45,11 @@ class ZeroOrigin {
 
 
 class ItemOrigin {
+  static Rehydrate(origin) {
+    Object.setPrototypeOf(origin, ItemOrigin.prototype);
+  }
+
+
   constructor(otherOrigin, itemNr) {
     this.maxUses = otherOrigin.maxUses // noone is modifying it; by ref is fine
     this.itemUses = otherOrigin.itemUses.slice()

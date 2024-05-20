@@ -94,9 +94,9 @@ jazil.AddTestSet(omeoPage, 'FormData', {
 
     jazil.ShouldBe(dataState.GetLocalStorage(), 'ceKRdGfGvFIvpxqkf_F')
 
+    let loadingOptions = new DataStreamLoadingOptions()
     let restoreStream = new DataStream(false)
-    let conflictSolver = new DataStreamConflictSolverMock(true)
-    restoreStream.Load(conflictSolver)
+    restoreStream.Load(loadingOptions)
 
     let restoredData = new FormData
     restoredData.Deserialize(restoreStream)
@@ -129,9 +129,9 @@ jazil.AddTestSet(omeoPage, 'FormData', {
 
     jazil.ShouldBe(dataState.GetLocalStorage(), 'cefG_Wzsji5kxjcrykvpYH')
 
+    let loadingOptions = new DataStreamLoadingOptions()
     let restoreStream = new DataStream(false)
-    let conflictSolver = new DataStreamConflictSolverMock(true)
-    restoreStream.Load(conflictSolver)
+    restoreStream.Load(loadingOptions)
 
     let restoredData = new FormData
     restoredData.Deserialize(restoreStream)
@@ -156,9 +156,9 @@ jazil.AddTestSet(omeoPage, 'FormData', {
     let dataState = new DataStateController(jazil)
     dataState.SetOnlyLocalStorage('ccmbaGKRKQ') // truncated data
 
+    let loadingOptions = new DataStreamLoadingOptions()
     let restoreStream = new DataStream(false)
-    let conflictSolver = new DataStreamConflictSolverMock(true)
-    restoreStream.Load(conflictSolver)
+    restoreStream.Load(loadingOptions)
 
     let restoredData = new FormData
     let deserializedOK = restoredData.Deserialize(restoreStream)

@@ -22,6 +22,12 @@
 
 
 class ItemInfo {
+  // returns one of the static ItemInfo globals
+  static GetRehydrated(info) {
+    return g_itemInfosByID.get(info.id)
+  }
+
+
   constructor(id, name, enchantNames) {
     // ==== PUBLIC ====
     this.id = id

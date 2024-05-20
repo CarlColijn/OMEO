@@ -18,13 +18,12 @@
 
 
 class ItemRow {
-  constructor(ShowCountInputError, ShowDetails, rowElemJQ, set, hookUpGUI) {
+  constructor(ShowDetails, rowElemJQ, set, hookUpGUI) {
     // ==== PUBLIC ====
     this.set = set
     this.nr = -1 // to be filled in later
 
     // ==== PRIVATE ====
-    this.ShowCountInputError = ShowCountInputError
     this.ShowDetails = ShowDetails
 
     this.rowElemJQ = rowElemJQ
@@ -125,7 +124,8 @@ class ItemRow {
   // only for source and desired
   // returns object:
   // - item: Item
-  // - withErrors: bool
+  // - withCountError: bool
+  // - countErrorElemJQ: JQuery-wrapped input element, if applicable
   GetItem() {
     let countResult = this.GetValidatedCount()
 
@@ -141,7 +141,11 @@ class ItemRow {
 
     return {
       item: item,
-      withErrors: countResult.withErrors
+      withCountError: countResult.inError,
+      countErrorElemJQ:
+        countResult.inError ?
+        this.countElemJQ :
+        undefined
     }
   }
 
@@ -205,7 +209,7 @@ class ItemRow {
 
   RenumberAllRows(tbodyElemJQ) {
     tbodyElemJQ.find('.item').each((rowNr, rowElem) => {
-      new ItemRow(this.ShowCountInputError, this.ShowDetails, $(rowElem), g_source, false).SetNumber(rowNr)
+      new ItemRow(this.ShowDetails, $(rowElem), g_source, false).SetNumber(rowNr)
     })
   }
 
@@ -255,26 +259,23 @@ class ItemRow {
     newRowElemJQ.removeClass('template')
     newRowElemJQ.attr('data-real', 1)
 
-    return new ItemRow(this.ShowCountInputError, this.ShowDetails, newRowElemJQ, this.set, false)
+    return new ItemRow(this.ShowDetails, newRowElemJQ, this.set, false)
   }
 
 
   // returns object:
   // - count: int / NaN
-  // - withErrors: bool
+  // - inError: bool
   GetValidatedCount() {
     let count = 1
-    let withErrors = false
+    let inError = false
     if (this.set === g_source) {
       count = parseInt(this.countElemJQ.val())
-      if (isNaN(count)) {
-        this.ShowCountInputError(this.countElemJQ)
-        withErrors = true
-      }
+      inError = isNaN(count)
     }
     return {
       count: count,
-      withErrors: withErrors
+      inError: inError
     }
   }
 

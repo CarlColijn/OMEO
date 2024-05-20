@@ -47,8 +47,7 @@ class Form {
 
     this.InitializeNotesSection()
 
-    if (!this.Load())
-      this.formHandler.FailedToLoad()
+    this.StartLoading()
   }
 
 
@@ -63,9 +62,9 @@ class Form {
       this.detailsTable.ShowItem(item)
     }
 
-    this.sourceItemTable = new ItemTable(this.formHandler.NoteCountError, undefined, $('#sources table'), g_source)
-    this.desiredItemTable = new ItemTable(undefined, undefined, $('#desired table'), g_desired)
-    this.combineItemTable = new ItemTable(undefined, ShowDetails, $('#combines table'), g_combined)
+    this.sourceItemTable = new ItemTable(undefined, $('#sources table'), g_source)
+    this.desiredItemTable = new ItemTable(undefined, $('#desired table'), g_desired)
+    this.combineItemTable = new ItemTable(ShowDetails, $('#combines table'), g_combined)
     this.detailsTable = new DetailsTable($('#details table'))
   }
 
@@ -81,7 +80,44 @@ class Form {
 
     $('#makeBookmark').click(() => {
       if (!this.Save(true))
-        this.formHandler.FailedToSaveOnRequest()
+        this.formHandler.TellFailedToSaveOnRequest()
+    })
+  }
+
+
+  ContinueDivine(dataInContext) {
+    this.formHandler.TellCombineStarting(() => {
+      this.ExitDivine()
+    })
+
+    // Note: the path should be relative to the html document loading us!
+    this.combineWorker = new Worker('scripts/itemCombineWorker.js')
+
+    this.combineWorker.onmessage = (e) => {
+      switch (e.data.type) {
+        case 0:
+          this.formHandler.TellCombineProgress(e.data.progress, e.data.maxProgress)
+          break
+        case 1:
+          this.formHandler.TellCombineFinalizing()
+          break
+        case 2:
+          let cleanedUpItemsResult = e.data.result
+          RehydrateItems(cleanedUpItemsResult.items)
+          cleanedUpItemsResult.level = CombineResultLevel.GetRehydrated(cleanedUpItemsResult.level)
+
+          this.ShowCombinedItems(cleanedUpItemsResult.items)
+
+          this.formHandler.TellCombineDone(cleanedUpItemsResult.level, cleanedUpItemsResult.hasSources)
+          break
+      }
+    }
+
+    this.combineWorker.postMessage({
+      type: 0,
+      sourceItems: dataInContext.data.sourceItems,
+      desiredItem: dataInContext.data.desiredItem,
+      feedbackIntervalMS: 100
     })
   }
 
@@ -91,21 +127,25 @@ class Form {
     this.ClearResult()
 
     let dataInContext = this.GetData(true)
-    if (dataInContext.withErrors)
+    if (dataInContext.withCountErrors)
       this.formHandler.TellDataInError()
     else {
+      let ContinueCombine = () => {
+        this.ContinueDivine(dataInContext)
+      }
+
       if (dataInContext.mergedSourceItems)
-        this.formHandler.TellItemsGotMerged()
+        this.formHandler.TellItemsMerged(ContinueCombine)
+      else
+        ContinueCombine()
+    }
+  }
 
-      let itemCombiner = new ItemCombiner()
-      let combinedItems = itemCombiner.GetAllItemCombinations(dataInContext.data.sourceItems, dataInContext.data.desiredItem)
 
-      let combineResultFilter = new CombineResultFilter(dataInContext.data.desiredItem)
-      let cleanedUpItemsResult = combineResultFilter.GetCleanedUpItemList(dataInContext.data.sourceItems, combinedItems)
-
-      this.ShowCombinedItems(cleanedUpItemsResult.items)
-
-      this.formHandler.TellCombiningDone(cleanedUpItemsResult.level, cleanedUpItemsResult.hasSources)
+  ExitDivine() {
+    if (this.combineWorker !== undefined) {
+      this.combineWorker.terminate()
+      this.combineWorker = undefined
     }
   }
 
@@ -138,7 +178,7 @@ class Form {
 
 
   ClearErrors() {
-    $('.error').remove()
+    this.formHandler.ClearCountErrors()
   }
 
 
@@ -155,7 +195,7 @@ class Form {
 
   // returns object;
   // - data: FormData
-  // - withErrors: bool
+  // - withCountErrors: bool
   // - mergedSourceItems: bool
   GetData(mergeSourceItems) {
     let sourceItemsResult = this.sourceItemTable.GetItems(new ItemCollector(mergeSourceItems))
@@ -165,13 +205,20 @@ class Form {
     data.AddSourceItems(sourceItemsResult.items)
     data.SetDesiredItem(desiredItemResult.items[0])
 
-    let withErrors =
-      sourceItemsResult.withErrors ||
-      desiredItemResult.withErrors
+    let withCountErrors =
+      sourceItemsResult.withCountErrors ||
+      desiredItemResult.withCountErrors
+
+    if (withCountErrors) {
+      let countErrorElemJQs = [...sourceItemsResult.countErrorElemJQs, ...desiredItemResult.countErrorElemJQs]
+      countErrorElemJQs.forEach((countErrorElemJQ) => {
+        this.formHandler.NoteCountError(countErrorElemJQ)
+      })
+    }
 
     return {
       'data': data,
-      'withErrors': withErrors,
+      'withCountErrors': withCountErrors,
       'mergedSourceItems': sourceItemsResult.mergedItems
     }
   }
@@ -184,19 +231,35 @@ class Form {
   }
 
 
-  // returns bool (if loading was successful)
-  Load() {
-    let allOK = true
-    let stream = new DataStream(false)
-    let conflictSolver = new DataStreamConflictSolver()
-    if (stream.Load(conflictSolver)) {
-      let data = new FormData()
-      allOK = data.Deserialize(stream)
-      if (allOK)
-        this.SetData(data)
+  StartLoading() {
+    let loadingOptions = new DataStreamLoadingOptions()
+
+    let ContinueLoading = () => {
+      let allOK = true
+      let stream = new DataStream(false)
+      if (stream.Load(loadingOptions)) {
+        let data = new FormData()
+        allOK = data.Deserialize(stream)
+        if (allOK)
+          this.SetData(data)
+      }
+
+      if (!allOK)
+        this.formHandler.FailedToLoad()
     }
 
-    return allOK
+    if (!loadingOptions.inConflict)
+      ContinueLoading()
+    else {
+      this.formHandler.AskLoadFromURLOrLocalStorage(() => {
+        loadingOptions.ChooseLocalStorage()
+        ContinueLoading()
+      },
+      () => {
+        loadingOptions.ChooseURL()
+        ContinueLoading()
+      })
+    }
   }
 
 
@@ -205,7 +268,7 @@ class Form {
     this.ClearErrors()
 
     let dataInContext = this.GetData(false)
-    if (!dataInContext.withErrors) {
+    if (!dataInContext.withCountErrors) {
       let stream = new DataStream(true)
       dataInContext.data.Serialize(stream)
 
@@ -215,6 +278,6 @@ class Form {
         stream.SaveToLocalStorage()
     }
 
-    return !dataInContext.withErrors
+    return !dataInContext.withCountErrors
   }
 }

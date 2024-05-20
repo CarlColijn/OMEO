@@ -31,7 +31,30 @@
 // ======== PUBLIC ========
 
 
+function RehydrateItems(items) {
+  items.forEach((item) => {
+    Item.Rehydrate(item)
+  })
+}
+
+
 class Item {
+  static Rehydrate(item) {
+    Object.setPrototypeOf(item, Item.prototype);
+    item.set = DataSet.GetRehydrated(item.set)
+    item.info = ItemInfo.GetRehydrated(item.info)
+    item.enchantsByID.forEach((enchant) => {
+      Enchant.Rehydrate(enchant)
+    })
+    if (item.origin !== undefined)
+      ItemOrigin.Rehydrate(item.origin)
+    if (item.targetItem !== undefined)
+      Item.Rehydrate(item.targetItem)
+    if (item.sacrificeItem !== undefined)
+      Item.Rehydrate(item.sacrificeItem)
+  }
+
+
   constructor(count, set, id, priorWork) {
     // ==== PUBLIC ====
     this.count = count
