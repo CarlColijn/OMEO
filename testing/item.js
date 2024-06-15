@@ -15,16 +15,38 @@ jazil.AddTestSet(omeoPage, 'Item', {
     jazil.ShouldBe(pickaxe.enchantsByID.size, 0, 'newly created pickaxe already has an enchant!')
   },
 
-  'Like items (id & prior work) get same hash': (jazil) => {
-    let pickaxe1_a = BuildItem({ name:'Pickaxe', count:11, priorWork:77, set:g_source })
-    let pickaxe1_b = BuildItem({ name:'Pickaxe', count:22, priorWork:77, set:g_extra })
-    let pickaxe2_a = BuildItem({ name:'Pickaxe', count:33, priorWork:88, set:g_combined })
-    let pickaxe2_b = BuildItem({ name:'Pickaxe', count:44, priorWork:88, set:g_desired })
+  'Identical items get the same hash': (jazil) => {
+    let items = [
+      BuildItem({ name:'Pickaxe', count:11, priorWork:77, cost:1, set:g_source }),
+      BuildItem({ name:'Pickaxe', count:22, priorWork:77, cost:1, set:g_extra }),
+      BuildItem({ name:'Pickaxe', count:33, priorWork:88, cost:2, set:g_combined }),
+      BuildItem({ name:'Pickaxe', count:44, priorWork:88, cost:3, set:g_desired }),
+      BuildItem({ name:'Pickaxe', count:44, priorWork:88, cost:3, set:g_source, enchants:[{ name:'Fortune', level:2 }, { name:'Unbreaking', level:3 }] }),
+      BuildItem({ name:'Pickaxe', count:44, priorWork:88, cost:3, set:g_source, enchants:[{ name:'Fortune', level:3 }, { name:'Unbreaking', level:2 }] }),
+      BuildItem({ name:'Pickaxe', count:44, priorWork:88, cost:4, set:g_source, enchants:[{ name:'Fortune', level:2 }, { name:'Unbreaking', level:3 }] })
+    ]
 
-    jazil.ShouldBe(pickaxe1_a.Hash(true), pickaxe1_b.Hash(true), 'like items have different hash!')
-    jazil.ShouldBe(pickaxe2_a.Hash(true), pickaxe2_b.Hash(true), 'like items have different hash!')
-    jazil.ShouldNotBe(pickaxe2_a.Hash(true), pickaxe1_a.Hash(true), 'unlike items have same hash!')
-    jazil.ShouldNotBe(pickaxe2_b.Hash(true), pickaxe1_b.Hash(true), 'unlike items have same hash!')
+    let sameCombos = new Set()
+    sameCombos.add('0,1')
+    sameCombos.add('2,3')
+    sameCombos.add('4,6')
+
+    for (let item1Nr = 0; item1Nr < items.length - 1; ++item1Nr) {
+      let item1 = items[item1Nr]
+      // note: we start from item1Nr onwards; this way we get an extra
+      // check on item === item for free.
+      for (let item2Nr = item1Nr; item2Nr < items.length; ++item2Nr) {
+        let item2 = items[item2Nr]
+
+        let itemIndexCombo = `${item1Nr},${item2Nr}`
+
+        let sameHash = item1.Hash(true) == item2.Hash(true)
+        if (item1Nr == item2Nr || sameCombos.has(itemIndexCombo))
+          jazil.Assert(sameHash, `like items ${itemIndexCombo} have different hash!`)
+        else
+          jazil.Assert(!sameHash, `unlike items ${itemIndexCombo} have same hash!`)
+      }
+    }
   },
 
   'Set enchants get set': (jazil) => {
