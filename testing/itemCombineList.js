@@ -1,16 +1,29 @@
 /*
   Note: ItemCombineList doesn't do anything with the objects it
-  manages for us.  We make good use of that by not even setting
-  up proper items but test with some ints instead.
+  manages for us, except for calling its .Hash().  We make good
+  use of that by not even setting up proper items but test with
+  some mocks instead.
 */
+
+
+class ItemMock {
+  constructor(nr) {
+    this.nr = nr
+  }
+
+
+  Hash() {
+    return this.nr
+  }
+}
 
 
 function TestIteration(jazil, itemList, iteration, shouldHaveItems, item1, item2, currentProgress, maxProgress) {
   let items = {}
   jazil.ShouldBe(itemList.GetNextItems(items), shouldHaveItems, `#${iteration}: got items!`)
   if (shouldHaveItems) {
-    jazil.ShouldBe(items.item1, item1, `#${iteration}: wrong item1!`)
-    jazil.ShouldBe(items.item2, item2, `#${iteration}: wrong item2!`)
+    jazil.ShouldBe(items.item1.nr, item1, `#${iteration}: wrong item1!`)
+    jazil.ShouldBe(items.item2.nr, item2, `#${iteration}: wrong item2!`)
   }
   jazil.ShouldBe(itemList.GetCurrentProgress(), currentProgress, `#${iteration}: wrong Current!`)
   jazil.ShouldBe(itemList.GetMaxProgress(), maxProgress, `#${iteration}: wrong Max!`)
@@ -25,14 +38,14 @@ jazil.AddTestSet(omeoPage, 'ItemCombineList', {
   },
 
   'One item given': (jazil) => {
-    let itemList = new ItemCombineList([1])
+    let itemList = new ItemCombineList([new ItemMock(1)])
 
     TestIteration(jazil, itemList, 1, true, 1, 1, 1, 1)
     TestIteration(jazil, itemList, 2, false, 0, 0, 1, 1)
   },
 
   'Two items given': (jazil) => {
-    let itemList = new ItemCombineList([1, 2])
+    let itemList = new ItemCombineList([new ItemMock(1), new ItemMock(2)])
 
     TestIteration(jazil, itemList, 1, true, 1, 1, 1, 3)
     TestIteration(jazil, itemList, 2, true, 2, 1, 2, 3)
@@ -41,7 +54,7 @@ jazil.AddTestSet(omeoPage, 'ItemCombineList', {
   },
 
   'Three items given': (jazil) => {
-    let itemList = new ItemCombineList([1, 2, 3])
+    let itemList = new ItemCombineList([new ItemMock(1), new ItemMock(2), new ItemMock(3)])
 
     TestIteration(jazil, itemList, 1, true, 1, 1, 1, 6)
     TestIteration(jazil, itemList, 2, true, 2, 1, 2, 6)
@@ -53,18 +66,18 @@ jazil.AddTestSet(omeoPage, 'ItemCombineList', {
   },
 
   'Adding extra items mid-way': (jazil) => {
-    let itemList = new ItemCombineList([1, 2, 3])
+    let itemList = new ItemCombineList([new ItemMock(1), new ItemMock(2), new ItemMock(3)])
 
     TestIteration(jazil, itemList, 1, true, 1, 1, 1, 6)
     TestIteration(jazil, itemList, 2, true, 2, 1, 2, 6)
     TestIteration(jazil, itemList, 3, true, 2, 2, 3, 6)
     TestIteration(jazil, itemList, 4, true, 3, 1, 4, 6)
     TestIteration(jazil, itemList, 5, true, 3, 2, 5, 6)
-    itemList.AddCombinedItem(4)
+    itemList.AddCombinedItem(new ItemMock(4))
     TestIteration(jazil, itemList, 6, true, 3, 3, 6, 10)
     TestIteration(jazil, itemList, 7, true, 4, 1, 7, 10)
     TestIteration(jazil, itemList, 8, true, 4, 2, 8, 10)
-    itemList.AddCombinedItem(5)
+    itemList.AddCombinedItem(new ItemMock(5))
     TestIteration(jazil, itemList, 9, true, 4, 3, 9, 15)
     TestIteration(jazil, itemList, 10, true, 4, 4, 10, 15)
     TestIteration(jazil, itemList, 11, true, 5, 1, 11, 15)

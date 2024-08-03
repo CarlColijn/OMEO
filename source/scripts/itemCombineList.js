@@ -20,6 +20,8 @@
 class ItemCombineList {
   constructor(sourceItems) {
     this.allItems = sourceItems.slice()
+    this.SetUpItemsByHash()
+
     this.combinedItems = []
 
     this.item1Nr = 0
@@ -61,8 +63,9 @@ class ItemCombineList {
   }
 
 
-  AddCombinedItem(combinedItem) {
+  AddCombinedItem(combinedItem, combinedItemHash) {
     this.allItems.push(combinedItem)
+    this.AddItemToAllItemsByHash(combinedItem, combinedItemHash)
     this.combinedItems.push(combinedItem)
   }
 
@@ -72,5 +75,21 @@ class ItemCombineList {
 
   Progress(value) {
     return value * (value + 1) / 2
+  }
+
+
+  AddItemToAllItemsByHash(item, itemHash) {
+    if (this.allItemsByHash.has(itemHash))
+      this.allItemsByHash.get(itemHash).push(item)
+    else
+      this.allItemsByHash.set(itemHash, [item])
+  }
+
+
+  SetUpItemsByHash() {
+    this.allItemsByHash = new Map()
+    this.allItems.forEach((item) => {
+      this.AddItemToAllItemsByHash(item, item.Hash(false, false))
+    })
   }
 }

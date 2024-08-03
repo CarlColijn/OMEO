@@ -87,4 +87,13 @@ class ItemOrigin {
 
     return numCombines
   }
+
+
+  IsSubsetOf(otherOrigin) {
+    for (let itemNr = 0; itemNr < this.itemUses.length; ++itemNr)
+      if (this.itemUses[itemNr] > otherOrigin.itemUses[itemNr])
+        return false
+
+    return true
+  }
 }

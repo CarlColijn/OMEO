@@ -22,14 +22,16 @@ jazil.AddTestSet(omeoPage, 'Item', {
       BuildItem({ name:'Pickaxe', count:33, priorWork:88, cost:2, set:g_combined }),
       BuildItem({ name:'Pickaxe', count:44, priorWork:88, cost:3, set:g_desired }),
       BuildItem({ name:'Pickaxe', count:44, priorWork:88, cost:3, set:g_source, enchants:[{ name:'Fortune', level:2 }, { name:'Unbreaking', level:3 }] }),
-      BuildItem({ name:'Pickaxe', count:44, priorWork:88, cost:3, set:g_source, enchants:[{ name:'Fortune', level:3 }, { name:'Unbreaking', level:2 }] }),
-      BuildItem({ name:'Pickaxe', count:44, priorWork:88, cost:4, set:g_source, enchants:[{ name:'Fortune', level:2 }, { name:'Unbreaking', level:3 }] })
+      BuildItem({ name:'Pickaxe', count:44, priorWork:88, cost:3, set:g_desired, enchants:[{ name:'Fortune', level:3 }, { name:'Unbreaking', level:2 }] }),
+      BuildItem({ name:'Pickaxe', count:44, priorWork:88, cost:4, set:g_combined, enchants:[{ name:'Fortune', level:2 }, { name:'Unbreaking', level:3 }] })
     ]
 
-    let sameCombos = new Set()
-    sameCombos.add('0,1')
-    sameCombos.add('2,3')
-    sameCombos.add('4,6')
+    let sameCombosWithoutCost = new Set()
+    sameCombosWithoutCost.add('0,1')
+    sameCombosWithoutCost.add('2,3')
+    sameCombosWithoutCost.add('4,6')
+    let sameCombosWithCost = new Set()
+    sameCombosWithCost.add('0,1')
 
     for (let item1Nr = 0; item1Nr < items.length - 1; ++item1Nr) {
       let item1 = items[item1Nr]
@@ -40,11 +42,17 @@ jazil.AddTestSet(omeoPage, 'Item', {
 
         let itemIndexCombo = `${item1Nr},${item2Nr}`
 
-        let sameHash = item1.Hash(true) == item2.Hash(true)
-        if (item1Nr == item2Nr || sameCombos.has(itemIndexCombo))
-          jazil.Assert(sameHash, `like items ${itemIndexCombo} have different hash!`)
+        let sameHashWithoutCost = item1.Hash(true, false) == item2.Hash(true, false)
+        if (item1Nr == item2Nr || sameCombosWithoutCost.has(itemIndexCombo))
+          jazil.Assert(sameHashWithoutCost, `like items without cost ${itemIndexCombo} have different hash!`)
         else
-          jazil.Assert(!sameHash, `unlike items ${itemIndexCombo} have same hash!`)
+          jazil.Assert(!sameHashWithoutCost, `unlike items without cost ${itemIndexCombo} have same hash!`)
+
+        let sameHashWithCost = item1.Hash(true, true) == item2.Hash(true, true)
+        if (item1Nr == item2Nr || sameCombosWithCost.has(itemIndexCombo))
+          jazil.Assert(sameHashWithCost, `like items with cost ${itemIndexCombo} have different hash!`)
+        else
+          jazil.Assert(!sameHashWithCost, `unlike items with cost ${itemIndexCombo} have same hash!`)
       }
     }
   },

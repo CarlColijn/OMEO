@@ -12,14 +12,14 @@
     all items:
     - count: int
     - set: DataSet
-    - nr: int
+    - id: int
     - info: ItemInfo
     - enchantsByID: Map(int -> Enchant)
     - priorWork: int
     - cost: int
     - totalCost: int
-    source items retrieved from a source table only:
-    - id: int
+    source and desired items only:
+    - nr: int
     combined items only:
     - targetItem: Item
     - sacrificeItem: Item
@@ -74,13 +74,16 @@ class Item {
 
 
   // returns string
-  Hash(withPriorWork) {
+  Hash(withPriorWork, withCost) {
     // note: no fancy stuff for now with bit fiddling, just a big 'ol string concat
 
     let allData = this.id
 
     if (withPriorWork)
       allData += `|${this.priorWork}`
+
+    if (withCost)
+      allData += `|${this.cost}|${this.totalCost}`
 
     for (let enchantNr = 0; enchantNr < g_numDifferentEnchants; ++enchantNr) {
       let enchant = this.enchantsByID.get(g_enchantInfos[enchantNr].id)
