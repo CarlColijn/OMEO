@@ -9,6 +9,7 @@
   - enchant.js
   - itemOrigins.js
   - enchantCombiner.js
+  - itemCombineList.js
   - itemCombineTester.js
 
   Defined classes:
@@ -81,78 +82,48 @@ class ItemCombiner {
   }
 
 
-  // returns object;
-  // - item1: Item (or undefined)
-  // - item2: Item (or undefined)
-  PickBestItemCombinations(item1, item2) {
-    if (item1 !== undefined && item2 !== undefined) {
-      if (item1.Hash(true) == item2.Hash(true)) {
-        if (item1.cost < item2.cost)
-          item2 = undefined
-        else
-          item1 = undefined
-      }
-    }
+  RegisterItemCombinations(tester, item1, item2, desiredItem, itemList) {
+    let combinedItem1 = this.CombineItems(tester, item1, item2, desiredItem)
 
-    return {
-      item1: item1,
-      item2: item2
-    }
-  }
-
-
-  RegisterItemCombinations(tester, item1, item2, desiredItem, allItems, combinedItems) {
-    let combination1 = this.CombineItems(tester, item1, item2, desiredItem)
-    let combination2 =
-      item1 === item2?
-      undefined: // no need reversing the same item onto itself
+    // In case of identical items, we do not need to reverse the combination.
+    let combinedItem2 =
+      item1 === item2 ?
+      undefined :
       this.CombineItems(tester, item2, item1, desiredItem)
-    let newItems = this.PickBestItemCombinations(combination1, combination2)
 
-    if (newItems.item1 !== undefined) {
-      allItems.push(newItems.item1)
-      combinedItems.push(newItems.item1)
+    if (
+      combinedItem1 !== undefined && combinedItem2 !== undefined &&
+      combinedItem1.Hash(true) == combinedItem2.Hash(true)
+    ) {
+      if (combinedItem1.cost < combinedItem2.cost)
+        combinedItem2 = undefined
+      else
+        combinedItem1 = undefined
     }
-    if (newItems.item2 !== undefined) {
-      allItems.push(newItems.item2)
-      combinedItems.push(newItems.item2)
-    }
+
+    if (combinedItem1 !== undefined)
+      itemList.AddCombinedItem(combinedItem1)
+    if (combinedItem2 !== undefined)
+      itemList.AddCombinedItem(combinedItem2)
   }
 
 
   // returns Item[] (the combined items)
   MakeAllCombinations(tester, sourceItems, desiredItem, feedbackHandler) {
-    /*
-      Strategy: we process all items, combining them with all items that
-      come before them.  New items are added at the back so that they
-      in turn will automatically be picked up too in time.  The process
-      stops out of itself once no new items can be added anymore, which
-      should happen since at some point all low-level combinations have
-      already been made and new combinations are just too costly due to
-      the prior work penalty.
-    */
-    let allItems = sourceItems.slice()
-    let combinedItems = []
+    let itemList = new ItemCombineList(sourceItems)
 
-    let Progress = (value) => {
-      ++value
-      return value * (value + 1) / 2
+    let nextItems = {}
+    while (itemList.GetNextItems(nextItems)) {
+      if (feedbackHandler.TimeForFeedback())
+        feedbackHandler.TellProgress(
+          itemList.GetCurrentProgress(),
+          itemList.GetMaxProgress()
+        )
+
+      this.RegisterItemCombinations(tester, nextItems.item1, nextItems.item2, desiredItem, itemList)
     }
 
-    for (let item1Nr = 0; item1Nr < allItems.length; ++item1Nr) {
-      let item1 = allItems[item1Nr]
-
-      for (let item2Nr = 0; item2Nr <= item1Nr; ++item2Nr) {
-        let item2 = allItems[item2Nr]
-
-        if (feedbackHandler.TimeForFeedback())
-          feedbackHandler.TellProgress(Progress(item1Nr) + item2Nr, Progress(allItems.length))
-
-        this.RegisterItemCombinations(tester, item1, item2, desiredItem, allItems, combinedItems)
-      }
-    }
-
-    return combinedItems
+    return itemList.GetCombinedItems()
   }
 
 

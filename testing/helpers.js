@@ -24,6 +24,7 @@ let omeoAccessObjectNames = [
   'FormData',
   'Item',
   'ItemCollector',
+  'ItemCombineList',
   'ItemCombiner',
   'ItemCombineTester',
   'ItemRow',

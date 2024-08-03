@@ -32,8 +32,9 @@ importScripts('enchantCombiner.js')
 importScripts('itemInfo.js')
 importScripts('itemOrigins.js')
 importScripts('item.js')
-importScripts('itemCombiner.js')
+importScripts('itemCombineList.js')
 importScripts('itemCombineTester.js')
+importScripts('itemCombiner.js')
 importScripts('combineResultFilter.js')
 
 

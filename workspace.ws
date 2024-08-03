@@ -23,6 +23,7 @@
             <File name="source\scripts\formData.js" />
             <File name="source\scripts\item.js" />
             <File name="source\scripts\itemCollector.js" />
+            <File name="source\scripts\itemCombineList.js" />
             <File name="source\scripts\itemCombiner.js" />
             <File name="source\scripts\itemCombineTester.js" />
             <File name="source\scripts\itemCombineWorker.js" />
@@ -61,6 +62,7 @@
         <File name="testing\helpers.js" />
         <File name="testing\item.js" />
         <File name="testing\itemCollector.js" />
+        <File name="testing\itemCombineList.js" />
         <File name="testing\itemCombiner.js" />
         <File name="testing\itemCombineTester.js" />
         <File name="testing\itemCombineWorker.js" />
