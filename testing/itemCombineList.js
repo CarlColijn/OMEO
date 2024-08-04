@@ -12,7 +12,22 @@ class ItemMock {
   }
 
 
-  Hash() {
+  HashType() {
+    return this.nr
+  }
+
+
+  HashTypeAndPriorWork() {
+    return this.nr
+  }
+
+
+  HashTypeAndPriorWorkAndCost() {
+    return this.nr
+  }
+
+
+  HashAll() {
     return this.nr
   }
 }

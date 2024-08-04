@@ -273,17 +273,17 @@ class CombineResultFilter {
   }
 
 
-  // returns Map(hash -> Item[])
-  GroupItemsByHash(items) {
-    let itemsByHash = new Map()
+  // returns Map(hash(type) -> Item[])
+  GroupItemsByType(items) {
+    let itemsByType = new Map()
     items.forEach((item) => {
-      let itemHash = item.Hash(false)
-      if (!itemsByHash.has(itemHash))
-        itemsByHash.set(itemHash, [])
-      itemsByHash.get(itemHash).push(item)
+      let typeHash = item.HashType()
+      if (!itemsByType.has(typeHash))
+        itemsByType.set(typeHash, [])
+      itemsByType.get(typeHash).push(item)
     })
 
-    return itemsByHash
+    return itemsByType
   }
 
 
@@ -345,10 +345,10 @@ class CombineResultFilter {
 
 
   PickBestUniqueItems(items) {
-    let itemsByHash = this.GroupItemsByHash(items)
+    let itemsByType = this.GroupItemsByType(items)
 
     let itemsToKeep = new Set()
-    itemsByHash.forEach((items) => {
+    itemsByType.forEach((items) => {
       this.AddLowestPrioAndCostItems(items, itemsToKeep)
     })
 

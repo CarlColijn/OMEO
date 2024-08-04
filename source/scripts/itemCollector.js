@@ -62,7 +62,7 @@ class ItemCollector {
     }
 
     let item = itemResult.item
-    let itemHash = item.Hash(true)
+    let itemHash = item.HashTypeAndPriorWork()
 
     item.nr = this.nextRowNr
 

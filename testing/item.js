@@ -42,13 +42,13 @@ jazil.AddTestSet(omeoPage, 'Item', {
 
         let itemIndexCombo = `${item1Nr},${item2Nr}`
 
-        let sameHashWithoutCost = item1.Hash(true, false) == item2.Hash(true, false)
+        let sameHashWithoutCost = item1.HashTypeAndPriorWork() == item2.HashTypeAndPriorWork()
         if (item1Nr == item2Nr || sameCombosWithoutCost.has(itemIndexCombo))
           jazil.Assert(sameHashWithoutCost, `like items without cost ${itemIndexCombo} have different hash!`)
         else
           jazil.Assert(!sameHashWithoutCost, `unlike items without cost ${itemIndexCombo} have same hash!`)
 
-        let sameHashWithCost = item1.Hash(true, true) == item2.Hash(true, true)
+        let sameHashWithCost = item1.HashTypeAndPriorWorkAndCost() == item2.HashTypeAndPriorWorkAndCost()
         if (item1Nr == item2Nr || sameCombosWithCost.has(itemIndexCombo))
           jazil.Assert(sameHashWithCost, `like items with cost ${itemIndexCombo} have different hash!`)
         else

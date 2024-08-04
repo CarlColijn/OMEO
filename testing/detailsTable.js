@@ -38,7 +38,7 @@ function CheckItemInTable(jazil, item, tableElemJQ, neededPlacement) {
     return !itemFound
   })
 
-  jazil.Assert(itemFound, `Item ${GetAbbrItemDesciption(item, true)} not found in table!`)
+  jazil.Assert(itemFound, `Item ${GetAbbrItemDesciption(item)} not found in table!`)
 }
 
 

@@ -49,7 +49,7 @@ class ItemCombineList {
 
     this.numSourceItems = sourceItems.length
     sourceItems.forEach((item) => {
-      this.AddItem(item, item.Hash(false, false))
+      this.AddItem(item, item.HashType())
     })
 
     this.item1Nr = 0
@@ -95,7 +95,7 @@ class ItemCombineList {
       // No item; nothing to do.
       return
 
-    let combinedItemTypeHash = combinedItem.Hash(false, false)
+    let combinedItemTypeHash = combinedItem.HashType()
 
     // Note: we keep the item by default; if there is no itemsByHashType
     // for this item we haven't seen items of this kind yet, so keep it.

@@ -74,10 +74,40 @@ class Item {
 
 
   // returns string
-  Hash(withPriorWork, withCost) {
+  HashType() {
+    return this.Hash(false, false, false)
+  }
+
+
+  // returns string
+  HashTypeAndPriorWork() {
+    return this.Hash(true, false, false)
+  }
+
+
+  // returns string
+  HashTypeAndPriorWorkAndCost() {
+    return this.Hash(true, true, false)
+  }
+
+
+  // returns string
+  HashAll() {
+    return this.Hash(true, true, true)
+  }
+
+
+  // returns string
+  Hash(withPriorWork, withCost, withCount) {
     // note: no fancy stuff for now with bit fiddling, just a big 'ol string concat
 
     let allData = this.id
+
+    for (let enchantNr = 0; enchantNr < g_numDifferentEnchants; ++enchantNr) {
+      let enchant = this.enchantsByID.get(g_enchantInfos[enchantNr].id)
+      if (enchant !== undefined)
+        allData += `|${enchant.id}|${enchant.level}`
+    }
 
     if (withPriorWork)
       allData += `|${this.priorWork}`
@@ -85,11 +115,8 @@ class Item {
     if (withCost)
       allData += `|${this.cost}|${this.totalCost}`
 
-    for (let enchantNr = 0; enchantNr < g_numDifferentEnchants; ++enchantNr) {
-      let enchant = this.enchantsByID.get(g_enchantInfos[enchantNr].id)
-      if (enchant !== undefined)
-        allData += `|${enchant.id}|${enchant.level}`
-    }
+    if (withCount)
+      allData += `|${this.count}`
 
     return allData
   }

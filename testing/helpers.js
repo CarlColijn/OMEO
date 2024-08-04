@@ -127,21 +127,45 @@ function BuildItem(info) {
 }
 
 
-function GetAbbrItemDesciption(item, addSet) {
-  let description = `na:${item.info.name}|pw:${item.priorWork}`
+function GetEnchantsDescription(enchantsByID) {
+  let enchantsDescription = ''
+  let hasEnchants = false
+  g_enchantInfos.forEach((enchantInfo) => {
+    let enchant = enchantsByID.get(enchantInfo.id)
+    if (enchant !== undefined) {
+      if (hasEnchants)
+        enchantsDescription += ','
+      enchantsDescription += `${enchant.level}-${enchantInfo.name}`
+      hasEnchants = true
+    }
+  })
 
-  for (let enchantNr = 0; enchantNr < g_numDifferentEnchants; ++enchantNr) {
-    let enchant = item.enchantsByID.get(g_enchantInfos[enchantNr].id)
-    if (enchant !== undefined)
-      description += `|en:${enchant.info.name}|lv:${enchant.level}`
-  }
+  if (hasEnchants)
+    return enchantsDescription
+  else
+    return '-'
+}
 
-  if (addSet)
-    description += `|se:${item.set.id}`
 
-  description += `|sc:${item.cost}|tc:${item.totalCost}|cn:${item.count}`
+function GetOriginDescription(origin) {
+  if (origin === undefined)
+    return '-'
 
-  return description
+  let originDescription = ''
+  origin.itemUses.forEach((itemUse, originNr) => {
+    if (originNr > 0)
+      originDescription += ','
+    originDescription += itemUse
+  })
+  return originDescription
+}
+
+
+function GetAbbrItemDesciption(item) {
+  if (item === undefined)
+    return '<undefined>'
+  else
+    return `na:${item.info.name}|en:${GetEnchantsDescription(item.enchantsByID)}|se:${item.set.id}|pw:${item.priorWork}|sc:${item.cost}|tc:${item.totalCost}|cn:${item.count}|or:${GetOriginDescription(item.origin)}`
 }
 
 
@@ -152,7 +176,7 @@ function IndexItemsByHash(items) {
 
   for (let itemNr = 0; itemNr < items.length; ++itemNr) {
     let item = items[itemNr]
-    let hash = GetAbbrItemDesciption(item, false)
+    let hash = item.HashAll()
     if (itemsByHash.has(hash))
       itemsByHash.get(hash).items.push(item)
     else
@@ -181,15 +205,19 @@ function TestItemListsMatch(jazil, items1, item1Description, items2, item2Descri
   items1ByHash.forEach((items1, hash1) => {
     if (items2ByHash.has(hash1))
       jazil.ShouldBe(items1.length, items2ByHash.get(hash1).length, `unequal number of items found in ${item1Description} vs. ${item1Description}!`)
-    else
-      jazil.Fail(`${hash1} - ${ItemTagOrNr(items1.items[0])} : ${item1Description} item not found in ${item2Description}!`)
+    else {
+      let item1 = items1.items[0]
+      jazil.Fail(`${ItemTagOrNr(item1)} - ${GetAbbrItemDesciption(item1)} : ${item1Description} item not found in ${item2Description}!`)
+    }
   })
 
   items2ByHash.forEach((items2, hash2) => {
     if (items1ByHash.has(hash2))
       jazil.ShouldBe(items2.length, items1ByHash.get(hash2).length, `unequal number of items found in ${item2Description} vs. ${item1Description}!`)
-    else
-      jazil.Fail(`${hash2} - ${ItemTagOrNr(items2.items[0])} : ${item2Description} item not found in ${item1Description}!`)
+    else {
+      let item2 = items2.items[0]
+      jazil.Fail(`${ItemTagOrNr(item2)} - ${GetAbbrItemDesciption(item2)} : ${item2Description} item not found in ${item1Description}!`)
+    }
   })
 
   items2ByHash.forEach((items2, hash2) => {
