@@ -18,6 +18,21 @@ class ItemMock {
 }
 
 
+function NeverInserter(previousItem, newItem) {
+  return -1
+}
+
+
+function AlwaysInserter(previousItem, newItem) {
+  return 0
+}
+
+
+function AlwaysReplacer(previousItem, newItem) {
+  return +1
+}
+
+
 function TestIteration(jazil, itemList, iteration, shouldHaveItems, item1, item2, currentProgress, maxProgress) {
   let items = {}
   jazil.ShouldBe(itemList.GetNextItems(items), shouldHaveItems, `#${iteration}: got items!`)
@@ -65,6 +80,20 @@ jazil.AddTestSet(omeoPage, 'ItemCombineList', {
     TestIteration(jazil, itemList, 7, false, 0, 0, 6, 6)
   },
 
+  'Adding non-interesting items mid-way': (jazil) => {
+    let itemList = new ItemCombineList([new ItemMock(1), new ItemMock(2), new ItemMock(3)])
+
+    TestIteration(jazil, itemList, 1, true, 1, 1, 1, 6)
+    TestIteration(jazil, itemList, 2, true, 2, 1, 2, 6)
+    itemList.ProcessItem(new ItemMock(2), NeverInserter)
+    TestIteration(jazil, itemList, 3, true, 2, 2, 3, 6)
+    TestIteration(jazil, itemList, 4, true, 3, 1, 4, 6)
+    TestIteration(jazil, itemList, 5, true, 3, 2, 5, 6)
+    itemList.ProcessItem(new ItemMock(1), NeverInserter)
+    TestIteration(jazil, itemList, 6, true, 3, 3, 6, 6)
+    TestIteration(jazil, itemList, 7, false, 0, 0, 6, 6)
+  },
+
   'Adding extra items mid-way': (jazil) => {
     let itemList = new ItemCombineList([new ItemMock(1), new ItemMock(2), new ItemMock(3)])
 
@@ -73,11 +102,11 @@ jazil.AddTestSet(omeoPage, 'ItemCombineList', {
     TestIteration(jazil, itemList, 3, true, 2, 2, 3, 6)
     TestIteration(jazil, itemList, 4, true, 3, 1, 4, 6)
     TestIteration(jazil, itemList, 5, true, 3, 2, 5, 6)
-    itemList.AddCombinedItem(new ItemMock(4))
+    itemList.ProcessItem(new ItemMock(4), AlwaysInserter)
     TestIteration(jazil, itemList, 6, true, 3, 3, 6, 10)
     TestIteration(jazil, itemList, 7, true, 4, 1, 7, 10)
     TestIteration(jazil, itemList, 8, true, 4, 2, 8, 10)
-    itemList.AddCombinedItem(new ItemMock(5))
+    itemList.ProcessItem(new ItemMock(5), AlwaysInserter)
     TestIteration(jazil, itemList, 9, true, 4, 3, 9, 15)
     TestIteration(jazil, itemList, 10, true, 4, 4, 10, 15)
     TestIteration(jazil, itemList, 11, true, 5, 1, 11, 15)

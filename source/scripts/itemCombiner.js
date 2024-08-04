@@ -83,68 +83,38 @@ class ItemCombiner {
 
 
   // Grades the given combined items; returns:
-  // -1: item1 is constructed better
-  // +1: item2 is constructed better
-  // 0: it's a mixed bag
-  GradeCombinedItems(item1, item2) {
+  // -1: previousItem is constructed better
+  // +1: newItem is constructed better
+  //  0: it's a mixed bag
+  //
+  // Used to optimize adding items: if one item is identical to
+  // something we already have in both type and enchants, then
+  // we can dedupe these and toss the one that:
+  // - has the same or a superset of the same origins, and
+  // - has the same or a higher priorWork, and
+  // - has the same or higher totalCost
+  GradeCombinedItems(previousItem, newItem) {
     if (
-      item1.totalCost <= item2.totalCost &&
-      item1.priorWork <= item2.priorWork &&
-      item1.origin.IsSubsetOf(item2.origin)
+      previousItem.totalCost <= newItem.totalCost &&
+      previousItem.priorWork <= newItem.priorWork &&
+      previousItem.origin.IsSubsetOf(newItem.origin)
     )
       return -1
     else if (
-      item2.totalCost <= item1.totalCost &&
-      item2.priorWork <= item1.priorWork &&
-      item2.origin.IsSubsetOf(item1.origin)
+      newItem.totalCost <= previousItem.totalCost &&
+      newItem.priorWork <= previousItem.priorWork &&
+      newItem.origin.IsSubsetOf(previousItem.origin)
     )
       return +1
     else
       return 0
   }
 
-  // Returns bool (whether the combination is useful)
-  CheckCombinationUseful(combinedItem, combinedItemHash, allItemsByHash) {
-    if (!allItemsByHash.has(combinedItemHash))
-      // Haven't seen this combination yet, so useful
-      return true
 
-    // Optimization: if the new item is identical to something we already
-    // have in both type and enchants, then we can dedupe these and toss
-    // the one that:
-    // - has the same or a superset of the same origins, and
-    // - has the same or a higher priorWork, and
-    // - has the same or higher totalCost
-    let otherCombinedItems = allItemsByHash.get(combinedItemHash)
-
-    return otherCombinedItems.every((previousItem) => {
-      let grade = this.GradeCombinedItems(previousItem, combinedItem)
-
-      if (grade == -1)
-        // This previous item is constructed better, so we can discard
-        // the new one.  We can also stop checking, since other previous
-        // items will not be worse than the new one either.
-        return false
-
-      if (grade == +1) {
-        // We are constructed better; we can discard the previous one and all it's
-        // decendants.
-        // TO IMPLEMENT
-      }
-
-      return true
-    })
-  }
-
-
-  RegisterItemCombination(tester, item1, item2, desiredItem, combineProgress) {
+  ProcessItemCombination(tester, item1, item2, desiredItem, itemList) {
     let combinedItem = this.CombineItems(tester, item1, item2, desiredItem)
-    if (combinedItem === undefined)
-      return
 
-    let combinedItemHash = combinedItem.Hash(false, false)
-    if (this.CheckCombinationUseful(combinedItem, combinedItemHash, combineProgress.allItemsByHash))
-      combineProgress.AddCombinedItem(combinedItem, combinedItemHash)
+    itemList.ProcessItem(combinedItem, this.GradeCombinedItems)
   }
 
 
@@ -160,10 +130,10 @@ class ItemCombiner {
           itemList.GetMaxProgress()
         )
 
-      this.RegisterItemCombination(tester, nextItems.item1, nextItems.item2, desiredItem, itemList)
+      this.ProcessItemCombination(tester, nextItems.item1, nextItems.item2, desiredItem, itemList)
       if (nextItems.item1 !== nextItems.item2)
         // Optimization: no need reversing the same item onto itself
-        this.RegisterItemCombination(tester, nextItems.item2, nextItems.item1, desiredItem, itemList)
+        this.ProcessItemCombination(tester, nextItems.item2, nextItems.item1, desiredItem, itemList)
     }
 
     return itemList.GetCombinedItems()

@@ -48,6 +48,57 @@ class ItemCombineList {
   }
 
 
+  ProcessItem(combinedItem, GradeCombinedItems) {
+    // Optimization: if the new item is identical to something we already
+    // have in both type and enchants, then we can dedupe these and toss
+    // the one that:
+    // - has the same or a superset of the same origins, and
+    // - has the same or a higher priorWork, and
+    // - has the same or higher totalCost
+    // If not all conditions are met it's a toss-up which one will turn out
+    // to be the better one, so we need to take both.
+
+    if (combinedItem === undefined)
+      // No item; nothing to do.
+      return
+
+    let combinedItemHash = combinedItem.Hash(false, false)
+
+    let keepItem
+    if (!this.allItemsByHash.has(combinedItemHash))
+      // Haven't seen items of this kind yet, so keep it.
+      keepItem = true
+    else {
+      // Let GradeCombinedItems decide what should happen by holding it
+      // against all previous items.
+      let previousCombinedItems = this.allItemsByHash.get(combinedItemHash)
+      keepItem = previousCombinedItems.every((previousItem) => {
+        let grade = GradeCombinedItems(previousItem, combinedItem)
+        if (grade == -1)
+          // This previous item is constructed better, so we can discard
+          // the new one.  We can also stop checking, since other previous
+          // items will not be worse than the new one either.
+          return false
+
+        if (grade == +1) {
+          // The new item is constructed better; we can discard the previous
+          // one and all it's decendants.
+          // TO IMPLEMENT
+        }
+
+        // New is undecided or better than all, so keep it.
+        return true
+      })
+    }
+
+    if (keepItem) {
+      this.allItems.push(combinedItem)
+      this.AddItemToAllItemsByHash(combinedItem, combinedItemHash)
+      this.combinedItems.push(combinedItem)
+    }
+  }
+
+
   GetCombinedItems() {
     return this.combinedItems
   }
@@ -60,13 +111,6 @@ class ItemCombineList {
 
   GetMaxProgress() {
     return this.Progress(this.allItems.length)
-  }
-
-
-  AddCombinedItem(combinedItem, combinedItemHash) {
-    this.allItems.push(combinedItem)
-    this.AddItemToAllItemsByHash(combinedItem, combinedItemHash)
-    this.combinedItems.push(combinedItem)
   }
 
 
