@@ -46,7 +46,11 @@ class ItemCombiner {
 
     this.SetupItemOrigins(filteredSourceItems)
 
-    return this.MakeAllCombinations(tester, filteredSourceItems, desiredItem, feedbackHandler)
+    let itemList = new ItemCombineList(filteredSourceItems)
+
+    this.MakeAllCombinations(tester, itemList, desiredItem, feedbackHandler)
+
+    return itemList.GetCombinedItems()
   }
 
 
@@ -118,10 +122,7 @@ class ItemCombiner {
   }
 
 
-  // returns Item[] (the combined items)
-  MakeAllCombinations(tester, sourceItems, desiredItem, feedbackHandler) {
-    let itemList = new ItemCombineList(sourceItems)
-
+  MakeAllCombinations(tester, itemList, desiredItem, feedbackHandler) {
     let nextItems = {}
     while (itemList.GetNextItems(nextItems)) {
       if (feedbackHandler.TimeForFeedback())
@@ -135,8 +136,6 @@ class ItemCombiner {
         // Optimization: no need reversing the same item onto itself
         this.ProcessItemCombination(tester, nextItems.item2, nextItems.item1, desiredItem, itemList)
     }
-
-    return itemList.GetCombinedItems()
   }
 
 

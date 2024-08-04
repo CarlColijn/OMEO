@@ -8,6 +8,30 @@
   should happen since at some point all low-level combinations have
   already been made and new combinations are just too costly due to
   the prior work penalty.
+  To make the process more efficient, we want to be able to remove
+  inferior items.  For that we keep track of 3 lists;
+  - allItems: Item[]
+    Contains all items, incl. source items.  This list is allowed to
+    get holes in it (spots set to undefined); it will become quite
+    large so that splicing it will be costly.  Introducing holes also
+    means we do not have to patch up item indices all over the place
+    (our 'next' iterators as well as the item indices in all follow-up
+    ItemListInfos).
+  - allItemsByTypeHash: Map(string -> Item)
+    Groups same-typed items together to enable quick retrieval for
+    comparison on fitness.
+  - itemListInfosByItem: Map(Item -> ItemListInfo)
+    Stores extra list indexing information for each item, to make
+    managing our internal lists more efficient.
+  Each ItemListInfo in turn tracks three things;
+  - index: int
+    The index the item has in the allItems list.
+  - typeHash: string
+    The type hash of the item, and thus also the index the item has
+    in the allItemsByTypeHash list.
+  - derivedItems: [Item]
+    All items that are derived from the item (whose targetItem or
+    sacrificeItem is set to that item).
 
   Prerequisites:
   - item.js
@@ -19,10 +43,14 @@
 
 class ItemCombineList {
   constructor(sourceItems) {
-    this.allItems = sourceItems.slice()
-    this.SetUpItemsByHash()
+    this.allItems = []
+    this.allItemsByTypeHash = new Map()
+    this.itemListInfosByItem = new Map()
 
-    this.combinedItems = []
+    this.numSourceItems = sourceItems.length
+    sourceItems.forEach((item) => {
+      this.AddItem(item, item.Hash(false, false))
+    })
 
     this.item1Nr = 0
     this.item2Nr = 0
@@ -35,16 +63,21 @@ class ItemCombineList {
     if (this.item1Nr >= this.allItems.length)
       return false
 
-    items.item1 = this.allItems[this.item1Nr]
-    items.item2 = this.allItems[this.item2Nr]
+    let foundItems
+    do {
+      items.item1 = this.allItems[this.item1Nr]
+      items.item2 = this.allItems[this.item2Nr]
 
-    ++this.item2Nr
-    if (this.item2Nr > this.item1Nr) {
-      ++this.item1Nr
-      this.item2Nr = 0
-    }
+      foundItems = items.item1 !== undefined && items.item2 !== undefined
 
-    return true
+      ++this.item2Nr
+      if (this.item2Nr > this.item1Nr) {
+        ++this.item1Nr
+        this.item2Nr = 0
+      }
+    } while (!foundItems && this.item1Nr < this.allItems.length)
+
+    return foundItems
   }
 
 
@@ -62,45 +95,53 @@ class ItemCombineList {
       // No item; nothing to do.
       return
 
-    let combinedItemHash = combinedItem.Hash(false, false)
+    let combinedItemTypeHash = combinedItem.Hash(false, false)
 
-    let keepItem
-    if (!this.allItemsByHash.has(combinedItemHash))
-      // Haven't seen items of this kind yet, so keep it.
-      keepItem = true
-    else {
-      // Let GradeCombinedItems decide what should happen by holding it
-      // against all previous items.
-      let previousCombinedItems = this.allItemsByHash.get(combinedItemHash)
-      keepItem = previousCombinedItems.every((previousItem) => {
-        let grade = GradeCombinedItems(previousItem, combinedItem)
+    // Note: we keep the item by default; if there is no itemsByHashType
+    // for this item we haven't seen items of this kind yet, so keep it.
+    // If there already are like items, we let GradeCombinedItems decide
+    // what should happen by holding it against all other items.  And in
+    // case that list has become empty, .every returns true for empty
+    // arrays, which is what we want too.
+    let keepItem = true
+    let removeItems = []
+    if (this.allItemsByTypeHash.has(combinedItemTypeHash)) {
+      let otherSameTypedItems = this.allItemsByTypeHash.get(combinedItemTypeHash)
+      keepItem = otherSameTypedItems.every((otherItem) => {
+        let grade = GradeCombinedItems(otherItem, combinedItem)
         if (grade == -1)
-          // This previous item is constructed better, so we can discard
-          // the new one.  We can also stop checking, since other previous
-          // items will not be worse than the new one either.
+          // This other item is constructed better, so we can discard the
+          // new one.  We can also stop checking, since all other items
+          // will not be worse than the new one either.
           return false
 
-        if (grade == +1) {
-          // The new item is constructed better; we can discard the previous
+        if (grade == +1)
+          // The new item is constructed better; we can discard the other
           // one and all it's decendants.
-          // TO IMPLEMENT
-        }
+          removeItems.push(otherItem)
 
-        // New is undecided or better than all, so keep it.
+        // The new one's grade is a toss-up or better than all, so keep it.
         return true
       })
     }
 
-    if (keepItem) {
-      this.allItems.push(combinedItem)
-      this.AddItemToAllItemsByHash(combinedItem, combinedItemHash)
-      this.combinedItems.push(combinedItem)
-    }
+    if (keepItem)
+      this.AddItem(combinedItem, combinedItemTypeHash)
+
+    if (removeItems.length > 0)
+      this.RemoveItems(removeItems)
   }
 
 
   GetCombinedItems() {
-    return this.combinedItems
+    let combinedItems = []
+    for (let itemNr = this.numSourceItems; itemNr < this.allItems.length; ++itemNr) {
+      let item = this.allItems[itemNr]
+      if (item !== undefined)
+        combinedItems.push(item)
+    }
+
+    return combinedItems
   }
 
 
@@ -122,18 +163,60 @@ class ItemCombineList {
   }
 
 
-  AddItemToAllItemsByHash(item, itemHash) {
-    if (this.allItemsByHash.has(itemHash))
-      this.allItemsByHash.get(itemHash).push(item)
+  AddItem(item, itemTypeHash) {
+    let itemIndex = this.allItems.length
+    let itemListInfo = {
+      index: itemIndex,
+      typeHash: itemTypeHash,
+      derivedItems: []
+    }
+
+    this.allItems.push(item)
+
+    this.itemListInfosByItem.set(item, itemListInfo)
+    if (item.set === g_combined) {
+      this.itemListInfosByItem.get(item.targetItem).derivedItems.push(item)
+      this.itemListInfosByItem.get(item.sacrificeItem).derivedItems.push(item)
+    }
+
+    if (this.allItemsByTypeHash.has(itemTypeHash))
+      this.allItemsByTypeHash.get(itemTypeHash).push(item)
     else
-      this.allItemsByHash.set(itemHash, [item])
+      this.allItemsByTypeHash.set(itemTypeHash, [item])
   }
 
 
-  SetUpItemsByHash() {
-    this.allItemsByHash = new Map()
-    this.allItems.forEach((item) => {
-      this.AddItemToAllItemsByHash(item, item.Hash(false, false))
-    })
+  RemoveFromParentLists(item, parentItem) {
+    // Note: if we already removed the parent item, it's
+    // itemListInfo will also be gone by now.  That's OK
+    // though; no need then to patch it up either.
+    let parentListInfo = this.itemListInfosByItem.get(parentItem)
+    if (parentListInfo !== undefined) {
+      let index = parentListInfo.derivedItems.indexOf(item)
+      parentListInfo.derivedItems.splice(index, 1)
+    }
+  }
+
+
+  RemoveItems(items) {
+    for (let itemIndex = 0; itemIndex < items.length; ++itemIndex) {
+      let item = items[itemIndex]
+      let listInfo = this.itemListInfosByItem.get(item)
+
+      this.allItems[listInfo.index] = undefined
+
+      this.itemListInfosByItem.delete(item)
+      if (item.set === g_combined) {
+        this.RemoveFromParentLists(item, item.targetItem)
+        this.RemoveFromParentLists(item, item.sacrificeItem)
+      }
+
+      let otherSameTypedItems = this.allItemsByTypeHash.get(listInfo.typeHash)
+      let otherItemIndex = otherSameTypedItems.indexOf(item)
+      otherSameTypedItems.splice(otherItemIndex, 1)
+
+      if (listInfo.derivedItems.length > 0)
+        items.push(...listInfo.derivedItems)
+    }
   }
 }
