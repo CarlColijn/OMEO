@@ -58,8 +58,14 @@ class Form {
 
 
   InitializeSubObjects() {
+    let detailsHeaderElem = $('#details')[0]
     let ShowDetails = (item) => {
       this.detailsTable.ShowItem(item)
+      detailsHeaderElem.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start',
+        inline: 'start'
+      })
     }
 
     this.sourceItemTable = new ItemTable(undefined, $('#sources table'), g_source)
