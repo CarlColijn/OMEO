@@ -165,6 +165,32 @@ jazil.AddTestSet(omeoPage, 'EnchantCombiner', {
     jazil.ShouldBe(combineResult2.sacrificeUsed, true, 'Sacrifice wasn\'t used!')
   },
 
+  'Enchant usage is recognized correctly': (jazil) => {
+    let smite = BuildEnchant('Smite')
+
+    let sword0 = BuildItem({ name:'Sword', enchants:[] })
+    let sword1 = BuildItem({ name:'Sword', enchants:[{ name:'Smite', level:1 }] })
+    let sword5 = BuildItem({ name:'Sword', enchants:[{ name:'Smite', level:5 }] })
+
+    let combines = [
+      { tItem:sword0, sItem:sword0, tUsed:false, sUsed:false, desc:'sword0+sword0' },
+      { tItem:sword0, sItem:sword1, tUsed:false, sUsed:true,  desc:'sword0+sword1' },
+      { tItem:sword0, sItem:sword5, tUsed:false, sUsed:true,  desc:'sword0+sword5' },
+      { tItem:sword1, sItem:sword0, tUsed:true,  sUsed:false, desc:'sword1+sword0' },
+      { tItem:sword1, sItem:sword1, tUsed:true,  sUsed:true,  desc:'sword1+sword1' },
+      { tItem:sword1, sItem:sword5, tUsed:false, sUsed:true,  desc:'sword1+sword5' },
+      { tItem:sword5, sItem:sword0, tUsed:true,  sUsed:false, desc:'sword5+sword0' },
+      { tItem:sword5, sItem:sword1, tUsed:true,  sUsed:false, desc:'sword5+sword1' },
+      { tItem:sword5, sItem:sword5, tUsed:false, sUsed:false, desc:'sword5+sword5' },
+    ]
+
+    combines.forEach((combine) => {
+      let combineResult = new EnchantCombiner(combine.tItem, combine.sItem, smite.info).Combine()
+      jazil.ShouldBe(combineResult.targetUsed, combine.tUsed, `${combine.desc} - target usage incorrect!`)
+      jazil.ShouldBe(combineResult.sacrificeUsed, combine.sUsed, `${combine.desc} - sacrifice usage incorrect!`)
+    })
+  },
+
   'Irrelevant enchants get skipped': (jazil) => {
     let flame = BuildEnchant('Flame')
 

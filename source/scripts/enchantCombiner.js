@@ -31,7 +31,7 @@ class EnchantCombiner {
     this.sacrificeLevel = this.onSacrifice ? this.sacrificeEnchant.level : 0
 
     // ==== PUBLIC ====
-    this.isRelevant = this.onTarget || this.onSacrifice
+    this.isRelevant = this.targetLevel > 0 || this.sacrificeLevel > 0
   }
 
 
@@ -46,27 +46,27 @@ class EnchantCombiner {
     let sacrificeUsed
     let costless
     if (!this.isRelevant) {
+      combinedLevel = 0
       targetUsed = false
       sacrificeUsed = false
-      combinedLevel = 0
       costless = true
     }
     else if (this.targetLevel < this.sacrificeLevel) {
+      combinedLevel = this.sacrificeLevel
       targetUsed = false
       sacrificeUsed = true
-      combinedLevel = this.sacrificeLevel
       costless = false
     }
     else if (this.targetLevel > this.sacrificeLevel) {
+      combinedLevel = this.targetLevel
       targetUsed = true
       sacrificeUsed = false
-      combinedLevel = this.targetLevel
       costless = this.sacrificeLevel == 0
     }
     else { // this.targetLevel == this.sacrificeLevel
-      targetUsed = true
-      sacrificeUsed = true
       combinedLevel = Math.min(this.targetLevel + 1, this.enchantInfo.maxLevel)
+      targetUsed = combinedLevel > this.targetLevel
+      sacrificeUsed = targetUsed
       costless = false
     }
 
