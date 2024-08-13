@@ -68,18 +68,14 @@ class Form {
       })
     }
 
-    this.sourceItemTable = new ItemTable(undefined, $('#sources table'), g_source)
-    this.desiredItemTable = new ItemTable(undefined, $('#desired table'), g_desired)
-    this.combineItemTable = new ItemTable(ShowDetails, $('#combines table'), g_combined)
+    this.sourceItemTable = new ItemTable(undefined, $('#sources table'), $('#addSourceItem'), g_source)
+    this.desiredItemTable = new ItemTable(undefined, $('#desired table'), undefined, g_desired)
+    this.combineItemTable = new ItemTable(ShowDetails, $('#combines table'), undefined, g_combined)
     this.detailsTable = new DetailsTable($('#details table'))
   }
 
 
   HookUpGUI() {
-    $('#addSourceItem').click(() => {
-      this.sourceItemTable.AddRow()
-    })
-
     $('#divine').click(() => {
       this.PerformDivine()
     })

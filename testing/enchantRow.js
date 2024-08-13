@@ -7,7 +7,8 @@ function GetEnchantTemplateRow(testContainerID, set) {
 function CreateEnchantRow(templateRow, enchantName, enchantLevel, itemName) {
   return templateRow.CreateNew(
     BuildEnchant(enchantName, enchantLevel),
-    GetItemInfo(itemName).id
+    GetItemInfo(itemName).id,
+    false, undefined
   )
 }
 

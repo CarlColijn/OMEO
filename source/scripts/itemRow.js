@@ -64,7 +64,7 @@ class ItemRow {
 
 
   // returns ItemRow
-  CreateNew(nr, item) {
+  CreateNew(nr, item, giveFocus, focusElemJQWhenAllGone) {
     let newItemRow = this.MakeExtraRealRow()
 
     newItemRow.SetNumber(nr)
@@ -73,6 +73,10 @@ class ItemRow {
 
     if (item !== undefined)
       newItemRow.SetItem(item)
+
+    newItemRow.focusElemJQWhenAllGone = focusElemJQWhenAllGone
+    if (giveFocus && this.set === g_source || this.set === g_desired)
+      newItemRow.idElemJQ[0].focus()
 
     return newItemRow
   }
@@ -84,6 +88,21 @@ class ItemRow {
 
 
   Remove() {
+    if (this.set === g_source || this.set === g_desired) {
+      let focusRowElemJQ = this.rowElemJQ.next()
+      if (focusRowElemJQ.length == 0)
+        focusRowElemJQ = this.rowElemJQ.prev()
+
+      let focusElemJQ
+      if (focusRowElemJQ.length > 0 && focusRowElemJQ.attr('data-real') != 0)
+        focusElemJQ = focusRowElemJQ.find('button[name="removeItem"]')
+      else
+        focusElemJQ = this.focusElemJQWhenAllGone
+
+      if (focusElemJQ?.length > 0)
+        focusElemJQ[0].focus()
+    }
+
     this.rowElemJQ.remove()
   }
 
@@ -107,7 +126,7 @@ class ItemRow {
       this.set === g_source || this.set === g_desired ?
       parseInt(this.idElemJQ.val()) :
       undefined
-    this.enchantTemplateRow.CreateNew(enchant, itemID)
+    this.enchantTemplateRow.CreateNew(enchant, itemID, true, this.addEnchantElemJQ)
   }
 
 
@@ -227,7 +246,7 @@ class ItemRow {
       this.rowElemJQ.find('button[name="removeItem"]').click(() => {
         let tbodyElemJQ = this.rowElemJQ.parent()
 
-        this.rowElemJQ.remove()
+        this.Remove()
 
         this.RenumberAllRows(tbodyElemJQ)
       })
@@ -238,7 +257,8 @@ class ItemRow {
         this.SyncEnchantOptions()
       })
 
-      this.rowElemJQ.find('button[name="addEnchant"]').click(() => {
+      this.addEnchantElemJQ = this.rowElemJQ.find('button[name="addEnchant"]')
+      this.addEnchantElemJQ.click(() => {
         this.AddEnchant()
       })
     }

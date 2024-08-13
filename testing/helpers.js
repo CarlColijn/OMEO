@@ -272,7 +272,7 @@ function GetItemTemplateRow(testContainerID, set) {
 
 
 function CreateItemRow(templateRowDetails, item, nr) {
-  return templateRowDetails.row.CreateNew(nr ?? 1, item)
+  return templateRowDetails.row.CreateNew(nr ?? 1, item, false, undefined)
 }
 
 
@@ -440,7 +440,7 @@ function GetItemTable(testContainerID, set) {
   let tableElemJQ = $(`#${testContainerID}`)
   let details = new ItemTableDetails()
   details.tableElemJQ = tableElemJQ
-  details.table = new ItemTable(details.ShowDetails, tableElemJQ, set)
+  details.table = new ItemTable(details.ShowDetails, tableElemJQ, undefined, set)
   return details
 }
 

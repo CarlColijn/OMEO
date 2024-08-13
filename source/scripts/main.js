@@ -46,7 +46,10 @@ class FormHandler {
     let dialogElemJQ = $(dialogID)
     dialogElemJQ.css('display', 'flex')
 
-    this.MakeDialogKeyboardCloseable(dialogElemJQ, dialogElemJQ.find('.exit'), ContinueCallback)
+    let exitButtonJQ = dialogElemJQ.find('.exit')
+    exitButtonJQ[0].focus()
+
+    this.MakeDialogKeyboardCloseable(dialogElemJQ, exitButtonJQ, ContinueCallback)
   }
 
 
@@ -113,6 +116,7 @@ class FormHandler {
     $('#divineProgress').html('Starting up...')
     exitButtonElemJQ.html('Stop')
 
+    exitButtonElemJQ[0].focus()
     this.MakeDialogKeyboardCloseable(dialogElemJQ, exitButtonElemJQ, OnCancel)
   }
 

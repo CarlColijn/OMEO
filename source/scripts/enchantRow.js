@@ -41,7 +41,7 @@ class EnchantRow {
 
 
   // returns EnchantRow
-  CreateNew(enchant, itemID) {
+  CreateNew(enchant, itemID, giveFocus, focusElemJQWhenAllGone) {
     let newRow = this.MakeExtraRealRow()
 
     if (this.set === g_source || this.set === g_desired)
@@ -52,11 +52,30 @@ class EnchantRow {
     else
       newRow.UpdateLevelOptions()
 
+    newRow.focusElemJQWhenAllGone = focusElemJQWhenAllGone
+    if (giveFocus && this.set === g_source || this.set === g_desired)
+      newRow.idElemJQ[0].focus()
+
     return newRow
   }
 
 
   Remove() {
+    if (this.set === g_source || this.set === g_desired) {
+      let focusRowElemJQ = this.rowElemJQ.next()
+      if (focusRowElemJQ.length == 0)
+        focusRowElemJQ = this.rowElemJQ.prev()
+
+      let focusElemJQ
+      if (focusRowElemJQ.length > 0 && focusRowElemJQ.attr('data-real') != 0)
+        focusElemJQ = focusRowElemJQ.find('button[name="removeEnchant"]')
+      else
+        focusElemJQ = this.focusElemJQWhenAllGone
+
+      if (focusElemJQ?.length > 0)
+        focusElemJQ[0].focus()
+    }
+
     this.rowElemJQ.remove()
   }
 
@@ -119,7 +138,7 @@ class EnchantRow {
     })
 
     this.rowElemJQ.find('button[name="removeEnchant"]').click(() => {
-      this.rowElemJQ.remove()
+      this.Remove()
     })
   }
 

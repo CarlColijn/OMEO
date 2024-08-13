@@ -17,13 +17,20 @@
 
 
 class ItemTable {
-  constructor(ShowDetails, tableElemJQ, set) {
+  constructor(ShowDetails, tableElemJQ, addItemElemJQ, set) {
     // ==== PUBLIC ====
     this.set = set
     this.tableElemJQ = tableElemJQ
 
     // ==== PRIVATE ====
     this.ShowDetails = ShowDetails
+
+    this.addItemElemJQ = addItemElemJQ
+    if (this.addItemElemJQ !== undefined) {
+      addItemElemJQ.click(() => {
+        this.AddRow()
+      })
+    }
 
     if (this.set === g_desired) {
       let itemRowElemJQ = this.tableElemJQ.find('.item').first()
@@ -39,7 +46,7 @@ class ItemTable {
   // returns ItemRow
   AddRow() {
     let newNr = this.tableElemJQ.find('.item').length
-    return this.templateRow.CreateNew(newNr, undefined)
+    return this.templateRow.CreateNew(newNr, undefined, true, this.addItemElemJQ)
   }
 
 
@@ -52,7 +59,7 @@ class ItemTable {
 
       for (let itemNr = 0; itemNr < items.length; ++itemNr) {
         let item = items[itemNr]
-        this.templateRow.CreateNew(itemNr + 1, item)
+        this.templateRow.CreateNew(itemNr + 1, item, false, this.addItemElemJQ)
       }
     }
   }
