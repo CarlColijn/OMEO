@@ -126,27 +126,29 @@ class FormHandler {
   }
 
 
-  TellCombineProgress(progress, maxProgress) {
-    $('#divineProgress').html(`Working on combination ${Math.round(progress / 1000)}K of ${Math.round(maxProgress / 1000)}K...`)
+  TellCombineProgress(progress, maxProgress, timeInMilliseconds) {
+    $('#divineProgress').html(this.GetProgressMessage(progress, maxProgress, timeInMilliseconds))
   }
 
 
-  TellCombineDone(level, hasSources) {
+  TellCombineDone(level, hasSources, maxProgress, timeInMilliseconds) {
+    let timeInSeconds = Math.round(timeInMilliseconds / 1000)
+
     let title = 'Divination is compete!'
-    let message
+    let message = `${this.GetProgressMessage(maxProgress, maxProgress, timeInMilliseconds)}<br><br>`
 
     if (level === g_noCombines) {
       title = 'Divination is unsuccessful'
-      message = 'Sorry, I couldn\'t come up with your desired item at all.<br><br>Please look at your source items and desired item and make sure there is some sort of match.'
+      message += 'Sorry, I couldn\'t come up with your desired item at all.<br><br>Please look at your source items and desired item and make sure there is some sort of match.'
     }
     else if (level === g_onlyImperfectCombines)
-      message = 'An exact match cannot be made.<br>I\'ll show you what can be made.'
+      message += 'An exact match cannot be made.<br>I\'ll show you what can be made.'
     else if (level === g_onlyPerfectWithExtrasCombines)
-      message = 'An exact match cannot be made, but I could create combinations with even more enchantments.<br>I\'ll show these instead.'
+      message += 'An exact match cannot be made, but I could create combinations with even more enchantments.<br>I\'ll show these instead.'
     else if (level === g_perfectAndPerfectWithExtrasCombines)
-      message = 'I could also create combinations with even more enchantments.<br>I\'ll also show these combinations.'
+      message += 'I could also create combinations with even more enchantments.<br>I\'ll also show these combinations.'
     else if (level === g_onlyPerfectCombines)
-      message = 'I listed how to get at your desired item.'
+      message += 'I listed how to get at your desired item.'
 
     if (hasSources)
       message += '<br><br>Some of your source item(s) are however also nice matches for what you requested.<br>I\'ve also listed these and marked them for you.'
@@ -154,6 +156,41 @@ class FormHandler {
     $('#divineTitle').html(title)
     $('#divineProgress').html(message)
     $('#divining .exit').html('OK')
+  }
+
+
+  // returns string
+  GetFormattedTime(time) {
+    time = Math.round(time)
+    let seconds = time % 60
+    time = Math.round((time - seconds) / 60)
+    let minutes = time % 60
+    time = Math.round((time - minutes) / 60)
+    let hours = time
+    return (
+      hours == 0 ?
+      `${minutes}:${seconds.toString().padStart(2, '0')}` :
+      `${hours}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`
+    )
+  }
+
+
+  // returns string
+  GetProgressMessage(progress, maxProgress, timeInMilliseconds) {
+    let timeInSeconds = Math.round(timeInMilliseconds / 1000)
+
+    let percentageText =
+      maxProgress == 0 ?
+      '100.0' :
+      (100 * progress / maxProgress).toFixed(1)
+    let maxProgressText = maxProgress.toLocaleString('en-US')
+    let maxTimeInMilliseconds =
+      progress == 0 ?
+      0 :
+      timeInMilliseconds * maxProgress / progress
+    let maxTimeInSeconds = Math.round(maxTimeInMilliseconds / 1000)
+
+    return `Progress: ${percentageText}% of ${maxProgressText} combinations<br>Time elapsed: ${this.GetFormattedTime(timeInSeconds)} of ${this.GetFormattedTime(maxTimeInSeconds)}`
   }
 }
 

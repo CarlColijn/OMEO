@@ -49,6 +49,8 @@ class FeedbackHandler {
     // so that feedback will already be given the first
     // time round.
     this.prevFeedbackTimeMS = 0
+
+    this.startTimeMS = Date.now()
   }
 
 
@@ -65,7 +67,8 @@ class FeedbackHandler {
     postMessage({
       type: 0,
       progress: progress,
-      maxProgress: maxProgress
+      maxProgress: maxProgress,
+      timeInMS: Date.now() - this.startTimeMS
     })
   }
 
@@ -77,10 +80,12 @@ class FeedbackHandler {
   }
 
 
-  TellDone(cleanedUpItemsResult) {
+  TellDone(cleanedUpItemsResult, maxProgress) {
     postMessage({
       type: 2,
-      result: cleanedUpItemsResult
+      result: cleanedUpItemsResult,
+      maxProgress: maxProgress,
+      timeInMS: Date.now() - this.startTimeMS
     })
   }
 }
@@ -96,11 +101,11 @@ onmessage = (e) => {
   let feedbackHandler = new FeedbackHandler(feedbackIntervalMS)
 
   let itemCombiner = new ItemCombiner()
-  let combinedItems = itemCombiner.GetAllItemCombinations(sourceItems, desiredItem, feedbackHandler)
+  let combineResult = itemCombiner.GetAllItemCombinations(sourceItems, desiredItem, feedbackHandler)
 
   feedbackHandler.TellFinalizing()
   let combineResultFilter = new CombineResultFilter(desiredItem)
-  let cleanedUpItemsResult = combineResultFilter.GetCleanedUpItemList(sourceItems, combinedItems)
+  let cleanedUpItemsResult = combineResultFilter.GetCleanedUpItemList(sourceItems, combineResult.combinedItems)
 
-  feedbackHandler.TellDone(cleanedUpItemsResult)
+  feedbackHandler.TellDone(cleanedUpItemsResult, combineResult.maxProgress)
 }

@@ -34,7 +34,7 @@ class CombineResult {
 
 
 class ItemCombiner {
-  // returns Item[]
+  // returns object; { combinedItems: Item[], maxProgress: int }
   GetAllItemCombinations(sourceItems, desiredItem, feedbackHandler) {
     let tester = new ItemCombineTester()
 
@@ -50,7 +50,10 @@ class ItemCombiner {
 
     this.MakeAllCombinations(tester, itemList, desiredItem, feedbackHandler)
 
-    return itemList.GetCombinedItems()
+    return {
+      combinedItems: itemList.GetCombinedItems(),
+      maxProgress: itemList.GetMaxProgress()
+    }
   }
 
 

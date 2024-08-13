@@ -20,7 +20,7 @@ class FeedbackHandlerMock {
 function TestCombineResult(jazil, sourceItems, canCombine, desiredItem, expectedItems) {
   let feedbackHandler = new FeedbackHandlerMock()
   let combiner = new ItemCombiner()
-  let combinedItems = combiner.GetAllItemCombinations(sourceItems, desiredItem, feedbackHandler)
+  let combinedItems = combiner.GetAllItemCombinations(sourceItems, desiredItem, feedbackHandler).combinedItems
 
   jazil.ShouldBe(feedbackHandler.timeForFeedbackCalled, canCombine, 'TimeForFeedback not called properly!')
   jazil.ShouldBe(feedbackHandler.tellProgressCalled, canCombine, 'TellProgress not called properly!')

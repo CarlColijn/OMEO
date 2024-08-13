@@ -98,7 +98,7 @@ class Form {
     this.combineWorker.onmessage = (e) => {
       switch (e.data.type) {
         case 0:
-          this.formHandler.TellCombineProgress(e.data.progress, e.data.maxProgress)
+          this.formHandler.TellCombineProgress(e.data.progress, e.data.maxProgress, e.data.timeInMS)
           break
         case 1:
           this.formHandler.TellCombineFinalizing()
@@ -110,7 +110,7 @@ class Form {
 
           this.ShowCombinedItems(cleanedUpItemsResult.items)
 
-          this.formHandler.TellCombineDone(cleanedUpItemsResult.level, cleanedUpItemsResult.hasSources)
+          this.formHandler.TellCombineDone(cleanedUpItemsResult.level, cleanedUpItemsResult.hasSources, e.data.maxProgress, e.data.timeInMS)
           break
       }
     }

@@ -11,14 +11,18 @@ async function TestWorker(sourceItems, desiredItem, progressCallback = undefined
     progressCalled: false,
     finalizeCalled: false,
     doneCalled: false,
+    finalMaxProgress: 0,
     result: undefined,
+    timeInMSReported: 0,
+    timeInMSMeasured: 0,
     stoppedResponding: false
   }
 
   // Note: the path should be relative to the html document loading us!
   let combineWorker = new Worker('../source/scripts/itemCombineWorker.js')
 
-  let lastFeedback = Date.now()
+  let startTimeInMS = Date.now()
+  let lastFeedback = startTimeInMS
   let promise = new Promise((resolve, reject) => {
     combineWorker.onmessage = (e) => {
       switch (e.data.type) {
@@ -26,7 +30,7 @@ async function TestWorker(sourceItems, desiredItem, progressCallback = undefined
           status.progressCalled = true
           lastFeedback = Date.now()
           if (progressCallback !== undefined)
-            progressCallback(combineWorker, e.data.progress, e.data.maxProgress)
+            progressCallback(combineWorker, e.data.progress, e.data.maxProgress, e.data.timeInMS)
           break
         case 1:
           status.finalizeCalled = true
@@ -34,6 +38,9 @@ async function TestWorker(sourceItems, desiredItem, progressCallback = undefined
         case 2:
           status.doneCalled = true
           status.result = e.data.result
+          status.finalMaxProgress = e.data.maxProgress
+          status.timeInMSMeasured = Date.now() - startTimeInMS
+          status.timeInMSReported = e.data.timeInMS
           resolve()
           break
       }
@@ -89,6 +96,7 @@ jazil.AddTestSet(omeoPage, 'ItemCombineWorker', {
     jazil.ShouldBe(status.stoppedResponding, false, 'stopped responding!')
     jazil.ShouldBe(status.finalizeCalled, true, 'finalize not called!')
     jazil.ShouldBe(status.doneCalled, true, 'done not called!')
+    jazil.ShouldBeBetween(status.timeInMSReported, status.timeInMSMeasured - 500, status.timeInMSMeasured, 'timeInMS diverges too much!')
     jazil.ShouldNotBe(status.result, undefined, 'result is not returned!')
     TestItemListsMatch(jazil, expectedItems, 'expected', status.result.items, 'combined', g_combined)
   },
@@ -109,25 +117,27 @@ jazil.AddTestSet(omeoPage, 'ItemCombineWorker', {
     jazil.ShouldBe(status.stoppedResponding, false, 'stopped responding!')
     jazil.ShouldBe(status.finalizeCalled, true, 'finalize not called!')
     jazil.ShouldBe(status.doneCalled, true, 'done not called!')
+    jazil.ShouldBeBetween(status.timeInMSReported, status.timeInMSMeasured - 500, status.timeInMSMeasured, 'timeInMS diverges too much!')
     jazil.ShouldNotBe(status.result, undefined, 'result is not returned!')
     TestItemListsMatch(jazil, expectedItems, 'expected', status.result.items, 'combined', g_combined)
   },
 
-  'Progress always increases': async (jazil) => {
+  'Progress indicators are correct': async (jazil) => {
     let sourceItems = [
-      BuildItem({ name:'Sword', enchants:[{ name:'Smite', level:1 }] }),
-      BuildItem({ name:'Sword', enchants:[{ name:'Unbreaking', level:1 }] }),
+      BuildItem({ name:'Sword', count:20, enchants:[{ name:'Smite', level:1 }] }),
+      BuildItem({ name:'Sword', count:20, enchants:[{ name:'Unbreaking', level:1 }] }),
+      BuildItem({ name:'Book', count:20, enchants:[{ name:'Looting', level:1 }] }),
+      BuildItem({ name:'Book', count:20, enchants:[{ name:'Bane of Arthropods', level:1 }] }),
     ]
-    let desiredItem = BuildItem({ name:'Sword', enchants:[{ name:'Unbreaking', level:1 }, { name:'Smite', level:1 }] })
-    let expectedItems = [
-      BuildItem({ name:'Sword', priorWork:1, cost:2, count:1, enchants:[{ name:'Unbreaking', level:1 }, { name:'Smite', level:1 }] })
-    ]
+    let desiredItem = BuildItem({ name:'Sword', enchants:[{ name:'Unbreaking', level:3 }, { name:'Smite', level:5 }, { name:'Looting', level:3}, { name:'Bane of Arthropods', level:5 }] })
 
     let prevProgress = -1
     let prevMaxProgress = -1
+    let prevTimeInMS = -1
     let progressIncreases = true
     let maxProgressIncreases = true
-    let progressCallback = (combineWorker, progress, maxProgress) => {
+    let timeInMSIncreases = true
+    let progressCallback = (combineWorker, progress, maxProgress, timeInMS) => {
       // Note: >= and not >, since progress should always increase.
       if (prevProgress >= progress)
         progressIncreases = false
@@ -136,18 +146,27 @@ jazil.AddTestSet(omeoPage, 'ItemCombineWorker', {
       if (prevMaxProgress > maxProgress)
         maxProgressIncreases = false
       prevMaxProgress = maxProgress
+
+      if (prevTimeInMS > timeInMS)
+        timeInMSIncreases = false
+      prevTimeInMS = timeInMS
     }
 
     let status = await TestWorker(sourceItems, desiredItem, progressCallback)
 
     jazil.Assert(progressIncreases, 'progress is not increasing!')
     jazil.Assert(maxProgressIncreases, 'maxProgress is not increasing!')
+    jazil.Assert(timeInMSIncreases, 'timeInMS is not increasing!')
     jazil.ShouldBe(status.progressCalled, true, 'progress not called!')
+    jazil.ShouldBe(status.finalMaxProgress, prevMaxProgress, 'final max progress incorrect!')
     jazil.ShouldBe(status.stoppedResponding, false, 'stopped responding!')
     jazil.ShouldBe(status.finalizeCalled, true, 'finalize not called!')
     jazil.ShouldBe(status.doneCalled, true, 'done not called!')
+    jazil.ShouldBeBetween(status.timeInMSReported, status.timeInMSMeasured - 500, status.timeInMSMeasured, 'timeInMS diverges too much!')
     jazil.ShouldNotBe(status.result, undefined, 'result is not returned!')
-    TestItemListsMatch(jazil, expectedItems, 'expected', status.result.items, 'combined', g_combined)
+    // We won't test with TestItemListsMatch; this is covered by other unit tests
+    // anyway and we want a more time consuming thus more complex combine round
+    // for this test.
   },
 
   'Worker can be cancelled': async (jazil) => {
@@ -169,6 +188,7 @@ jazil.AddTestSet(omeoPage, 'ItemCombineWorker', {
     jazil.ShouldBe(status.progressCalled, true, 'progress not called!')
     jazil.ShouldBe(status.finalizeCalled, false, 'finalize called!')
     jazil.ShouldBe(status.doneCalled, false, 'done called!')
+    jazil.ShouldBeBetween(status.timeInMSReported, status.timeInMSMeasured - 500, status.timeInMSMeasured, 'timeInMS diverges too much!')
     jazil.ShouldBe(status.result, undefined, 'result is returned!')
     jazil.ShouldBe(status.stoppedResponding, true, 'didn\'t stop responding!')
   },
