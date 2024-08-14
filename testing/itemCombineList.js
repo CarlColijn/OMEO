@@ -50,7 +50,7 @@ function TestResult(jazil, itemList, desiredItems) {
   actualItems = itemList.GetCombinedItems()
   jazil.ShouldBe(actualItems.length, desiredItems.length, 'Unequal number of desired vs. actual items!')
   for (let itemNr = 0; itemNr < actualItems.length; ++itemNr)
-    jazil.ShouldBe(actualItems[itemNr].desc, desiredItems[itemNr].desc, `Wrong item returned at idnex ${itemNr}!`)
+    jazil.ShouldBe(actualItems[itemNr].desc, desiredItems[itemNr].desc, `Wrong item returned at index ${itemNr}!`)
 }
 
 
@@ -171,17 +171,17 @@ jazil.AddTestSet(omeoPage, 'ItemCombineList', {
     itemList.ProcessItem(mock3r, AlwaysReplacer)
     // 5's mock3+... is gone
     // 6's mock3+... is gone
-    TestIteration(jazil, itemList, true, mock3r, mock1, 7, 10)
-    TestIteration(jazil, itemList, true, mock3r, mock2, 8, 10)
+    TestIteration(jazil, itemList, true, mock3r, mock1, 4, 6)
+    TestIteration(jazil, itemList, true, mock3r, mock2, 5, 6)
     // 9's ...+mock3 is gone
-    TestIteration(jazil, itemList, true, mock3r, mock3r, 10, 10)
+    TestIteration(jazil, itemList, true, mock3r, mock3r, 6, 6)
     itemList.ProcessItem(mock2r, AlwaysReplacer)
-    TestIteration(jazil, itemList, true, mock2r, mock1, 11, 15)
+    TestIteration(jazil, itemList, true, mock2r, mock1, 4, 6)
     // 12's ...+mock2 is gone
     // 13's ...+mock3 is gone
-    TestIteration(jazil, itemList, true, mock2r, mock3r, 14, 15)
-    TestIteration(jazil, itemList, true, mock2r, mock2r, 15, 15)
-    TestIteration(jazil, itemList, false, undefined, undefined, 15, 15)
+    TestIteration(jazil, itemList, true, mock2r, mock3r, 5, 6)
+    TestIteration(jazil, itemList, true, mock2r, mock2r, 6, 6)
+    TestIteration(jazil, itemList, false, undefined, undefined, 6, 6)
     TestResult(jazil, itemList, [mock3r, mock2r])
   },
 
@@ -201,29 +201,29 @@ jazil.AddTestSet(omeoPage, 'ItemCombineList', {
     TestIteration(jazil, itemList, true, mock3, mock1, 4, 6)
     itemList.ProcessItem(mock2r, AlwaysReplacer)
     // 5's ...+mock2 is gone
-    TestIteration(jazil, itemList, true, mock3, mock3, 6, 10)
-    TestIteration(jazil, itemList, true, mock2r, mock1, 7, 10)
+    TestIteration(jazil, itemList, true, mock3, mock3, 3, 6)
+    TestIteration(jazil, itemList, true, mock2r, mock1, 4, 6)
     // 8's ...+mock2 is gone
-    TestIteration(jazil, itemList, true, mock2r, mock3, 9, 10)
+    TestIteration(jazil, itemList, true, mock2r, mock3, 5, 6)
     itemList.ProcessItem(mock2rr, AlwaysReplacer)
     // 10's mock2r+mock2r is gone
-    TestIteration(jazil, itemList, true, mock2rr, mock1, 11, 15)
+    TestIteration(jazil, itemList, true, mock2rr, mock1, 4, 6)
     // 12's ...+mock2 is gone
-    TestIteration(jazil, itemList, true, mock2rr, mock3, 13, 15)
+    TestIteration(jazil, itemList, true, mock2rr, mock3, 5, 6)
     itemList.ProcessItem(mock4, AlwaysInserter)
     // 14's ...+mock2r is gone
-    TestIteration(jazil, itemList, true, mock2rr, mock2rr, 15, 21)
-    TestIteration(jazil, itemList, true, mock4, mock1, 16, 21)
+    TestIteration(jazil, itemList, true, mock2rr, mock2rr, 6, 10)
+    TestIteration(jazil, itemList, true, mock4, mock1, 7, 10)
     itemList.ProcessItem(mock4r, AlwaysReplacer)
     // 17-21's mock4+... is gone
-    TestIteration(jazil, itemList, true, mock4r, mock1, 22, 28)
+    TestIteration(jazil, itemList, true, mock4r, mock1, 7, 10)
     // 23's ...+mock2 is gone
-    TestIteration(jazil, itemList, true, mock4r, mock3, 24, 28)
+    TestIteration(jazil, itemList, true, mock4r, mock3, 8, 10)
     // 25's ...+mock2r is gone
-    TestIteration(jazil, itemList, true, mock4r, mock2rr, 26, 28)
+    TestIteration(jazil, itemList, true, mock4r, mock2rr, 9, 10)
     // 27's ...+mock4 is gone
-    TestIteration(jazil, itemList, true, mock4r, mock4r, 28, 28)
-    TestIteration(jazil, itemList, false, undefined, undefined, 28, 28)
+    TestIteration(jazil, itemList, true, mock4r, mock4r, 10, 10)
+    TestIteration(jazil, itemList, false, undefined, undefined, 10, 10)
     TestResult(jazil, itemList, [mock2rr, mock4r])
   },
 

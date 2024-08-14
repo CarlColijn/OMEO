@@ -11,12 +11,7 @@
   To make the process more efficient, we want to be able to remove
   inferior items.  For that we keep track of 3 lists;
   - allItems: Item[]
-    Contains all items, incl. source items.  This list is allowed to
-    get holes in it (spots set to undefined); it will become quite
-    large so that splicing it will be costly.  Introducing holes also
-    means we do not have to patch up item indices all over the place
-    (our 'next' iterators as well as the item indices in all follow-up
-    ItemListInfos).
+    Contains all items, incl. source items.
   - allItemsByTypeHash: Map(string -> Item)
     Groups same-typed items together to enable quick retrieval for
     comparison on fitness.
@@ -63,21 +58,16 @@ class ItemCombineList {
     if (this.item1Nr >= this.allItems.length)
       return false
 
-    let foundItems
-    do {
-      items.item1 = this.allItems[this.item1Nr]
-      items.item2 = this.allItems[this.item2Nr]
+    items.item1 = this.allItems[this.item1Nr]
+    items.item2 = this.allItems[this.item2Nr]
 
-      foundItems = items.item1 !== undefined && items.item2 !== undefined
+    ++this.item2Nr
+    if (this.item2Nr > this.item1Nr) {
+      ++this.item1Nr
+      this.item2Nr = 0
+    }
 
-      ++this.item2Nr
-      if (this.item2Nr > this.item1Nr) {
-        ++this.item1Nr
-        this.item2Nr = 0
-      }
-    } while (!foundItems && this.item1Nr < this.allItems.length)
-
-    return foundItems
+    return true
   }
 
 
@@ -134,14 +124,7 @@ class ItemCombineList {
 
 
   GetCombinedItems() {
-    let combinedItems = []
-    for (let itemNr = this.numSourceItems; itemNr < this.allItems.length; ++itemNr) {
-      let item = this.allItems[itemNr]
-      if (item !== undefined)
-        combinedItems.push(item)
-    }
-
-    return combinedItems
+    return this.allItems.slice(this.numSourceItems, this.allItems.length)
   }
 
 
@@ -203,7 +186,23 @@ class ItemCombineList {
       let item = items[itemIndex]
       let listInfo = this.itemListInfosByItem.get(item)
 
-      this.allItems[listInfo.index] = undefined
+      this.allItems.splice(listInfo.index, 1)
+      for (let higherItemIndex = listInfo.index; higherItemIndex < this.allItems.length; ++higherItemIndex) {
+        let higherItem = this.allItems[higherItemIndex]
+        let higherListInfo = this.itemListInfosByItem.get(higherItem)
+        --higherListInfo.index
+      }
+      if (listInfo.index < this.numSourceItems)
+        --this.numSourceItems
+
+      if (this.item1Nr == listInfo.index)
+        this.item2Nr = 0
+      else {
+        if (this.item1Nr > listInfo.index)
+          --this.item1Nr
+        if (this.item2Nr > listInfo.index)
+          --this.item2Nr
+      }
 
       this.itemListInfosByItem.delete(item)
       if (item.set === g_combined) {
