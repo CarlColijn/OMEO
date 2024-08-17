@@ -80,7 +80,7 @@ class DetailsTable {
       if (enchant !== undefined) {
         enchants += isFirstEnchant ? '' : '<br>'
         isFirstEnchant = false
-        enchants += `${enchant.info.name} ${enchant.level}`
+        enchants += `${enchant.info.name} ${GetRomanNumeralForLevel(enchant.level)}`
       }
     }
     return enchants

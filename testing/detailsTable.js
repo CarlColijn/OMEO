@@ -14,7 +14,7 @@ function CheckItemInTable(jazil, item, tableElemJQ, neededPlacement) {
         neededDescription += ` nr. ${item.nr}`
       let neededEnchants = ''
       item.enchantsByID.forEach((enchant) => {
-        neededEnchants += `${enchant.info.name} ${enchant.level}`
+        neededEnchants += `${enchant.info.name} ${GetGUITextForEnchantLevel(enchant)}`
       })
       let neededCost
       if (item.set !== g_combined)

@@ -278,6 +278,33 @@ function CreateItemRow(templateRowDetails, item, nr) {
 
 
 
+function GetGUITextForEnchantLevel(enchant) {
+  let text = ['-','I','II','III','IV','V','VI','VII','VII','VIII','IX','X'][enchant.level]
+  if (text === undefined)
+    text = '!ERR!'
+  return text
+}
+
+
+function GetEnchantLevelFromGUIText(guiText) {
+  let level = {
+    'I':    1,
+    'II':   2,
+    'III':  3,
+    'IV':   4,
+    'V':    5,
+    'VI':   6,
+    'VII':  7,
+    'VIII': 8,
+    'IX':   9,
+    'X':    10
+  }[guiText.toUpperCase()]
+  if (level === undefined)
+    level = '!ERR!'
+  return level
+}
+
+
 function GetDescriptionForItemInTable(set, item) {
   let name = item.info.name
   if (set === g_combined) {
@@ -291,17 +318,17 @@ function GetDescriptionForItemInTable(set, item) {
 
 
 function GetItemRowDetails(itemRowElemJQ, set) {
-  let MakeNumberSafe = (className) => {
-    let value = itemRowElemJQ.find(className).text()
+  let MakeNumberSafe = (numberElemJQ) => {
+    let value = numberElemJQ.text()
     return value === '' ? undefined : parseInt(value)
   }
 
-  let MakeTextSafe = (className) => {
-    let value = itemRowElemJQ.find(className).text()
+  let MakeTextSafe = (textElemJQ) => {
+    let value = textElemJQ.text()
     return value === '' ? undefined : value
   }
 
-  let nr = MakeNumberSafe('.nr')
+  let nr = MakeNumberSafe(itemRowElemJQ.find('.nr'))
   let cost
   switch (set) {
     case g_source:
@@ -309,7 +336,7 @@ function GetItemRowDetails(itemRowElemJQ, set) {
       cost = undefined
       break
     case g_combined:
-      cost = MakeNumberSafe('.cost')
+      cost = MakeNumberSafe(itemRowElemJQ.find('.cost'))
       break
   }
   let count
@@ -322,7 +349,7 @@ function GetItemRowDetails(itemRowElemJQ, set) {
       count = undefined
       break
     case g_combined:
-      count = MakeNumberSafe('.count')
+      count = MakeNumberSafe(itemRowElemJQ.find('.count'))
       break
   }
   let type
@@ -335,7 +362,7 @@ function GetItemRowDetails(itemRowElemJQ, set) {
       type = g_itemInfosByID.get(typeID).name
       break
     case g_combined:
-      type = MakeTextSafe('.type')
+      type = MakeTextSafe(itemRowElemJQ.find('.type'))
       break
   }
   let priorWork
@@ -348,7 +375,7 @@ function GetItemRowDetails(itemRowElemJQ, set) {
       priorWork = undefined
       break
     case g_combined:
-      priorWork = MakeNumberSafe('.priorWork')
+      priorWork = MakeNumberSafe(itemRowElemJQ.find('.priorWork'))
       break
   }
   let enchantNames
@@ -361,12 +388,23 @@ function GetItemRowDetails(itemRowElemJQ, set) {
         let rowElemJQ = inputElemJQ.parent().parent()
         if (rowElemJQ.attr('data-real') != 0) {
           let enchantID = parseInt(inputElemJQ.val())
+          if (enchantNames != '')
+            enchantNames += '/'
           enchantNames += g_enchantInfosByID.get(enchantID).name
         }
       })
       break
     case g_combined:
-      enchantNames = MakeTextSafe('.enchant .name')
+      enchantNames = ''
+      itemRowElemJQ.find('.enchant .name').each((enchantNr, nameElem) => {
+        let nameElemJQ = $(nameElem)
+        let rowElemJQ = nameElemJQ.parent().parent()
+        if (rowElemJQ.attr('data-real') != 0) {
+          if (enchantNames != '')
+            enchantNames += '/'
+          enchantNames += MakeTextSafe(nameElemJQ)
+        }
+      })
       break
   }
   let enchantLevels
@@ -377,12 +415,24 @@ function GetItemRowDetails(itemRowElemJQ, set) {
       itemRowElemJQ.find('[name=level]').each((inputNr, inputElem) => {
         let inputElemJQ = $(inputElem)
         let rowElemJQ = inputElemJQ.parent().parent()
-        if (rowElemJQ.attr('data-real') != 0)
+        if (rowElemJQ.attr('data-real') != 0) {
+          if (enchantLevels != '')
+            enchantLevels += '/'
           enchantLevels += inputElemJQ.val()
+        }
       })
       break
     case g_combined:
-      enchantLevels = MakeTextSafe('.enchant .level')
+      enchantLevels = ''
+      itemRowElemJQ.find('.enchant .level').each((enchantNr, levelElem) => {
+        let levelElemJQ = $(levelElem)
+        let rowElemJQ = levelElemJQ.parent().parent()
+        if (rowElemJQ.attr('data-real') != 0) {
+          if (enchantLevels != '')
+            enchantLevels += '/'
+          enchantLevels += GetEnchantLevelFromGUIText(MakeTextSafe(levelElemJQ))
+        }
+      })
       break
   }
 

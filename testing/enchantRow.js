@@ -27,7 +27,7 @@ function GetEnchantRowDetails(enchantRowElemJQ, set) {
   else
     return {
       'name': enchantRowElemJQ.find('.name').text(),
-      'level': parseInt(enchantRowElemJQ.find('.level').text())
+      'level': GetEnchantLevelFromGUIText(enchantRowElemJQ.find('.level').text())
     }
 }
 

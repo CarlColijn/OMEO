@@ -4,6 +4,9 @@
   prerequisites:
   - none
 
+  Defined funtions:
+  - GetRomanNumeralForLevel
+
   Defined classes:
   - EnchantInfo
     - id: char
@@ -23,9 +26,16 @@
 
 // ======== PUBLIC ========
 
+
 let g_enchantIDsByName = new Map()
 let g_enchantInfosByID = new Map()
 let g_numDifferentEnchants = 0
+
+
+// returns string
+function GetRomanNumeralForLevel(level) {
+  return ['-', 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X'][level]
+}
 
 
 class EnchantInfo {

@@ -97,7 +97,7 @@ class EnchantRow {
     }
     else if (this.set === g_combined) {
       this.nameElemJQ.text(enchant.info.name)
-      this.levelElemJQ.text(enchant.level)
+      this.levelElemJQ.text(GetRomanNumeralForLevel(enchant.level))
     }
   }
 
@@ -156,7 +156,7 @@ class EnchantRow {
     this.levelElemJQ.find('option').remove()
 
     for (let level = 1; level <= maxLevel; ++level)
-      this.levelElemJQ.append(`<option value="${level}"${level == selectedLevel ? ' selected' : ''}>${level}</option>`)
+      this.levelElemJQ.append(`<option value="${level}"${level == selectedLevel ? ' selected' : ''}>${GetRomanNumeralForLevel(level)}</option>`)
   }
 
 
