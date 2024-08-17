@@ -40,6 +40,12 @@ class EnchantRow {
   }
 
 
+  // returns jQuery-wrapped input element
+  GetIDElemJQ() {
+    return this.idElemJQ
+  }
+
+
   // returns EnchantRow
   CreateNew(enchant, itemID, giveFocus, focusElemJQWhenAllGone) {
     let newRow = this.MakeExtraRealRow()

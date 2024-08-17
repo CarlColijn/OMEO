@@ -129,7 +129,7 @@ class Form {
     this.ClearResult()
 
     let dataInContext = this.GetData(true)
-    if (dataInContext.withCountErrors)
+    if (dataInContext.withCountErrors || dataInContext.withEnchantConflicts)
       this.formHandler.TellDataInError()
     else {
       let ContinueCombine = () => {
@@ -180,7 +180,7 @@ class Form {
 
 
   ClearErrors() {
-    this.formHandler.ClearCountErrors()
+    this.formHandler.ClearErrors()
   }
 
 
@@ -198,6 +198,7 @@ class Form {
   // returns object;
   // - data: FormData
   // - withCountErrors: bool
+  // - withEnchantConflicts: bool
   // - mergedSourceItems: bool
   GetData(mergeSourceItems) {
     let sourceItemsResult = this.sourceItemTable.GetItems(new ItemCollector(mergeSourceItems))
@@ -210,7 +211,6 @@ class Form {
     let withCountErrors =
       sourceItemsResult.withCountErrors ||
       desiredItemResult.withCountErrors
-
     if (withCountErrors) {
       let countErrorElemJQs = [...sourceItemsResult.countErrorElemJQs, ...desiredItemResult.countErrorElemJQs]
       countErrorElemJQs.forEach((countErrorElemJQ) => {
@@ -218,10 +218,21 @@ class Form {
       })
     }
 
+    let withEnchantConflicts =
+      sourceItemsResult.withEnchantConflicts ||
+      desiredItemResult.withEnchantConflicts
+    if (withEnchantConflicts) {
+      let enchantConflictInfos = [...sourceItemsResult.enchantConflictInfos, ...desiredItemResult.enchantConflictInfos]
+      enchantConflictInfos.forEach((enchantConflictInfo) => {
+        this.formHandler.NoteEnchantConflict(enchantConflictInfo)
+      })
+    }
+
     return {
-      'data': data,
-      'withCountErrors': withCountErrors,
-      'mergedSourceItems': sourceItemsResult.mergedItems
+      data: data,
+      withCountErrors: withCountErrors,
+      withEnchantConflicts: withEnchantConflicts,
+      mergedSourceItems: sourceItemsResult.mergedItems
     }
   }
 

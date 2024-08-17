@@ -9,6 +9,11 @@
   - ItemCollectionResult
     - withCountErrors: bool
     - countErrorElemJQs: [] of JQuery wrapped DOM input elements
+    - withEnchantConflicts: bool
+    - enchantConflictInfos: [] of {
+        conflictEnchantName: string,
+        inputElemJQ: JQuery wrapped DOM input element
+      }
     - items: Item[]
     - mergedItems: bool
     - rowsToUpdateNr: ItemRow[]
@@ -30,6 +35,8 @@ class ItemCollectionResult {
     // ==== PUBLIC ====
     this.withCountErrors = false
     this.countErrorElemJQs = []
+    this.withEnchantConflicts = false
+    this.enchantConflictInfos = []
     this.items = []
     this.mergedItems = false
     this.rowsToUpdateNr = []
@@ -59,6 +66,10 @@ class ItemCollector {
     if (itemResult.withCountError) {
       this.result.withCountErrors = true
       this.result.countErrorElemJQs.push(itemResult.countErrorElemJQ)
+    }
+    if (itemResult.withEnchantConflict) {
+      this.result.withEnchantConflicts = true
+      this.result.enchantConflictInfos.push(itemResult.enchantConflictInfo)
     }
 
     let item = itemResult.item

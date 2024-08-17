@@ -145,6 +145,11 @@ class ItemRow {
   // - item: Item
   // - withCountError: bool
   // - countErrorElemJQ: JQuery-wrapped input element, if applicable
+  // - withEnchantConflict: bool
+  // - enchantConflictInfo: {
+  //     conflictingEnchantName: string,
+  //     inputElemJQ: JQuery-wrapped input element
+  //   }
   GetItem() {
     let countResult = this.GetValidatedCount()
 
@@ -154,17 +159,16 @@ class ItemRow {
       parseInt(this.idElemJQ.val()),
       this.set === g_source ? parseInt(this.priorWorkElemJQ.val()) : 0
     )
-    this.AddItemEnchants(item)
+    let enchantResult = this.AddItemEnchants(item)
     if (this.set === g_source)
       item.nr = parseInt(this.rowElemJQ.attr('data-nr'))
 
     return {
       item: item,
       withCountError: countResult.inError,
-      countErrorElemJQ:
-        countResult.inError ?
-        this.countElemJQ :
-        undefined
+      countErrorElemJQ: countResult.errorElemJQ,
+      withEnchantConflict: enchantResult.withConflict,
+      enchantConflictInfo: enchantResult.conflictInfo
     }
   }
 
@@ -286,6 +290,7 @@ class ItemRow {
   // returns object:
   // - count: int / NaN
   // - inError: bool
+  // - errorElemJQ: JQuery-wrapped input element, if applicable
   GetValidatedCount() {
     let count = 1
     let inError = false
@@ -295,22 +300,48 @@ class ItemRow {
     }
     return {
       count: count,
-      inError: inError
+      inError: inError,
+      errorElemJQ:
+        inError ?
+        this.countElemJQ :
+        undefined
     }
   }
 
 
+  // returns object:
+  // - withConflict: bool
+  // - conflictInfo: {
+  //     conflictingEnchantName: string
+  //     inputElemJQ: JQuery-wrapped input element, if applicable
+  //   }
   AddItemEnchants(item) {
+    let result = {
+      withConflict: false,
+      conflictInfo: {}
+    }
+    let foundEnchants = []
     this.rowElemJQ.find('.enchants .enchant').each((rowNr, enchantRowElem) => {
       let enchantRowElemJQ = $(enchantRowElem)
       let enchantRow = new EnchantRow(enchantRowElemJQ, this.set)
       if (enchantRow.IsReal()) {
         let enchant = enchantRow.GetEnchant()
+        foundEnchants.forEach((previousEnchant) => {
+          if (EnchantIDsConflict(previousEnchant.info.id, enchant.info.id)) {
+            result.withConflict = true
+            result.conflictInfo.conflictingEnchantName = previousEnchant.info.name
+            result.conflictInfo.inputElemJQ = enchantRow.GetIDElemJQ()
+          }
+        })
+
+        foundEnchants.push(enchant)
 
         item.SetEnchant(enchant)
       }
-      return true
+      return !result.withConflict
     })
+
+    return result
   }
 
 

@@ -53,13 +53,18 @@ class FormHandler {
   }
 
 
-  ClearCountErrors() {
+  ClearErrors() {
     $('.error').remove()
   }
 
 
   NoteCountError(inputElemJQ) {
     inputElemJQ.after('<div class="error">This is not a number</div>')
+  }
+
+
+  NoteEnchantConflict(conflictInfo) {
+    conflictInfo.inputElemJQ.after(`<div class="error">This enchantment conflicts<br>with ${conflictInfo.conflictingEnchantName}</div>`)
   }
 
 

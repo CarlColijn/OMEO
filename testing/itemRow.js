@@ -103,6 +103,7 @@ function CreateTestSet(setDescription, testContainerID, setLetter) {
       let description = GetDescriptionForItemInTable(set, item)
 
       jazil.ShouldBe(itemDetails.withCountError, false, 'row says there were count errors!')
+      jazil.ShouldBe(itemDetails.withEnchantConflict, false, 'row says there were enchant conflicts!')
       jazil.ShouldBe(itemDetails.countErrorElemJQ, undefined, 'row reports a DOM element in error!')
       jazil.ShouldBe(retrievedItem.set, set, 'set is off!')
       if (set === g_source)
@@ -152,6 +153,41 @@ function CreateTestSet(setDescription, testContainerID, setLetter) {
       jazil.ShouldBe(retrievedItem.priorWork, set === g_source ? item.priorWork : 0, 'priorWork is off!')
       jazil.ShouldBe(enchantNames, 'Projectile Protection', 'enchant names are off!')
       jazil.ShouldBe(enchantLevels, '1', 'enchant levels are off!')
+      jazil.ShouldBe(ItemRowInTable(testContainerID, description, set), true, 'added row is not present!')
+    },
+
+    'Enchant conflicts get registered': (jazil) => {
+      let set = GetSet(setLetter)
+      if (set !== g_source && set !== g_desired)
+        jazil.SkipTest()
+
+      let templateRowDetails = GetItemTemplateRow(testContainerID, set)
+      let item = BuildItem({ name:'Leggings', count:23, priorWork:5, cost:3, enchants:[{ name:'Fire Protection', level:1 }, { name:'Blast Protection', level:1 }] })
+      let itemRow = CreateItemRow(templateRowDetails, item, 63)
+
+      let itemDetails = itemRow.GetItem()
+      let retrievedItem = itemDetails.item
+      let enchantNames = ''
+      let enchantLevels = ''
+      retrievedItem.enchantsByID.forEach((enchant) => {
+        if (enchant !== undefined) {
+          enchantNames += enchant.info.name
+          enchantLevels += enchant.level
+        }
+      })
+      let description = GetDescriptionForItemInTable(set, item)
+
+      jazil.ShouldBe(itemDetails.withEnchantConflict, true, 'row says there were no enchant conflicts!')
+      jazil.ShouldNotBe(itemDetails.enchantConflictInfo?.inputElemJQ, undefined, 'row reports no DOM element in error!')
+      jazil.ShouldBe(retrievedItem.set, set, 'set is off!')
+      if (set === g_source)
+        jazil.ShouldBe(retrievedItem.nr, 63, 'nr is off!')
+      jazil.ShouldBe(retrievedItem.cost, 0, 'cost is set!')
+      jazil.ShouldBe(retrievedItem.count, set === g_source ? item.count : 1, 'count is off!')
+      jazil.ShouldBe(retrievedItem.info.name, item.info.name, 'name is off!')
+      jazil.ShouldBe(retrievedItem.priorWork, set === g_source ? item.priorWork : 0, 'priorWork is off!')
+      jazil.ShouldBe(enchantNames, 'Blast ProtectionFire Protection', 'enchant names are off!')
+      jazil.ShouldBe(enchantLevels, '11', 'enchant levels are off!')
       jazil.ShouldBe(ItemRowInTable(testContainerID, description, set), true, 'added row is not present!')
     },
 
