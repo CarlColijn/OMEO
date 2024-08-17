@@ -85,7 +85,7 @@ class FormData {
     let numSources = stream.GetCount()
     for (let sourceNr = 1; sourceNr <= numSources; ++sourceNr) {
       let sourceItem = this.DeserializeItem(stream, g_source)
-      if (sourceItem === undefined) {
+      if (sourceItem === undefined || !stream.RetrievalOK()) {
         dataOK = false
         break
       }
@@ -122,6 +122,7 @@ class FormData {
   }
 
 
+  // returns bool (whether the deserialization went OK)
   DeserializeEnchants(stream, item) {
     let numEnchants = stream.GetCount()
     for (let enchantNr = 0; enchantNr < numEnchants; ++enchantNr) {
@@ -129,8 +130,11 @@ class FormData {
         stream.GetSizedInt(g_numEnchantIDBits),
         stream.GetSizedInt(3)
       )
+      if (enchant.info === undefined || !stream.RetrievalOK())
+        return false
       item.SetEnchant(enchant)
     }
+    return true
   }
 
 
@@ -142,7 +146,8 @@ class FormData {
       stream.GetSizedInt(g_numItemIDBits),
       stream.GetSizedInt(3)
     )
-    this.DeserializeEnchants(stream, item)
+    if (!this.DeserializeEnchants(stream, item))
+      return undefined
 
     return (
       stream.RetrievalOK() ?

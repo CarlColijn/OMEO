@@ -145,16 +145,40 @@ jazil.AddTestSet(omeoPage, 'FormData', {
     }
   },
 
-  'Malformed form data gives error when deserializing': (jazil) => {
+  'Truncated form data gives error when deserializing': (jazil) => {
     /*
     let sword = BuildItem({ name:'Sword', count:11, set:g_desired, priorWork:1, enchants:[{ name:'Looting' }] })
     let book = BuildItem({ name:'Book', count:33, set:g_source, priorWork:3, enchants:[{ name:'Fortune', level:3 }] })
 
-    // gives serialized data state ccmbaGKRKQhza_
+    // gives serialized data state ccmbaGOlKQhyW_, but we truncate
+    // after the Q
     */
 
     let dataState = new DataStateController(jazil)
-    dataState.SetOnlyLocalStorage('ccmbaGKRKQ') // truncated data
+    dataState.SetOnlyLocalStorage('ccmbaGOlKQ') // truncated data
+
+    let loadingOptions = new DataStreamLoadingOptions()
+    let restoreStream = new DataStream(false)
+    restoreStream.Load(loadingOptions)
+
+    let restoredData = new FormData
+    let deserializedOK = restoredData.Deserialize(restoreStream)
+    jazil.ShouldBe(deserializedOK, false, 'Could deserialize corrupt data!')
+    jazil.ShouldBe(restoredData.sourceItems.length, 0, 'Faulty source items restored!')
+    jazil.ShouldBe(restoredData.desiredItem, undefined, 'Faulty desired item restored!')
+  },
+
+  'Malformed form data gives error when deserializing': (jazil) => {
+    /*
+    let sword = BuildItem({ name:'Sword', count:11, set:g_desired, priorWork:1, enchants:[{ name:'Looting' }] })
+    let book = BuildItem({ name:'Book', count:33, set:g_source, priorWork:3, enchants:[{ name:'Fortune', level:3 }] })
+    // gives serialized data state ccmbaGOlKQhyW_, but the data was built
+    // with Looting's ID set to 63 which is invalid, giving ccmbaGOlKQhE4_
+    // instead
+    */
+
+    let dataState = new DataStateController(jazil)
+    dataState.SetOnlyLocalStorage('ccmbaGOlKQhE4_') // malformed data
 
     let loadingOptions = new DataStreamLoadingOptions()
     let restoreStream = new DataStream(false)
