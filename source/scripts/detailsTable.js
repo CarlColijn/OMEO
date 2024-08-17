@@ -18,50 +18,56 @@ class DetailsTable {
     // ==== PRIVATE ====
     this.tableElemJQ = tableElemJQ
     this.templateRowElemJQ = tableElemJQ.find('.template').first()
+    this.allRowInfos = []
   }
 
 
   Clear() {
-    this.tableElemJQ.find('.item').each((rowNr, rowElem) => {
-      let rowElemJQ = $(rowElem)
-      if (rowElemJQ.attr('data-real') != 0)
-        rowElemJQ.remove()
-      return true
+    this.tableElemJQ.find('th:first').attr('colspan', 1)
+
+    this.allRowInfos.forEach((rowInfo) => {
+      rowInfo.rowElemJQ.remove()
     })
+    this.allRowInfos.length = 0
   }
 
 
   ShowItem(item) {
+    let maxItemDepth = this.GetItemDepth(item)
+
     this.Clear()
-    this.AddItem(item, 0, 'Result') // adds the whole tree recursively
+
+    this.AddItemTree(item, maxItemDepth, 'f', 'Result', undefined)
+    this.tableElemJQ.find('th:first').attr('colspan', maxItemDepth + 1)
   }
 
 
   // ======== PRIVATE ========
 
 
-  // returns jQueryElem
-  AddNewRow() {
-    let newRowElemJQ = this.templateRowElemJQ.clone()
-    let rowParentElemJQ = this.templateRowElemJQ.parent()
-    newRowElemJQ.appendTo(rowParentElemJQ)
+  // returns int
+  GetItemDepth(item) {
+    if (item === undefined)
+      return 0
+    if (item.targetItem === undefined)
+      return 1
 
-    newRowElemJQ.removeClass('template')
-    newRowElemJQ.attr('data-real', 1)
-
-    return newRowElemJQ
+    return 1 + Math.max(
+      this.GetItemDepth(item.targetItem),
+      this.GetItemDepth(item.sacrificeItem)
+    )
   }
 
 
   // returns string
   GetItemDescription(item) {
-    let description = ''
+    let description = '<input type="checkbox"></input> '
 
     switch (item.set) {
-      case g_combined: description = 'Combined '; break
-      case g_source:   description = 'Source '; break
-      case g_extra:    description = 'Extra '; break
-      case g_desired:  description = 'Desired '; break
+      case g_combined: description += 'Combined '; break
+      case g_source:   description += 'Source '; break
+      case g_extra:    description += 'Extra '; break
+      case g_desired:  description += 'Desired '; break
     }
 
     description += item.info.name
@@ -98,20 +104,108 @@ class DetailsTable {
   }
 
 
-  AddItem(item, indent, placement) {
-    if (item !== undefined) {
-      let newRowElemJQ = this.AddNewRow()
+  SetChildHideState(rowInfo, hide) {
+    rowInfo.numHides += (hide ? 1 : -1)
+    if (rowInfo.numHides > 0)
+      rowInfo.rowElemJQ.hide(100)
+    else
+      rowInfo.rowElemJQ.show(100)
 
-      let placementElemJQ = newRowElemJQ.find('.placement')
-      placementElemJQ.css('padding-left', `+=${indent * 1.5}em`)
-      placementElemJQ.text(placement)
-      newRowElemJQ.find('.description').html(this.GetItemDescription(item))
-      newRowElemJQ.find('.enchants').html(this.GetItemEnchants(item))
-      newRowElemJQ.find('.priorWork').text(item.priorWork)
-      newRowElemJQ.find('.cost').text(this.GetItemCost(item))
+    rowInfo.childRowInfos.forEach((childRowInfo) => {
+      this.SetChildHideState(childRowInfo, hide)
+    })
+  }
 
-      this.AddItem(item.targetItem, indent + 1, 'Left')
-      this.AddItem(item.sacrificeItem, indent + 1, 'Right')
+
+  NodeClicked(rowInfo) {
+    rowInfo.isUserCollapsed = !rowInfo.isUserCollapsed
+
+    if (rowInfo.isUserCollapsed) {
+      rowInfo.mainTDElemJQ.html('&boxplus;')
+      rowInfo.mainTDElemJQ.removeClass('treeLeft')
+    }
+    else {
+      rowInfo.mainTDElemJQ.html('&boxminus;')
+      rowInfo.mainTDElemJQ.addClass('treeLeft')
+    }
+
+    rowInfo.childRowInfos.forEach((childRowInfo) => {
+      this.SetChildHideState(childRowInfo, rowInfo.isUserCollapsed)
+    })
+  }
+
+
+  // returns RowInfo
+  AddNewRow() {
+    let newRowElemJQ = this.templateRowElemJQ.clone()
+
+    let rowParentElemJQ = this.templateRowElemJQ.parent()
+    newRowElemJQ.appendTo(rowParentElemJQ)
+
+    newRowElemJQ.removeClass('template')
+    newRowElemJQ.attr('data-real', 1)
+
+    return {
+      rowElemJQ: newRowElemJQ,
+      isUserCollapsed: false,
+      numHides: 0,
+      childRowInfos: []
+    }
+  }
+
+
+  AddItemTree(item, numUnusedColumns, collapseTrail, placement, parentRowInfo) {
+    let newRowInfo = this.AddNewRow()
+    this.allRowInfos.push(newRowInfo)
+    if (parentRowInfo !== undefined)
+      parentRowInfo.childRowInfos.push(newRowInfo)
+    let hasChildren = item.targetItem !== undefined
+
+    let placementTDElemJQ = newRowInfo.rowElemJQ.find('td:first')
+
+    for (let tdElemNr = 0; tdElemNr < collapseTrail.length; ++tdElemNr) {
+      let tdElemJQ = $('<td class="treeNode"></td>')
+
+      let isLeafNode = tdElemNr == 0
+      let isNonLeafNode = tdElemNr > 0
+      let isExpandableLeafNode = isLeafNode && hasChildren
+      let isUnexpandableLeafNode = isLeafNode && !hasChildren
+      let isOneBeforeLeafNode = tdElemNr == 1
+      let isPassthroughFromLeftNode =
+        !isNonLeafNode ?
+        false :
+        collapseTrail[tdElemNr - 1] == 'l'
+
+      if (isLeafNode)
+        newRowInfo.mainTDElemJQ = tdElemJQ
+
+      if (isExpandableLeafNode) {
+        tdElemJQ.addClass('treeClick')
+        tdElemJQ.html('&boxminus;')
+        newRowInfo.mainTDElemJQ.click(() => {
+          this.NodeClicked(newRowInfo)
+        })
+      }
+
+      if (isUnexpandableLeafNode || isOneBeforeLeafNode)
+        tdElemJQ.addClass('treeTop')
+
+      if (isExpandableLeafNode || isPassthroughFromLeftNode)
+        tdElemJQ.addClass('treeLeft')
+
+      tdElemJQ.prependTo(newRowInfo.rowElemJQ)
+    }
+
+    placementTDElemJQ.attr('colspan', numUnusedColumns)
+    newRowInfo.rowElemJQ.find('.placement').html(placement)
+    newRowInfo.rowElemJQ.find('.description').html(this.GetItemDescription(item))
+    newRowInfo.rowElemJQ.find('.enchants').html(this.GetItemEnchants(item))
+    newRowInfo.rowElemJQ.find('.priorWork').text(item.priorWork)
+    newRowInfo.rowElemJQ.find('.cost').text(this.GetItemCost(item))
+
+    if (hasChildren) {
+      this.AddItemTree(item.targetItem, numUnusedColumns - 1, 'l' + collapseTrail, 'Left', newRowInfo)
+      this.AddItemTree(item.sacrificeItem, numUnusedColumns - 1, 'r' + collapseTrail, 'Right', newRowInfo)
     }
   }
 }

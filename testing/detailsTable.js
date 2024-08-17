@@ -68,10 +68,14 @@ jazil.AddTestSet(omeoPage, 'DetailsTable - common', {
 
   'Re-showing a new item clears the old content': (jazil) => {
     let tableElemJQ = $('#detailsTable')
-    let numRowsBefore = tableElemJQ.find('tr').length
     let table = new DetailsTable(tableElemJQ)
-    let item = BuildItem({ name:'Pickaxe', count:4, cost:2, totalCost:7, priorWork:2, set:g_extra })
-    table.ShowItem(item)
+    let item1 = BuildItem({ name:'Pickaxe', count:4, cost:2, totalCost:7, priorWork:2, set:g_extra })
+    table.ShowItem(item1)
+
+    let numRowsBefore = tableElemJQ.find('tr').length
+    let item2 = BuildItem({ name:'Sword', count:1, cost:2, totalCost:3, priorWork:4, set:g_source })
+    table.ShowItem(item2)
+
     let numRowsAfter = tableElemJQ.find('tr').length
     let numRowsDiff = numRowsAfter - numRowsBefore
 
