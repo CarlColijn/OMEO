@@ -68,6 +68,11 @@ class FormHandler {
   }
 
 
+  NoteEnchantDupe(inputElemJQ) {
+    inputElemJQ.after('<div class="error">Duplicate enchantment</div>')
+  }
+
+
   AskLoadFromURLOrLocalStorage(OnLocalStorage, OnURL) {
     let dialogElemJQ = $('#urlVsLocalStorageConflict')
     dialogElemJQ.css('display', 'flex')

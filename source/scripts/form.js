@@ -129,7 +129,7 @@ class Form {
     this.ClearResult()
 
     let dataInContext = this.GetData(true)
-    if (dataInContext.withCountErrors || dataInContext.withEnchantConflicts)
+    if (dataInContext.withCountErrors || dataInContext.withEnchantConflicts || dataInContext.withEnchantDupes)
       this.formHandler.TellDataInError()
     else {
       let ContinueCombine = () => {
@@ -199,6 +199,7 @@ class Form {
   // - data: FormData
   // - withCountErrors: bool
   // - withEnchantConflicts: bool
+  // - withEnchantDupes: bool
   // - mergedSourceItems: bool
   GetData(mergeSourceItems) {
     let sourceItemsResult = this.sourceItemTable.GetItems(new ItemCollector(mergeSourceItems))
@@ -228,10 +229,21 @@ class Form {
       })
     }
 
+    let withEnchantDupes =
+      sourceItemsResult.withEnchantDupes ||
+      desiredItemResult.withEnchantDupes
+    if (withEnchantDupes) {
+      let enchantDupeElemJQs = [...sourceItemsResult.enchantDupeElemJQs, ...desiredItemResult.enchantDupeElemJQs]
+      enchantDupeElemJQs.forEach((enchantDupeElemJQ) => {
+        this.formHandler.NoteEnchantDupe(enchantDupeElemJQ)
+      })
+    }
+
     return {
       data: data,
       withCountErrors: withCountErrors,
       withEnchantConflicts: withEnchantConflicts,
+      withEnchantDupes: withEnchantDupes,
       mergedSourceItems: sourceItemsResult.mergedItems
     }
   }
@@ -281,7 +293,8 @@ class Form {
     this.ClearErrors()
 
     let dataInContext = this.GetData(false)
-    if (!dataInContext.withCountErrors) {
+    let dataOK = !dataInContext.withCountErrors && !dataInContext.withEnchantDupes
+    if (dataOK) {
       let stream = new DataStream(true)
       dataInContext.data.Serialize(stream)
 
@@ -291,6 +304,6 @@ class Form {
         stream.SaveToLocalStorage()
     }
 
-    return !dataInContext.withCountErrors
+    return dataOK
   }
 }

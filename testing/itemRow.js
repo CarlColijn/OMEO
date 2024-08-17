@@ -104,6 +104,7 @@ function CreateTestSet(setDescription, testContainerID, setLetter) {
 
       jazil.ShouldBe(itemDetails.withCountError, false, 'row says there were count errors!')
       jazil.ShouldBe(itemDetails.withEnchantConflict, false, 'row says there were enchant conflicts!')
+      jazil.ShouldBe(itemDetails.withEnchantDupe, false, 'row says there were enchant dupes!')
       jazil.ShouldBe(itemDetails.countErrorElemJQ, undefined, 'row reports a DOM element in error!')
       jazil.ShouldBe(retrievedItem.set, set, 'set is off!')
       if (set === g_source)
@@ -188,6 +189,44 @@ function CreateTestSet(setDescription, testContainerID, setLetter) {
       jazil.ShouldBe(retrievedItem.priorWork, set === g_source ? item.priorWork : 0, 'priorWork is off!')
       jazil.ShouldBe(enchantNames, 'Blast ProtectionFire Protection', 'enchant names are off!')
       jazil.ShouldBe(enchantLevels, '11', 'enchant levels are off!')
+      jazil.ShouldBe(ItemRowInTable(testContainerID, description, set), true, 'added row is not present!')
+    },
+
+    'Enchant dupes get registered': (jazil) => {
+      let set = GetSet(setLetter)
+      if (set !== g_source && set !== g_desired)
+        jazil.SkipTest()
+
+      let templateRowDetails = GetItemTemplateRow(testContainerID, set)
+      let item = BuildItem({ name:'Pumpkin', count:23, priorWork:5, cost:3, enchants:[] })
+      let itemRow = CreateItemRow(templateRowDetails, item, 46)
+      let enchant = new Enchant(g_enchantIDsByName.get('Curse of Vanishing'), 1)
+      itemRow.AddEnchant(enchant)
+      itemRow.AddEnchant(enchant)
+
+      let itemDetails = itemRow.GetItem()
+      let retrievedItem = itemDetails.item
+      let enchantNames = ''
+      let enchantLevels = ''
+      retrievedItem.enchantsByID.forEach((enchant) => {
+        if (enchant !== undefined) {
+          enchantNames += enchant.info.name
+          enchantLevels += enchant.level
+        }
+      })
+      let description = GetDescriptionForItemInTable(set, item)
+
+      jazil.ShouldBe(itemDetails.withEnchantDupe, true, 'row says there were no enchant dupes!')
+      jazil.ShouldNotBe(itemDetails.enchantDupeElemJQ, undefined, 'row reports no DOM element in error!')
+      jazil.ShouldBe(retrievedItem.set, set, 'set is off!')
+      if (set === g_source)
+        jazil.ShouldBe(retrievedItem.nr, 46, 'nr is off!')
+      jazil.ShouldBe(retrievedItem.cost, 0, 'cost is set!')
+      jazil.ShouldBe(retrievedItem.count, set === g_source ? item.count : 1, 'count is off!')
+      jazil.ShouldBe(retrievedItem.info.name, item.info.name, 'name is off!')
+      jazil.ShouldBe(retrievedItem.priorWork, set === g_source ? item.priorWork : 0, 'priorWork is off!')
+      jazil.ShouldBe(enchantNames, 'Curse of Vanishing', 'enchant names are off!')
+      jazil.ShouldBe(enchantLevels, '1', 'enchant levels are off!')
       jazil.ShouldBe(ItemRowInTable(testContainerID, description, set), true, 'added row is not present!')
     },
 

@@ -150,6 +150,8 @@ class ItemRow {
   //     conflictingEnchantName: string,
   //     inputElemJQ: JQuery-wrapped input element
   //   }
+  // - withEnchantDupe: bool
+  // - enchantDupeElemJQ: JQuery-wrapped input element, if applicable
   GetItem() {
     let countResult = this.GetValidatedCount()
 
@@ -168,7 +170,9 @@ class ItemRow {
       withCountError: countResult.inError,
       countErrorElemJQ: countResult.errorElemJQ,
       withEnchantConflict: enchantResult.withConflict,
-      enchantConflictInfo: enchantResult.conflictInfo
+      enchantConflictInfo: enchantResult.conflictInfo,
+      withEnchantDupe: enchantResult.withDupe,
+      enchantDupeElemJQ: enchantResult.dupeElemJQ
     }
   }
 
@@ -315,10 +319,14 @@ class ItemRow {
   //     conflictingEnchantName: string
   //     inputElemJQ: JQuery-wrapped input element, if applicable
   //   }
+  // - withDupe: bool
+  // - dupeElemJQ: JQuery-wrapped input element, if applicable
   AddItemEnchants(item) {
     let result = {
       withConflict: false,
-      conflictInfo: {}
+      conflictInfo: {},
+      withDupe: false,
+      dupeElemJQ: undefined
     }
     let foundEnchants = []
     this.rowElemJQ.find('.enchants .enchant').each((rowNr, enchantRowElem) => {
@@ -331,6 +339,10 @@ class ItemRow {
             result.withConflict = true
             result.conflictInfo.conflictingEnchantName = previousEnchant.info.name
             result.conflictInfo.inputElemJQ = enchantRow.GetIDElemJQ()
+          }
+          if (previousEnchant.info.id == enchant.info.id) {
+            result.withDupe = true
+            result.dupeElemJQ = enchantRow.GetIDElemJQ()
           }
         })
 
