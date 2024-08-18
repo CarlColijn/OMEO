@@ -39,6 +39,7 @@
         </Folder>
         <Folder name="other">
             <File name="source\browserconfig.xml" />
+            <File name="source\CNAME" />
             <File name="source\scripts\index.js" />
             <File name="source\scripts\recipe.js" />
             <File name="source\site.webmanifest" />
@@ -52,6 +53,7 @@
         <File name="publish.py" />
         <File name="README.md" />
         <File name="startTests.py" />
+        <File name=".github\workflows\web.yml" />
     </Project>
     <Project name="testing">
         <File name="testing\bitSerializer.js" />
