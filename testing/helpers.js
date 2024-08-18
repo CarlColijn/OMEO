@@ -32,6 +32,7 @@ let omeoAccessObjectNames = [
   'RehydrateItems',
   'ZeroOrigin',
   'g_combined',
+  'g_dataSetsByID',
   'g_desired',
   'g_enchantIDsByName',
   'g_enchantInfos',
@@ -165,7 +166,7 @@ function GetAbbrItemDesciption(item) {
   if (item === undefined)
     return '<undefined>'
   else
-    return `na:${item.info.name}|en:${GetEnchantsDescription(item.enchantsByID)}|se:${item.set.id}|pw:${item.priorWork}|sc:${item.cost}|tc:${item.totalCost}|cn:${item.count}|or:${GetOriginDescription(item.origin)}`
+    return `na:${item.info.name}|en:${GetEnchantsDescription(item.enchantsByID)}|se:${item.set.desc}|pw:${item.priorWork}|sc:${item.cost}|tc:${item.totalCost}|cn:${item.count}|or:${GetOriginDescription(item.origin)}`
 }
 
 

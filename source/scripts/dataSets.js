@@ -8,13 +8,16 @@
 
   Defined classes:
   - DataSet
-    - id: char
+    - id: int
+    - desc: char
 
   Defined globals:
   - g_source: source DataSet
   - g_desired: desired DataSet
   - g_combined: combined DataSet
   - g_extra: extra inserted DataSet
+  - g_numDataSetIDBits: int
+  - g_dataSetsByID: [DataSet]
 */
 
 
@@ -24,25 +27,30 @@
 class DataSet {
   // returns one of the predefined DataSet globals
   static GetRehydrated(set) {
-    switch (set.id) {
-      case 's': return g_source
-      case 'd': return g_desired
-      case 'c': return g_combined
-      case 'e': return g_extra
-    }
-
-    return undefined
+    return g_dataSetsByID[set.id]
   }
 
 
-  constructor(id) {
+  constructor(id, desc) {
     // ==== PUBLIC ====
     this.id = id
+    this.desc = desc
   }
 }
 
 
-let g_source = new DataSet('s');
-let g_desired = new DataSet('d');
-let g_combined = new DataSet('c');
-let g_extra = new DataSet('e');
+let g_source = new DataSet(0, 's');
+let g_desired = new DataSet(1, 'd');
+let g_combined = new DataSet(2, 'c');
+let g_extra = new DataSet(3, 'e');
+
+
+let g_numDataSetIDBits = 2
+
+
+let g_dataSetsByID = [
+  g_source,
+  g_desired,
+  g_combined,
+  g_extra
+]
