@@ -1,0 +1,412 @@
+/* Page */
+body {
+  color: #000000;
+  background-color: #ffffff;
+  margin: 0px;
+  padding: 1em;
+  min-height: 100vh;
+}
+
+
+/* Content blocks */
+.content {
+  border-radius: 1em;
+  margin: 3em 0em 0em 0em;
+  padding: 0.5em;
+  box-shadow: 0.05em 0.15em 0.2em #00000040;
+}
+.firstContent {
+  margin: 0em !important;
+}
+
+
+/* Titles */
+h1 {
+  margin-top: 0px;
+  color: #ffffff;
+  font-size: 1em;
+  text-align: center;
+  border-radius: 15px;
+  padding: 0.3em;
+  box-shadow: 0.1em 0.3em 0.2em #00000040;
+}
+h1 .letter {
+  display: inline-block;
+}
+h2 {
+  color: #ffffff;
+  font-size: 1.2em;
+  text-align: center;
+  margin: 0em 0em 1em 0em;
+  border-radius: 15px;
+  padding: 0.6em;
+  box-shadow: 0.1em 0.3em 0.2em #00000040;
+}
+
+
+/* Tables */
+table {
+  border-collapse: collapse;
+  border: 0px solid #000000;
+}
+th {
+  text-align: left;
+}
+th, td {
+  padding: 0.2em 0.5em;
+  vertical-align: top;
+}
+.table {
+  border: 2px solid #000000;
+}
+.table > thead > tr {
+  color: #ffffff;
+}
+.table > tbody > tr {
+  border-top: 1px solid #000000;
+  border-bottom: 1px solid #000000;
+}
+.enchants > tbody > tr > td {
+  padding-top: 0px;
+  padding-left: 0px;
+}
+
+
+/* Recipe table node tree */
+.treeClick {
+  cursor: pointer;
+}
+.treeTop {
+  box-shadow: inset 0px 4px 0px 0px black;
+}
+.treeLeft {
+  box-shadow: inset 4px 0px 0px 0px black;
+}
+.treeTop.treeLeft {
+  box-shadow: inset 4px 4px 0px 0px black;
+}
+.treeNode {
+  width: 1em;
+  padding: 0.2em 0.0em 0.2em 0.3em;
+}
+
+
+/* Lists */
+dl,
+dt,
+dd,
+ul {
+  padding: 0px;
+  margin: 0px;
+}
+
+dl,
+dd,
+ul {
+  padding-left: 1em;
+}
+
+dt {
+  margin-top: 0.4em;
+  font-weight: bold;
+}
+
+
+/* Templates */
+.template {
+  display: none;
+}
+
+
+/* Form elements */
+input[type=number] {
+  width: 3em;
+}
+#bookmark {
+  display: none;
+}
+.enchantInput {
+  /* Note: needs to be adjusted if longer enchant names come along... */
+  width: 11em;
+}
+
+
+/* Links */
+a {
+  font-weight: bold;
+  text-decoration: none;
+  border-bottom: 1px solid #000000;
+  border-radius: 4px;
+}
+a,
+a:link {
+  color: #535c02;
+}
+a:hover {
+  color: #879704;
+}
+a:visited {
+  color: #02245c;
+}
+
+
+/* Notes */
+#showNotes {
+  display: none;
+}
+
+
+/* Errors */
+.error {
+  margin: 0px;
+  padding: 0.2em 0.4em;
+  font-weight: bold;
+  border: 1px solid #300000;
+  border-radius: 0em 0.5em 0.5em 0.5em;
+  color: #ffffff;
+  background-color: #802020;
+}
+
+
+/* Dialogs */
+.dialog {
+  background-color: #00000050;
+  position: fixed;
+  left: 0px;
+  top: 0px;
+  width: 100%;
+  height: 100%;
+  display: none; /* to be changed by flex on demand */
+  align-items: center;
+  justify-content: center;
+}
+.dialogBody {
+  margin: 10%;
+  background-color: #10101080;
+  background-color: #fff4e0f0;
+  color: #e0e0e0;
+  color: #000000;
+  border: 1px solid #303030;
+  border-radius: 1em;
+  padding: 1em 3em;
+  text-align: center;
+  box-shadow: 0.1em 0.3em 0.4em #00000040;
+}
+.dialog button {
+  margin: 0em 0.5em;
+}
+.dialog h1 {
+  font-size: 2em;
+  box-shadow: none; /* override regular h1's */
+  color: #000000;
+}
+.dialog em {
+  color: #000000;
+}
+
+
+/* Special content */
+.indented {
+  margin-left: 2em;
+}
+.footnote {
+  font-style: italic;
+  font-size: 0.8em;
+}
+.keepTogether :first-child {
+  margin-bottom: 0px;
+}
+.keepTogether :last-child {
+  margin-top: 0px;
+}
+.keepTogether * {
+  margin-top: 0px;
+  margin-bottom: 0px;
+}
+em {
+  font-style: italic;
+  color: #ffffff;
+  border-radius: 0.3em;
+  padding: 0em 0.2em;
+}
+.smaller {
+  font-size: 0.8em;
+}
+.check {
+  color: #008020;
+  font-weight: bold;
+}
+
+
+/* Patreon */
+.patreonIcon {
+  position: fixed;
+  right: 0px;
+  top: 0px;
+  text-align: center;
+  background-color: #ffffffb0;
+  border: 1px solid #00000050;
+  border-radius: 30px;
+  margin: 1em;
+  padding: 1em;
+}
+.patreonIcon .firstLetter {
+  font-size: 1.3em;
+  font-weight: bold;
+  color: #fc674d;
+}
+.patreonIcon a {
+  border-width: 0px;
+}
+.patreonIcon a,
+.patreonIcon a:link,
+.patreonIcon a:visited {
+  color: #000000;
+}
+.patreonIcon a:hover,
+.patreonIcon a:active {
+  color: #a0a0a0;
+}
+.patreonIcon a:hover .firstLetter,
+.patreonIcon a:active .firstLetter {
+  color: #fc9e8d;
+}
+
+
+/* Content block customizations */
+
+/* Built using the Colors.html page, with the defaults set there,
+   except for the overrides stated above the blocks below. */
+
+/* hue 0 */
+.red {
+  background-color: #ffcdcd;
+}
+.red h1,
+.red h2 {
+  background-color: #5b1d1d;
+}
+.red em,
+.red .table > thead > tr {
+  background-color: #6f3131;
+}
+.red .table > tbody > tr:nth-child(odd) {
+  background-color: #eeb6b6;
+}
+.red .table > tbody > tr:nth-child(even) {
+  background-color: #e79595;
+}
+
+/* hue 37, luminance 200 */
+.yellow {
+  background-color: #fff9cd;
+}
+.yellow h1,
+.yellow h2 {
+  background-color: #6b5f0d;
+}
+.yellow em,
+.yellow .table > thead > tr {
+  background-color: #6f6731;
+}
+.yellow .table > tbody > tr:nth-child(odd) {
+  background-color: #eee7b6;
+}
+.yellow .table > tbody > tr:nth-child(even) {
+  background-color: #e7dc95;
+}
+
+/* hue 55 */
+.olive {
+  background-color: #f1ffcd;
+}
+.olive h1,
+.olive h2 {
+  background-color: #495b1d;
+}
+.olive em,
+.olive .table > thead > tr {
+  background-color: #5e6f31;
+}
+.olive .table > tbody > tr:nth-child(odd) {
+  background-color: #dfeeb6;
+}
+.olive .table > tbody > tr:nth-child(even) {
+  background-color: #d1e795;
+}
+
+/* hue 110 */
+.turquoise {
+  background-color: #cdffea;
+}
+.turquoise h1,
+.turquoise h2 {
+  background-color: #1d5b41;
+}
+.turquoise em,
+.turquoise .table > thead > tr {
+  background-color: #316f56;
+}
+.turquoise .table > tbody > tr:nth-child(odd) {
+  background-color: #b6eed7;
+}
+.turquoise .table > tbody > tr:nth-child(even) {
+  background-color: #95e7c5;
+}
+
+/* hue 155 */
+.azure {
+  background-color: #cddfff;
+}
+.azure h1,
+.azure h2 {
+  background-color: #1d335b;
+}
+.azure em,
+.azure .table > thead > tr {
+  background-color: #31476f;
+}
+.azure .table > tbody > tr:nth-child(odd) {
+  background-color: #b6caee;
+}
+.azure .table > tbody > tr:nth-child(even) {
+  background-color: #95b2e7;
+}
+
+/* hue 180 */
+.violet {
+  background-color: #d9cdff;
+}
+.violet h1,
+.violet h2 {
+  background-color: #2c1d5b;
+}
+.violet em,
+.violet .table > thead > tr {
+  background-color: #3f316f;
+}
+.violet .table > tbody > tr:nth-child(odd) {
+  background-color: #c3b6ee;
+}
+.violet .table > tbody > tr:nth-child(even) {
+  background-color: #a895e7;
+}
+
+/* hue 200 */
+.fuchsia {
+  background-color: #f0cdff;
+}
+.fuchsia h1,
+.fuchsia h2 {
+  background-color: #491d5b;
+}
+.fuchsia em,
+.fuchsia .table > thead > tr {
+  background-color: #5d316f;
+}
+.fuchsia .table > tbody > tr:nth-child(odd) {
+  background-color: #deb6ee;
+}
+.fuchsia .table > tbody > tr:nth-child(even) {
+  background-color: #cf95e7;
+}
