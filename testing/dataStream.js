@@ -1,4 +1,4 @@
-jazil.AddTestSet(omeoPage, 'DataStreamLoadingOptions', {
+jazil.AddTestSet(mainPage, 'DataStreamLoadingOptions', {
   'Loading when nothing set': (jazil) => {
     let dataState = new DataStateController(jazil)
     dataState.Reset()
@@ -76,7 +76,7 @@ jazil.AddTestSet(omeoPage, 'DataStreamLoadingOptions', {
 })
 
 
-jazil.AddTestSet(omeoPage, 'DataStream', {
+jazil.AddTestSet(mainPage, 'DataStream', {
   'Store to local storage': (jazil) => {
     let dataState = new DataStateController(jazil)
     dataState.SetOnlyLocalStorage('abc')
@@ -93,7 +93,7 @@ jazil.AddTestSet(omeoPage, 'DataStream', {
 
     let dataStream = new DataStream(true)
     dataStream.AddSizedInt(255, 8)
-    dataStream.SaveToURL()
+    dataStream.SaveToBookmarkLink()
 
     jazil.ShouldBe(dataState.GetBookmark(), '-V')
   },

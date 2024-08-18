@@ -1,4 +1,4 @@
-jazil.AddTestSet(omeoPage, 'BitSerializer', {
+jazil.AddTestSet(mainPage, 'BitSerializer', {
   'Store full byte': (jazil) => {
     let storer = new BitStorer
     storer.AddBits(255, 8)

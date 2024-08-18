@@ -54,7 +54,7 @@ function TestResult(jazil, itemList, desiredItems) {
 }
 
 
-jazil.AddTestSet(omeoPage, 'ItemCombineList', {
+jazil.AddTestSet(mainPage, 'ItemCombineList', {
   'No items given': (jazil) => {
     let itemList = new ItemCombineList([])
 

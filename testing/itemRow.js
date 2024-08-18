@@ -1,5 +1,5 @@
 function CreateTestSet(setDescription, testContainerID, setLetter) {
-  jazil.AddTestSet(omeoPage, `ItemRow - ${setDescription} style`, {
+  jazil.AddTestSet(mainPage, `ItemRow - ${setDescription} style`, {
     'Template row is not real': (jazil) => {
       let set = GetSet(setLetter)
       let templateRowDetails = GetItemTemplateRow(testContainerID, set)

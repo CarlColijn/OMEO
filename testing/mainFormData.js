@@ -24,16 +24,16 @@ function CompareItemsEqual(jazil, item1, item2, itemDescription) {
 }
 
 
-jazil.AddTestSet(omeoPage, 'FormData', {
+jazil.AddTestSet(mainPage, 'MainFormData', {
   'Initialized correctly': (jazil) => {
-    let data = new FormData
+    let data = new MainFormData
 
     jazil.ShouldBe(data.desiredItem, undefined, 'Desired item already present on new form data!')
     jazil.ShouldBe(data.sourceItems.length, 0, 'Source items already present on new form data!')
   },
 
   'Desired item gets set': (jazil) => {
-    let data = new FormData
+    let data = new MainFormData
 
     let axe = BuildItem({ name:'Axe', set:g_desired })
     data.SetDesiredItem(axe)
@@ -47,7 +47,7 @@ jazil.AddTestSet(omeoPage, 'FormData', {
   },
 
   'Source items get added individually': (jazil) => {
-    let data = new FormData
+    let data = new MainFormData
 
     for (let swordNr = 0; swordNr < 10; ++swordNr) {
       let sword = BuildItem({ name:'Sword', count:44 })
@@ -59,7 +59,7 @@ jazil.AddTestSet(omeoPage, 'FormData', {
   },
 
   'Source items get added in bulk': (jazil) => {
-    let data = new FormData
+    let data = new MainFormData
 
     let swords = []
     let numSwords = 10
@@ -82,7 +82,7 @@ jazil.AddTestSet(omeoPage, 'FormData', {
     let sword = BuildItem({ name:'Sword', count:33, set:g_source, priorWork:2 })
     let helmet = BuildItem({ name:'Helmet', count:44, set:g_source, priorWork:3 })
 
-    let storedData = new FormData
+    let storedData = new MainFormData
     storedData.SetDesiredItem(pickaxe)
     storedData.AddSourceItem(axe)
     storedData.AddSourceItem(sword)
@@ -98,7 +98,7 @@ jazil.AddTestSet(omeoPage, 'FormData', {
     let restoreStream = new DataStream(false)
     restoreStream.Load(loadingOptions)
 
-    let restoredData = new FormData
+    let restoredData = new MainFormData
     restoredData.Deserialize(restoreStream)
 
     jazil.ShouldBe(restoredData.sourceItems.length, 3, 'Incorrect number of source items restored!')
@@ -118,7 +118,7 @@ jazil.AddTestSet(omeoPage, 'FormData', {
     let book = BuildItem({ name:'Book', count:33, set:g_source, priorWork:3, enchants:[{ name:'Fortune', level:3 }, { name:'Smite', level:1 }, { name:'Efficiency', level:2 }] })
     let axe = BuildItem({ name:'Axe', count:22, set:g_source, priorWork:2, enchants:[{ name:'Fortune', level:3 }] })
 
-    let storedData = new FormData
+    let storedData = new MainFormData
     storedData.SetDesiredItem(sword)
     storedData.AddSourceItem(book)
     storedData.AddSourceItem(axe)
@@ -133,7 +133,7 @@ jazil.AddTestSet(omeoPage, 'FormData', {
     let restoreStream = new DataStream(false)
     restoreStream.Load(loadingOptions)
 
-    let restoredData = new FormData
+    let restoredData = new MainFormData
     restoredData.Deserialize(restoreStream)
 
     jazil.ShouldBe(restoredData.sourceItems.length, 2, 'Incorrect number of source items restored!')
@@ -161,7 +161,7 @@ jazil.AddTestSet(omeoPage, 'FormData', {
     let restoreStream = new DataStream(false)
     restoreStream.Load(loadingOptions)
 
-    let restoredData = new FormData
+    let restoredData = new MainFormData
     let deserializedOK = restoredData.Deserialize(restoreStream)
     jazil.ShouldBe(deserializedOK, false, 'Could deserialize corrupt data!')
     jazil.ShouldBe(restoredData.sourceItems.length, 0, 'Faulty source items restored!')
@@ -184,7 +184,7 @@ jazil.AddTestSet(omeoPage, 'FormData', {
     let restoreStream = new DataStream(false)
     restoreStream.Load(loadingOptions)
 
-    let restoredData = new FormData
+    let restoredData = new MainFormData
     let deserializedOK = restoredData.Deserialize(restoreStream)
     jazil.ShouldBe(deserializedOK, false, 'Could deserialize corrupt data!')
     jazil.ShouldBe(restoredData.sourceItems.length, 0, 'Faulty source items restored!')

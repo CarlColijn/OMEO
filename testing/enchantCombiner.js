@@ -11,7 +11,7 @@ function TestCombineResultEqual(jazil, combineResult1, combineResult2, combiner1
 
 
 
-jazil.AddTestSet(omeoPage, 'EnchantCombiner', {
+jazil.AddTestSet(mainPage, 'EnchantCombiner', {
   'Same lvl 1 enchants combine': (jazil) => {
     let smite = BuildEnchant('Smite')
 

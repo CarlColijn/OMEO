@@ -1,6 +1,6 @@
 let jazilOptions = {
   'resultElementSpec': '#testResults',
-  'iframeElementSpec': '#omeoPage',
+  'iframeElementSpec': '#testPage',
   'passColor': '#c0ffc0',
   'failColor': '#ffd0d0',
   'textColor': '#ffffff',
@@ -9,19 +9,39 @@ let jazilOptions = {
 let jazil = new Jazillionth(jazilOptions)
 
 
-let omeoURL = '../source/index.html'
-let omeoAccessObjectNames = [
+let recipeURL = '../source/recipe.html?form=cixlcGSWZh'
+let recipeAccessObjectNames = [
+  'DataStream',
+  'DataStreamLoadingOptions',
+  'Enchant',
+  'Item',
+  'RecipeFormData',
+  'RecipeTable',
+  'g_combined',
+  'g_dataSetsByID',
+  'g_desired',
+  'g_enchantIDsByName',
+  'g_enchantInfos',
+  'g_extra',
+  'g_itemInfosByID',
+  'g_source'
+]
+let recipeTrackObjectNames = [
+]
+let recipePage = jazil.AddPageToTest('Recipe', recipeURL, recipeAccessObjectNames, recipeTrackObjectNames)
+
+
+let mainURL = '../source/index.html'
+let mainAccessObjectNames = [
   'EnchantIDsConflict',
   'BitRestorer',
   'BitStorer',
   'CombineResultFilter',
   'DataStream',
   'DataStreamLoadingOptions',
-  'DetailsTable',
   'Enchant',
   'EnchantCombiner',
   'EnchantRow',
-  'FormData',
   'Item',
   'ItemCollector',
   'ItemCombineList',
@@ -29,6 +49,7 @@ let omeoAccessObjectNames = [
   'ItemCombineTester',
   'ItemRow',
   'ItemTable',
+  'MainFormData',
   'RehydrateItems',
   'ZeroOrigin',
   'g_combined',
@@ -47,13 +68,13 @@ let omeoAccessObjectNames = [
   'g_perfectAndPerfectWithExtrasCombines',
   'g_source'
 ]
-let omeoTrackObjectNames = [
+let mainTrackObjectNames = [
   'g_numDifferentEnchants',
   'g_numEnchantIDBits',
   'g_numDifferentItems',
   'g_numItemIDBits'
 ]
-let omeoPage = jazil.AddPageToTest('OMEO', omeoURL, omeoAccessObjectNames, omeoTrackObjectNames)
+let mainPage = jazil.AddPageToTest('Main', mainURL, mainAccessObjectNames, mainTrackObjectNames)
 
 
 
@@ -574,7 +595,7 @@ class DataStateController {
 
 
 
-jazil.AddTestSet(omeoPage, 'own DataStateController', {
+jazil.AddTestSet(mainPage, 'own DataStateController', {
   'Only local storage is consistent': (jazil) => {
     let value = `ls-${Math.random()}`
     let dataState = new DataStateController(jazil)
@@ -665,7 +686,7 @@ jazil.AddTestSet(omeoPage, 'own DataStateController', {
 })
 
 
-jazil.AddTestSet(omeoPage, 'own BuildEnchant', {
+jazil.AddTestSet(mainPage, 'own BuildEnchant', {
   'BuildEnchant returns correct enchant with defaults': (jazil) => {
     let enchant = BuildEnchant('Flame')
     let enchantInfo = g_enchantInfosByID.get(g_enchantIDsByName.get('Flame'))
@@ -684,7 +705,7 @@ jazil.AddTestSet(omeoPage, 'own BuildEnchant', {
 })
 
 
-jazil.AddTestSet(omeoPage, 'own GetItemInfo', {
+jazil.AddTestSet(mainPage, 'own GetItemInfo', {
   'GetItemInfo returns correct info': (jazil) => {
     let leggingsInfo = GetItemInfo('Leggings')
     let turtleShellInfo = GetItemInfo('Turtle Shell')
@@ -697,7 +718,7 @@ jazil.AddTestSet(omeoPage, 'own GetItemInfo', {
 })
 
 
-jazil.AddTestSet(omeoPage, 'own BuildItem', {
+jazil.AddTestSet(mainPage, 'own BuildItem', {
   'BuildItem returns correct item type for all items': (jazil) => {
     g_itemInfosByID.forEach((itemInfo) => {
       let item = BuildItem({ name:itemInfo.name })

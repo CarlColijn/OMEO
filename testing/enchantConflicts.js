@@ -1,4 +1,4 @@
-jazil.AddTestSet(omeoPage, 'EnchantConflicts', {
+jazil.AddTestSet(mainPage, 'EnchantConflicts', {
   'Conflicting ids conflict both ways': (jazil) => {
     let infinityID = g_enchantIDsByName.get('Infinity')
     let mendingID = g_enchantIDsByName.get('Mending')

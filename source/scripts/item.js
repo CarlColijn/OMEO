@@ -55,7 +55,7 @@ class Item {
   }
 
 
-  constructor(count, set, id, priorWork) {
+  constructor(count, set, id, priorWork, cost=0, totalCost=0) {
     // ==== PUBLIC ====
     this.count = count
     this.set = set
@@ -63,8 +63,8 @@ class Item {
     this.info = g_itemInfosByID.get(id)
     this.enchantsByID = new Map()
     this.priorWork = priorWork
-    this.cost = 0
-    this.totalCost = 0
+    this.cost = cost
+    this.totalCost = totalCost
   }
 
 

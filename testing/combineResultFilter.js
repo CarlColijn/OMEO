@@ -73,7 +73,7 @@ class ItemCreatorForFilter {
 
 
 
-jazil.AddTestSet(omeoPage, 'CombineResultFilter helpers', {
+jazil.AddTestSet(mainPage, 'CombineResultFilter helpers', {
   'Own creator returns correct plain desired item': (jazil) => {
     let creator = new ItemCreatorForFilter('Pickaxe', undefined)
     let item = creator.GetDesired()
@@ -171,7 +171,7 @@ jazil.AddTestSet(omeoPage, 'CombineResultFilter helpers', {
 
 
 
-jazil.AddTestSet(omeoPage, 'CombineResultFilter', {
+jazil.AddTestSet(mainPage, 'CombineResultFilter', {
   'No items': (jazil) => {
     CheckItemFilterResultOK('No items',
       jazil,

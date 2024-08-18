@@ -111,11 +111,15 @@ class DataStream {
   }
 
 
-  SaveToURL() {
+  GetAsURL(url) {
+    let urlBase = url.href.replace(url.search, '')
     let serialized = this.storer.Finalize()
+    return `${urlBase}?form=${serialized}`
+  }
 
-    let addressBase = location.href.replace(location.search, '')
-    let bookmarkLink = `${addressBase}?form=${serialized}`
+
+  SaveToBookmarkLink() {
+    let bookmarkLink = this.GetAsURL(location)
     let bookmarkElemJQ = $('#bookmark')
     bookmarkElemJQ.show()
     let bookmarkLinkElemJQ = bookmarkElemJQ.find('a')

@@ -51,7 +51,7 @@ function EnchantRowInTable(testContainerID, enchantName, set) {
 
 
 function CreateTestSet(setDescription, testContainerID, setLetter) {
-  jazil.AddTestSet(omeoPage, `EnchantRow - ${setDescription} style`, {
+  jazil.AddTestSet(mainPage, `EnchantRow - ${setDescription} style`, {
     'Template row is not real': (jazil) => {
       let set = GetSet(setLetter)
       let templateRow = GetEnchantTemplateRow(testContainerID, set)

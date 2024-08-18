@@ -1,14 +1,14 @@
 /*
-  Main javascript module.
+  Main page javascript module.
 
   Prerequisites:
-  - form.js
+  - mainForm.js
 
   Defined classes:
   - FormHandler
 
   Defined globals:
-  - g_form: Form
+  - g_form: MainForm
 */
 
 
@@ -207,4 +207,4 @@ class FormHandler {
 
 
 
-let g_form = new Form(new FormHandler())
+let g_form = new MainForm(new FormHandler())

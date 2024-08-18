@@ -31,7 +31,7 @@ function TestCombineResult(jazil, sourceItems, canCombine, desiredItem, expected
 
 
 
-jazil.AddTestSet(omeoPage, 'ItemCombiner', {
+jazil.AddTestSet(mainPage, 'ItemCombiner', {
   'No sources => 0 combines': (jazil) => {
     let sourceItems = [
     ]

@@ -1,4 +1,4 @@
-jazil.AddTestSet(omeoPage, 'ItemInfo', {
+jazil.AddTestSet(mainPage, 'ItemInfo', {
   'All item types are counted': (jazil) => {
     jazil.ShouldBe(g_numDifferentItems(), g_itemInfos.length)
   },

@@ -1,4 +1,4 @@
-jazil.AddTestSet(omeoPage, 'Enchant', {
+jazil.AddTestSet(mainPage, 'Enchant', {
   'Enchant is built using correct info': (jazil) => {
     let enchant = BuildEnchant('Blast Protection', 3)
 

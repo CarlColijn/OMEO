@@ -1,4 +1,4 @@
-jazil.AddTestSet(omeoPage, 'Item', {
+jazil.AddTestSet(mainPage, 'Item', {
   'Pickaxe gets created with passed details': (jazil) => {
     let pickaxe = BuildItem({ name:'Pickaxe', nr:22, count:44, priorWork:11 })
 

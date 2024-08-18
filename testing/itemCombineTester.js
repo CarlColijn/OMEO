@@ -1,4 +1,4 @@
-jazil.AddTestSet(omeoPage, 'ItemCombineTester', {
+jazil.AddTestSet(mainPage, 'ItemCombineTester', {
 
   // TargetIsRelevant
 

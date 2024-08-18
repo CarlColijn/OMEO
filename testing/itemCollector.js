@@ -19,7 +19,7 @@ function ProcessItemRows(itemRows, mergeRows) {
 }
 
 
-jazil.AddTestSet(omeoPage, 'ItemCollector', {
+jazil.AddTestSet(mainPage, 'ItemCollector', {
   'Processing rows without issues goes OK': (jazil) => {
     let templateRowDetails = GetItemTemplateRow('collectingItemRow', g_source)
 

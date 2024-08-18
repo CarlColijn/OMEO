@@ -54,7 +54,7 @@ class ItemRow {
         this.typeElemJQ = rowElemJQ.find('.type')
         this.priorWorkElemJQ = rowElemJQ.find('.priorWork')
         this.costElemJQ = rowElemJQ.find('.cost')
-        this.showDetailsElemJQ = rowElemJQ.find('[name=showDetails]')
+        this.showDetailsElemJQ = rowElemJQ.find('[name=show]')
         break
     }
 
@@ -272,7 +272,7 @@ class ItemRow {
     }
 
     if (this.set === g_combined) {
-      this.rowElemJQ.find('button[name="showDetails"]').click(() => {
+      this.rowElemJQ.find('button[name="show"]').click(() => {
         this.ShowDetails(item)
       })
     }

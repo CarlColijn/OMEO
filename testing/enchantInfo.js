@@ -1,4 +1,4 @@
-jazil.AddTestSet(omeoPage, 'EnchantInfo', {
+jazil.AddTestSet(mainPage, 'EnchantInfo', {
   'All enchants are counted': (jazil) => {
     jazil.ShouldBe(g_numDifferentEnchants(), g_enchantInfos.length)
   },

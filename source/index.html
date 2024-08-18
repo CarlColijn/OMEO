@@ -33,19 +33,19 @@
     <script src="scripts/item.js"></script>
     <script src="scripts/bitSerializer.js"></script>
     <script src="scripts/dataStream.js"></script>
-    <script src="scripts/formData.js"></script>
+    <script src="scripts/mainFormData.js"></script>
+    <script src="scripts/recipeFormData.js"></script>
     <script src="scripts/enchantRow.js"></script>
     <script src="scripts/itemRow.js"></script>
     <script src="scripts/itemCollector.js"></script>
     <script src="scripts/itemTable.js"></script>
-    <script src="scripts/detailsTable.js"></script>
-    <script src="scripts/form.js"></script>
+    <script src="scripts/mainForm.js"></script>
     <script src="scripts/enchantCombiner.js"></script>
     <script src="scripts/itemCombineList.js"></script>
     <script src="scripts/itemCombineTester.js"></script>
     <script src="scripts/itemCombiner.js"></script>
     <script src="scripts/combineResultFilter.js"></script>
-    <script src="scripts/main.js"></script><!-- /scripts -->
+    <script src="scripts/mainPage.js"></script><!-- /scripts -->
 
     <title>OMEO - Online Minecraft Enchantment Oracle</title>
   </head>
@@ -219,7 +219,7 @@
     <div id="combines" class="content violet">
       <h2>&#x25bd;&nbsp; All creatable items &nbsp;&#x25bd;</h2>
 
-      <p>Press <button type="button" id="divine">Make it happen!</button> and I'll try to see what you can get.</p>
+      <p>Press <button type="button" id="divine">Make it happen!</button> and I'll try to see what you can get. After the divination is complete, press the &quot;Show&quot; buttons to show the recipe for that item.</p>
 
       <table class="table items">
         <thead>
@@ -247,45 +247,18 @@
             </td>
             <td><span class="priorWork"></span></td>
             <td><span class="cost"></span></td>
-            <td><button type="button" name="showDetails">Show details</button></td>
+            <td><button type="button" name="show">Show</button></td>
           </tr>
         </tbody>
       </table>
     </div>
 
-    <div id="details" class="content yellow">
-      <h2>&#x25bd;&nbsp; Details on how to create it &nbsp;&#x25bd;</h2>
-
-      <p>Click on one of the &quot;Details&quot; buttons in the listing above and I'll show you below how you end up with that item. You can use the checkboxes to mark your building progress. But beware; their state will <em>not</em> be saved for you!</p>
-
-      <table class="table items">
-        <thead>
-          <tr>
-            <th>Place</th>
-            <th>Item</th>
-            <th>Enchantments</th>
-            <th>Prior work</th>
-            <th>Cost</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr class="template item" data-real="0">
-            <td><span class="placement"></span></td>
-            <td><span class="description"></span></td>
-            <td><span class="enchants"></span></td>
-            <td><span class="priorWork"></span></td>
-            <td><span class="cost"></span></td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-
-    <div class="content turquoise">
+    <div class="content yellow">
       <h2>&#x25bd;&nbsp; Keep your work and share it &nbsp;&#x25bd;</h2>
 
-      <p>Your data is stored automatically for you in this browser on this device.  <em>Note:</em> if you are browsing in incognito mode or in a private tab, the data can't be stored for you!</p>
+      <p>Your list of items is stored automatically for you in this browser on this device. <em>Note 1:</em> the item combinations after a divination won't be stored! <em>Note 2:</em> if you are browsing in incognito mode or in a private tab, the data can't be stored for you!</p>
 
-      <p>If you wish to use the data on another device or send it to your friends, you can <button type="button" id="makeBookmark">Create a bookmark</button> to share it. <span id="bookmark">Mkay, <a href="">here it is then</a>. Right-click the link to bookmark or copy it.</span></p>
+      <p>If you wish to use the list of items on another device or send it to your friends, you can <button type="button" id="makeBookmark">Create a bookmark</button> to share it. <span id="bookmark">Mkay, <a href="">here it is then</a>. Right-click the link to bookmark or copy it.</span></p>
     </div>
 
     <div class="content fuchsia">

@@ -82,7 +82,7 @@ async function TestWorker(sourceItems, desiredItem, progressCallback = undefined
 }
 
 
-jazil.AddTestSet(omeoPage, 'ItemCombineWorker', {
+jazil.AddTestSet(mainPage, 'ItemCombineWorker', {
   'Worker goes through the motions with no items': async (jazil) => {
     let sourceItems = [
     ]

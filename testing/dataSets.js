@@ -1,4 +1,4 @@
-jazil.AddTestSet(omeoPage, 'DataSets', {
+jazil.AddTestSet(mainPage, 'DataSets', {
   'Correct sets get returned by ID': (jazil) => {
     function TestSet(set, description) {
       jazil.ShouldBe(g_dataSetsByID[set.id], set, `${description} not mapped correctly!`)

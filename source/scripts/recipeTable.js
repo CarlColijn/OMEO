@@ -1,19 +1,19 @@
 /*
-  Wrapper for the details table on the page.
+  Wrapper for the recipe table on the page.
 
   Prerequisites:
   - dataSets.js
   - enchantInfo.js
 
   Defined classes:
-  - DetailsTable
+  - RecipeTable
 */
 
 
 // ======== PUBLIC ========
 
 
-class DetailsTable {
+class RecipeTable {
   constructor(tableElemJQ) {
     // ==== PRIVATE ====
     this.tableElemJQ = tableElemJQ
@@ -22,20 +22,8 @@ class DetailsTable {
   }
 
 
-  Clear() {
-    this.tableElemJQ.find('th:first').attr('colspan', 1)
-
-    this.allRowInfos.forEach((rowInfo) => {
-      rowInfo.rowElemJQ.remove()
-    })
-    this.allRowInfos.length = 0
-  }
-
-
-  ShowItem(item) {
+  SetItem(item) {
     let maxItemDepth = this.GetItemDepth(item)
-
-    this.Clear()
 
     this.AddItemTree(item, maxItemDepth, 'f', 'Result', undefined)
     this.tableElemJQ.find('th:first').attr('colspan', maxItemDepth + 1)

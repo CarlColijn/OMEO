@@ -1,5 +1,5 @@
 function CreateTestSet(setDescription, testContainerID, setLetter) {
-  jazil.AddTestSet(omeoPage, `ItemTable - ${setDescription} style`, {
+  jazil.AddTestSet(mainPage, `ItemTable - ${setDescription} style`, {
     'Table is initialized correctly': (jazil) => {
       let set = GetSet(setLetter)
       let tableDetails = GetItemTable(testContainerID, set)

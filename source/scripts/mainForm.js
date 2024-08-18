@@ -1,5 +1,5 @@
 /*
-  Form (page I/O) management.  Links all buttons to action handlers, and
+  Main form (page I/O) management.  Links all buttons to action handlers, and
   populates form element values/options.
 
   Prerequisites:
@@ -8,21 +8,21 @@
   - itemInfo.js
   - itemTable.js
   - itemRow.js
-  - detailsTable.js
-  - formData.js
+  - mainFormData.js
   - dataStream.js
   - itemCombiner.js
   - combineResultFilter.js
+  - recipeFormData.js
 
   Defined classes:
-  - Form
+  - MainForm
 */
 
 
 // ======== PUBLIC ========
 
 
-class Form {
+class MainForm {
   constructor(formHandler) {
     this.formHandler = formHandler
 
@@ -57,21 +57,23 @@ class Form {
   }
 
 
-  InitializeSubObjects() {
-    let detailsHeaderElem = $('#details')[0]
-    let ShowDetails = (item) => {
-      this.detailsTable.ShowItem(item)
-      detailsHeaderElem.scrollIntoView({
-        behavior: 'smooth',
-        block: 'start',
-        inline: 'start'
-      })
-    }
+  ShowRecipePage(item) {
+    let dataStream = new DataStream(true)
 
+    let recipeFormData = new RecipeFormData()
+    recipeFormData.SetItem(item)
+    recipeFormData.Serialize(dataStream)
+
+    let baseURL = new URL('recipe.html', document.baseURI)
+    let recipeUrl = dataStream.GetAsURL(baseURL)
+    window.open(recipeUrl)
+  }
+
+
+  InitializeSubObjects() {
     this.sourceItemTable = new ItemTable(undefined, $('#sources table'), $('#addSourceItem'), g_source)
     this.desiredItemTable = new ItemTable(undefined, $('#desired table'), undefined, g_desired)
-    this.combineItemTable = new ItemTable(ShowDetails, $('#combines table'), undefined, g_combined)
-    this.detailsTable = new DetailsTable($('#details table'))
+    this.combineItemTable = new ItemTable(this.ShowRecipePage, $('#combines table'), undefined, g_combined)
   }
 
 
@@ -186,7 +188,6 @@ class Form {
 
   ClearResult() {
     this.combineItemTable.Clear()
-    this.detailsTable.Clear()
   }
 
 
@@ -196,7 +197,7 @@ class Form {
 
 
   // returns object;
-  // - data: FormData
+  // - data: MainFormData
   // - withCountErrors: bool
   // - withEnchantConflicts: bool
   // - withEnchantDupes: bool
@@ -205,7 +206,7 @@ class Form {
     let sourceItemsResult = this.sourceItemTable.GetItems(new ItemCollector(mergeSourceItems))
     let desiredItemResult = this.desiredItemTable.GetItems(new ItemCollector(false))
 
-    let data = new FormData()
+    let data = new MainFormData()
     data.AddSourceItems(sourceItemsResult.items)
     data.SetDesiredItem(desiredItemResult.items[0])
 
@@ -263,7 +264,7 @@ class Form {
       let allOK = true
       let stream = new DataStream(false)
       if (stream.Load(loadingOptions)) {
-        let data = new FormData()
+        let data = new MainFormData()
         allOK = data.Deserialize(stream)
         if (allOK)
           this.SetData(data)
@@ -299,7 +300,7 @@ class Form {
       dataInContext.data.Serialize(stream)
 
       if (toURL)
-        stream.SaveToURL()
+        stream.SaveToBookmarkLink()
       else
         stream.SaveToLocalStorage()
     }

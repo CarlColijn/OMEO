@@ -1,5 +1,5 @@
 /*
-  All data in the form.
+  All data in the main form.
 
   Prerequisites:
   - dataSets.js
@@ -9,7 +9,7 @@
   - itemInfo.js
 
   Defined classes:
-  - FormData
+  - MainFormData
     - desiredItem: Item
     - sourceItems: array(Item)
 */
@@ -18,7 +18,7 @@
 // ======== PUBLIC ========
 
 
-class FormData {
+class MainFormData {
   constructor() {
     // ==== PUBLIC ====
     this.Reset()

@@ -26,7 +26,7 @@ function CombineAndTestUses(jazil, origin1, origin2, combineDescription, expecte
 }
 
 
-jazil.AddTestSet(omeoPage, 'ItemOrigins', {
+jazil.AddTestSet(mainPage, 'ItemOrigins', {
   'ZeroOrigin can be created': (jazil) => {
     let zeroOrigin = CreateZeroOrigin(jazil)
 
