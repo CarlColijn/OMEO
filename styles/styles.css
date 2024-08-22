@@ -278,6 +278,25 @@ em {
 /* Built using the Colors.html page, with the defaults set there,
    except for the overrides stated above the blocks below. */
 
+/* hue 0, saturation 0 */
+.grey {
+  background-color: #e6e6e6;
+}
+.grey h1,
+.grey h2 {
+  background-color: #3c3c3c;
+}
+.grey em,
+.grey .table > thead > tr {
+  background-color: #505050;
+}
+.grey .table > tbody > tr:nth-child(odd) {
+  background-color: #d2d2d2;
+}
+.grey .table > tbody > tr:nth-child(even) {
+  background-color: #bebebe;
+}
+
 /* hue 0 */
 .red {
   background-color: #ffcdcd;
