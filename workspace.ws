@@ -4,6 +4,7 @@
             <File name="source\styles\styles.css" />
         </Folder>
         <Folder name="html">
+            <File name="source\changeHistory.html" />
             <File name="source\explained.html" />
             <File name="source\index.html" />
             <File name="source\recipe.html" />
