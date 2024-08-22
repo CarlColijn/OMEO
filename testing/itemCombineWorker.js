@@ -122,6 +122,50 @@ jazil.AddTestSet(mainPage, 'ItemCombineWorker', {
     TestItemListsMatch(jazil, expectedItems, 'expected', status.result.items, 'combined', g_combined)
   },
 
+  'Max cost combine works': async (jazil) => {
+    let sourceItems = [
+      BuildItem({ tag:0, name:'Sword' }),
+      BuildItem({ tag:1, name:'Book', priorWork:5, enchants:[{ name:'Unbreaking', level:3 }, { name:'Smite', level:3 }, { name:'Mending', level:1 }]}),
+    ]
+    let desiredItem = BuildItem({ name:'Sword', set:g_desired, enchants:[{ name:'Unbreaking' }]})
+    let expectedItems = [
+      BuildItem({ tag:2, name:'Sword', cost:39, priorWork:6, enchants:[{ name:'Unbreaking', level:3 }, { name:'Smite', level:3 }, { name:'Mending', level:1 }]}),
+    ]
+
+    let status = await TestWorker(sourceItems, desiredItem)
+
+    jazil.ShouldBe(status.progressCalled, true, 'progress not called!')
+    jazil.ShouldBe(status.stoppedResponding, false, 'stopped responding!')
+    jazil.ShouldBe(status.finalizeCalled, true, 'finalize not called!')
+    jazil.ShouldBe(status.doneCalled, true, 'done not called!')
+    jazil.ShouldBeBetween(status.timeInMSReported, status.timeInMSMeasured - 500, status.timeInMSMeasured, 'timeInMS diverges too much!')
+    jazil.ShouldNotBe(status.result, undefined, 'result is not returned!')
+    TestItemListsMatch(jazil, expectedItems, 'expected', status.result.items, 'combined', g_combined)
+  },
+
+  'Too costly combine gives nothing back': async (jazil) => {
+    let sourceItems = [
+      BuildItem({ tag:0, name:'Sword' }),
+      BuildItem({ tag:1, name:'Book', priorWork:5, enchants:[{ name:'Unbreaking', level:3 }, { name:'Smite', level:4 }, { name:'Mending', level:1 }]}),
+    ]
+    let desiredItem = BuildItem({ name:'Sword', set:g_desired, enchants:[{ name:'Unbreaking' }]})
+    let expectedItems = [
+      //BuildItem({ tag:2, name:'Sword', cost:40, priorWork:6, enchants:[{ name:'Unbreaking', level:3 }, { name:'Smite', level:4 }, { name:'Mending', level:1 }]}),
+      // Item list filtering will revert back to source item
+      sourceItems[0]
+    ]
+
+    let status = await TestWorker(sourceItems, desiredItem)
+
+    jazil.ShouldBe(status.progressCalled, true, 'progress not called!')
+    jazil.ShouldBe(status.stoppedResponding, false, 'stopped responding!')
+    jazil.ShouldBe(status.finalizeCalled, true, 'finalize not called!')
+    jazil.ShouldBe(status.doneCalled, true, 'done not called!')
+    jazil.ShouldBeBetween(status.timeInMSReported, status.timeInMSMeasured - 500, status.timeInMSMeasured, 'timeInMS diverges too much!')
+    jazil.ShouldNotBe(status.result, undefined, 'result is not returned!')
+    TestItemListsMatch(jazil, expectedItems, 'expected', status.result.items, 'combined', g_combined)
+  },
+
   'Progress indicators are correct': async (jazil) => {
     let sourceItems = [
       BuildItem({ name:'Sword', count:20, enchants:[{ name:'Smite', level:1 }] }),

@@ -156,7 +156,6 @@ jazil.AddTestSet(mainPage, 'ItemCombiner', {
   },
 
   'Two matching loose enchanted sources + unenchanted desired => higher-level enchant combine': (jazil) => {
-    // reason: we just try combining everything remotely relevant
     let sourceItems = [
       BuildItem({ tag:0, name:'Pickaxe', enchants:[{ name:'Unbreaking' }]}),
       BuildItem({ tag:1, name:'Pickaxe', enchants:[{ name:'Unbreaking' }]}),
@@ -179,7 +178,6 @@ jazil.AddTestSet(mainPage, 'ItemCombiner', {
   },
 
   'Two matching stacked enchanted sources + unenchanted desired => higher-level enchant combine': (jazil) => {
-    // reason: we just try combining everything remotely relevant
     let sourceItems = [
       BuildItem({ tag:0, name:'Pickaxe', count:2, enchants:[{ name:'Unbreaking' }]}),
       // note: an implicit unenchanted pick is added for us
@@ -244,7 +242,6 @@ jazil.AddTestSet(mainPage, 'ItemCombiner', {
   },
 
   'Two stacked enchanted sources + semi-matching desired => still higher-level enchant combine': (jazil) => {
-    // reason: we just try combining everything remotely relevant
     let sourceItems = [
       BuildItem({ tag:0, name:'Pickaxe', count:2, enchants:[{ name:'Unbreaking' }]}),
       // note: an implicit unenchanted pick is added for us
@@ -265,8 +262,51 @@ jazil.AddTestSet(mainPage, 'ItemCombiner', {
     TestCombineResult(jazil, sourceItems, true, desiredItem, expectedItems)
   },
 
+  'Only 1 too costly combine doesn\'t work': (jazil) => {
+    let sourceItems = [
+      BuildItem({ tag:0, name:'Sword' }),
+      BuildItem({ tag:1, name:'Book', priorWork:5, enchants:[{ name:'Unbreaking', level:3 }, { name:'Smite', level:4 }, { name:'Mending', level:1 }]}),
+    ]
+    let desiredItem = BuildItem({ name:'Sword', set:g_desired, enchants:[{ name:'Unbreaking' }]})
+    let expectedItems = [
+      // 2 = 0+1
+      //   origin uses: 1,1
+      //   parent cost: 0+0
+      //   prior work cost: 0+31
+      //   enchant cost: 9
+      //     unbreaking lvl 3 * mult 1 (book)
+      //     smite lvl 4 * mult 1 (book)
+      //     mending lvl 1 * mult 2 (book)
+      //   total cost: 40
+      //BuildItem({ tag:2, name:'Sword', cost:40, priorWork:6, enchants:[{ name:'Unbreaking', level:3 }, { name:'Smite', level:4 }, { name:'Mending', level:1 }]}),
+    ]
+
+    TestCombineResult(jazil, sourceItems, true, desiredItem, expectedItems)
+  },
+
+  'Max cost combine works': (jazil) => {
+    let sourceItems = [
+      BuildItem({ tag:0, name:'Sword' }),
+      BuildItem({ tag:1, name:'Book', priorWork:5, enchants:[{ name:'Unbreaking', level:3 }, { name:'Smite', level:3 }, { name:'Mending', level:1 }]}),
+    ]
+    let desiredItem = BuildItem({ name:'Sword', set:g_desired, enchants:[{ name:'Unbreaking' }]})
+    let expectedItems = [
+      // 2 = 0+1
+      //   origin uses: 1,1
+      //   parent cost: 0+0
+      //   prior work cost: 0+31
+      //   enchant cost: 8
+      //     unbreaking lvl 3 * mult 1 (book)
+      //     smite lvl 3 * mult 1 (book)
+      //     mending lvl 1 * mult 2 (book)
+      //   total cost: 39
+      BuildItem({ tag:2, name:'Sword', cost:39, priorWork:6, enchants:[{ name:'Unbreaking', level:3 }, { name:'Smite', level:3 }, { name:'Mending', level:1 }]}),
+    ]
+
+    TestCombineResult(jazil, sourceItems, true, desiredItem, expectedItems)
+  },
+
   'Lots of books combine in all possible ways': (jazil) => {
-    // reason: we just try combining everything remotely relevant
     let sourceItems = [
       BuildItem({ tag:0, name:'Pickaxe' }),
       BuildItem({ tag:1, name:'Book', count:4, enchants:[{ name:'Unbreaking' }]}),
