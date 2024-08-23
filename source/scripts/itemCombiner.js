@@ -42,7 +42,7 @@ class ItemCombiner {
 
     this.DropUnusedEnchantsFromItems(filteredSourceItems, desiredItem)
 
-    this.InsertExtraUnenchantedItem(tester, filteredSourceItems, desiredItem)
+    this.InsertExtraBareItem(tester, filteredSourceItems, desiredItem)
 
     this.SetupItemOrigins(filteredSourceItems)
 
@@ -142,12 +142,12 @@ class ItemCombiner {
   }
 
 
-  InsertExtraUnenchantedItem(tester, sourceItems, desiredItem) {
+  InsertExtraBareItem(tester, sourceItems, desiredItem) {
     let hasEnchants = desiredItem.enchantsByID.size > 0
     if (
       !desiredItem.info.isBook &&
       hasEnchants &&
-      !tester.UnenchantedSourcePresent(sourceItems, desiredItem)
+      !tester.BareSourcePresent(sourceItems, desiredItem)
     ) {
       let extraItem = new Item(
         1,

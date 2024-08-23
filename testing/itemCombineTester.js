@@ -205,49 +205,74 @@ jazil.AddTestSet(mainPage, 'ItemCombineTester', {
     )
   },
 
-  // UnenchantedSourcePresent
+  // BareSourcePresent
 
-  'Empty source list doesn\'t contain unenchanted item': (jazil) => {
-    let unenchantedPickaxe = BuildItem({ name:'Pickaxe' })
+  'Empty source list doesn\'t contain bare item': (jazil) => {
+    let barePickaxe = BuildItem({ name:'Pickaxe' })
 
     let tester = new ItemCombineTester()
     jazil.ShouldBe(
-      tester.UnenchantedSourcePresent([], unenchantedPickaxe),
+      tester.BareSourcePresent([], barePickaxe),
       false
     )
   },
 
-  'Source list without relevant tools doesn\'t contain unenchanted item': (jazil) => {
-    let unenchantedPickaxe = BuildItem({ name:'Pickaxe' })
-    let unenchantedBook = BuildItem({ name:'Book' })
+  'Source list without relevant tools doesn\'t contain bare item': (jazil) => {
+    let barePickaxe = BuildItem({ name:'Pickaxe' })
+    let bareBook = BuildItem({ name:'Book' })
     let enchantedBook = BuildItem({ name:'Book', enchants:[{ name:'Smite' }] })
 
     let tester = new ItemCombineTester()
     jazil.ShouldBe(
-      tester.UnenchantedSourcePresent([unenchantedBook, enchantedBook], unenchantedPickaxe),
+      tester.BareSourcePresent([bareBook, enchantedBook], barePickaxe),
       false
     )
   },
 
-  'Source list with only enchanted relevant tools doesn\'t contain unenchanted item': (jazil) => {
-    let unenchantedPickaxe = BuildItem({ name:'Pickaxe' })
+  'Source list with only enchanted relevant tools doesn\'t contain bare item': (jazil) => {
+    let barePickaxe = BuildItem({ name:'Pickaxe' })
     let enchantedPickaxe = BuildItem({ name:'Pickaxe', enchants:[{ name:'Mending' }] })
     let enchantedBook = BuildItem({ name:'Book', enchants:[{ name:'Smite' }] })
 
     let tester = new ItemCombineTester()
     jazil.ShouldBe(
-      tester.UnenchantedSourcePresent([enchantedPickaxe, enchantedBook], unenchantedPickaxe),
+      tester.BareSourcePresent([enchantedPickaxe, enchantedBook], barePickaxe),
       false
     )
   },
 
-  'Source list with unenchanted relevant tool contains unenchanted item': (jazil) => {
-    let unenchantedPickaxe = BuildItem({ name:'Pickaxe' })
+  'Source list with only prioWorked relevant tools doesn\'t contain bare item': (jazil) => {
+    let barePickaxe = BuildItem({ name:'Pickaxe' })
+    let priorWorkPickaxe = BuildItem({ name:'Pickaxe', priorWork:3 })
+    let enchantedBook = BuildItem({ name:'Book', enchants:[{ name:'Smite' }] })
+
+    let tester = new ItemCombineTester()
+    jazil.ShouldBe(
+      tester.BareSourcePresent([priorWorkPickaxe, enchantedBook], barePickaxe),
+      false
+    )
+  },
+
+  'Source list with only prioWorked + enchanted relevant tools doesn\'t contain bare item': (jazil) => {
+    let barePickaxe = BuildItem({ name:'Pickaxe' })
+    let enchantedPickaxe = BuildItem({ name:'Pickaxe', enchants:[{ name:'Mending' }] })
+    let priorWorkPickaxe = BuildItem({ name:'Pickaxe', priorWork:3 })
+    let enchantedBook = BuildItem({ name:'Book', enchants:[{ name:'Smite' }] })
+
+    let tester = new ItemCombineTester()
+    jazil.ShouldBe(
+      tester.BareSourcePresent([enchantedPickaxe, priorWorkPickaxe, enchantedBook], barePickaxe),
+      false
+    )
+  },
+
+  'Source list with bare relevant tool contains bare item': (jazil) => {
+    let barePickaxe = BuildItem({ name:'Pickaxe' })
     let enchantedPickaxe = BuildItem({ name:'Pickaxe', enchants:[{ name:'Mending' }] })
 
     let tester = new ItemCombineTester()
     jazil.ShouldBe(
-      tester.UnenchantedSourcePresent([enchantedPickaxe, unenchantedPickaxe], unenchantedPickaxe),
+      tester.BareSourcePresent([enchantedPickaxe, barePickaxe], barePickaxe),
       true
     )
   },

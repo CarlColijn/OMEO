@@ -621,6 +621,45 @@ jazil.AddTestSet(mainPage, 'ItemCombiner', {
     TestCombineResult(jazil, sourceItems, true, desiredItem, expectedItems)
   },
 
+  'PriorWork-ed source item + compatibly enchanted source book => correct combine via added extra + extra spin offs': (jazil) => {
+    let sourceItems = [
+      BuildItem({ tag:0, name:'Pickaxe', priorWork:1 }),
+      BuildItem({ tag:1, name:'Book', enchants:[{ name:'Unbreaking' }]}),
+      // note: an implicit fresh pick is added for us
+      //BuildItem({ tag:2, name:'Pickaxe'),
+    ]
+    let desiredItem = BuildItem({ name:'Pickaxe', set:g_desired, enchants:[{ name:'Unbreaking', level:1 }]})
+    let expectedItems = [
+      // 3 = 0+1
+      //   origin uses: 1,1,0
+      //   parent cost: 1+0
+      //   prior work cost: 0+0
+      //   enchants 0+1: 1
+      //     unbreaking lvl 1 * mult 1 (book)
+      //   total cost: 2
+      BuildItem({ tag:3, name:'Pickaxe', cost:2, priorWork:2, rename:'', enchants:[{ name:'Unbreaking' }]}),
+      // 4 = 1+2
+      //   origin uses: 0,1,1
+      //   parent cost: 0+0
+      //   prior work cost: 0+0
+      //   enchants 2+1: 1
+      //     unbreaking lvl 1 * mult 1 (book)
+      //   total cost: 1
+      BuildItem({ tag:4, name:'Pickaxe', cost:1, priorWork:1, rename:'', enchants:[{ name:'Unbreaking' }]}),
+      // 5 = 4+0; wasteful
+      // 6 = 0+4; same as 3 but more costly
+      //   origin uses: 1,1,1
+      //   parent cost: 0+1
+      //   prior work cost: 1+1
+      //   enchant cost: 2
+      //     unbreaking lvl 1 * mult 2 (tool)
+      //   total cost: 5
+      //BuildItem({ tag:6, name:'Pickaxe', cost:4, totalCost:5, priorWork:2, rename:'', enchants:[{ name:'Unbreaking' }]}),
+    ]
+
+    TestCombineResult(jazil, sourceItems, true, desiredItem, expectedItems)
+  },
+
   'Complex combine #1, order 1': (jazil) => {
     let sourceItems = [
       BuildItem({ tag:0, name:'Sword', enchants:[{ name:'Sharpness', level:3 }, { name:'Knockback', level:2 }, { name:'Looting', level:3 }]}),
