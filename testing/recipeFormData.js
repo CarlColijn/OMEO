@@ -7,6 +7,8 @@ function CompareItemsEqual(jazil, item1, item2, itemDescription) {
   jazil.ShouldBe(item1.priorWork, item2.priorWork, `${itemDescription} priorWork not equal!`)
   jazil.ShouldBe(item1.cost, item2.cost, `${itemDescription} cost is not equal!`)
   jazil.ShouldBe(item1.totalCost, item2.totalCost, `${itemDescription} totalCost is not equal!`)
+  jazil.ShouldBe(item1.renamePoint, item2.renamePoint, `${itemDescription} renamePoint is not equal!`)
+  // We don't check .includesRename, since that one isn't serialized by the recipe form.
 
   item1.enchantsByID.forEach((enchant1, id) => {
     let enchant2 = item2.enchantsByID.get(id)
@@ -48,11 +50,11 @@ jazil.AddTestSet(recipePage, 'RecipeFormData', {
     jazil.ShouldBe(data.item, sword, 'Updated item not set correctly!')
   },
 
-  'Simple item get serialized/deserialized OK': (jazil) => {
+  'Simple item with renamePoint gets serialized/deserialized OK': (jazil) => {
     let dataState = new DataStateController(jazil)
     dataState.Reset()
 
-    let item = BuildItem({ set:g_source, name:'Pickaxe', count:11, nr:5, priorWork:0, cost:4, totalCost:55 })
+    let item = BuildItem({ set:g_combined, name:'Pickaxe', count:11, nr:5, priorWork:0, rename:'r', cost:4, totalCost:55 })
 
     let storedData = new RecipeFormData
     storedData.SetItem(item)
@@ -61,7 +63,7 @@ jazil.AddTestSet(recipePage, 'RecipeFormData', {
     storedData.Serialize(storeStream)
     storeStream.SaveToLocalStorage()
 
-    jazil.ShouldBe(dataState.GetLocalStorage(), 'cixlcGSWZh')
+    jazil.ShouldBe(dataState.GetLocalStorage(), 'ciBlcGS3p')
 
     let loadingOptions = new DataStreamLoadingOptions()
     let restoreStream = new DataStream(false)
@@ -74,11 +76,11 @@ jazil.AddTestSet(recipePage, 'RecipeFormData', {
     CompareItemsEqual(jazil, item, restoredData.item, 'item')
   },
 
-  'Enchanted item get serialized/deserialized OK': (jazil) => {
+  'Enchanted item without renamePoint get serialized/deserialized OK': (jazil) => {
     let dataState = new DataStateController(jazil)
     dataState.Reset()
 
-    let item = BuildItem({ set:g_combined, name:'Sword', count:11, priorWork:1, cost:66, totalCost:11, enchants:[{ name:'Sharpness', level:4 }] })
+    let item = BuildItem({ set:g_combined, name:'Sword', count:11, priorWork:1, rename:'', cost:66, totalCost:11, enchants:[{ name:'Sharpness', level:4 }] })
 
     let storedData = new RecipeFormData
     storedData.SetItem(item)
@@ -87,7 +89,7 @@ jazil.AddTestSet(recipePage, 'RecipeFormData', {
     storedData.Serialize(storeStream)
     storeStream.SaveToLocalStorage()
 
-    jazil.ShouldBe(dataState.GetLocalStorage(), 'ciBRMGdRlL_')
+    jazil.ShouldBe(dataState.GetLocalStorage(), 'ciBRMGdRfs_')
 
     let loadingOptions = new DataStreamLoadingOptions()
     let restoreStream = new DataStream(false)
@@ -104,10 +106,10 @@ jazil.AddTestSet(recipePage, 'RecipeFormData', {
     let dataState = new DataStateController(jazil)
     dataState.Reset()
 
-    let itemF = BuildItem({ set:g_combined, name:'Sword', count:11, priorWork:1, cost:22, totalCost:90, enchants:[{ name:'Looting', level:2 }] })
+    let itemF = BuildItem({ set:g_combined, name:'Sword', count:11, priorWork:1, cost:22, totalCost:90, rename:'i', enchants:[{ name:'Looting', level:2 }] })
     let itemL = BuildItem({ set:g_source, name:'Axe', count:22, nr:7, priorWork:2, cost:66, totalCost:9, enchants:[{ name:'Mending' }] })
     let itemLL = BuildItem({ set:g_desired, name:'Pumpkin', count:12, priorWork:0, cost:22, totalCost:12, enchants:[{ name:'Curse of Binding' }] })
-    let itemLR = BuildItem({ set:g_combined, name:'Chestplate', count:22, priorWork:2, cost:7, totalCost:4, enchants:[{ name:'Protection', level:3 }, { name:'Thorns'}] })
+    let itemLR = BuildItem({ set:g_combined, name:'Chestplate', count:22, priorWork:2, cost:7, totalCost:4, rename:'r', enchants:[{ name:'Protection', level:3 }, { name:'Thorns'}] })
     let itemR = BuildItem({ set:g_extra, name:'Book', count:33, priorWork:4, cost:1, totalCost:11 })
 
     itemL.targetItem = itemLL
@@ -122,7 +124,7 @@ jazil.AddTestSet(recipePage, 'RecipeFormData', {
     storedData.Serialize(storeStream)
     storeStream.SaveToLocalStorage()
 
-    jazil.ShouldBe(dataState.GetLocalStorage(), 'ciBRKRDZfBOA_tDdrq7mNXx0aAdVmRH1MNEgapcehZnbaJRh')
+    jazil.ShouldBe(dataState.GetLocalStorage(), 'ciBRKRDZcntSFjobih9fZylzFSHxf1qAsZoIJt_WrmcFFykb_')
 
     let loadingOptions = new DataStreamLoadingOptions()
     let restoreStream = new DataStream(false)
@@ -179,7 +181,7 @@ jazil.AddTestSet(recipePage, 'RecipeFormData', {
     let dataState = new DataStateController(jazil)
     dataState.Reset()
 
-    let sword = BuildItem({ set:g_combined, name:'Sword', count:11, priorWork:1, cost:9, totalCost:33 })
+    let sword = BuildItem({ set:g_combined, name:'Sword', count:11, priorWork:1, rename:'r', cost:9, totalCost:33 })
     GiveItemBrokenEnchant(sword)
 
     let storedData = new RecipeFormData
@@ -189,7 +191,7 @@ jazil.AddTestSet(recipePage, 'RecipeFormData', {
     storedData.Serialize(storeStream)
     storeStream.SaveToLocalStorage()
 
-    jazil.ShouldBe(dataState.GetLocalStorage(), 'ciBRJJZhE4_') // malformed data
+    jazil.ShouldBe(dataState.GetLocalStorage(), 'ciBRJJZlo7F') // malformed data
 
     let loadingOptions = new DataStreamLoadingOptions()
     let restoreStream = new DataStream(false)

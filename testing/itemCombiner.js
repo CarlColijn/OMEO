@@ -17,10 +17,10 @@ class FeedbackHandlerMock {
 }
 
 
-function TestCombineResult(jazil, sourceItems, canCombine, desiredItem, expectedItems) {
+function TestCombineResult(jazil, sourceItems, canCombine, desiredItem, renameToo, expectedItems) {
   let feedbackHandler = new FeedbackHandlerMock()
   let combiner = new ItemCombiner()
-  let combinedItems = combiner.GetAllItemCombinations(sourceItems, desiredItem, feedbackHandler).combinedItems
+  let combinedItems = combiner.GetAllItemCombinations(sourceItems, desiredItem, renameToo, feedbackHandler).combinedItems
 
   jazil.ShouldBe(feedbackHandler.timeForFeedbackCalled, canCombine, 'TimeForFeedback not called properly!')
   jazil.ShouldBe(feedbackHandler.tellProgressCalled, canCombine, 'TellProgress not called properly!')
@@ -39,7 +39,7 @@ jazil.AddTestSet(mainPage, 'ItemCombiner', {
     let expectedItems = [
     ]
 
-    TestCombineResult(jazil, sourceItems, false, desiredItem, expectedItems)
+    TestCombineResult(jazil, sourceItems, false, desiredItem, false, expectedItems)
   },
 
   'Too few unenchanted sources + matching desired => 0 combines': (jazil) => {
@@ -50,7 +50,7 @@ jazil.AddTestSet(mainPage, 'ItemCombiner', {
     let expectedItems = [
     ]
 
-    TestCombineResult(jazil, sourceItems, true, desiredItem, expectedItems)
+    TestCombineResult(jazil, sourceItems, true, desiredItem, false, expectedItems)
   },
 
   'Too few enchanted sources + matching desired => 0 combines': (jazil) => {
@@ -61,7 +61,7 @@ jazil.AddTestSet(mainPage, 'ItemCombiner', {
     let expectedItems = [
     ]
 
-    TestCombineResult(jazil, sourceItems, true, desiredItem, expectedItems)
+    TestCombineResult(jazil, sourceItems, true, desiredItem, false, expectedItems)
   },
 
   'Only loose wasteful unenchanted combines => 0 combines': (jazil) => {
@@ -76,7 +76,7 @@ jazil.AddTestSet(mainPage, 'ItemCombiner', {
     let expectedItems = [
     ]
 
-    TestCombineResult(jazil, sourceItems, true, desiredItem, expectedItems)
+    TestCombineResult(jazil, sourceItems, true, desiredItem, false, expectedItems)
   },
 
   'Only stacked wasteful unenchanted combines => 0 combines': (jazil) => {
@@ -88,7 +88,7 @@ jazil.AddTestSet(mainPage, 'ItemCombiner', {
     let expectedItems = [
     ]
 
-    TestCombineResult(jazil, sourceItems, true, desiredItem, expectedItems)
+    TestCombineResult(jazil, sourceItems, true, desiredItem, false, expectedItems)
   },
 
   'Only loose wasteful enchanted combines => 0 combines': (jazil) => {
@@ -100,7 +100,7 @@ jazil.AddTestSet(mainPage, 'ItemCombiner', {
     let expectedItems = [
     ]
 
-    TestCombineResult(jazil, sourceItems, true, desiredItem, expectedItems)
+    TestCombineResult(jazil, sourceItems, true, desiredItem, false, expectedItems)
   },
 
   'Two incompatible sources + desired => 0 combines': (jazil) => {
@@ -112,7 +112,7 @@ jazil.AddTestSet(mainPage, 'ItemCombiner', {
     let expectedItems = [
     ]
 
-    TestCombineResult(jazil, sourceItems, true, desiredItem, expectedItems)
+    TestCombineResult(jazil, sourceItems, true, desiredItem, false, expectedItems)
   },
 
   'Only stacked unenchanted sources + non-matching desired => 0 combines': (jazil) => {
@@ -124,7 +124,7 @@ jazil.AddTestSet(mainPage, 'ItemCombiner', {
     let expectedItems = [
     ]
 
-    TestCombineResult(jazil, sourceItems, false, desiredItem, expectedItems)
+    TestCombineResult(jazil, sourceItems, false, desiredItem, false, expectedItems)
   },
 
   'Only stacked enchanted sources + non-matching desired => 0 combines': (jazil) => {
@@ -136,7 +136,7 @@ jazil.AddTestSet(mainPage, 'ItemCombiner', {
     let expectedItems = [
     ]
 
-    TestCombineResult(jazil, sourceItems, false, desiredItem, expectedItems)
+    TestCombineResult(jazil, sourceItems, false, desiredItem, false, expectedItems)
   },
 
   'Only loose enchanted sources + non-matching desired => no combines': (jazil) => {
@@ -152,7 +152,7 @@ jazil.AddTestSet(mainPage, 'ItemCombiner', {
     let expectedItems = [
     ]
 
-    TestCombineResult(jazil, sourceItems, false, desiredItem, expectedItems)
+    TestCombineResult(jazil, sourceItems, false, desiredItem, false, expectedItems)
   },
 
   'Two matching loose enchanted sources + unenchanted desired => higher-level enchant combine': (jazil) => {
@@ -171,10 +171,30 @@ jazil.AddTestSet(mainPage, 'ItemCombiner', {
       //   enchant cost: 4
       //     unbreaking lvl 2 * mult 2 (tool)
       //   total cost: 4
-      BuildItem({ set:g_combined, tag:3, name:'Pickaxe', cost:4, priorWork:1, enchants:[{ name:'Unbreaking', level:2 }]}),
+      BuildItem({ set:g_combined, tag:3, name:'Pickaxe', cost:4, priorWork:1, rename:'', includesRename:false, enchants:[{ name:'Unbreaking', level:2 }]}),
     ]
 
-    TestCombineResult(jazil, sourceItems, true, desiredItem, expectedItems)
+    TestCombineResult(jazil, sourceItems, true, desiredItem, false, expectedItems)
+  },
+
+  'Two loose enchanted sources + unenchanted desired + renameToo => higher-level enchant combine + rename-tagged item': (jazil) => {
+    let sourceItems = [
+      BuildItem({ set:g_source, tag:0, name:'Pickaxe' }),
+      BuildItem({ set:g_source, tag:1, name:'Book', enchants:[{ name:'Unbreaking' }]}),
+    ]
+    let desiredItem = BuildItem({ set:g_desired, name:'Pickaxe' })
+    let expectedItems = [
+      // 2 = 0+1
+      //   origin uses: 1,1
+      //   parent cost: 0+0
+      //   prior work cost: 0+0
+      //   enchant cost: 1
+      //     unbreaking lvl 1 * mult 1 (tool)
+      //   total cost: 1
+      BuildItem({ set:g_combined, tag:2, name:'Pickaxe', cost:1, priorWork:1, rename:'r', enchants:[{ name:'Unbreaking' }]}),
+    ]
+
+    TestCombineResult(jazil, sourceItems, true, desiredItem, true, expectedItems)
   },
 
   'Two matching stacked enchanted sources + unenchanted desired => higher-level enchant combine': (jazil) => {
@@ -192,10 +212,10 @@ jazil.AddTestSet(mainPage, 'ItemCombiner', {
       //   enchant cost: 4
       //     unbreaking lvl 2 * mult 2 (tool)
       //   total cost: 4
-      BuildItem({ set:g_combined, tag:2, name:'Pickaxe', cost:4, priorWork:1, enchants:[{ name:'Unbreaking', level:2 }]}),
+      BuildItem({ set:g_combined, tag:2, name:'Pickaxe', cost:4, priorWork:1, rename:'', enchants:[{ name:'Unbreaking', level:2 }]}),
     ]
 
-    TestCombineResult(jazil, sourceItems, true, desiredItem, expectedItems)
+    TestCombineResult(jazil, sourceItems, true, desiredItem, false, expectedItems)
   },
 
   'Two matching loose enchanted sources + matching desired => higher-level enchant combine': (jazil) => {
@@ -214,13 +234,13 @@ jazil.AddTestSet(mainPage, 'ItemCombiner', {
       //   enchant cost: 4
       //     unbreaking lvl 2 * mult 2 (tool)
       //   total cost: 4
-      BuildItem({ set:g_combined, tag:3, name:'Pickaxe', cost:4, priorWork:1, enchants:[{ name:'Unbreaking', level:2 }]}),
+      BuildItem({ set:g_combined, tag:3, name:'Pickaxe', cost:4, priorWork:1, rename:'', enchants:[{ name:'Unbreaking', level:2 }]}),
     ]
 
-    TestCombineResult(jazil, sourceItems, true, desiredItem, expectedItems)
+    TestCombineResult(jazil, sourceItems, true, desiredItem, false, expectedItems)
   },
 
-  'Two stacked enchanted sources + matching desired => higher-level enchant combine': (jazil) => {
+  'Two stacked enchanted sources + matching desired + rename => higher-level enchant combine + rename-tagged item': (jazil) => {
     let sourceItems = [
       BuildItem({ set:g_source, tag:0, name:'Pickaxe', count:2, enchants:[{ name:'Unbreaking' }]}),
       // note: an implicit unenchanted pick is added for us
@@ -235,10 +255,10 @@ jazil.AddTestSet(mainPage, 'ItemCombiner', {
       //   enchant cost: 4
       //     unbreaking lvl 2 * mult 2 (tool)
       //   total cost: 4
-      BuildItem({ set:g_combined, tag:2, name:'Pickaxe', cost:4, priorWork:1, enchants:[{ name:'Unbreaking', level:2 }]}),
+      BuildItem({ set:g_combined, tag:2, name:'Pickaxe', cost:4, priorWork:1, rename:'r', enchants:[{ name:'Unbreaking', level:2 }]}),
     ]
 
-    TestCombineResult(jazil, sourceItems, true, desiredItem, expectedItems)
+    TestCombineResult(jazil, sourceItems, true, desiredItem, true, expectedItems)
   },
 
   'Two stacked enchanted sources + semi-matching desired => still higher-level enchant combine': (jazil) => {
@@ -256,10 +276,10 @@ jazil.AddTestSet(mainPage, 'ItemCombiner', {
       //   enchant cost: 4
       //     unbreaking lvl 2 * mult 2 (tool)
       //   total cost: 4
-      BuildItem({ set:g_combined, tag:2, name:'Pickaxe', cost:4, priorWork:1, enchants:[{ name:'Unbreaking', level:2 }]}),
+      BuildItem({ set:g_combined, tag:2, name:'Pickaxe', cost:4, priorWork:1, rename:'', enchants:[{ name:'Unbreaking', level:2 }]}),
     ]
 
-    TestCombineResult(jazil, sourceItems, true, desiredItem, expectedItems)
+    TestCombineResult(jazil, sourceItems, true, desiredItem, false, expectedItems)
   },
 
   'Only 1 too costly combine doesn\'t work': (jazil) => {
@@ -278,10 +298,10 @@ jazil.AddTestSet(mainPage, 'ItemCombiner', {
       //     smite lvl 4 * mult 1 (book)
       //     mending lvl 1 * mult 2 (book)
       //   total cost: 40
-      //BuildItem({ set:g_combined, tag:2, name:'Sword', cost:40, priorWork:6, enchants:[{ name:'Unbreaking', level:3 }, { name:'Smite', level:4 }, { name:'Mending', level:1 }]}),
+      //BuildItem({ set:g_combined, tag:2, name:'Sword', cost:40, priorWork:6, rename:'', enchants:[{ name:'Unbreaking', level:3 }, { name:'Smite', level:4 }, { name:'Mending', level:1 }]}),
     ]
 
-    TestCombineResult(jazil, sourceItems, true, desiredItem, expectedItems)
+    TestCombineResult(jazil, sourceItems, true, desiredItem, false, expectedItems)
   },
 
   'Max cost combine works': (jazil) => {
@@ -300,10 +320,32 @@ jazil.AddTestSet(mainPage, 'ItemCombiner', {
       //     smite lvl 3 * mult 1 (book)
       //     mending lvl 1 * mult 2 (book)
       //   total cost: 39
-      BuildItem({ set:g_combined, tag:2, name:'Sword', cost:39, priorWork:6, enchants:[{ name:'Unbreaking', level:3 }, { name:'Smite', level:3 }, { name:'Mending', level:1 }]}),
+      BuildItem({ set:g_combined, tag:2, name:'Sword', cost:39, priorWork:6, rename:'', enchants:[{ name:'Unbreaking', level:3 }, { name:'Smite', level:3 }, { name:'Mending', level:1 }]}),
     ]
 
-    TestCombineResult(jazil, sourceItems, true, desiredItem, expectedItems)
+    TestCombineResult(jazil, sourceItems, true, desiredItem, false, expectedItems)
+  },
+
+  'Max cost combine with rename doesn\'t work': (jazil) => {
+    let sourceItems = [
+      BuildItem({ set:g_source, tag:0, name:'Sword' }),
+      BuildItem({ set:g_source, tag:1, name:'Book', priorWork:5, enchants:[{ name:'Unbreaking', level:3 }, { name:'Smite', level:3 }, { name:'Mending', level:1 }]}),
+    ]
+    let desiredItem = BuildItem({ set:g_desired, name:'Sword', enchants:[{ name:'Unbreaking' }]})
+    let expectedItems = [
+      // 2 = 0+1
+      //   origin uses: 1,1
+      //   parent cost: 0+0
+      //   prior work cost: 0+31
+      //   enchant cost: 8
+      //     unbreaking lvl 3 * mult 1 (book)
+      //     smite lvl 3 * mult 1 (book)
+      //     mending lvl 1 * mult 2 (book)
+      //   total cost: 39
+      BuildItem({ set:g_combined, tag:2, name:'Sword', cost:39, priorWork:6, rename:'', enchants:[{ name:'Unbreaking', level:3 }, { name:'Smite', level:3 }, { name:'Mending', level:1 }]}),
+    ]
+
+    TestCombineResult(jazil, sourceItems, true, desiredItem, true, expectedItems)
   },
 
   'Lots of books combine in all possible ways': (jazil) => {
@@ -320,7 +362,7 @@ jazil.AddTestSet(mainPage, 'ItemCombiner', {
       //   enchant cost: 1
       //     unbreaking lvl 1 * mult 1 (book)
       //   total cost: 1
-      BuildItem({ set:g_combined, tag:2, name:'Pickaxe', count:1, cost:1, totalCost:1, priorWork:1, enchants:[{ name:'Unbreaking', level:1 }]}),
+      BuildItem({ set:g_combined, tag:2, name:'Pickaxe', count:1, cost:1, totalCost:1, priorWork:1, rename:'', enchants:[{ name:'Unbreaking', level:1 }]}),
       // 3 = 1+1
       //   origin uses: 0,2
       //   parent cost: 0+0
@@ -328,7 +370,7 @@ jazil.AddTestSet(mainPage, 'ItemCombiner', {
       //   enchant cost: 2
       //     unbreaking lvl 2 * mult 1 (book)
       //   total cost: 2
-      BuildItem({ set:g_combined, tag:3, name:'Book', count:2, cost:2, totalCost:2, priorWork:1, enchants:[{ name:'Unbreaking', level:2 }]}),
+      BuildItem({ set:g_combined, tag:3, name:'Book', count:2, cost:2, totalCost:2, priorWork:1, rename:'', enchants:[{ name:'Unbreaking', level:2 }]}),
       // 4 = 2+1
       //   origin uses: 1,2
       //   parent cost: 1+0
@@ -336,7 +378,7 @@ jazil.AddTestSet(mainPage, 'ItemCombiner', {
       //   enchant cost: 2
       //     unbreaking lvl 2 * mult 1 (book)
       //   total cost: 4
-      BuildItem({ set:g_combined, tag:4, name:'Pickaxe', count:1, cost:3, totalCost:4, priorWork:2, enchants:[{ name:'Unbreaking', level:2 }]}),
+      BuildItem({ set:g_combined, tag:4, name:'Pickaxe', count:1, cost:3, totalCost:4, priorWork:2, rename:'', enchants:[{ name:'Unbreaking', level:2 }]}),
       // 5 = 3+0; same as 4 but more costly
       //   origin uses: 1,2
       //   parent cost: 2+0
@@ -344,7 +386,7 @@ jazil.AddTestSet(mainPage, 'ItemCombiner', {
       //   enchant cost: 2
       //     unbreaking lvl 2 * mult 1 (book)
       //   total cost: 5
-      //BuildItem({ set:g_combined, tag:5, name:'Pickaxe', count:1, cost:3, totalCost:5, priorWork:2, enchants:[{ name:'Unbreaking', level:2 }]}),
+      //BuildItem({ set:g_combined, tag:5, name:'Pickaxe', count:1, cost:3, totalCost:5, priorWork:2, rename:'', enchants:[{ name:'Unbreaking', level:2 }]}),
       // 6 = 3+2; same as 4 but this wastes a book
       //   origin uses: 1,3
       //   parent cost: 2+1
@@ -352,7 +394,7 @@ jazil.AddTestSet(mainPage, 'ItemCombiner', {
       //   enchant cost: 2
       //     unbreaking lvl 2 * mult 1 (book)
       //   total cost: 7
-      //BuildItem({ set:g_combined, tag:6, name:'Pickaxe', count:1, cost:4, totalCost:7, priorWork:2, enchants:[{ name:'Unbreaking', level:2 }]}),
+      //BuildItem({ set:g_combined, tag:6, name:'Pickaxe', count:1, cost:4, totalCost:7, priorWork:2, rename:'', enchants:[{ name:'Unbreaking', level:2 }]}),
       // 7 = 3+3
       //   origin uses: 0,4
       //   parent cost: 2+2
@@ -360,7 +402,7 @@ jazil.AddTestSet(mainPage, 'ItemCombiner', {
       //   enchant cost: 3
       //     unbreaking lvl 3 * mult 1 (book)
       //   total cost: 9
-      BuildItem({ set:g_combined, tag:7, name:'Book', count:1, cost:5, totalCost:9, priorWork:2, enchants:[{ name:'Unbreaking', level:3 }]}),
+      BuildItem({ set:g_combined, tag:7, name:'Book', count:1, cost:5, totalCost:9, priorWork:2, rename:'', enchants:[{ name:'Unbreaking', level:3 }]}),
       // 8 = 4+3
       //   origin uses: 0,4
       //   parent cost: 4+2
@@ -368,10 +410,10 @@ jazil.AddTestSet(mainPage, 'ItemCombiner', {
       //   enchant cost: 3
       //     unbreaking lvl 3 * mult 1 (book)
       //   total cost: 13
-      BuildItem({ set:g_combined, tag:8, name:'Pickaxe', count:1, cost:7, totalCost:13, priorWork:3, enchants:[{ name:'Unbreaking', level:3 }]}),
+      BuildItem({ set:g_combined, tag:8, name:'Pickaxe', count:1, cost:7, totalCost:13, priorWork:3, rename:'', enchants:[{ name:'Unbreaking', level:3 }]}),
     ]
 
-    TestCombineResult(jazil, sourceItems, true, desiredItem, expectedItems)
+    TestCombineResult(jazil, sourceItems, true, desiredItem, false, expectedItems)
   },
 
   'Prior work is taken up in cost and result - stacked version => 1 combine': (jazil) => {
@@ -389,13 +431,13 @@ jazil.AddTestSet(mainPage, 'ItemCombiner', {
       //   enchant cost: 4
       //     unbreaking lvl 2 * mult 2 (tool)
       //   total cost: 34
-      BuildItem({ set:g_combined, tag:2, name:'Pickaxe', cost:34, priorWork:5, enchants:[{ name:'Unbreaking', level:2 }]}),
+      BuildItem({ set:g_combined, tag:2, name:'Pickaxe', cost:34, priorWork:5, rename:'', enchants:[{ name:'Unbreaking', level:2 }]}),
     ]
 
-    TestCombineResult(jazil, sourceItems, true, desiredItem, expectedItems)
+    TestCombineResult(jazil, sourceItems, true, desiredItem, false, expectedItems)
   },
 
-  'Prior work is taken up in cost and result - loose version => 1 combine': (jazil) => {
+  'Prior work is taken up in cost and result + rename - loose version => 1 combine + rename-tagged item': (jazil) => {
     let sourceItems = [
       BuildItem({ set:g_source, tag:0, name:'Pickaxe', priorWork:0, enchants:[{ name:'Unbreaking' }]}),
       BuildItem({ set:g_source, tag:1, name:'Pickaxe', priorWork:4, enchants:[{ name:'Unbreaking' }]}),
@@ -411,10 +453,10 @@ jazil.AddTestSet(mainPage, 'ItemCombiner', {
       //   enchant cost: 4
       //     unbreaking lvl 2 * mult 2 (tool)
       //   total cost: 19
-      BuildItem({ set:g_combined, tag:3, name:'Pickaxe', cost:19, priorWork:5, enchants:[{ name:'Unbreaking', level:2 }]}),
+      BuildItem({ set:g_combined, tag:3, name:'Pickaxe', cost:19, priorWork:5, rename:'r', enchants:[{ name:'Unbreaking', level:2 }]}),
     ]
 
-    TestCombineResult(jazil, sourceItems, true, desiredItem, expectedItems)
+    TestCombineResult(jazil, sourceItems, true, desiredItem, true, expectedItems)
   },
 
   'Merging enchants where order matters for cost => correct combine': (jazil) => {
@@ -433,7 +475,7 @@ jazil.AddTestSet(mainPage, 'ItemCombiner', {
       //   enchant cost: 2
       //     unbreaking lvl 1 * mult 2 (tool)
       //   total cost: 2
-      BuildItem({ set:g_combined, tag:3, name:'Pickaxe', cost:2, priorWork:1, enchants:[{ name:'Unbreaking' }, { name:'Mending' }]}),
+      BuildItem({ set:g_combined, tag:3, name:'Pickaxe', cost:2, priorWork:1, rename:'', enchants:[{ name:'Unbreaking' }, { name:'Mending' }]}),
       // 4 = 0+1; same as 3 but with higher cost
       //   origin uses: 1,1
       //   parent cost: 0+0
@@ -441,10 +483,10 @@ jazil.AddTestSet(mainPage, 'ItemCombiner', {
       //   enchant cost: 4
       //     mending lvl 1 * mult 4 (tool)
       //   total cost: 4
-      //BuildItem({ set:g_combined, tag:4, name:'Pickaxe', cost:4, priorWork:1, enchants:[{ name:'Unbreaking' }, { name:'Mending' }]}),
+      //BuildItem({ set:g_combined, tag:4, name:'Pickaxe', cost:4, priorWork:1, rename:'', enchants:[{ name:'Unbreaking' }, { name:'Mending' }]}),
     ]
 
-    TestCombineResult(jazil, sourceItems, true, desiredItem, expectedItems)
+    TestCombineResult(jazil, sourceItems, true, desiredItem, false, expectedItems)
   },
 
   'Merging enchants where order matters for cost + one-sided prior work => correct combine': (jazil) => {
@@ -463,7 +505,7 @@ jazil.AddTestSet(mainPage, 'ItemCombiner', {
       //   enchant cost: 2
       //     unbreaking lvl 1 * mult 2 (tool)
       //   total cost: 17
-      BuildItem({ set:g_combined, tag:3, name:'Pickaxe', cost:17, priorWork:5, enchants:[{ name:'Unbreaking' }, { name:'Mending' }]}),
+      BuildItem({ set:g_combined, tag:3, name:'Pickaxe', cost:17, priorWork:5, rename:'', enchants:[{ name:'Unbreaking' }, { name:'Mending' }]}),
       // 4 = 0+1; same as 3 but with higher cost
       //   origin uses: 1,1
       //   parent cost: 0+0
@@ -471,10 +513,10 @@ jazil.AddTestSet(mainPage, 'ItemCombiner', {
       //   enchant cost: 4
       //     mending lvl 1 * mult 4 (tool)
       //   total cost: 19
-      //BuildItem({ set:g_combined, tag:4, name:'Pickaxe', cost:19, priorWork:5, enchants:[{ name:'Unbreaking' }, { name:'Mending' }]}),
+      //BuildItem({ set:g_combined, tag:4, name:'Pickaxe', cost:19, priorWork:5, rename:'', enchants:[{ name:'Unbreaking' }, { name:'Mending' }]}),
     ]
 
-    TestCombineResult(jazil, sourceItems, true, desiredItem, expectedItems)
+    TestCombineResult(jazil, sourceItems, true, desiredItem, false, expectedItems)
   },
 
   'Conflicting enchants have their cost & order matters => 2 combines + spin offs': (jazil) => {
@@ -494,7 +536,7 @@ jazil.AddTestSet(mainPage, 'ItemCombiner', {
       //     frost walker: dropped = 1
       //     unbreaking lvl 1 & mult 1 (book)
       //   total cost: 2
-      BuildItem({ set:g_combined, tag:3, name:'Boots', cost:2, priorWork:1, enchants:[{ name:'Depth Strider' }, { name:'Feather Falling' }, { name:'Unbreaking' }]}),
+      BuildItem({ set:g_combined, tag:3, name:'Boots', cost:2, priorWork:1, rename:'', enchants:[{ name:'Depth Strider' }, { name:'Feather Falling' }, { name:'Unbreaking' }]}),
       // 4 = 2+1
       //   origin uses: 0,1,1
       //   parent cost: 0+0
@@ -503,7 +545,7 @@ jazil.AddTestSet(mainPage, 'ItemCombiner', {
       //     frost walker lvl 1 & mult 2 (book)
       //     unbreaking lvl 1 & mult 1 (book)
       //   total cost: 3
-      BuildItem({ set:g_combined, tag:4, name:'Boots', cost:3, priorWork:1, enchants:[{ name:'Frost Walker' }, { name:'Unbreaking' }]}),
+      BuildItem({ set:g_combined, tag:4, name:'Boots', cost:3, priorWork:1, rename:'', enchants:[{ name:'Frost Walker' }, { name:'Unbreaking' }]}),
       // 5 = 4+0
       //   origin uses: 1,1,1
       //   parent cost: 3+0
@@ -512,7 +554,7 @@ jazil.AddTestSet(mainPage, 'ItemCombiner', {
       //     depth strider: dropped  = 1
       //     Feather Falling lvl 1 & mult 2 (tool)
       //   total cost: 7
-      BuildItem({ set:g_combined, tag:5, name:'Boots', cost:4, totalCost:7, priorWork:2, enchants:[{ name:'Frost Walker' }, { name:'Feather Falling' }, { name:'Unbreaking' }]}),
+      BuildItem({ set:g_combined, tag:5, name:'Boots', cost:4, totalCost:7, priorWork:2, rename:'', enchants:[{ name:'Frost Walker' }, { name:'Feather Falling' }, { name:'Unbreaking' }]}),
       // 6 = 0+4; same as 3 but with lower cost and less ingredients
       //   origin uses: 1,1,1
       //   parent cost: 0+3
@@ -521,10 +563,10 @@ jazil.AddTestSet(mainPage, 'ItemCombiner', {
       //     frost walker: dropped = 1
       //     unbreaking lvl 1 & mult 2 (tool)
       //   total cost: 7
-      //BuildItem({ set:g_combined, tag:6, name:'Boots', cost:4, totalCost:7, priorWork:2, enchants:[{ name:'Depth Strider' }, { name:'Feather Falling' }, { name:'Unbreaking' }]}),
+      //BuildItem({ set:g_combined, tag:6, name:'Boots', cost:4, totalCost:7, priorWork:2, rename:'', enchants:[{ name:'Depth Strider' }, { name:'Feather Falling' }, { name:'Unbreaking' }]}),
     ]
 
-    TestCombineResult(jazil, sourceItems, true, desiredItem, expectedItems)
+    TestCombineResult(jazil, sourceItems, true, desiredItem, false, expectedItems)
   },
 
   'Merging appropriate + inappropriate enchants => correct combine + extra spin offs': (jazil) => {
@@ -544,7 +586,7 @@ jazil.AddTestSet(mainPage, 'ItemCombiner', {
       //     unbreaking lvl 1 * mult 1 (book)
       //     protection: ignored
       //   total cost: 1
-      BuildItem({ set:g_combined, tag:3, name:'Pickaxe', cost:1, priorWork:1, enchants:[{ name:'Unbreaking' }, { name:'Mending' }]}),
+      BuildItem({ set:g_combined, tag:3, name:'Pickaxe', cost:1, priorWork:1, rename:'', enchants:[{ name:'Unbreaking' }, { name:'Mending' }]}),
       // 4 = 1+2
       //   origin uses: 0,1,1
       //   parent cost: 0+0
@@ -553,7 +595,7 @@ jazil.AddTestSet(mainPage, 'ItemCombiner', {
       //     unbreaking lvl 1 * mult 1 (book)
       //     protection: ignored
       //   total cost: 1
-      BuildItem({ set:g_combined, tag:4, name:'Pickaxe', cost:1, priorWork:1, enchants:[{ name:'Unbreaking' }]}),
+      BuildItem({ set:g_combined, tag:4, name:'Pickaxe', cost:1, priorWork:1, rename:'', enchants:[{ name:'Unbreaking' }]}),
       // 5 = 4+0; same as 3 but more costly
       //   origin uses: 1,1,1
       //   parent cost: 1+0
@@ -561,7 +603,7 @@ jazil.AddTestSet(mainPage, 'ItemCombiner', {
       //   enchant cost: 4
       //     mending lvl 1 * mult 4 (tool)
       //   total cost: 6
-      //BuildItem({ set:g_combined, tag:5, name:'Pickaxe', cost:3, totalCost:4, priorWork:2, enchants:[{ name:'Unbreaking' }, { name:'Mending' }]}),
+      //BuildItem({ set:g_combined, tag:5, name:'Pickaxe', cost:3, totalCost:4, priorWork:2, rename:'', enchants:[{ name:'Unbreaking' }, { name:'Mending' }]}),
       // 6 = 0+4; same as 3 but more costly
       //   origin uses: 1,1,1
       //   parent cost: 0+1
@@ -569,10 +611,10 @@ jazil.AddTestSet(mainPage, 'ItemCombiner', {
       //   enchant cost: 2
       //     unbreaking lvl 1 * mult 2 (tool)
       //   total cost: 4
-      //BuildItem({ set:g_combined, tag:6, name:'Pickaxe', cost:3, totalCost:4, priorWork:2, enchants:[{ name:'Unbreaking' }, { name:'Mending' }]}),
+      //BuildItem({ set:g_combined, tag:6, name:'Pickaxe', cost:3, totalCost:4, priorWork:2, rename:'', enchants:[{ name:'Unbreaking' }, { name:'Mending' }]}),
     ]
 
-    TestCombineResult(jazil, sourceItems, true, desiredItem, expectedItems)
+    TestCombineResult(jazil, sourceItems, true, desiredItem, false, expectedItems)
   },
 
   'Incompatibly enchanted source item + compatibly enchanted source book => correct combine via added extra + extra spin offs': (jazil) => {
@@ -591,7 +633,7 @@ jazil.AddTestSet(mainPage, 'ItemCombiner', {
       //   enchants 0+1: 1
       //     unbreaking lvl 1 * mult 1 (book)
       //   total cost: 1
-      BuildItem({ set:g_combined, tag:3, name:'Pickaxe', cost:1, priorWork:1, enchants:[{ name:'Unbreaking' }, { name:'Mending' }]}),
+      BuildItem({ set:g_combined, tag:3, name:'Pickaxe', cost:1, priorWork:1, rename:'', enchants:[{ name:'Unbreaking' }, { name:'Mending' }]}),
       // 4 = 1+2
       //   origin uses: 0,1,1
       //   parent cost: 0+0
@@ -599,7 +641,7 @@ jazil.AddTestSet(mainPage, 'ItemCombiner', {
       //   enchants 2+1: 1
       //     unbreaking lvl 1 * mult 1 (book)
       //   total cost: 1
-      BuildItem({ set:g_combined, tag:4, name:'Pickaxe', cost:1, priorWork:1, enchants:[{ name:'Unbreaking' }]}),
+      BuildItem({ set:g_combined, tag:4, name:'Pickaxe', cost:1, priorWork:1, rename:'', enchants:[{ name:'Unbreaking' }]}),
       // 5 = 4+0; same as 3 but more costly
       //   origin uses: 1,1,1
       //   parent cost: 1+0
@@ -607,7 +649,7 @@ jazil.AddTestSet(mainPage, 'ItemCombiner', {
       //   enchant cost: 4
       //     mending lvl 1 * mult 4 (tool)
       //   total cost: 6
-      //BuildItem({ set:g_combined, tag:5, name:'Pickaxe', cost:3, totalCost:6, priorWork:2, enchants:[{ name:'Unbreaking' }, { name:'Mending' }]}),
+      //BuildItem({ set:g_combined, tag:5, name:'Pickaxe', cost:3, totalCost:6, priorWork:2, rename:'', enchants:[{ name:'Unbreaking' }, { name:'Mending' }]}),
       // 6 = 0+4; same as 3 but more costly
       //   origin uses: 1,1,1
       //   parent cost: 0+1
@@ -615,10 +657,10 @@ jazil.AddTestSet(mainPage, 'ItemCombiner', {
       //   enchant cost: 2
       //     unbreaking lvl 1 * mult 2 (tool)
       //   total cost: 4
-      //BuildItem({ set:g_combined, tag:6, name:'Pickaxe', cost:3, totalCost:4, priorWork:2, enchants:[{ name:'Unbreaking' }, { name:'Mending' }]}),
+      //BuildItem({ set:g_combined, tag:6, name:'Pickaxe', cost:3, totalCost:4, priorWork:2, rename:'', enchants:[{ name:'Unbreaking' }, { name:'Mending' }]}),
     ]
 
-    TestCombineResult(jazil, sourceItems, true, desiredItem, expectedItems)
+    TestCombineResult(jazil, sourceItems, true, desiredItem, false, expectedItems)
   },
 
   'PriorWork-ed source item + compatibly enchanted source book => correct combine via added extra + extra spin offs': (jazil) => {
@@ -657,7 +699,7 @@ jazil.AddTestSet(mainPage, 'ItemCombiner', {
       //BuildItem({ set:g_combined, tag:6, name:'Pickaxe', cost:4, totalCost:5, priorWork:2, rename:'', enchants:[{ name:'Unbreaking' }]}),
     ]
 
-    TestCombineResult(jazil, sourceItems, true, desiredItem, expectedItems)
+    TestCombineResult(jazil, sourceItems, true, desiredItem, false, expectedItems)
   },
 
   'Complex combine #1, order 1': (jazil) => {
@@ -678,7 +720,7 @@ jazil.AddTestSet(mainPage, 'ItemCombiner', {
       //     knockback lvl 2 * mult 2 (tool)
       //     looting lvl 3 * mult 4 (tool)
       //   total cost: 20
-      //BuildItem({ set:g_combined, tag:3, name:'Sword', cost:20, priorWork:1, enchants:[{ name:'Sharpness', level:4 }, { name:'Knockback', level:2 }, { name:'Looting', level:3 }]}),
+      //BuildItem({ set:g_combined, tag:3, name:'Sword', cost:20, priorWork:1, rename:'', enchants:[{ name:'Sharpness', level:4 }, { name:'Knockback', level:2 }, { name:'Looting', level:3 }]}),
       // 4 = 0+1; same as 3 but less costly so taken
       //   origin uses: 1,1,0
       //   parent cost: 0+0
@@ -687,10 +729,10 @@ jazil.AddTestSet(mainPage, 'ItemCombiner', {
       //     sharpness lvl 4 * mult 1 (tool)
       //     looting lvl 3 * mult 4 (tool)
       //   total cost: 16
-      BuildItem({ set:g_combined, tag:4, name:'Sword', cost:16, priorWork:1, enchants:[{ name:'Sharpness', level:4 }, { name:'Knockback', level:2 }, { name:'Looting', level:3 }]}),
+      BuildItem({ set:g_combined, tag:4, name:'Sword', cost:16, priorWork:1, rename:'', enchants:[{ name:'Sharpness', level:4 }, { name:'Knockback', level:2 }, { name:'Looting', level:3 }]}),
     ]
 
-    TestCombineResult(jazil, sourceItems, true, desiredItem, expectedItems)
+    TestCombineResult(jazil, sourceItems, true, desiredItem, false, expectedItems)
   },
 
   'Complex combine #1, order 2': (jazil) => {
@@ -710,7 +752,7 @@ jazil.AddTestSet(mainPage, 'ItemCombiner', {
       //     sharpness lvl 4 * mult 1 (tool)
       //     looting lvl 3 * mult 4 (tool)
       //   total cost: 16
-      BuildItem({ set:g_combined, tag:3, name:'Sword', cost:16, priorWork:1, enchants:[{ name:'Sharpness', level:4 }, { name:'Knockback', level:2 }, { name:'Looting', level:3 }]}),
+      BuildItem({ set:g_combined, tag:3, name:'Sword', cost:16, priorWork:1, rename:'', enchants:[{ name:'Sharpness', level:4 }, { name:'Knockback', level:2 }, { name:'Looting', level:3 }]}),
       // 4 = 0+1; same as 3 but more costly
       //   origin uses: 1,1,0
       //   parent cost: 0+0
@@ -720,13 +762,13 @@ jazil.AddTestSet(mainPage, 'ItemCombiner', {
       //     knockback lvl 2 * mult 2 (tool)
       //     looting lvl 3 * mult 4 (tool)
       //   total cost: 20
-      //BuildItem({ set:g_combined, tag:4, name:'Sword', cost:20, priorWork:1, enchants:[{ name:'Sharpness', level:4 }, { name:'Knockback', level:2 }, { name:'Looting', level:3 }]}),
+      //BuildItem({ set:g_combined, tag:4, name:'Sword', cost:20, priorWork:1, rename:'', enchants:[{ name:'Sharpness', level:4 }, { name:'Knockback', level:2 }, { name:'Looting', level:3 }]}),
     ]
 
-    TestCombineResult(jazil, sourceItems, true, desiredItem, expectedItems)
+    TestCombineResult(jazil, sourceItems, true, desiredItem, false, expectedItems)
   },
 
-  'Complex combine with many permutations #1': (jazil) => {
+  'Complex combine with many permutations and rename': (jazil) => {
     let sourceItems = [
       BuildItem({ set:g_source, tag:0, name:'Pickaxe', priorWork:4, enchants:[{ name:'Unbreaking' }]}),
       BuildItem({ set:g_source, tag:1, name:'Pickaxe', enchants:[{ name:'Mending' }]}),
@@ -744,7 +786,7 @@ jazil.AddTestSet(mainPage, 'ItemCombiner', {
       //   enchant cost: 2
       //     unbreaking lvl 1 * mult 2 (tool)
       //   total cost: 17
-      BuildItem({ set:g_combined, tag:4, name:'Pickaxe', cost:17, priorWork:5, enchants:[{ name:'Unbreaking' }, { name:'Mending' }]}),
+      BuildItem({ set:g_combined, tag:4, name:'Pickaxe', cost:17, priorWork:5, rename:'r', enchants:[{ name:'Unbreaking' }, { name:'Mending' }]}),
       // - = 0+1; same as 4 but more costly
       //   origin uses: 1,1,0,0
       //   parent cost: 0+0
@@ -761,7 +803,7 @@ jazil.AddTestSet(mainPage, 'ItemCombiner', {
       //   enchant cost: 2
       //     unbreaking lvl 2 * mult 1 (book)
       //   total cost: 17
-      BuildItem({ set:g_combined, tag:5, name:'Pickaxe', cost:17, priorWork:5, enchants:[{ name:'Unbreaking', level:2 }]}),
+      BuildItem({ set:g_combined, tag:5, name:'Pickaxe', cost:17, priorWork:5, rename:'r', enchants:[{ name:'Unbreaking', level:2 }]}),
       // - = 2+1; illegal
       // 6 = 1+2
       //   origin uses: 0,1,1,0
@@ -770,7 +812,7 @@ jazil.AddTestSet(mainPage, 'ItemCombiner', {
       //   enchant cost: 1
       //     unbreaking lvl 1 * mult 1 (book)
       //   total cost: 1
-      BuildItem({ set:g_combined, tag:6, name:'Pickaxe', cost:1, priorWork:1, enchants:[{ name:'Unbreaking' }, { name:'Mending' }]}),
+      BuildItem({ set:g_combined, tag:6, name:'Pickaxe', cost:1, priorWork:1, rename:'r', enchants:[{ name:'Unbreaking' }, { name:'Mending' }]}),
       // - = 2+2; not enough uses
       // - = 3+0; useless
       // - = 0+3; useless
@@ -783,7 +825,7 @@ jazil.AddTestSet(mainPage, 'ItemCombiner', {
       //   enchant cost: 1
       //     unbreaking lvl 1 * mult 1 (book)
       //   total cost: 1
-      BuildItem({ set:g_combined, tag:7, name:'Pickaxe', cost:1, priorWork:1, enchants:[{ name:'Unbreaking' }]}),
+      BuildItem({ set:g_combined, tag:7, name:'Pickaxe', cost:1, priorWork:1, rename:'r', enchants:[{ name:'Unbreaking' }]}),
       // - = 2+3; illegal
       // - = 3+3; useless
       // - = 4+0; not enough uses
@@ -797,7 +839,7 @@ jazil.AddTestSet(mainPage, 'ItemCombiner', {
       //   enchant cost: 2
       //     unbreaking lvl 2 * mult 1 (book)
       //   total cost: 50
-      //BuildItem({ set:g_combined, tag:8, name:'Pickaxe', cost:33, totalCost:50, priorWork:6, enchants:[{ name:'Unbreaking', level:2 }, { name:'Mending' }]}),
+      //BuildItem({ set:g_combined, tag:8, name:'Pickaxe', cost:33, totalCost:50, priorWork:6, rename:'i', enchants:[{ name:'Unbreaking', level:2 }, { name:'Mending' }]}),
       // - = 2+4; illegal
       // - = 4+3; useless
       // - = 3+4; useless
@@ -832,7 +874,7 @@ jazil.AddTestSet(mainPage, 'ItemCombiner', {
       //   enchant cost: 4
       //     unbreaking lvl 2 * mult 2 (tool)
       //   total cost: 21
-      BuildItem({ set:g_combined, tag:9, name:'Pickaxe', cost:20, totalCost:21, priorWork:5, enchants:[{ name:'Unbreaking', level:2 }, { name:'Mending' }]}),
+      BuildItem({ set:g_combined, tag:9, name:'Pickaxe', cost:20, totalCost:21, priorWork:5, rename:'i', enchants:[{ name:'Unbreaking', level:2 }, { name:'Mending' }]}),
       // - = 0+6; more costly than 9
       //   origin uses: 1,1,1,0
       //   parent cost: 0+1
@@ -883,7 +925,7 @@ jazil.AddTestSet(mainPage, 'ItemCombiner', {
       //   total cost: 4
     ]
 
-    TestCombineResult(jazil, sourceItems, true, desiredItem, expectedItems)
+    TestCombineResult(jazil, sourceItems, true, desiredItem, true, expectedItems)
   },
 
   'Complex combine with many permutations #2': (jazil) => {
@@ -901,105 +943,105 @@ jazil.AddTestSet(mainPage, 'ItemCombiner', {
       // was generated by the output of the combine algorithm, and curated
       // by hand afterwards for correctness.
       // 5 = 0+1 - 1/1,1/10,0/1,0/4,0/1
-      BuildItem({ set:g_combined, tag:5, count:1, name:'Pickaxe', cost:7, totalCost:7, priorWork:3, enchants:[{ name:'Efficiency', level:1 }, { name:'Fortune', level:2 }]}),
+      BuildItem({ set:g_combined, tag:5, count:1, name:'Pickaxe', cost:7, totalCost:7, priorWork:3, rename:'', enchants:[{ name:'Efficiency', level:1 }, { name:'Fortune', level:2 }]}),
       // 6 = 1+1 - 0/1,2/10,0/1,0/4,0/1
-      BuildItem({ set:g_combined, tag:6, count:5, name:'Book', cost:6, totalCost:6, priorWork:1, enchants:[{ name:'Fortune', level:3 }]}),
+      BuildItem({ set:g_combined, tag:6, count:5, name:'Book', cost:6, totalCost:6, priorWork:1, rename:'', enchants:[{ name:'Fortune', level:3 }]}),
       // 7 = 0+2 - 1/1,0/10,1/1,0/4,0/1
-      BuildItem({ set:g_combined, tag:7, count:1, name:'Pickaxe', cost:4, totalCost:4, priorWork:3, enchants:[{ name:'Efficiency', level:1 }, { name:'Unbreaking', level:1 }]}),
+      BuildItem({ set:g_combined, tag:7, count:1, name:'Pickaxe', cost:4, totalCost:4, priorWork:3, rename:'', enchants:[{ name:'Efficiency', level:1 }, { name:'Unbreaking', level:1 }]}),
       // 8 = 2+1 - 0/1,1/10,1/1,0/4,0/1; superceded by 9
-      //BuildItem({ set:g_combined, tag:8, count:1, name:'Book', cost:4, totalCost:4, priorWork:1, enchants:[{ name:'Fortune', level:2 }, { name:'Unbreaking', level:1 }]}),
+      //BuildItem({ set:g_combined, tag:8, count:1, name:'Book', cost:4, totalCost:4, priorWork:1, rename:'', enchants:[{ name:'Fortune', level:2 }, { name:'Unbreaking', level:1 }]}),
       // 9 = 1+2 - 0/1,1/10,1/1,0/4,0/1; supercedes 8
-      BuildItem({ set:g_combined, tag:9, count:1, name:'Book', cost:1, totalCost:1, priorWork:1, enchants:[{ name:'Fortune', level:2 }, { name:'Unbreaking', level:1 }]}),
+      BuildItem({ set:g_combined, tag:9, count:1, name:'Book', cost:1, totalCost:1, priorWork:1, rename:'', enchants:[{ name:'Fortune', level:2 }, { name:'Unbreaking', level:1 }]}),
       // 10 = 0+3 - 1/1,0/10,0/1,1/4,0/1
-      BuildItem({ set:g_combined, tag:10, count:1, name:'Pickaxe', cost:7, totalCost:7, priorWork:3, enchants:[{ name:'Efficiency', level:2 }, { name:'Unbreaking', level:1 }]}),
+      BuildItem({ set:g_combined, tag:10, count:1, name:'Pickaxe', cost:7, totalCost:7, priorWork:3, rename:'', enchants:[{ name:'Efficiency', level:2 }, { name:'Unbreaking', level:1 }]}),
       // 11 = 3+1 - 0/1,1/10,0/1,1/4,0/1; superceded by 12
-      //BuildItem({ set:g_combined, tag:11, count:4, name:'Book', cost:5, totalCost:5, priorWork:2, enchants:[{ name:'Efficiency', level:1 }, { name:'Fortune', level:2 }, { name:'Unbreaking', level:1 }]}),
+      //BuildItem({ set:g_combined, tag:11, count:4, name:'Book', cost:5, totalCost:5, priorWork:2, rename:'', enchants:[{ name:'Efficiency', level:1 }, { name:'Fortune', level:2 }, { name:'Unbreaking', level:1 }]}),
       // 12 = 1+3 - 0/1,1/10,0/1,1/4,0/1; supercedes 11
-      BuildItem({ set:g_combined, tag:12, count:4, name:'Book', cost:3, totalCost:3, priorWork:2, enchants:[{ name:'Efficiency', level:1 }, { name:'Fortune', level:2 }, { name:'Unbreaking', level:1 }]}),
+      BuildItem({ set:g_combined, tag:12, count:4, name:'Book', cost:3, totalCost:3, priorWork:2, rename:'', enchants:[{ name:'Efficiency', level:1 }, { name:'Fortune', level:2 }, { name:'Unbreaking', level:1 }]}),
       // 13 = 3+2 - 0/1,0/10,1/1,1/4,0/1
-      BuildItem({ set:g_combined, tag:13, count:1, name:'Book', cost:3, totalCost:3, priorWork:2, enchants:[{ name:'Efficiency', level:1 }, { name:'Unbreaking', level:2 }]}),
+      BuildItem({ set:g_combined, tag:13, count:1, name:'Book', cost:3, totalCost:3, priorWork:2, rename:'', enchants:[{ name:'Efficiency', level:1 }, { name:'Unbreaking', level:2 }]}),
       // - = 2+3; worse than 13
       // 14 = 3+3 - 0/1,0/10,0/1,2/4,0/1
-      BuildItem({ set:g_combined, tag:14, count:2, name:'Book', cost:6, totalCost:6, priorWork:2, enchants:[{ name:'Efficiency', level:2 }, { name:'Unbreaking', level:2 }]}),
+      BuildItem({ set:g_combined, tag:14, count:2, name:'Book', cost:6, totalCost:6, priorWork:2, rename:'', enchants:[{ name:'Efficiency', level:2 }, { name:'Unbreaking', level:2 }]}),
       // 15 = 4+1 - 0/1,1/10,0/1,0/4,1/1
-      BuildItem({ set:g_combined, tag:15, count:1, name:'Pickaxe', cost:4, totalCost:4, priorWork:1, enchants:[{ name:'Fortune', level:2 }]}),
+      BuildItem({ set:g_combined, tag:15, count:1, name:'Pickaxe', cost:4, totalCost:4, priorWork:1, rename:'', enchants:[{ name:'Fortune', level:2 }]}),
       // 16 = 4+2 - 0/1,0/10,1/1,0/4,1/1
-      BuildItem({ set:g_combined, tag:16, count:1, name:'Pickaxe', cost:1, totalCost:1, priorWork:1, enchants:[{ name:'Unbreaking', level:1 }]}),
+      BuildItem({ set:g_combined, tag:16, count:1, name:'Pickaxe', cost:1, totalCost:1, priorWork:1, rename:'', enchants:[{ name:'Unbreaking', level:1 }]}),
       // 17 = 4+3 - 0/1,0/10,0/1,1/4,1/1
-      BuildItem({ set:g_combined, tag:17, count:1, name:'Pickaxe', cost:3, totalCost:3, priorWork:2, enchants:[{ name:'Efficiency', level:1 }, { name:'Unbreaking', level:1 }]}),
+      BuildItem({ set:g_combined, tag:17, count:1, name:'Pickaxe', cost:3, totalCost:3, priorWork:2, rename:'', enchants:[{ name:'Efficiency', level:1 }, { name:'Unbreaking', level:1 }]}),
       // 18 = 5+1 - 1/1,2/10,0/1,0/4,0/1; superceded by 21
-      //BuildItem({ set:g_combined, tag:18, count:1, name:'Pickaxe', cost:13, totalCost:20, priorWork:4, enchants:[{ name:'Efficiency', level:1 }, { name:'Fortune', level:3 }]}),
+      //BuildItem({ set:g_combined, tag:18, count:1, name:'Pickaxe', cost:13, totalCost:20, priorWork:4, rename:'', enchants:[{ name:'Efficiency', level:1 }, { name:'Fortune', level:3 }]}),
       // 19 = 5+2 - 1/1,1/10,1/1,0/4,0/1; superceded by 27
-      //BuildItem({ set:g_combined, tag:19, count:1, name:'Pickaxe', cost:8, totalCost:15, priorWork:4, enchants:[{ name:'Efficiency', level:1 }, { name:'Fortune', level:2 }, { name:'Unbreaking', level:1 }]}),
+      //BuildItem({ set:g_combined, tag:19, count:1, name:'Pickaxe', cost:8, totalCost:15, priorWork:4, rename:'', enchants:[{ name:'Efficiency', level:1 }, { name:'Fortune', level:2 }, { name:'Unbreaking', level:1 }]}),
       // 20 = 5+3 - 1/1,1/10,0/1,1/4,0/1; superceded by 34
-      //BuildItem({ set:g_combined, tag:20, count:1, name:'Pickaxe', cost:11, totalCost:18, priorWork:4, enchants:[{ name:'Efficiency', level:2 }, { name:'Fortune', level:2 }, { name:'Unbreaking', level:1 }]}),
+      //BuildItem({ set:g_combined, tag:20, count:1, name:'Pickaxe', cost:11, totalCost:18, priorWork:4, rename:'', enchants:[{ name:'Efficiency', level:2 }, { name:'Fortune', level:2 }, { name:'Unbreaking', level:1 }]}),
       // 21 = 0+6 - 1/1,2/10,0/1,0/4,0/1; supercedes 18
-      BuildItem({ set:g_combined, tag:21, count:1, name:'Pickaxe', cost:10, totalCost:16, priorWork:3, enchants:[{ name:'Efficiency', level:1 }, { name:'Fortune', level:3 }]}),
+      BuildItem({ set:g_combined, tag:21, count:1, name:'Pickaxe', cost:10, totalCost:16, priorWork:3, rename:'', enchants:[{ name:'Efficiency', level:1 }, { name:'Fortune', level:3 }]}),
       // 22 = 6+2 - 0/1,2/10,1/1,0/4,0/1
-      BuildItem({ set:g_combined, tag:22, count:1, name:'Book', cost:2, totalCost:8, priorWork:2, enchants:[{ name:'Fortune', level:3 }, { name:'Unbreaking', level:1 }]}),
+      BuildItem({ set:g_combined, tag:22, count:1, name:'Book', cost:2, totalCost:8, priorWork:2, rename:'', enchants:[{ name:'Fortune', level:3 }, { name:'Unbreaking', level:1 }]}),
       // - = 2+6; worse than 22
       // 23 = 6+3 - 0/1,2/10,0/1,1/4,0/1
-      BuildItem({ set:g_combined, tag:23, count:4, name:'Book', cost:4, totalCost:10, priorWork:2, enchants:[{ name:'Efficiency', level:1 }, { name:'Fortune', level:3 }, { name:'Unbreaking', level:1 }]}),
+      BuildItem({ set:g_combined, tag:23, count:4, name:'Book', cost:4, totalCost:10, priorWork:2, rename:'', enchants:[{ name:'Efficiency', level:1 }, { name:'Fortune', level:3 }, { name:'Unbreaking', level:1 }]}),
       // - = 3+6; worse than 23
       // 24 = 4+6 - 0/1,2/10,0/1,0/4,1/1; superceded by 49
-      //BuildItem({ set:g_combined, tag:24, count:1, name:'Pickaxe', cost:7, totalCost:13, priorWork:2, enchants:[{ name:'Fortune', level:3 }]}),
+      //BuildItem({ set:g_combined, tag:24, count:1, name:'Pickaxe', cost:7, totalCost:13, priorWork:2, rename:'', enchants:[{ name:'Fortune', level:3 }]}),
       // - = 5+6; worse than 21
       // - = 7+1; worse than 19
       // 25 = 7+3 - 1/1,0/10,1/1,1/4,0/1; superceded by 40
-      //BuildItem({ set:g_combined, tag:25, count:1, name:'Pickaxe', cost:12, totalCost:16, priorWork:4, enchants:[{ name:'Efficiency', level:2 }, { name:'Unbreaking', level:2 }]}),
+      //BuildItem({ set:g_combined, tag:25, count:1, name:'Pickaxe', cost:12, totalCost:16, priorWork:4, rename:'', enchants:[{ name:'Efficiency', level:2 }, { name:'Unbreaking', level:2 }]}),
       // 26 = 7+6 - 1/1,2/10,1/1,0/4,0/1; superceded by 30
-      //BuildItem({ set:g_combined, tag:26, count:1, name:'Pickaxe', cost:14, totalCost:24, priorWork:4, enchants:[{ name:'Efficiency', level:1 }, { name:'Fortune', level:3 }, { name:'Unbreaking', level:1 }]}),
+      //BuildItem({ set:g_combined, tag:26, count:1, name:'Pickaxe', cost:14, totalCost:24, priorWork:4, rename:'', enchants:[{ name:'Efficiency', level:1 }, { name:'Fortune', level:3 }, { name:'Unbreaking', level:1 }]}),
       // 27 = 0+9 - 1/1,1/10,1/1,0/4,0/1; supercedes 19
-      BuildItem({ set:g_combined, tag:27, count:1, name:'Pickaxe', cost:9, totalCost:10, priorWork:3, enchants:[{ name:'Efficiency', level:1 }, { name:'Fortune', level:2 }, { name:'Unbreaking', level:1 }]}),
+      BuildItem({ set:g_combined, tag:27, count:1, name:'Pickaxe', cost:9, totalCost:10, priorWork:3, rename:'', enchants:[{ name:'Efficiency', level:1 }, { name:'Fortune', level:2 }, { name:'Unbreaking', level:1 }]}),
       // - = 9+1; worse than 22
       // - = 1+9; worse than 22
       // 28 = 9+3 - 0/1,1/10,1/1,1/4,0/1
-      BuildItem({ set:g_combined, tag:28, count:1, name:'Book', cost:5, totalCost:6, priorWork:2, enchants:[{ name:'Efficiency', level:1 }, { name:'Fortune', level:2 }, { name:'Unbreaking', level:2 }]}),
+      BuildItem({ set:g_combined, tag:28, count:1, name:'Book', cost:5, totalCost:6, priorWork:2, rename:'', enchants:[{ name:'Efficiency', level:1 }, { name:'Fortune', level:2 }, { name:'Unbreaking', level:2 }]}),
       // - = 3+9; worse than 28
       // 29 = 4+9 - 0/1,1/10,1/1,0/4,1/1; superceded by 50
-      //BuildItem({ set:g_combined, tag:29, count:1, name:'Pickaxe', cost:6, totalCost:7, priorWork:2, enchants:[{ name:'Fortune', level:2 }, { name:'Unbreaking', level:1 }]}),
+      //BuildItem({ set:g_combined, tag:29, count:1, name:'Pickaxe', cost:6, totalCost:7, priorWork:2, rename:'', enchants:[{ name:'Fortune', level:2 }, { name:'Unbreaking', level:1 }]}),
       // 30 = 5+9 - 1/1,2/10,1/1,0/4,0/1; supercedes 26; superceded by 60
-      //BuildItem({ set:g_combined, tag:30, count:1, name:'Pickaxe', cost:15, totalCost:23, priorWork:4, enchants:[{ name:'Efficiency', level:1 }, { name:'Fortune', level:3 }, { name:'Unbreaking', level:1 }]}),
+      //BuildItem({ set:g_combined, tag:30, count:1, name:'Pickaxe', cost:15, totalCost:23, priorWork:4, rename:'', enchants:[{ name:'Efficiency', level:1 }, { name:'Fortune', level:3 }, { name:'Unbreaking', level:1 }]}),
       // - = 9+6; worse than 22
       // - = 6+9; worse than 22
       // - = 10+1; worse than 20
       // - = 10+2; worse than 25
       // 31 = 10+3 - 1/1,0/10,0/1,2/4,0/1; superceded by 42
-      //BuildItem({ set:g_combined, tag:31, count:1, name:'Pickaxe', cost:12, totalCost:19, priorWork:4, enchants:[{ name:'Efficiency', level:2 }, { name:'Unbreaking', level:2 }]}),
+      //BuildItem({ set:g_combined, tag:31, count:1, name:'Pickaxe', cost:12, totalCost:19, priorWork:4, rename:'', enchants:[{ name:'Efficiency', level:2 }, { name:'Unbreaking', level:2 }]}),
       // 32 = 10+6 - 1/1,2/10,0/1,1/4,0/1; superceded by 63
-      //BuildItem({ set:g_combined, tag:32, count:1, name:'Pickaxe', cost:14, totalCost:27, priorWork:4, enchants:[{ name:'Efficiency', level:2 }, { name:'Fortune', level:3 }, { name:'Unbreaking', level:1 }]}),
+      //BuildItem({ set:g_combined, tag:32, count:1, name:'Pickaxe', cost:14, totalCost:27, priorWork:4, rename:'', enchants:[{ name:'Efficiency', level:2 }, { name:'Fortune', level:3 }, { name:'Unbreaking', level:1 }]}),
       // 33 = 10+9 - 1/1,1/10,1/1,1/4,0/1; superceded by 67
-      //BuildItem({ set:g_combined, tag:33, count:1, name:'Pickaxe', cost:14, totalCost:22, priorWork:4, enchants:[{ name:'Efficiency', level:2 }, { name:'Fortune', level:2 }, { name:'Unbreaking', level:2 }]}),
+      //BuildItem({ set:g_combined, tag:33, count:1, name:'Pickaxe', cost:14, totalCost:22, priorWork:4, rename:'', enchants:[{ name:'Efficiency', level:2 }, { name:'Fortune', level:2 }, { name:'Unbreaking', level:2 }]}),
       // 34 = 0+12 - 1/1,1/10,0/1,1/4,0/1; supercedes 20
-      BuildItem({ set:g_combined, tag:34, count:1, name:'Pickaxe', cost:13, totalCost:16, priorWork:3, enchants:[{ name:'Efficiency', level:2 }, { name:'Fortune', level:2 }, { name:'Unbreaking', level:1 }]}),
+      BuildItem({ set:g_combined, tag:34, count:1, name:'Pickaxe', cost:13, totalCost:16, priorWork:3, rename:'', enchants:[{ name:'Efficiency', level:2 }, { name:'Fortune', level:2 }, { name:'Unbreaking', level:1 }]}),
       // - = 12+1; worse than 23
       // - = 1+12; worse than 23
       // - = 12+2; worse than 28
       // - = 2+12; worse than 28
       // 35 = 12+3 - 0/1,1/10,0/1,2/4,0/1
-      BuildItem({ set:g_combined, tag:35, count:2, name:'Book', cost:8, totalCost:11, priorWork:3, enchants:[{ name:'Efficiency', level:2 }, { name:'Fortune', level:2 }, { name:'Unbreaking', level:2 }]}),
+      BuildItem({ set:g_combined, tag:35, count:2, name:'Book', cost:8, totalCost:11, priorWork:3, rename:'', enchants:[{ name:'Efficiency', level:2 }, { name:'Fortune', level:2 }, { name:'Unbreaking', level:2 }]}),
       // - = 3+12; worse than 35
       // 36 = 4+12 - 0/1,1/10,0/1,1/4,1/1; superceded by 51
-      //BuildItem({ set:g_combined, tag:36, count:1, name:'Pickaxe', cost:9, totalCost:12, priorWork:3, enchants:[{ name:'Efficiency', level:1 }, { name:'Fortune', level:2 }, { name:'Unbreaking', level:1 }]}),
+      //BuildItem({ set:g_combined, tag:36, count:1, name:'Pickaxe', cost:9, totalCost:12, priorWork:3, rename:'', enchants:[{ name:'Efficiency', level:1 }, { name:'Fortune', level:2 }, { name:'Unbreaking', level:1 }]}),
       // - = 5+12; worse than 32
       // - = 12+6; worse than 23
       // - = 6+12; worse than 23
       // - = 7+12; worse than 33
       // 37 = 12+9 - 0/1,2/10,1/1,1/4,0/1; superceded by 61
-      //BuildItem({ set:g_combined, tag:37, count:1, name:'Book', cost:12, totalCost:16, priorWork:3, enchants:[{ name:'Efficiency', level:1 }, { name:'Fortune', level:3 }, { name:'Unbreaking', level:2 }]}),
+      //BuildItem({ set:g_combined, tag:37, count:1, name:'Book', cost:12, totalCost:16, priorWork:3, rename:'', enchants:[{ name:'Efficiency', level:1 }, { name:'Fortune', level:3 }, { name:'Unbreaking', level:2 }]}),
       // - = 9+12; worse than 37
       // 38 = 10+12 - 1/1,1/10,0/1,2/4,0/1; superceded by 44
-      //BuildItem({ set:g_combined, tag:38, count:1, name:'Pickaxe', cost:18, totalCost:28, priorWork:4, enchants:[{ name:'Efficiency', level:2 }, { name:'Fortune', level:2 }, { name:'Unbreaking', level:2 }]}),
+      //BuildItem({ set:g_combined, tag:38, count:1, name:'Pickaxe', cost:18, totalCost:28, priorWork:4, rename:'', enchants:[{ name:'Efficiency', level:2 }, { name:'Fortune', level:2 }, { name:'Unbreaking', level:2 }]}),
       // 39 = 12+12 - 0/1,2/10,0/1,2/4,0/1; superceded by 45
-      //BuildItem({ set:g_combined, tag:39, count:2, name:'Book', cost:16, totalCost:22, priorWork:3, enchants:[{ name:'Efficiency', level:2 }, { name:'Fortune', level:3 }, { name:'Unbreaking', level:2 }]}),
+      //BuildItem({ set:g_combined, tag:39, count:2, name:'Book', cost:16, totalCost:22, priorWork:3, rename:'', enchants:[{ name:'Efficiency', level:2 }, { name:'Fortune', level:3 }, { name:'Unbreaking', level:2 }]}),
       // 40 = 0+13 - 1/1,0/10,1/1,1/4,0/1; supercedes 25
-      BuildItem({ set:g_combined, tag:40, count:1, name:'Pickaxe', cost:10, totalCost:13, priorWork:3, enchants:[{ name:'Efficiency', level:2 }, { name:'Unbreaking', level:2 }]}),
+      BuildItem({ set:g_combined, tag:40, count:1, name:'Pickaxe', cost:10, totalCost:13, priorWork:3, rename:'', enchants:[{ name:'Efficiency', level:2 }, { name:'Unbreaking', level:2 }]}),
       // - = 13+1; worse than 28
       // - = 1+13; worse than 28
       // - = 13+3; worse than 14
       // - = 3+13; worse than 14
       // 41 = 4+13 - 0/1,0/10,1/1,1/4,1/1; superceded by 56
-      //BuildItem({ set:g_combined, tag:41, count:1, name:'Pickaxe', cost:6, totalCost:9, priorWork:3, enchants:[{ name:'Efficiency', level:1 }, { name:'Unbreaking', level:2 }]}),
+      //BuildItem({ set:g_combined, tag:41, count:1, name:'Pickaxe', cost:6, totalCost:9, priorWork:3, rename:'', enchants:[{ name:'Efficiency', level:1 }, { name:'Unbreaking', level:2 }]}),
       // - = 5+13; worse than 33
       // - = 13+6; worse than 37
       // - = 6+13; worse than 37
@@ -1007,56 +1049,56 @@ jazil.AddTestSet(mainPage, 'ItemCombiner', {
       // - = 13+12; worse than 35
       // - = 12+13; worse than 35
       // 42 = 0+14 - 1/1,0/10,0/1,2/4,0/1; supercedes 31
-      BuildItem({ set:g_combined, tag:42, count:1, name:'Pickaxe', cost:10, totalCost:16, priorWork:3, enchants:[{ name:'Efficiency', level:2 }, { name:'Unbreaking', level:2 }]}),
+      BuildItem({ set:g_combined, tag:42, count:1, name:'Pickaxe', cost:10, totalCost:16, priorWork:3, rename:'', enchants:[{ name:'Efficiency', level:2 }, { name:'Unbreaking', level:2 }]}),
       // - = 14+1; worse than 35
       // - = 1+14; worse than 35
       // 43 = 4+14 - 0/1,0/10,0/1,2/4,1/1; superceded by 57
-      //BuildItem({ set:g_combined, tag:43, count:1, name:'Pickaxe', cost:7, totalCost:13, priorWork:3, enchants:[{ name:'Efficiency', level:2 }, { name:'Unbreaking', level:2 }]}),
+      //BuildItem({ set:g_combined, tag:43, count:1, name:'Pickaxe', cost:7, totalCost:13, priorWork:3, rename:'', enchants:[{ name:'Efficiency', level:2 }, { name:'Unbreaking', level:2 }]}),
       // 44 = 5+14 - 1/1,1/10,0/1,2/4,0/1; supercedes 38
-      BuildItem({ set:g_combined, tag:44, count:1, name:'Pickaxe', cost:14, totalCost:27, priorWork:4, enchants:[{ name:'Efficiency', level:2 }, { name:'Fortune', level:2 }, { name:'Unbreaking', level:2 }]}),
+      BuildItem({ set:g_combined, tag:44, count:1, name:'Pickaxe', cost:14, totalCost:27, priorWork:4, rename:'', enchants:[{ name:'Efficiency', level:2 }, { name:'Fortune', level:2 }, { name:'Unbreaking', level:2 }]}),
       // - = 14+6; worse than 39
       // 45 = 6+14 - 0/1,2/10,0/1,2/4,0/1; supercedes 39; superceded by 64
-      //BuildItem({ set:g_combined, tag:45, count:2, name:'Book', cost:8, totalCost:20, priorWork:3, enchants:[{ name:'Efficiency', level:2 }, { name:'Fortune', level:3 }, { name:'Unbreaking', level:2 }]}),
+      //BuildItem({ set:g_combined, tag:45, count:2, name:'Book', cost:8, totalCost:20, priorWork:3, rename:'', enchants:[{ name:'Efficiency', level:2 }, { name:'Fortune', level:3 }, { name:'Unbreaking', level:2 }]}),
       // - = 7+14; worse than 40
       // - = 14+9; worse than 35
       // - = 9+14; worse than 35
       // 46 = 10+14 - 1/1,0/10,0/1,3/4,0/1
-      BuildItem({ set:g_combined, tag:46, count:1, name:'Pickaxe', cost:15, totalCost:28, priorWork:4, enchants:[{ name:'Efficiency', level:3 }, { name:'Unbreaking', level:2 }]}),
+      BuildItem({ set:g_combined, tag:46, count:1, name:'Pickaxe', cost:15, totalCost:28, priorWork:4, rename:'', enchants:[{ name:'Efficiency', level:3 }, { name:'Unbreaking', level:2 }]}),
       // - = 14+12; worse than 35
       // - = 12+14; worse than 35
       // 47 = 14+13 - 0/1,0/10,1/1,3/4,0/1
-      BuildItem({ set:g_combined, tag:47, count:1, name:'Book', cost:11, totalCost:20, priorWork:3, enchants:[{ name:'Efficiency', level:2 }, { name:'Unbreaking', level:3 }]}),
+      BuildItem({ set:g_combined, tag:47, count:1, name:'Book', cost:11, totalCost:20, priorWork:3, rename:'', enchants:[{ name:'Efficiency', level:2 }, { name:'Unbreaking', level:3 }]}),
       // - = 13+14; worse than 47
       // 48 = 14+14 - 0/1,0/10,0/1,4/4,0/1
-      BuildItem({ set:g_combined, tag:48, count:1, name:'Book', cost:12, totalCost:24, priorWork:3, enchants:[{ name:'Efficiency', level:3 }, { name:'Unbreaking', level:3 }]}),
+      BuildItem({ set:g_combined, tag:48, count:1, name:'Book', cost:12, totalCost:24, priorWork:3, rename:'', enchants:[{ name:'Efficiency', level:3 }, { name:'Unbreaking', level:3 }]}),
       // - = 15+0; worse than 5
       // - = 0+15; worse than 5
       // 49 = 15+1 - 0/1,2/10,0/1,0/4,1/1; supercedes 24
-      BuildItem({ set:g_combined, tag:49, count:1, name:'Pickaxe', cost:7, totalCost:11, priorWork:2, enchants:[{ name:'Fortune', level:3 }]}),
+      BuildItem({ set:g_combined, tag:49, count:1, name:'Pickaxe', cost:7, totalCost:11, priorWork:2, rename:'', enchants:[{ name:'Fortune', level:3 }]}),
       // 50 = 15+2 - 0/1,1/10,1/1,0/4,1/1; supercedes 29
-      BuildItem({ set:g_combined, tag:50, count:1, name:'Pickaxe', cost:2, totalCost:6, priorWork:2, enchants:[{ name:'Fortune', level:2 }, { name:'Unbreaking', level:1 }]}),
+      BuildItem({ set:g_combined, tag:50, count:1, name:'Pickaxe', cost:2, totalCost:6, priorWork:2, rename:'', enchants:[{ name:'Fortune', level:2 }, { name:'Unbreaking', level:1 }]}),
       // 51 = 15+3 - 0/1,1/10,0/1,1/4,1/1; supercedes 36
-      BuildItem({ set:g_combined, tag:51, count:1, name:'Pickaxe', cost:4, totalCost:8, priorWork:2, enchants:[{ name:'Efficiency', level:1 }, { name:'Fortune', level:2 }, { name:'Unbreaking', level:1 }]}),
+      BuildItem({ set:g_combined, tag:51, count:1, name:'Pickaxe', cost:4, totalCost:8, priorWork:2, rename:'', enchants:[{ name:'Efficiency', level:1 }, { name:'Fortune', level:2 }, { name:'Unbreaking', level:1 }]}),
       // - = 15+5; worse than 21
       // - = 5+15; worse than 21
       // - = 15+6; worse than 49
       // - = 15+7; worse than 27
       // - = 7+15; worse than 27
       // 52 = 15+9 - 0/1,2/10,1/1,0/4,1/1
-      BuildItem({ set:g_combined, tag:52, count:1, name:'Pickaxe', cost:9, totalCost:14, priorWork:2, enchants:[{ name:'Fortune', level:3 }, { name:'Unbreaking', level:1 }]}),
+      BuildItem({ set:g_combined, tag:52, count:1, name:'Pickaxe', cost:9, totalCost:14, priorWork:2, rename:'', enchants:[{ name:'Fortune', level:3 }, { name:'Unbreaking', level:1 }]}),
       // - = 15+10; worse than 34
       // - = 10+15; worse than 34
       // 53 = 15+12 - 0/1,2/10,0/1,1/4,1/1; superceded by 90
-      //BuildItem({ set:g_combined, tag:53, count:1, name:'Pickaxe', cost:12, totalCost:19, priorWork:3, enchants:[{ name:'Efficiency', level:1 }, { name:'Fortune', level:3 }, { name:'Unbreaking', level:1 }]}),
+      //BuildItem({ set:g_combined, tag:53, count:1, name:'Pickaxe', cost:12, totalCost:19, priorWork:3, rename:'', enchants:[{ name:'Efficiency', level:1 }, { name:'Fortune', level:3 }, { name:'Unbreaking', level:1 }]}),
       // 54 = 15+13 - 0/1,1/10,1/1,1/4,1/1; superceded by 94
-      //BuildItem({ set:g_combined, tag:54, count:1, name:'Pickaxe', cost:7, totalCost:14, priorWork:3, enchants:[{ name:'Efficiency', level:1 }, { name:'Fortune', level:2 }, { name:'Unbreaking', level:2 }]}),
+      //BuildItem({ set:g_combined, tag:54, count:1, name:'Pickaxe', cost:7, totalCost:14, priorWork:3, rename:'', enchants:[{ name:'Efficiency', level:1 }, { name:'Fortune', level:2 }, { name:'Unbreaking', level:2 }]}),
       // 55 = 15+14 - 0/1,1/10,0/1,2/4,1/1; superceded by 95
-      //BuildItem({ set:g_combined, tag:55, count:1, name:'Pickaxe', cost:8, totalCost:18, priorWork:3, enchants:[{ name:'Efficiency', level:2 }, { name:'Fortune', level:2 }, { name:'Unbreaking', level:2 }]}),
+      //BuildItem({ set:g_combined, tag:55, count:1, name:'Pickaxe', cost:8, totalCost:18, priorWork:3, rename:'', enchants:[{ name:'Efficiency', level:2 }, { name:'Fortune', level:2 }, { name:'Unbreaking', level:2 }]}),
       // - = 16+0; worse than 7
       // - = 0+16; worse than 7
       // - = 16+1; worse than 50
       // 56 = 16+3 - 0/1,0/10,1/1,1/4,1/1; supercedes 41
-      BuildItem({ set:g_combined, tag:56, count:1, name:'Pickaxe', cost:5, totalCost:6, priorWork:2, enchants:[{ name:'Efficiency', level:1 }, { name:'Unbreaking', level:2 }]}),
+      BuildItem({ set:g_combined, tag:56, count:1, name:'Pickaxe', cost:5, totalCost:6, priorWork:2, rename:'', enchants:[{ name:'Efficiency', level:1 }, { name:'Unbreaking', level:2 }]}),
       // - = 16+5; worse than 27
       // - = 5+16; worse than 27
       // - = 16+6; worse than 52
@@ -1069,7 +1111,7 @@ jazil.AddTestSet(mainPage, 'ItemCombiner', {
       // - = 17+1; worse than 51
       // - = 17+2; worse than 56
       // 57 = 17+3 - 0/1,0/10,0/1,2/4,1/1; supercedes 43
-      BuildItem({ set:g_combined, tag:57, count:1, name:'Pickaxe', cost:8, totalCost:11, priorWork:3, enchants:[{ name:'Efficiency', level:2 }, { name:'Unbreaking', level:2 }]}),
+      BuildItem({ set:g_combined, tag:57, count:1, name:'Pickaxe', cost:8, totalCost:11, priorWork:3, rename:'', enchants:[{ name:'Efficiency', level:2 }, { name:'Unbreaking', level:2 }]}),
       // - = 17+5; worse than 34
       // - = 5+17; worse than 34
       // - = 17+6; worse than 53
@@ -1086,17 +1128,17 @@ jazil.AddTestSet(mainPage, 'ItemCombiner', {
       // - = 21+9; worse than 30
       // - = 21+12; worse than 32
       // 58 = 21+13 - 1/1,2/10,1/1,1/4,0/1
-      BuildItem({ set:g_combined, tag:58, count:1, name:'Pickaxe', cost:14, totalCost:33, priorWork:4, enchants:[{ name:'Efficiency', level:2 }, { name:'Fortune', level:3 }, { name:'Unbreaking', level:2 }]}),
+      BuildItem({ set:g_combined, tag:58, count:1, name:'Pickaxe', cost:14, totalCost:33, priorWork:4, rename:'', enchants:[{ name:'Efficiency', level:2 }, { name:'Fortune', level:3 }, { name:'Unbreaking', level:2 }]}),
       // 59 = 21+14 - 1/1,2/10,0/1,2/4,0/1
-      BuildItem({ set:g_combined, tag:59, count:1, name:'Pickaxe', cost:14, totalCost:36, priorWork:4, enchants:[{ name:'Efficiency', level:2 }, { name:'Fortune', level:3 }, { name:'Unbreaking', level:2 }]}),
+      BuildItem({ set:g_combined, tag:59, count:1, name:'Pickaxe', cost:14, totalCost:36, priorWork:4, rename:'', enchants:[{ name:'Efficiency', level:2 }, { name:'Fortune', level:3 }, { name:'Unbreaking', level:2 }]}),
       // - = 21+16; worse than 30
       // - = 16+21; worse than 30
       // - = 21+17; worse than 32
       // - = 17+21; worse than 32
       // 60 = 0+22 - 1/1,2/10,1/1,0/4,0/1; supercedes 30
-      BuildItem({ set:g_combined, tag:60, count:1, name:'Pickaxe', cost:13, totalCost:21, priorWork:3, enchants:[{ name:'Efficiency', level:1 }, { name:'Fortune', level:3 }, { name:'Unbreaking', level:1 }]}),
+      BuildItem({ set:g_combined, tag:60, count:1, name:'Pickaxe', cost:13, totalCost:21, priorWork:3, rename:'', enchants:[{ name:'Efficiency', level:1 }, { name:'Fortune', level:3 }, { name:'Unbreaking', level:1 }]}),
       // 61 = 22+3 - 0/1,2/10,1/1,1/4,0/1; supercedes 37
-      BuildItem({ set:g_combined, tag:61, count:1, name:'Book', cost:7, totalCost:15, priorWork:3, enchants:[{ name:'Efficiency', level:1 }, { name:'Fortune', level:3 }, { name:'Unbreaking', level:2 }]}),
+      BuildItem({ set:g_combined, tag:61, count:1, name:'Book', cost:7, totalCost:15, priorWork:3, rename:'', enchants:[{ name:'Efficiency', level:1 }, { name:'Fortune', level:3 }, { name:'Unbreaking', level:2 }]}),
       // - = 3+22; worse than 61
       // - = 4+22; worse than 52
       // - = 5+22; worse than 60
@@ -1107,14 +1149,14 @@ jazil.AddTestSet(mainPage, 'ItemCombiner', {
       // - = 14+22; worse than 45
       // - = 15+22; worse than 52
       // 62 = 17+22 - 0/1,2/10,1/1,1/4,1/1; superceded by 65
-      //BuildItem({ set:g_combined, tag:62, count:1, name:'Pickaxe', cost:14, totalCost:25, priorWork:3, enchants:[{ name:'Efficiency', level:1 }, { name:'Fortune', level:3 }, { name:'Unbreaking', level:2 }]}),
+      //BuildItem({ set:g_combined, tag:62, count:1, name:'Pickaxe', cost:14, totalCost:25, priorWork:3, rename:'', enchants:[{ name:'Efficiency', level:1 }, { name:'Fortune', level:3 }, { name:'Unbreaking', level:2 }]}),
       // - = 21+22; worse than 60
       // 63 = 0+23 - 1/1,2/10,0/1,1/4,0/1; supercedes 32
-      BuildItem({ set:g_combined, tag:63, count:1, name:'Pickaxe', cost:15, totalCost:25, priorWork:3, enchants:[{ name:'Efficiency', level:2 }, { name:'Fortune', level:3 }, { name:'Unbreaking', level:1 }]}),
+      BuildItem({ set:g_combined, tag:63, count:1, name:'Pickaxe', cost:15, totalCost:25, priorWork:3, rename:'', enchants:[{ name:'Efficiency', level:2 }, { name:'Fortune', level:3 }, { name:'Unbreaking', level:1 }]}),
       // - = 23+2; worse than 61
       // - = 2+23; worse than 61
       // 64 = 23+3 - 0/1,2/10,0/1,2/4,0/1; supercedes 45
-      BuildItem({ set:g_combined, tag:64, count:2, name:'Book', cost:8, totalCost:18, priorWork:3, enchants:[{ name:'Efficiency', level:2 }, { name:'Fortune', level:3 }, { name:'Unbreaking', level:2 }]}),
+      BuildItem({ set:g_combined, tag:64, count:2, name:'Book', cost:8, totalCost:18, priorWork:3, rename:'', enchants:[{ name:'Efficiency', level:2 }, { name:'Fortune', level:3 }, { name:'Unbreaking', level:2 }]}),
       // - = 3+23; worse than 64
       // - = 4+23; worse than 53
       // - = 5+23; worse than 63
@@ -1130,9 +1172,9 @@ jazil.AddTestSet(mainPage, 'ItemCombiner', {
       // - = 14+23; worse than 64
       // - = 15+23; worse than 53
       // 65 = 16+23 - 0/1,2/10,1/1,1/4,1/1; supercedes 62; superceded by 69
-      //BuildItem({ set:g_combined, tag:65, count:1, name:'Pickaxe', cost:13, totalCost:24, priorWork:3, enchants:[{ name:'Efficiency', level:1 }, { name:'Fortune', level:3 }, { name:'Unbreaking', level:2 }]}),
+      //BuildItem({ set:g_combined, tag:65, count:1, name:'Pickaxe', cost:13, totalCost:24, priorWork:3, rename:'', enchants:[{ name:'Efficiency', level:1 }, { name:'Fortune', level:3 }, { name:'Unbreaking', level:2 }]}),
       // 66 = 17+23 - 0/1,2/10,0/1,2/4,1/1; superceded by 91
-      //BuildItem({ set:g_combined, tag:66, count:1, name:'Pickaxe', cost:16, totalCost:29, priorWork:3, enchants:[{ name:'Efficiency', level:2 }, { name:'Fortune', level:3 }, { name:'Unbreaking', level:2 }]}),
+      //BuildItem({ set:g_combined, tag:66, count:1, name:'Pickaxe', cost:16, totalCost:29, priorWork:3, rename:'', enchants:[{ name:'Efficiency', level:2 }, { name:'Fortune', level:3 }, { name:'Unbreaking', level:2 }]}),
       // - = 21+23; worse than 63
       // - = 23+22; worse than 61
       // - = 22+23; worse than 61
@@ -1148,7 +1190,7 @@ jazil.AddTestSet(mainPage, 'ItemCombiner', {
       // - = 17+27; worse than 33
       // - = 27+23; worse than 58
       // 67 = 0+28 - 1/1,1/10,1/1,1/4,0/1; supercedes 33
-      BuildItem({ set:g_combined, tag:67, count:1, name:'Pickaxe', cost:14, totalCost:20, priorWork:3, enchants:[{ name:'Efficiency', level:2 }, { name:'Fortune', level:2 }, { name:'Unbreaking', level:2 }]}),
+      BuildItem({ set:g_combined, tag:67, count:1, name:'Pickaxe', cost:14, totalCost:20, priorWork:3, rename:'', enchants:[{ name:'Efficiency', level:2 }, { name:'Fortune', level:2 }, { name:'Unbreaking', level:2 }]}),
       // - = 28+1; worse than 61
       // - = 1+28; worse than 61
       // - = 28+3; worse than 35
@@ -1161,10 +1203,10 @@ jazil.AddTestSet(mainPage, 'ItemCombiner', {
       // - = 28+12; worse than 64
       // - = 12+28; worse than 64
       // 68 = 28+14 - 0/1,1/10,1/1,3/4,0/1
-      BuildItem({ set:g_combined, tag:68, count:1, name:'Book', cost:11, totalCost:23, priorWork:3, enchants:[{ name:'Efficiency', level:2 }, { name:'Fortune', level:2 }, { name:'Unbreaking', level:3 }]}),
+      BuildItem({ set:g_combined, tag:68, count:1, name:'Book', cost:11, totalCost:23, priorWork:3, rename:'', enchants:[{ name:'Efficiency', level:2 }, { name:'Fortune', level:2 }, { name:'Unbreaking', level:3 }]}),
       // - = 14+28; worse than 68
       // 69 = 15+28 - 0/1,2/10,1/1,1/4,1/1; supercedes 65; superceded by 96
-      //BuildItem({ set:g_combined, tag:69, count:1, name:'Pickaxe', cost:13, totalCost:23, priorWork:3, enchants:[{ name:'Efficiency', level:1 }, { name:'Fortune', level:3 }, { name:'Unbreaking', level:2 }]}),
+      //BuildItem({ set:g_combined, tag:69, count:1, name:'Pickaxe', cost:13, totalCost:23, priorWork:3, rename:'', enchants:[{ name:'Efficiency', level:1 }, { name:'Fortune', level:3 }, { name:'Unbreaking', level:2 }]}),
       // - = 17+28; worse than 55
       // - = 21+28; worse than 58
       // - = 28+23; worse than 64
@@ -1177,7 +1219,7 @@ jazil.AddTestSet(mainPage, 'ItemCombiner', {
       // - = 34+12; worse than 59
       // - = 34+13; worse than 44
       // 70 = 34+14 - 1/1,1/10,0/1,3/4,0/1
-      BuildItem({ set:g_combined, tag:70, count:1, name:'Pickaxe', cost:15, totalCost:37, priorWork:4, enchants:[{ name:'Efficiency', level:3 }, { name:'Fortune', level:2 }, { name:'Unbreaking', level:2 }]}),
+      BuildItem({ set:g_combined, tag:70, count:1, name:'Pickaxe', cost:15, totalCost:37, priorWork:4, rename:'', enchants:[{ name:'Efficiency', level:3 }, { name:'Fortune', level:2 }, { name:'Unbreaking', level:2 }]}),
       // - = 34+15; worse than 63
       // - = 15+34; worse than 63
       // - = 34+16; worse than 67
@@ -1203,7 +1245,7 @@ jazil.AddTestSet(mainPage, 'ItemCombiner', {
       // - = 35+13; worse than 68
       // - = 13+35; worse than 68
       // 71 = 35+14 - 0/1,1/10,0/1,4/4,0/1
-      BuildItem({ set:g_combined, tag:71, count:1, name:'Book', cost:16, totalCost:33, priorWork:4, enchants:[{ name:'Efficiency', level:3 }, { name:'Fortune', level:2 }, { name:'Unbreaking', level:3 }]}),
+      BuildItem({ set:g_combined, tag:71, count:1, name:'Book', cost:16, totalCost:33, priorWork:4, rename:'', enchants:[{ name:'Efficiency', level:3 }, { name:'Fortune', level:2 }, { name:'Unbreaking', level:3 }]}),
       // - = 14+35; worse than 71
       // - = 15+35; worse than 66
       // - = 16+35; worse than 55
@@ -1215,38 +1257,38 @@ jazil.AddTestSet(mainPage, 'ItemCombiner', {
       // - = 23+35; worse than 64
       // - = 27+35; worse than 58
       // 72 = 35+28 - 0/1,2/10,1/1,3/4,0/1; superceded by 101
-      //BuildItem({ set:g_combined, tag:72, count:1, name:'Book', cost:21, totalCost:38, priorWork:4, enchants:[{ name:'Efficiency', level:2 }, { name:'Fortune', level:3 }, { name:'Unbreaking', level:3 }]}),
+      //BuildItem({ set:g_combined, tag:72, count:1, name:'Book', cost:21, totalCost:38, priorWork:4, rename:'', enchants:[{ name:'Efficiency', level:2 }, { name:'Fortune', level:3 }, { name:'Unbreaking', level:3 }]}),
       // - = 28+35; worse than 72
       // 73 = 34+35 - 1/1,2/10,0/1,3/4,0/1; superceded by 102
-      //BuildItem({ set:g_combined, tag:73, count:1, name:'Pickaxe', cost:25, totalCost:52, priorWork:4, enchants:[{ name:'Efficiency', level:3 }, { name:'Fortune', level:3 }, { name:'Unbreaking', level:2 }]}),
+      //BuildItem({ set:g_combined, tag:73, count:1, name:'Pickaxe', cost:25, totalCost:52, priorWork:4, rename:'', enchants:[{ name:'Efficiency', level:3 }, { name:'Fortune', level:3 }, { name:'Unbreaking', level:2 }]}),
       // 74 = 35+35 - 0/1,2/10,0/1,4/4,0/1; superceded by 87
-      //BuildItem({ set:g_combined, tag:74, count:1, name:'Book', cost:26, totalCost:48, priorWork:4, enchants:[{ name:'Efficiency', level:3 }, { name:'Fortune', level:3 }, { name:'Unbreaking', level:3 }]}),
+      //BuildItem({ set:g_combined, tag:74, count:1, name:'Book', cost:26, totalCost:48, priorWork:4, rename:'', enchants:[{ name:'Efficiency', level:3 }, { name:'Fortune', level:3 }, { name:'Unbreaking', level:3 }]}),
       // - = 40+1; worse than 67
       // - = 40+6; worse than 58
       // - = 40+12; worse than 44
       // 75 = 40+14 - 1/1,0/10,1/1,3/4,0/1
-      BuildItem({ set:g_combined, tag:75, count:1, name:'Pickaxe', cost:16, totalCost:35, priorWork:4, enchants:[{ name:'Efficiency', level:3 }, { name:'Unbreaking', level:3 }]}),
+      BuildItem({ set:g_combined, tag:75, count:1, name:'Pickaxe', cost:16, totalCost:35, priorWork:4, rename:'', enchants:[{ name:'Efficiency', level:3 }, { name:'Unbreaking', level:3 }]}),
       // - = 40+15; worse than 67
       // - = 15+40; worse than 67
       // - = 40+23; worse than 58
       // 76 = 40+35 - 1/1,1/10,1/1,3/4,0/1; superceded by 106
-      //BuildItem({ set:g_combined, tag:76, count:1, name:'Pickaxe', cost:24, totalCost:48, priorWork:4, enchants:[{ name:'Efficiency', level:3 }, { name:'Fortune', level:2 }, { name:'Unbreaking', level:3 }]}),
+      //BuildItem({ set:g_combined, tag:76, count:1, name:'Pickaxe', cost:24, totalCost:48, priorWork:4, rename:'', enchants:[{ name:'Efficiency', level:3 }, { name:'Fortune', level:2 }, { name:'Unbreaking', level:3 }]}),
       // - = 42+1; worse than 44
       // - = 42+6; worse than 59
       // - = 42+9; worse than 44
       // - = 42+12; worse than 44
       // 77 = 42+13 - 1/1,0/10,1/1,3/4,0/1
-      BuildItem({ set:g_combined, tag:77, count:1, name:'Pickaxe', cost:15, totalCost:34, priorWork:4, enchants:[{ name:'Efficiency', level:2 }, { name:'Unbreaking', level:3 }]}),
+      BuildItem({ set:g_combined, tag:77, count:1, name:'Pickaxe', cost:15, totalCost:34, priorWork:4, rename:'', enchants:[{ name:'Efficiency', level:2 }, { name:'Unbreaking', level:3 }]}),
       // 78 = 42+14 - 1/1,0/10,0/1,4/4,0/1
-      BuildItem({ set:g_combined, tag:78, count:1, name:'Pickaxe', cost:16, totalCost:38, priorWork:4, enchants:[{ name:'Efficiency', level:3 }, { name:'Unbreaking', level:3 }]}),
+      BuildItem({ set:g_combined, tag:78, count:1, name:'Pickaxe', cost:16, totalCost:38, priorWork:4, rename:'', enchants:[{ name:'Efficiency', level:3 }, { name:'Unbreaking', level:3 }]}),
       // - = 42+15; worse than 44
       // - = 15+42; worse than 44
       // - = 42+22; worse than 58
       // - = 42+23; worse than 59
       // 79 = 42+28 - 1/1,1/10,1/1,3/4,0/1
-      BuildItem({ set:g_combined, tag:79, count:1, name:'Pickaxe', cost:19, totalCost:41, priorWork:4, enchants:[{ name:'Efficiency', level:2 }, { name:'Fortune', level:2 }, { name:'Unbreaking', level:3 }]}),
+      BuildItem({ set:g_combined, tag:79, count:1, name:'Pickaxe', cost:19, totalCost:41, priorWork:4, rename:'', enchants:[{ name:'Efficiency', level:2 }, { name:'Fortune', level:2 }, { name:'Unbreaking', level:3 }]}),
       // 80 = 42+35 - 1/1,1/10,0/1,4/4,0/1
-      BuildItem({ set:g_combined, tag:80, count:1, name:'Pickaxe', cost:24, totalCost:51, priorWork:4, enchants:[{ name:'Efficiency', level:3 }, { name:'Fortune', level:2 }, { name:'Unbreaking', level:3 }]}),
+      BuildItem({ set:g_combined, tag:80, count:1, name:'Pickaxe', cost:24, totalCost:51, priorWork:4, rename:'', enchants:[{ name:'Efficiency', level:3 }, { name:'Fortune', level:2 }, { name:'Unbreaking', level:3 }]}),
       // - = 44+1; worse than 59
       // - = 44+6; worse than 59
       // - = 44+9; worse than 58
@@ -1258,9 +1300,9 @@ jazil.AddTestSet(mainPage, 'ItemCombiner', {
       // - = 44+22; worse than 58
       // - = 44+23; worse than 59
       // 81 = 44+28 - 1/1,2/10,1/1,3/4,0/1; superceded by 85
-      //BuildItem({ set:g_combined, tag:81, count:1, name:'Pickaxe', cost:29, totalCost:62, priorWork:5, enchants:[{ name:'Efficiency', level:2 }, { name:'Fortune', level:3 }, { name:'Unbreaking', level:3 }]}),
+      //BuildItem({ set:g_combined, tag:81, count:1, name:'Pickaxe', cost:29, totalCost:62, priorWork:5, rename:'', enchants:[{ name:'Efficiency', level:2 }, { name:'Fortune', level:3 }, { name:'Unbreaking', level:3 }]}),
       // 82 = 44+35 - 1/1,2/10,0/1,4/4,0/1; superceded by 89
-      //BuildItem({ set:g_combined, tag:82, count:1, name:'Pickaxe', cost:34, totalCost:72, priorWork:5, enchants:[{ name:'Efficiency', level:3 }, { name:'Fortune', level:3 }, { name:'Unbreaking', level:3 }]}),
+      //BuildItem({ set:g_combined, tag:82, count:1, name:'Pickaxe', cost:34, totalCost:72, priorWork:5, rename:'', enchants:[{ name:'Efficiency', level:3 }, { name:'Fortune', level:3 }, { name:'Unbreaking', level:3 }]}),
       // - = 46+1; worse than 70
       // - = 46+6; worse than 73
       // - = 46+9; worse than 70
@@ -1275,7 +1317,7 @@ jazil.AddTestSet(mainPage, 'ItemCombiner', {
       // - = 47+1; worse than 68
       // - = 1+47; worse than 68
       // 83 = 4+47 - 0/1,0/10,1/1,3/4,1/1; superceded by 97
-      //BuildItem({ set:g_combined, tag:83, count:1, name:'Pickaxe', cost:12, totalCost:32, priorWork:4, enchants:[{ name:'Efficiency', level:2 }, { name:'Unbreaking', level:3 }]}),
+      //BuildItem({ set:g_combined, tag:83, count:1, name:'Pickaxe', cost:12, totalCost:32, priorWork:4, rename:'', enchants:[{ name:'Efficiency', level:2 }, { name:'Unbreaking', level:3 }]}),
       // - = 5+47; worse than 79
       // - = 47+6; worse than 72
       // - = 6+47; worse than 72
@@ -1283,10 +1325,10 @@ jazil.AddTestSet(mainPage, 'ItemCombiner', {
       // - = 47+12; worse than 68
       // - = 12+47; worse than 68
       // 84 = 15+47 - 0/1,1/10,1/1,3/4,1/1; superceded by 98
-      //BuildItem({ set:g_combined, tag:84, count:1, name:'Pickaxe', cost:13, totalCost:37, priorWork:4, enchants:[{ name:'Efficiency', level:2 }, { name:'Fortune', level:2 }, { name:'Unbreaking', level:3 }]}),
+      //BuildItem({ set:g_combined, tag:84, count:1, name:'Pickaxe', cost:13, totalCost:37, priorWork:4, rename:'', enchants:[{ name:'Efficiency', level:2 }, { name:'Fortune', level:2 }, { name:'Unbreaking', level:3 }]}),
       // - = 17+47; worse than 83
       // 85 = 21+47 - 1/1,2/10,1/1,3/4,0/1; supercedes 81
-      BuildItem({ set:g_combined, tag:85, count:1, name:'Pickaxe', cost:19, totalCost:55, priorWork:4, enchants:[{ name:'Efficiency', level:2 }, { name:'Fortune', level:3 }, { name:'Unbreaking', level:3 }]}),
+      BuildItem({ set:g_combined, tag:85, count:1, name:'Pickaxe', cost:19, totalCost:55, priorWork:4, rename:'', enchants:[{ name:'Efficiency', level:2 }, { name:'Fortune', level:3 }, { name:'Unbreaking', level:3 }]}),
       // - = 47+23; worse than 72
       // - = 23+47; worse than 72
       // - = 34+47; worse than 76
@@ -1294,19 +1336,19 @@ jazil.AddTestSet(mainPage, 'ItemCombiner', {
       // - = 48+1; worse than 71
       // - = 1+48; worse than 71
       // 86 = 4+48 - 0/1,0/10,0/1,4/4,1/1; superceded by 99
-      //BuildItem({ set:g_combined, tag:86, count:1, name:'Pickaxe', cost:13, totalCost:37, priorWork:4, enchants:[{ name:'Efficiency', level:3 }, { name:'Unbreaking', level:3 }]}),
+      //BuildItem({ set:g_combined, tag:86, count:1, name:'Pickaxe', cost:13, totalCost:37, priorWork:4, rename:'', enchants:[{ name:'Efficiency', level:3 }, { name:'Unbreaking', level:3 }]}),
       // - = 5+48; worse than 80
       // 87 = 48+6 - 0/1,2/10,0/1,4/4,0/1; supercedes 74; superceded by 103
-      //BuildItem({ set:g_combined, tag:87, count:1, name:'Book', cost:14, totalCost:44, priorWork:4, enchants:[{ name:'Efficiency', level:3 }, { name:'Fortune', level:3 }, { name:'Unbreaking', level:3 }]}),
+      //BuildItem({ set:g_combined, tag:87, count:1, name:'Book', cost:14, totalCost:44, priorWork:4, rename:'', enchants:[{ name:'Efficiency', level:3 }, { name:'Fortune', level:3 }, { name:'Unbreaking', level:3 }]}),
       // - = 6+48; worse than 87
       // - = 7+48; worse than 75
       // - = 48+9; worse than 71
       // - = 9+48; worse than 71
       // 88 = 15+48 - 0/1,1/10,0/1,4/4,1/1; superceded by 109
-      //BuildItem({ set:g_combined, tag:88, count:1, name:'Pickaxe', cost:14, totalCost:42, priorWork:4, enchants:[{ name:'Efficiency', level:3 }, { name:'Fortune', level:2 }, { name:'Unbreaking', level:3 }]}),
+      //BuildItem({ set:g_combined, tag:88, count:1, name:'Pickaxe', cost:14, totalCost:42, priorWork:4, rename:'', enchants:[{ name:'Efficiency', level:3 }, { name:'Fortune', level:2 }, { name:'Unbreaking', level:3 }]}),
       // - = 16+48; worse than 86
       // 89 = 21+48 - 1/1,2/10,0/1,4/4,0/1; supercedes 82
-      BuildItem({ set:g_combined, tag:89, count:1, name:'Pickaxe', cost:20, totalCost:60, priorWork:4, enchants:[{ name:'Efficiency', level:3 }, { name:'Fortune', level:3 }, { name:'Unbreaking', level:3 }]}),
+      BuildItem({ set:g_combined, tag:89, count:1, name:'Pickaxe', cost:20, totalCost:60, priorWork:4, rename:'', enchants:[{ name:'Efficiency', level:3 }, { name:'Fortune', level:3 }, { name:'Unbreaking', level:3 }]}),
       // - = 48+22; worse than 87
       // - = 22+48; worse than 87
       // - = 27+48; worse than 76
@@ -1314,7 +1356,7 @@ jazil.AddTestSet(mainPage, 'ItemCombiner', {
       // - = 0+49; worse than 21
       // - = 49+2; worse than 52
       // 90 = 49+3 - 0/1,2/10,0/1,1/4,1/1; supercedes 53
-      BuildItem({ set:g_combined, tag:90, count:1, name:'Pickaxe', cost:6, totalCost:17, priorWork:3, enchants:[{ name:'Efficiency', level:1 }, { name:'Fortune', level:3 }, { name:'Unbreaking', level:1 }]}),
+      BuildItem({ set:g_combined, tag:90, count:1, name:'Pickaxe', cost:6, totalCost:17, priorWork:3, rename:'', enchants:[{ name:'Efficiency', level:1 }, { name:'Fortune', level:3 }, { name:'Unbreaking', level:1 }]}),
       // - = 49+5; worse than 21
       // - = 5+49; worse than 21
       // - = 49+7; worse than 60
@@ -1325,7 +1367,7 @@ jazil.AddTestSet(mainPage, 'ItemCombiner', {
       // - = 49+12; worse than 90
       // - = 49+13; worse than 69
       // 91 = 49+14 - 0/1,2/10,0/1,2/4,1/1; supercedes 66
-      BuildItem({ set:g_combined, tag:91, count:1, name:'Pickaxe', cost:10, totalCost:27, priorWork:3, enchants:[{ name:'Efficiency', level:2 }, { name:'Fortune', level:3 }, { name:'Unbreaking', level:2 }]}),
+      BuildItem({ set:g_combined, tag:91, count:1, name:'Pickaxe', cost:10, totalCost:27, priorWork:3, rename:'', enchants:[{ name:'Efficiency', level:2 }, { name:'Fortune', level:3 }, { name:'Unbreaking', level:2 }]}),
       // - = 49+22; worse than 52
       // - = 49+23; worse than 90
       // - = 49+27; worse than 60
@@ -1343,14 +1385,14 @@ jazil.AddTestSet(mainPage, 'ItemCombiner', {
       // - = 49+46; worse than 73
       // - = 46+49; worse than 73
       // 92 = 49+47 - 0/1,2/10,1/1,3/4,1/1; superceded by 105
-      //BuildItem({ set:g_combined, tag:92, count:1, name:'Pickaxe', cost:15, totalCost:46, priorWork:4, enchants:[{ name:'Efficiency', level:2 }, { name:'Fortune', level:3 }, { name:'Unbreaking', level:3 }]}),
+      //BuildItem({ set:g_combined, tag:92, count:1, name:'Pickaxe', cost:15, totalCost:46, priorWork:4, rename:'', enchants:[{ name:'Efficiency', level:2 }, { name:'Fortune', level:3 }, { name:'Unbreaking', level:3 }]}),
       // 93 = 49+48 - 0/1,2/10,0/1,4/4,1/1; superceded by 107
-      //BuildItem({ set:g_combined, tag:93, count:1, name:'Pickaxe', cost:16, totalCost:51, priorWork:4, enchants:[{ name:'Efficiency', level:3 }, { name:'Fortune', level:3 }, { name:'Unbreaking', level:3 }]}),
+      //BuildItem({ set:g_combined, tag:93, count:1, name:'Pickaxe', cost:16, totalCost:51, priorWork:4, rename:'', enchants:[{ name:'Efficiency', level:3 }, { name:'Fortune', level:3 }, { name:'Unbreaking', level:3 }]}),
       // - = 50+0; worse than 27
       // - = 0+50; worse than 27
       // - = 50+1; worse than 52
       // 94 = 50+3 - 0/1,1/10,1/1,1/4,1/1; supercedes 54
-      BuildItem({ set:g_combined, tag:94, count:1, name:'Pickaxe', cost:7, totalCost:13, priorWork:3, enchants:[{ name:'Efficiency', level:1 }, { name:'Fortune', level:2 }, { name:'Unbreaking', level:2 }]}),
+      BuildItem({ set:g_combined, tag:94, count:1, name:'Pickaxe', cost:7, totalCost:13, priorWork:3, rename:'', enchants:[{ name:'Efficiency', level:1 }, { name:'Fortune', level:2 }, { name:'Unbreaking', level:2 }]}),
       // - = 50+5; worse than 60
       // - = 5+50; worse than 60
       // - = 50+6; worse than 52
@@ -1376,14 +1418,14 @@ jazil.AddTestSet(mainPage, 'ItemCombiner', {
       // - = 51+1; worse than 90
       // - = 51+2; worse than 94
       // 95 = 51+3 - 0/1,1/10,0/1,2/4,1/1; supercedes 55
-      BuildItem({ set:g_combined, tag:95, count:1, name:'Pickaxe', cost:8, totalCost:16, priorWork:3, enchants:[{ name:'Efficiency', level:2 }, { name:'Fortune', level:2 }, { name:'Unbreaking', level:2 }]}),
+      BuildItem({ set:g_combined, tag:95, count:1, name:'Pickaxe', cost:8, totalCost:16, priorWork:3, rename:'', enchants:[{ name:'Efficiency', level:2 }, { name:'Fortune', level:2 }, { name:'Unbreaking', level:2 }]}),
       // - = 51+5; worse than 63
       // - = 5+51; worse than 63
       // - = 51+6; worse than 90
       // - = 51+7; worse than 67
       // - = 7+51; worse than 67
       // 96 = 51+9 - 0/1,2/10,1/1,1/4,1/1; supercedes 69
-      BuildItem({ set:g_combined, tag:96, count:1, name:'Pickaxe', cost:12, totalCost:21, priorWork:3, enchants:[{ name:'Efficiency', level:1 }, { name:'Fortune', level:3 }, { name:'Unbreaking', level:2 }]}),
+      BuildItem({ set:g_combined, tag:96, count:1, name:'Pickaxe', cost:12, totalCost:21, priorWork:3, rename:'', enchants:[{ name:'Efficiency', level:1 }, { name:'Fortune', level:3 }, { name:'Unbreaking', level:2 }]}),
       // - = 51+10; worse than 44
       // - = 10+51; worse than 44
       // - = 51+12; worse than 91
@@ -1441,14 +1483,14 @@ jazil.AddTestSet(mainPage, 'ItemCombiner', {
       // - = 10+56; worse than 40
       // - = 56+12; worse than 95
       // 97 = 56+14 - 0/1,0/10,1/1,3/4,1/1; supercedes 83
-      BuildItem({ set:g_combined, tag:97, count:1, name:'Pickaxe', cost:11, totalCost:23, priorWork:3, enchants:[{ name:'Efficiency', level:2 }, { name:'Unbreaking', level:3 }]}),
+      BuildItem({ set:g_combined, tag:97, count:1, name:'Pickaxe', cost:11, totalCost:23, priorWork:3, rename:'', enchants:[{ name:'Efficiency', level:2 }, { name:'Unbreaking', level:3 }]}),
       // - = 56+21; worse than 58
       // - = 21+56; worse than 58
       // - = 56+23; worse than 91
       // - = 56+34; worse than 44
       // - = 34+56; worse than 44
       // 98 = 56+35 - 0/1,1/10,1/1,3/4,1/1; supercedes 84; superceded by 108
-      //BuildItem({ set:g_combined, tag:98, count:1, name:'Pickaxe', cost:19, totalCost:36, priorWork:4, enchants:[{ name:'Efficiency', level:2 }, { name:'Fortune', level:2 }, { name:'Unbreaking', level:3 }]}),
+      //BuildItem({ set:g_combined, tag:98, count:1, name:'Pickaxe', cost:19, totalCost:36, priorWork:4, rename:'', enchants:[{ name:'Efficiency', level:2 }, { name:'Fortune', level:2 }, { name:'Unbreaking', level:3 }]}),
       // - = 56+42; worse than 77
       // - = 42+56; worse than 77
       // - = 56+44; worse than 79
@@ -1465,7 +1507,7 @@ jazil.AddTestSet(mainPage, 'ItemCombiner', {
       // - = 57+12; worse than 95
       // - = 57+13; worse than 97
       // 99 = 57+14 - 0/1,0/10,0/1,4/4,1/1; supercedes 86
-      BuildItem({ set:g_combined, tag:99, count:1, name:'Pickaxe', cost:16, totalCost:33, priorWork:4, enchants:[{ name:'Efficiency', level:3 }, { name:'Unbreaking', level:3 }]}),
+      BuildItem({ set:g_combined, tag:99, count:1, name:'Pickaxe', cost:16, totalCost:33, priorWork:4, rename:'', enchants:[{ name:'Efficiency', level:3 }, { name:'Unbreaking', level:3 }]}),
       // - = 57+21; worse than 59
       // - = 21+57; worse than 59
       // - = 57+22; worse than 91
@@ -1483,7 +1525,7 @@ jazil.AddTestSet(mainPage, 'ItemCombiner', {
       // - = 57+44; worse than 80
       // - = 44+57; worse than 80
       // 100 = 58+14 - 1/1,2/10,1/1,3/4,0/1; superceded by 104
-      //BuildItem({ set:g_combined, tag:100, count:1, name:'Pickaxe', cost:24, totalCost:63, priorWork:5, enchants:[{ name:'Efficiency', level:3 }, { name:'Fortune', level:3 }, { name:'Unbreaking', level:3 }]}),
+      //BuildItem({ set:g_combined, tag:100, count:1, name:'Pickaxe', cost:24, totalCost:63, priorWork:5, rename:'', enchants:[{ name:'Efficiency', level:3 }, { name:'Fortune', level:3 }, { name:'Unbreaking', level:3 }]}),
       // - = 58+35; worse than 100
       // - = 58+57; worse than 100
       // - = 59+13; worse than 85
@@ -1514,7 +1556,7 @@ jazil.AddTestSet(mainPage, 'ItemCombiner', {
       // - = 61+12; worse than 64
       // - = 12+61; worse than 64
       // 101 = 61+14 - 0/1,2/10,1/1,3/4,0/1; supercedes 72
-      BuildItem({ set:g_combined, tag:101, count:1, name:'Book', cost:15, totalCost:36, priorWork:4, enchants:[{ name:'Efficiency', level:2 }, { name:'Fortune', level:3 }, { name:'Unbreaking', level:3 }]}),
+      BuildItem({ set:g_combined, tag:101, count:1, name:'Book', cost:15, totalCost:36, priorWork:4, rename:'', enchants:[{ name:'Efficiency', level:2 }, { name:'Fortune', level:3 }, { name:'Unbreaking', level:3 }]}),
       // - = 14+61; worse than 101
       // - = 15+61; worse than 96
       // - = 17+61; worse than 91
@@ -1537,7 +1579,7 @@ jazil.AddTestSet(mainPage, 'ItemCombiner', {
       // - = 63+12; worse than 59
       // - = 63+13; worse than 58
       // 102 = 63+14 - 1/1,2/10,0/1,3/4,0/1; supercedes 73
-      BuildItem({ set:g_combined, tag:102, count:1, name:'Pickaxe', cost:15, totalCost:46, priorWork:4, enchants:[{ name:'Efficiency', level:3 }, { name:'Fortune', level:3 }, { name:'Unbreaking', level:2 }]}),
+      BuildItem({ set:g_combined, tag:102, count:1, name:'Pickaxe', cost:15, totalCost:46, priorWork:4, rename:'', enchants:[{ name:'Efficiency', level:3 }, { name:'Fortune', level:3 }, { name:'Unbreaking', level:2 }]}),
       // - = 63+16; worse than 58
       // - = 16+63; worse than 58
       // - = 63+17; worse than 59
@@ -1566,7 +1608,7 @@ jazil.AddTestSet(mainPage, 'ItemCombiner', {
       // - = 64+13; worse than 101
       // - = 13+64; worse than 101
       // 103 = 64+14 - 0/1,2/10,0/1,4/4,0/1; supercedes 87
-      BuildItem({ set:g_combined, tag:103, count:1, name:'Book', cost:16, totalCost:40, priorWork:4, enchants:[{ name:'Efficiency', level:3 }, { name:'Fortune', level:3 }, { name:'Unbreaking', level:3 }]}),
+      BuildItem({ set:g_combined, tag:103, count:1, name:'Book', cost:16, totalCost:40, priorWork:4, rename:'', enchants:[{ name:'Efficiency', level:3 }, { name:'Fortune', level:3 }, { name:'Unbreaking', level:3 }]}),
       // - = 14+64; worse than 103
       // - = 15+64; worse than 91
       // - = 16+64; worse than 91
@@ -1579,7 +1621,7 @@ jazil.AddTestSet(mainPage, 'ItemCombiner', {
       // - = 64+35; worse than 103
       // - = 35+64; worse than 103
       // 104 = 40+64 - 1/1,2/10,1/1,3/4,0/1; supercedes 100
-      BuildItem({ set:g_combined, tag:104, count:1, name:'Pickaxe', cost:26, totalCost:57, priorWork:4, enchants:[{ name:'Efficiency', level:3 }, { name:'Fortune', level:3 }, { name:'Unbreaking', level:3 }]}),
+      BuildItem({ set:g_combined, tag:104, count:1, name:'Pickaxe', cost:26, totalCost:57, priorWork:4, rename:'', enchants:[{ name:'Efficiency', level:3 }, { name:'Fortune', level:3 }, { name:'Unbreaking', level:3 }]}),
       // - = 42+64; worse than 89
       // - = 44+64; worse than 89
       // - = 49+64; worse than 91
@@ -1587,7 +1629,7 @@ jazil.AddTestSet(mainPage, 'ItemCombiner', {
       // - = 51+64; worse than 91
       // - = 52+64; worse than 91
       // 105 = 56+64 - 0/1,2/10,1/1,3/4,1/1; supercedes 92; superceded by 110
-      //BuildItem({ set:g_combined, tag:105, count:1, name:'Pickaxe', cost:21, totalCost:45, priorWork:4, enchants:[{ name:'Efficiency', level:2 }, { name:'Fortune', level:3 }, { name:'Unbreaking', level:3 }]}),
+      //BuildItem({ set:g_combined, tag:105, count:1, name:'Pickaxe', cost:21, totalCost:45, priorWork:4, rename:'', enchants:[{ name:'Efficiency', level:2 }, { name:'Fortune', level:3 }, { name:'Unbreaking', level:3 }]}),
       // - = 57+64; worse than 93
       // - = 58+64; worse than 104
       // - = 59+64; worse than 89
@@ -1600,7 +1642,7 @@ jazil.AddTestSet(mainPage, 'ItemCombiner', {
       // - = 67+6; worse than 58
       // - = 67+12; worse than 58
       // 106 = 67+14 - 1/1,1/10,1/1,3/4,0/1; supercedes 76
-      BuildItem({ set:g_combined, tag:106, count:1, name:'Pickaxe', cost:16, totalCost:42, priorWork:4, enchants:[{ name:'Efficiency', level:3 }, { name:'Fortune', level:2 }, { name:'Unbreaking', level:3 }]}),
+      BuildItem({ set:g_combined, tag:106, count:1, name:'Pickaxe', cost:16, totalCost:42, priorWork:4, rename:'', enchants:[{ name:'Efficiency', level:3 }, { name:'Fortune', level:2 }, { name:'Unbreaking', level:3 }]}),
       // - = 67+15; worse than 58
       // - = 15+67; worse than 58
       // - = 67+23; worse than 58
@@ -1777,7 +1819,7 @@ jazil.AddTestSet(mainPage, 'ItemCombiner', {
       // - = 10+91; worse than 102
       // - = 91+13; worse than 105
       // 107 = 91+14 - 0/1,2/10,0/1,4/4,1/1; supercedes 93
-      BuildItem({ set:g_combined, tag:107, count:1, name:'Pickaxe', cost:16, totalCost:49, priorWork:4, enchants:[{ name:'Efficiency', level:3 }, { name:'Fortune', level:3 }, { name:'Unbreaking', level:3 }]}),
+      BuildItem({ set:g_combined, tag:107, count:1, name:'Pickaxe', cost:16, totalCost:49, priorWork:4, rename:'', enchants:[{ name:'Efficiency', level:3 }, { name:'Fortune', level:3 }, { name:'Unbreaking', level:3 }]}),
       // - = 91+28; worse than 105
       // - = 91+34; worse than 102
       // - = 34+91; worse than 102
@@ -1803,7 +1845,7 @@ jazil.AddTestSet(mainPage, 'ItemCombiner', {
       // - = 10+94; worse than 44
       // - = 94+12; worse than 91
       // 108 = 94+14 - 0/1,1/10,1/1,3/4,1/1; supercedes 98
-      BuildItem({ set:g_combined, tag:108, count:1, name:'Pickaxe', cost:15, totalCost:34, priorWork:4, enchants:[{ name:'Efficiency', level:2 }, { name:'Fortune', level:2 }, { name:'Unbreaking', level:3 }]}),
+      BuildItem({ set:g_combined, tag:108, count:1, name:'Pickaxe', cost:15, totalCost:34, priorWork:4, rename:'', enchants:[{ name:'Efficiency', level:2 }, { name:'Fortune', level:2 }, { name:'Unbreaking', level:3 }]}),
       // - = 94+21; worse than 58
       // - = 21+94; worse than 58
       // - = 94+23; worse than 91
@@ -1827,7 +1869,7 @@ jazil.AddTestSet(mainPage, 'ItemCombiner', {
       // - = 95+12; worse than 91
       // - = 95+13; worse than 108
       // 109 = 95+14 - 0/1,1/10,0/1,4/4,1/1; supercedes 88
-      BuildItem({ set:g_combined, tag:109, count:1, name:'Pickaxe', cost:16, totalCost:38, priorWork:4, enchants:[{ name:'Efficiency', level:3 }, { name:'Fortune', level:2 }, { name:'Unbreaking', level:3 }]}),
+      BuildItem({ set:g_combined, tag:109, count:1, name:'Pickaxe', cost:16, totalCost:38, priorWork:4, rename:'', enchants:[{ name:'Efficiency', level:3 }, { name:'Fortune', level:2 }, { name:'Unbreaking', level:3 }]}),
       // - = 95+21; worse than 59
       // - = 21+95; worse than 59
       // - = 95+22; worse than 91
@@ -1835,7 +1877,7 @@ jazil.AddTestSet(mainPage, 'ItemCombiner', {
       // - = 95+27; worse than 58
       // - = 27+95; worse than 58
       // 110 = 95+28 - 0/1,2/10,1/1,3/4,1/1; supercedes 105; superceded by 111
-      //BuildItem({ set:g_combined, tag:110, count:1, name:'Pickaxe', cost:21, totalCost:43, priorWork:4, enchants:[{ name:'Efficiency', level:2 }, { name:'Fortune', level:3 }, { name:'Unbreaking', level:3 }]}),
+      //BuildItem({ set:g_combined, tag:110, count:1, name:'Pickaxe', cost:21, totalCost:43, priorWork:4, rename:'', enchants:[{ name:'Efficiency', level:2 }, { name:'Fortune', level:3 }, { name:'Unbreaking', level:3 }]}),
       // - = 95+34; worse than 102
       // - = 34+95; worse than 102
       // - = 95+35; worse than 107
@@ -1860,7 +1902,7 @@ jazil.AddTestSet(mainPage, 'ItemCombiner', {
       // - = 10+96; worse than 58
       // - = 96+12; worse than 91
       // 111 = 96+14 - 0/1,2/10,1/1,3/4,1/1; supercedes 110
-      BuildItem({ set:g_combined, tag:111, count:1, name:'Pickaxe', cost:15, totalCost:42, priorWork:4, enchants:[{ name:'Efficiency', level:2 }, { name:'Fortune', level:3 }, { name:'Unbreaking', level:3 }]}),
+      BuildItem({ set:g_combined, tag:111, count:1, name:'Pickaxe', cost:15, totalCost:42, priorWork:4, rename:'', enchants:[{ name:'Efficiency', level:2 }, { name:'Fortune', level:3 }, { name:'Unbreaking', level:3 }]}),
       // - = 96+21; worse than 58
       // - = 21+96; worse than 58
       // - = 96+23; worse than 91
@@ -1954,7 +1996,7 @@ jazil.AddTestSet(mainPage, 'ItemCombiner', {
       // - = 111+10; worse than 89
     ]
 
-    TestCombineResult(jazil, sourceItems, true, desiredItem, expectedItems)
+    TestCombineResult(jazil, sourceItems, true, desiredItem, false, expectedItems)
   },
 
 })

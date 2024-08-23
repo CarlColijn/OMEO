@@ -46,6 +46,16 @@ jazil.AddTestSet(mainPage, 'MainFormData', {
     jazil.ShouldBe(data.desiredItem, sword, 'Updated desired item not set correctly!')
   },
 
+  'RenameToo gets set': (jazil) => {
+    let data = new MainFormData
+
+    data.SetRenameToo(true)
+    jazil.ShouldBe(data.renameToo, true, 'RenameToo not set correctly!')
+
+    data.SetRenameToo(false)
+    jazil.ShouldBe(data.renameToo, false, 'Updated renameToo not set correctly!')
+  },
+
   'Source items get added individually': (jazil) => {
     let data = new MainFormData
 
@@ -83,6 +93,7 @@ jazil.AddTestSet(mainPage, 'MainFormData', {
     let helmet = BuildItem({ set:g_source, name:'Helmet', count:44, priorWork:3 })
 
     let storedData = new MainFormData
+    storedData.SetRenameToo(true)
     storedData.SetDesiredItem(pickaxe)
     storedData.AddSourceItem(axe)
     storedData.AddSourceItem(sword)
@@ -92,7 +103,7 @@ jazil.AddTestSet(mainPage, 'MainFormData', {
     storedData.Serialize(storeStream)
     storeStream.SaveToLocalStorage()
 
-    jazil.ShouldBe(dataState.GetLocalStorage(), 'ceKRdGfGvFIvpxqkf_F')
+    jazil.ShouldBe(dataState.GetLocalStorage(), 'ceKRdGfGvFIvpxqkf_N')
 
     let loadingOptions = new DataStreamLoadingOptions()
     let restoreStream = new DataStream(false)
@@ -101,6 +112,7 @@ jazil.AddTestSet(mainPage, 'MainFormData', {
     let restoredData = new MainFormData
     restoredData.Deserialize(restoreStream)
 
+    jazil.ShouldBe(restoredData.renameToo, true, 'Incorrect renameToo restored!')
     jazil.ShouldBe(restoredData.sourceItems.length, 3, 'Incorrect number of source items restored!')
     CheckRestoredItemCostDefaults(jazil, restoredData.desiredItem, 'desired item')
     CompareItemsEqual(jazil, storedData.desiredItem, restoredData.desiredItem, 'desired item')
@@ -119,6 +131,7 @@ jazil.AddTestSet(mainPage, 'MainFormData', {
     let axe = BuildItem({ set:g_source, name:'Axe', count:22, priorWork:2, enchants:[{ name:'Fortune', level:3 }] })
 
     let storedData = new MainFormData
+    storedData.SetRenameToo(false)
     storedData.SetDesiredItem(sword)
     storedData.AddSourceItem(book)
     storedData.AddSourceItem(axe)
@@ -127,7 +140,7 @@ jazil.AddTestSet(mainPage, 'MainFormData', {
     storedData.Serialize(storeStream)
     storeStream.SaveToLocalStorage()
 
-    jazil.ShouldBe(dataState.GetLocalStorage(), 'cefG_Wzsji5kxjcrykvpYH')
+    jazil.ShouldBe(dataState.GetLocalStorage(), 'cefG_Wzsji5kxjcrykvpYH_')
 
     let loadingOptions = new DataStreamLoadingOptions()
     let restoreStream = new DataStream(false)
@@ -136,6 +149,7 @@ jazil.AddTestSet(mainPage, 'MainFormData', {
     let restoredData = new MainFormData
     restoredData.Deserialize(restoreStream)
 
+    jazil.ShouldBe(restoredData.renameToo, false, 'Incorrect renameToo restored!')
     jazil.ShouldBe(restoredData.sourceItems.length, 2, 'Incorrect number of source items restored!')
     CheckRestoredItemCostDefaults(jazil, restoredData.desiredItem, 'desired item')
     CompareItemsEqual(jazil, storedData.desiredItem, restoredData.desiredItem, 'desired item')
@@ -153,6 +167,7 @@ jazil.AddTestSet(mainPage, 'MainFormData', {
     let book = BuildItem({ set:g_source, name:'Book', count:33, priorWork:3, enchants:[{ name:'Fortune', level:3 }] })
 
     let storedData = new MainFormData
+    storedData.SetRenameToo(true)
     storedData.SetDesiredItem(sword)
     storedData.AddSourceItem(book)
 
@@ -160,7 +175,7 @@ jazil.AddTestSet(mainPage, 'MainFormData', {
     storedData.Serialize(storeStream)
     storeStream.SaveToLocalStorage()
 
-    jazil.ShouldBe(dataState.GetLocalStorage(), 'ccmbaGOlKQhyW_')
+    jazil.ShouldBe(dataState.GetLocalStorage(), 'ccmbaGOlKQhyWF')
     dataState.SetOnlyLocalStorage('ccmbaGOlKQ') // we truncate after the Q
 
     let loadingOptions = new DataStreamLoadingOptions()
@@ -170,6 +185,7 @@ jazil.AddTestSet(mainPage, 'MainFormData', {
     let restoredData = new MainFormData
     let deserializedOK = restoredData.Deserialize(restoreStream)
     jazil.ShouldBe(deserializedOK, false, 'Could deserialize corrupt data!')
+    jazil.ShouldBe(restoredData.renameToo, false, 'Incorrect renameToo restored!')
     jazil.ShouldBe(restoredData.sourceItems.length, 0, 'Faulty source items restored!')
     jazil.ShouldBe(restoredData.desiredItem, undefined, 'Faulty desired item restored!')
   },
@@ -183,6 +199,7 @@ jazil.AddTestSet(mainPage, 'MainFormData', {
     GiveItemBrokenEnchant(sword)
 
     let storedData = new MainFormData
+    storedData.SetRenameToo(false)
     storedData.SetDesiredItem(sword)
     storedData.AddSourceItem(book)
 
@@ -199,6 +216,7 @@ jazil.AddTestSet(mainPage, 'MainFormData', {
     let restoredData = new MainFormData
     let deserializedOK = restoredData.Deserialize(restoreStream)
     jazil.ShouldBe(deserializedOK, false, 'Could deserialize corrupt data!')
+    jazil.ShouldBe(restoredData.renameToo, false, 'Incorrect renameToo restored!')
     jazil.ShouldBe(restoredData.sourceItems.length, 0, 'Faulty source items restored!')
     jazil.ShouldBe(restoredData.desiredItem, undefined, 'Faulty desired item restored!')
   },

@@ -62,6 +62,8 @@ class RecipeTable {
     description += item.info.name
     if (item.set == g_source)
       description += g_rtSettings.sourcePostfix.replace('#', item.nr)
+    if (item.renamePoint === true)
+      description += g_rtSettings.renamePostfix
     return description
   }
 

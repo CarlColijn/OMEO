@@ -28,8 +28,10 @@ function CheckItemInTable(jazil, item, tester, neededPlacement) {
       let listedPriorWork = $(rowElemJQ.find('.priorWork')).text()
 
       let neededDescription = `${GetSetName(item.set)} ${item.info.name}`
-      if (item.set == g_source)
+      if (item.set === g_source)
         neededDescription += ` nr. ${item.nr}`
+      if (item.renamePoint == true)
+        neededDescription += ` (rename here)`
       let neededEnchants = ''
       item.enchantsByID.forEach((enchant) => {
         neededEnchants += `${enchant.info.name} ${GetGUITextForEnchantLevel(enchant)}`
@@ -112,6 +114,16 @@ function CreateTestSet(setDescription, setLetter) {
       CheckItemInTable(jazil, item, tester, 'Result')
     },
 
+    'Simple item with renamePoint is shown OK': (jazil) => {
+      let tester = new RecipeTableTester()
+      let set = GetSet(setLetter)
+      let item = BuildItem({ set:g_combined, name:'Leggings', count:2, cost:4, totalCost:15, priorWork:2, renamePoint:true })
+      tester.table.SetItem(item)
+      tester.Finalize()
+
+      CheckItemInTable(jazil, item, tester, 'Result')
+    },
+
   })
 }
 
@@ -148,7 +160,7 @@ jazil.AddTestSet(recipePage, 'RecipeTable - complex combined listings', {
     let tester = new RecipeTableTester()
     let item0_t_t = BuildItem({ set:g_source, name:'Book', nr:1, count:4, cost:0, totalCost:0, priorWork:0, enchants:[{ name:'Unbreaking', level:3 }] })
     let item0_t_s = BuildItem({ set:g_source, name:'Book', nr:2, count:2, cost:0, totalCost:0, priorWork:0, enchants:[{ name:'Mending' }] })
-    let item0_t = BuildItem({ set:g_combined, name:'Shovel', count:1, cost:3, totalCost:12, priorWork:0, enchants:[{ name:'Mending' }, { name:'Unbreaking', level:3 }] })
+    let item0_t = BuildItem({ set:g_combined, name:'Shovel', count:1, cost:3, totalCost:12, priorWork:0, renamePoint:true, enchants:[{ name:'Mending' }, { name:'Unbreaking', level:3 }] })
     item0_t.targetItem = item0_t_t
     item0_t.sacrificeItem = item0_t_s
     let item0_s = BuildItem({ set:g_extra, name:'Shovel', count:6, cost:0, totalCost:0, priorWork:3 })

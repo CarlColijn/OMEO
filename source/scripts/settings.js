@@ -8,7 +8,7 @@
 
 // For mainForm.js
 const g_mfSettings = {
-  webWorkerURLVersion: '3',
+  webWorkerURLVersion: '4',
   feedbackIntervalMS: 100,
   numItemsPerGroup: 5,
   showHideSpeedMS: 400,
@@ -30,6 +30,7 @@ const g_rtSettings = {
   extraPrefix: 'Extra ',
   desiredPrefix: 'Desired ',
   combinedPrefix: 'Combined ',
+  renamePostfix: ' (rename here)',
   noCost: '-',
   singleCost: '#s',
   compoundCost: '#s (#t in total)',

@@ -35,7 +35,9 @@ class CombineResult {
 
 class ItemCombiner {
   // returns object; { combinedItems: Item[], maxProgress: int }
-  GetAllItemCombinations(sourceItems, desiredItem, feedbackHandler) {
+  GetAllItemCombinations(sourceItems, desiredItem, renameToo, feedbackHandler) {
+    this.renameToo = renameToo
+
     let tester = new ItemCombineTester()
 
     let filteredSourceItems = this.DropNonMatchingSourceItems(tester, sourceItems, desiredItem)
@@ -188,6 +190,29 @@ class ItemCombiner {
   }
 
 
+  // returns bool
+  CanApplyRename(targetItem, desiredItem) {
+    if (targetItem.renamePoint === true)
+      return false
+
+    if (targetItem.targetItem === undefined)
+      return targetItem.id == desiredItem.id
+
+    return this.CanApplyRename(targetItem.targetItem, desiredItem)
+  }
+
+
+  // returns bool
+  IncludesRename(canApplyRename, targetItem, sacrificeItem) {
+    return (
+      canApplyRename || (
+        this.renameToo &&
+        (targetItem.includesRename === true || sacrificeItem.includesRename === true)
+      )
+    )
+  }
+
+
   // returns Item (the combined item, or undefined if they couldn't be combined)
   CombineItems(tester, targetItem, sacrificeItem, desiredItem) {
     let combinedItem = undefined
@@ -205,9 +230,26 @@ class ItemCombiner {
           this.PriorWorkToCost(targetItem.priorWork) +
           this.PriorWorkToCost(sacrificeItem.priorWork)
 
+        // Note: we don't take up the rename cost in the calculated
+        // cost, since then we won't be able to grade two combinations
+        // fairly on cost, plus we would get double combine costs when
+        // later combines combine two already renamed subcombines.
+        // We instead tag the item as 'renamed' and compare against a
+        // lower maxCost to compensate.  But if the mere rename itself
+        // would make the combine too costly, we take it up unrenamed,
+        // since a rename might come from somewhere else anyway.
+        let canApplyRename =
+          this.renameToo &&
+          this.CanApplyRename(targetItem, desiredItem)
+        let costOK = combineResult.cost <= 38
+        if (!costOK) {
+          costOK = combineResult.cost == 39
+          canApplyRename = false
+        }
+
         if (
-          !tester.CombineIsWasteful(targetItem, combineResult.targetUsed, sacrificeItem, combineResult.sacrificeUsed) &&
-          combineResult.cost <= 39
+          costOK &&
+          !tester.CombineIsWasteful(targetItem, combineResult.targetUsed, sacrificeItem, combineResult.sacrificeUsed)
         ) {
           let combinedPriorWork = Math.max(targetItem.priorWork, sacrificeItem.priorWork) + 1
 
@@ -221,6 +263,8 @@ class ItemCombiner {
           combinedItem.enchantsByID = combineResult.enchantsByID
           combinedItem.targetItem = targetItem
           combinedItem.sacrificeItem = sacrificeItem
+          combinedItem.renamePoint = canApplyRename
+          combinedItem.includesRename = this.IncludesRename(canApplyRename, targetItem, sacrificeItem)
           combinedItem.origin = targetItem.origin.Combine(sacrificeItem.origin)
           combinedItem.cost = combineResult.cost
           combinedItem.totalCost = combineResult.cost

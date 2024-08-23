@@ -120,8 +120,8 @@ jazil.AddTestSet(mainPage, 'Item', {
   },
 
   'CollapseTree returns all items': (jazil) => {
-    let itemR = BuildItem({ set:g_combined, name:'Shield', count:19, cost:10, totalCost:12, priorWork:3, enchants:[{ name:'Mending', level:1 }] })
-    let itemRT = BuildItem({ set:g_combined, name:'Shield', count:2, renamePoint:true, cost:2, totalCost:55, priorWork:1, enchants:[{ name:'Mending', level:1 }] })
+    let itemR = BuildItem({ set:g_combined, name:'Shield', count:19, rename:'i', cost:10, totalCost:12, priorWork:3, enchants:[{ name:'Mending', level:1 }] })
+    let itemRT = BuildItem({ set:g_combined, name:'Shield', count:2, rename:'r', cost:2, totalCost:55, priorWork:1, enchants:[{ name:'Mending', level:1 }] })
     itemR.targetItem = itemRT
     let itemRTT = BuildItem({ set:g_source, nr:3, name:'Shield', count:22, priorWork:2 })
     itemRT.targetItem = itemRTT
@@ -141,8 +141,8 @@ jazil.AddTestSet(mainPage, 'Item', {
   },
 
   'Clone returns all items as clone': (jazil) => {
-    let itemR = BuildItem({ set:g_combined, name:'Shield', count:19, cost:10, totalCost:12, priorWork:3, enchants:[{ name:'Mending', level:1 }] })
-    let itemRT = BuildItem({ set:g_combined, name:'Shield', count:2, renamePoint:true, cost:2, totalCost:55, priorWork:1, enchants:[{ name:'Mending', level:1 }] })
+    let itemR = BuildItem({ set:g_combined, name:'Shield', count:19, rename:'i', cost:10, totalCost:12, priorWork:3, enchants:[{ name:'Mending', level:1 }] })
+    let itemRT = BuildItem({ set:g_combined, name:'Shield', count:2, rename:'r', cost:2, totalCost:55, priorWork:1, enchants:[{ name:'Mending', level:1 }] })
     itemR.targetItem = itemRT
     let itemRTT = BuildItem({ set:g_source, nr:3, name:'Shield', count:22, priorWork:2 })
     itemRT.targetItem = itemRTT

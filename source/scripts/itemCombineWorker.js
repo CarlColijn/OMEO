@@ -4,6 +4,7 @@
   Startup message data:
   - desiredItem: Item (dehydrated}
   - sourceItems: Item[] (dehydrated)
+  - renameToo: bool
   - feedbackIntervalMS: int
   - numItemsToTake: int
 
@@ -95,20 +96,21 @@ class FeedbackHandler {
 
 
 onmessage = (e) => {
-  let desiredItem = e.data.desiredItem
-  Item.Rehydrate(desiredItem)
   let sourceItems = e.data.sourceItems
   RehydrateItems(sourceItems)
+  let desiredItem = e.data.desiredItem
+  Item.Rehydrate(desiredItem)
+  let renameToo = e.data.renameToo
   let feedbackIntervalMS = e.data.feedbackIntervalMS
   let numItemsToTake = e.data.numItemsToTake
 
   let feedbackHandler = new FeedbackHandler(feedbackIntervalMS)
 
   let itemCombiner = new ItemCombiner()
-  let combineResult = itemCombiner.GetAllItemCombinations(sourceItems, desiredItem, feedbackHandler)
+  let combineResult = itemCombiner.GetAllItemCombinations(sourceItems, desiredItem, renameToo, feedbackHandler)
 
   feedbackHandler.TellFinalizing()
-  let combineResultFilter = new CombineResultFilter(desiredItem)
+  let combineResultFilter = new CombineResultFilter(desiredItem, renameToo)
   let filteredCombinedItems = combineResultFilter.FilterItems(combineResult.combinedItems, numItemsToTake)
 
   feedbackHandler.TellDone(filteredCombinedItems, combineResult.maxProgress)

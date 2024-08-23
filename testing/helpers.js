@@ -57,6 +57,7 @@ let mainAccessObjectNames = [
   'ItemCombineList',
   'ItemCombiner',
   'ItemCombineTester',
+  'ItemCostTreeFinalizer',
   'MainFormData',
   'RatedItem',
   'RealElement',
@@ -125,6 +126,10 @@ function BuildEnchant(name, level) {
 // - nr (for g_source only, no default)
 // - totalCost (default: cost)
 // - priorWork (default: 0)
+// - rename (default: unset)
+//   - 'r':   +renamePoint, +includesRename
+//   - 'i':   -renamePoint. +includesRename
+//   - other: -renamePoint. -includesRename
 // - enchants: array of enchantInfo (default: [])
 // enchantInfo should be a hashmap with:
 // - name
@@ -145,6 +150,10 @@ function BuildItem(info) {
     item.nr = info.nr
   item.cost = info.cost ?? 0
   item.totalCost = info.totalCost ?? item.cost
+  if (info.rename !== undefined) {
+    item.renamePoint = info.rename == 'r'
+    item.includesRename = info.rename == 'i' || info.rename == 'r'
+  }
 
   let enchantInfos = info.enchants ?? []
   enchantInfos.forEach((enchantInfo) => {
@@ -217,11 +226,20 @@ function GetOriginDescription(origin) {
 }
 
 
+function GetRenamedDescription(item) {
+  if (item.renamePoint === undefined)
+    return '.'
+  if (!item.includesRename)
+    return '-'
+  return item.renamePoint ? 'ri' : 'i'
+}
+
+
 function GetAbbrItemDesciption(item) {
   if (item === undefined)
     return '<undefined>'
   else
-    return `na:${item.info.name}|en:${GetEnchantsDescription(item.enchantsByID)}|se:${item.set.desc}|pw:${item.priorWork}|sc:${item.cost}|tc:${item.totalCost}|cn:${item.count}|or:${GetOriginDescription(item.origin)}`
+    return `na:${item.info.name}|en:${GetEnchantsDescription(item.enchantsByID)}|se:${item.set.desc}|pw:${item.priorWork}|sc:${item.cost}|tc:${item.totalCost}|re:${GetRenamedDescription(item)}|cn:${item.count}|or:${GetOriginDescription(item.origin)}`
 }
 
 
