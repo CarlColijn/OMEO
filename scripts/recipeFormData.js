@@ -85,10 +85,9 @@ class RecipeFormData {
     if (item.set === g_source)
       stream.AddCount(item.nr, 3)
     this.SerializeEnchants(item.enchantsByID, stream)
-    if (item.targetItem === undefined)
-      stream.AddSizedInt(0, 1)
-    else {
-      stream.AddSizedInt(1, 1)
+    let withChildren = item.targetItem !== undefined
+    stream.AddBool(withChildren)
+    if (withChildren) {
       this.SerializeItem(item.targetItem, stream)
       this.SerializeItem(item.sacrificeItem, stream)
     }
@@ -129,7 +128,7 @@ class RecipeFormData {
     )
       return undefined
 
-    let withChildren = stream.GetSizedInt(1)
+    let withChildren = stream.GetBool()
     if (withChildren) {
       item.targetItem = this.DeserializeItem(stream)
       if (item.targetItem === undefined)

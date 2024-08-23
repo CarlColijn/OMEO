@@ -82,6 +82,11 @@ class DataStream {
   }
 
 
+  AddBool(boolValue) {
+    this.AddSizedInt(boolValue ? 1 : 0, 1)
+  }
+
+
   // returns int
   GetSizedInt(numBits) {
     return this.restorer.GetBits(numBits)
@@ -92,6 +97,12 @@ class DataStream {
   GetCount() {
     let numBits = this.GetSizedInt(5)
     return this.GetSizedInt(numBits)
+  }
+
+
+  // returns bool
+  GetBool() {
+    return this.GetSizedInt(1) == 1
   }
 
 
