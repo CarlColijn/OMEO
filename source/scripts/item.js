@@ -68,6 +68,56 @@ class Item {
   }
 
 
+  // returns Item
+  // Only clones the items themselves (item + target/sacrifice);
+  // all other properties are shalow copies.
+  Clone() {
+    let clone = new Item(
+      this.count,
+      this.set,
+      this.id,
+      this.priorWork,
+      this.cost,
+      this.totalCost
+    )
+    clone.enchantsByID = this.enchantsByID
+
+    if (this.set === g_source || this.set === g_desired) {
+      clone.nr = this.nr
+    }
+    else if (this.set === g_combined) {
+      clone.renamePoint = this.renamePoint
+
+      if (this.targetItem === undefined) {
+        clone.targetItem = undefined
+        clone.sacrificeItem = undefined
+      }
+      else {
+        clone.targetItem = this.targetItem.Clone()
+        clone.sacrificeItem = this.sacrificeItem.Clone()
+      }
+    }
+
+    return clone
+  }
+
+
+  // returns Item[]
+  CollapseTree() {
+    let targetItems =
+      this.targetItem === undefined ?
+      [] :
+      this.targetItem.CollapseTree()
+
+    let sacrificeItems =
+      this.sacrificeItem === undefined ?
+      [] :
+      this.sacrificeItem.CollapseTree()
+
+    return [this, ...targetItems, ...sacrificeItems]
+  }
+
+
   SetEnchant(enchant) {
     this.enchantsByID.set(enchant.info.id, enchant)
   }

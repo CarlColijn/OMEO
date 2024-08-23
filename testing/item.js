@@ -121,4 +121,49 @@ jazil.AddTestSet(mainPage, 'Item', {
     jazil.ShouldBe(numEnchantsLeft, 2, 'Wrong number of enchants left!')
   },
 
+  'CollapseTree returns all items': (jazil) => {
+    let itemR = BuildItem({ name:'Shield', count:19, set:g_combined, cost:10, totalCost:12, priorWork:3, enchants:[{ name:'Mending', level:1 }] })
+    let itemRT = BuildItem({ name:'Shield', count:2, set:g_combined, renamePoint:true, cost:2, totalCost:55, priorWork:1, enchants:[{ name:'Mending', level:1 }] })
+    itemR.targetItem = itemRT
+    let itemRTT = BuildItem({ name:'Shield', count:22, set:g_source, nr:3, priorWork:2 })
+    itemRT.targetItem = itemRTT
+    let itemRTS = BuildItem({ name:'Book', count:15, set:g_source, nr:1, priorWork:3, enchants:[{ name:'Mending', level:1 }] })
+    itemRT.sacrificeItem = itemRTS
+    let itemRS = BuildItem({ name:'Book', count:6, set:g_extra, priorWork:3 })
+    itemR.sacrificeItem = itemRS
+
+    let allItems = itemR.CollapseTree()
+
+    jazil.ShouldBe(allItems.length, 5, 'list has incorrect number of items!')
+    jazil.Assert(allItems.indexOf(itemR) != -1, 'itemR not found in list!')
+    jazil.Assert(allItems.indexOf(itemRT) != -1, 'itemRT not found in list!')
+    jazil.Assert(allItems.indexOf(itemRTT) != -1, 'itemRTT not found in list!')
+    jazil.Assert(allItems.indexOf(itemRTS) != -1, 'itemRTS not found in list!')
+    jazil.Assert(allItems.indexOf(itemRS) != -1, 'itemRS not found in list!')
+  },
+
+  'Clone returns all items as clone': (jazil) => {
+    let itemR = BuildItem({ name:'Shield', count:19, set:g_combined, cost:10, totalCost:12, priorWork:3, enchants:[{ name:'Mending', level:1 }] })
+    let itemRT = BuildItem({ name:'Shield', count:2, set:g_combined, renamePoint:true, cost:2, totalCost:55, priorWork:1, enchants:[{ name:'Mending', level:1 }] })
+    itemR.targetItem = itemRT
+    let itemRTT = BuildItem({ name:'Shield', count:22, set:g_source, nr:3, priorWork:2 })
+    itemRT.targetItem = itemRTT
+    let itemRTS = BuildItem({ name:'Book', count:15, set:g_source, nr:1, priorWork:3, enchants:[{ name:'Mending', level:1 }] })
+    itemRT.sacrificeItem = itemRTS
+    let itemRS = BuildItem({ name:'Book', count:6, set:g_extra, priorWork:3 })
+    itemR.sacrificeItem = itemRS
+
+    let cloneR = itemR.Clone()
+
+    jazil.ShouldBe(cloneR.HashAll(), itemR.HashAll(), 'itemR not cloned correctly!')
+    jazil.ShouldNotBe(cloneR.targetItem, undefined, 'cloneR has no target item!')
+    jazil.ShouldBe(cloneR.targetItem.HashAll(), itemRT.HashAll(), 'itemRT not cloned correctly!')
+    jazil.ShouldNotBe(cloneR.targetItem.targetItem, undefined, 'cloneRT has no target item!')
+    jazil.ShouldBe(cloneR.targetItem.targetItem.HashAll(), itemRTT.HashAll(), 'itemRTT not cloned correctly!')
+    jazil.ShouldNotBe(cloneR.targetItem.sacrificeItem, undefined, 'cloneRT has no sacrifice item!')
+    jazil.ShouldBe(cloneR.targetItem.sacrificeItem.HashAll(), itemRTS.HashAll(), 'itemRTS not cloned correctly!')
+    jazil.ShouldNotBe(cloneR.sacrificeItem, undefined, 'cloneR has no sacrifice item!')
+    jazil.ShouldBe(cloneR.sacrificeItem.HashAll(), itemRS.HashAll(), 'itemRS not cloned correctly!')
+  },
+
 })
