@@ -57,12 +57,13 @@ class ItemCombineTester {
 
 
   // returns bool
-  UnenchantedSourcePresent(sourceItems, desiredItem) {
+  BareSourcePresent(sourceItems, desiredItem) {
     for (let itemNr = 0; itemNr < sourceItems.length; ++itemNr) {
       let sourceItem = sourceItems[itemNr]
       if (
         sourceItem.info === desiredItem.info &&
-        sourceItem.enchantsByID.size == 0
+        sourceItem.enchantsByID.size == 0 &&
+        sourceItem.priorWork == 0
       )
         return true
     }
