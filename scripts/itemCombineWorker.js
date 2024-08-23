@@ -5,14 +5,16 @@
   object with:
   - sourceItems: Item[]
   - desiredItem: Item
+  - renameToo: bool
 
   Output:
   cleanedUpItemsResult:
 
   Instruction messages:
   - start;
-    - desiredItem: Item (dehydrated}
     - sourceItems: Item[] (dehydrated)
+    - desiredItem: Item (dehydrated}
+    - renameToo: bool
     - feedbackIntervalMS: int
   Feedback messages:
   - type: 0 = progress; extra data items:
@@ -92,16 +94,17 @@ class FeedbackHandler {
 
 
 onmessage = (e) => {
-  let desiredItem = e.data.desiredItem
-  Item.Rehydrate(desiredItem)
   let sourceItems = e.data.sourceItems
   RehydrateItems(sourceItems)
+  let desiredItem = e.data.desiredItem
+  Item.Rehydrate(desiredItem)
+  let renameToo = e.data.renameToo
   let feedbackIntervalMS = e.data.feedbackIntervalMS
 
   let feedbackHandler = new FeedbackHandler(feedbackIntervalMS)
 
   let itemCombiner = new ItemCombiner()
-  let combineResult = itemCombiner.GetAllItemCombinations(sourceItems, desiredItem, feedbackHandler)
+  let combineResult = itemCombiner.GetAllItemCombinations(sourceItems, desiredItem, renameToo, feedbackHandler)
 
   feedbackHandler.TellFinalizing()
   let combineResultFilter = new CombineResultFilter(desiredItem)

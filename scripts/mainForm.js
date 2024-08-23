@@ -73,6 +73,7 @@ class MainForm {
   InitializeSubObjects() {
     this.sourceItemTable = new ItemTable(undefined, $('#sources table'), $('#addSourceItem'), g_source)
     this.desiredItemTable = new ItemTable(undefined, $('#desired table'), undefined, g_desired)
+    this.renameTooElemJQ = $('#desired #renameToo')
     this.combineItemTable = new ItemTable(this.ShowRecipePage, $('#combines table'), undefined, g_combined)
   }
 
@@ -121,6 +122,7 @@ class MainForm {
       type: 0,
       sourceItems: dataInContext.data.sourceItems,
       desiredItem: dataInContext.data.desiredItem,
+      renameToo: dataInContext.data.renameToo,
       feedbackIntervalMS: 100
     })
   }
@@ -205,10 +207,12 @@ class MainForm {
   GetData(mergeSourceItems) {
     let sourceItemsResult = this.sourceItemTable.GetItems(new ItemCollector(mergeSourceItems))
     let desiredItemResult = this.desiredItemTable.GetItems(new ItemCollector(false))
+    let renameToo = this.renameTooElemJQ.prop('checked')
 
     let data = new MainFormData()
     data.AddSourceItems(sourceItemsResult.items)
     data.SetDesiredItem(desiredItemResult.items[0])
+    data.SetRenameToo(renameToo)
 
     let withCountErrors =
       sourceItemsResult.withCountErrors ||
@@ -254,6 +258,7 @@ class MainForm {
     this.ClearResult()
     this.sourceItemTable.SetItems(data.sourceItems)
     this.desiredItemTable.SetItems([data.desiredItem])
+    this.renameTooElemJQ.prop('checked', data.renameToo)
   }
 
 

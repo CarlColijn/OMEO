@@ -35,7 +35,9 @@ class CombineResult {
 
 class ItemCombiner {
   // returns object; { combinedItems: Item[], maxProgress: int }
-  GetAllItemCombinations(sourceItems, desiredItem, feedbackHandler) {
+  GetAllItemCombinations(sourceItems, desiredItem, renameToo, feedbackHandler) {
+    this.maxCost = renameToo ? 38 : 39
+
     let tester = new ItemCombineTester()
 
     let filteredSourceItems = this.DropNonMatchingSourceItems(tester, sourceItems, desiredItem)
@@ -212,7 +214,7 @@ class ItemCombiner {
 
         if (
           !tester.CombineIsWasteful(targetItem, combineResult.targetUsed, sacrificeItem, combineResult.sacrificeUsed) &&
-          combineResult.cost <= 39
+          combineResult.cost <= this.maxCost
         ) {
           let combinedPriorWork = Math.max(targetItem.priorWork, sacrificeItem.priorWork) + 1
 

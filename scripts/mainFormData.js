@@ -12,6 +12,7 @@
   - MainFormData
     - desiredItem: Item
     - sourceItems: array(Item)
+    - renameToo: bool
 */
 
 
@@ -41,6 +42,11 @@ class MainFormData {
   }
 
 
+  SetRenameToo(renameToo) {
+    this.renameToo = renameToo
+  }
+
+
   Serialize(stream) {
     stream.AddCount(1) // version nr
 
@@ -52,6 +58,8 @@ class MainFormData {
     }
 
     this.SerializeItem(this.desiredItem, stream)
+
+    stream.AddBool(this.renameToo)
   }
 
 
@@ -76,6 +84,7 @@ class MainFormData {
   Reset() {
     this.sourceItems = []
     this.desiredItem = undefined
+    this.renameToo = false
   }
 
 
@@ -95,6 +104,11 @@ class MainFormData {
     if (dataOK) {
       this.desiredItem = this.DeserializeItem(stream, g_desired)
       dataOK = this.desiredItem !== undefined
+    }
+
+    if (dataOK) {
+      this.renameToo = stream.GetBool()
+      dataOK = stream.RetrievalOK()
     }
 
     if (!dataOK)
