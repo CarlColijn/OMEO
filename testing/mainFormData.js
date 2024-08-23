@@ -146,16 +146,22 @@ jazil.AddTestSet(mainPage, 'MainFormData', {
   },
 
   'Truncated form data gives error when deserializing': (jazil) => {
-    /*
+    let dataState = new DataStateController(jazil)
+    dataState.Reset()
+
     let sword = BuildItem({ name:'Sword', count:11, set:g_desired, priorWork:1, enchants:[{ name:'Looting' }] })
     let book = BuildItem({ name:'Book', count:33, set:g_source, priorWork:3, enchants:[{ name:'Fortune', level:3 }] })
 
-    // gives serialized data state ccmbaGOlKQhyW_, but we truncate
-    // after the Q
-    */
+    let storedData = new MainFormData
+    storedData.SetDesiredItem(sword)
+    storedData.AddSourceItem(book)
 
-    let dataState = new DataStateController(jazil)
-    dataState.SetOnlyLocalStorage('ccmbaGOlKQ') // truncated data
+    let storeStream = new DataStream(true)
+    storedData.Serialize(storeStream)
+    storeStream.SaveToLocalStorage()
+
+    jazil.ShouldBe(dataState.GetLocalStorage(), 'ccmbaGOlKQhyW_')
+    dataState.SetOnlyLocalStorage('ccmbaGOlKQ') // we truncate after the Q
 
     let loadingOptions = new DataStreamLoadingOptions()
     let restoreStream = new DataStream(false)
@@ -169,16 +175,22 @@ jazil.AddTestSet(mainPage, 'MainFormData', {
   },
 
   'Malformed form data gives error when deserializing': (jazil) => {
-    /*
-    let sword = BuildItem({ name:'Sword', count:11, set:g_desired, priorWork:1, enchants:[{ name:'Looting' }] })
-    let book = BuildItem({ name:'Book', count:33, set:g_source, priorWork:3, enchants:[{ name:'Fortune', level:3 }] })
-    // gives serialized data state ccmbaGOlKQhyW_, but the data was built
-    // with Looting's ID set to 63 which is invalid, giving ccmbaGOlKQhE4_
-    // instead
-    */
-
     let dataState = new DataStateController(jazil)
-    dataState.SetOnlyLocalStorage('ccmbaGOlKQhE4_') // malformed data
+    dataState.Reset()
+
+    let sword = BuildItem({ name:'Sword', count:11, set:g_desired, priorWork:1 })
+    let book = BuildItem({ name:'Book', count:33, set:g_source, priorWork:3, enchants:[{ name:'Fortune', level:3 }] })
+    GiveItemBrokenEnchant(sword)
+
+    let storedData = new MainFormData
+    storedData.SetDesiredItem(sword)
+    storedData.AddSourceItem(book)
+
+    let storeStream = new DataStream(true)
+    storedData.Serialize(storeStream)
+    storeStream.SaveToLocalStorage()
+
+    jazil.ShouldBe(dataState.GetLocalStorage(), 'ccmbaGOlKQhE4_') // malformed data
 
     let loadingOptions = new DataStreamLoadingOptions()
     let restoreStream = new DataStream(false)

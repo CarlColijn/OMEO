@@ -149,6 +149,28 @@ function BuildItem(info) {
 }
 
 
+function GiveItemBrokenEnchant(item) {
+    // Note: we can't fake it using new EnchantInfo, since that will
+    // also register the invalid data with g_enchantIDsByName and such.
+
+    let brokenEnchantInfo = {
+      id: 63,
+      maxLevel: 3,
+      bookMultiplier: 2,
+      toolMultiplier: 4,
+      name: 'Broken'
+    }
+
+    let brokenEnchant = {
+      id: 63,
+      level: 1,
+      info: brokenEnchantInfo
+    }
+
+    item.enchantsByID.set(63, brokenEnchant)
+}
+
+
 function GetEnchantsDescription(enchantsByID) {
   let enchantsDescription = ''
   let hasEnchants = false

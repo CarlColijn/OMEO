@@ -150,15 +150,20 @@ jazil.AddTestSet(recipePage, 'RecipeFormData', {
   },
 
   'Truncated form data gives error when deserializing': (jazil) => {
-    /*
+    let dataState = new DataStateController(jazil)
+    dataState.Reset()
+
     let sword = BuildItem({ name:'Sword', count:11, set:g_source, nr:9, priorWork:1, cost:22, totalCost:12, enchants:[{ name:'Looting' }] })
 
-    // gives serialized data state cixRKRsbrfBp, but we truncate
-    // after the s
-    */
+    let storedData = new RecipeFormData
+    storedData.SetItem(sword)
 
-    let dataState = new DataStateController(jazil)
-    dataState.SetOnlyLocalStorage('cixRKRs') // truncated data
+    let storeStream = new DataStream(true)
+    storedData.Serialize(storeStream)
+    storeStream.SaveToLocalStorage()
+
+    jazil.ShouldBe(dataState.GetLocalStorage(), 'cixRKRsbrfBp')
+    dataState.SetOnlyLocalStorage('cixRKRs') // we truncate after the s
 
     let loadingOptions = new DataStreamLoadingOptions()
     let restoreStream = new DataStream(false)
@@ -171,15 +176,20 @@ jazil.AddTestSet(recipePage, 'RecipeFormData', {
   },
 
   'Malformed form data gives error when deserializing': (jazil) => {
-    /*
-    let sword = BuildItem({ name:'Sword', count:11, set:g_combined, priorWork:1, cost:9, totalCost:33, enchants:[{ name:'Looting' }] })
-    // gives serialized data state ciBRJJZhyW_, but the data was built
-    // with Looting's ID set to 63 which is invalid, giving ciBRJJZhE4_
-    // instead
-    */
-
     let dataState = new DataStateController(jazil)
-    dataState.SetOnlyLocalStorage('ciBRJJZhE4_') // malformed data
+    dataState.Reset()
+
+    let sword = BuildItem({ name:'Sword', count:11, set:g_combined, priorWork:1, cost:9, totalCost:33 })
+    GiveItemBrokenEnchant(sword)
+
+    let storedData = new RecipeFormData
+    storedData.SetItem(sword)
+
+    let storeStream = new DataStream(true)
+    storedData.Serialize(storeStream)
+    storeStream.SaveToLocalStorage()
+
+    jazil.ShouldBe(dataState.GetLocalStorage(), 'ciBRJJZhE4_') // malformed data
 
     let loadingOptions = new DataStreamLoadingOptions()
     let restoreStream = new DataStream(false)
