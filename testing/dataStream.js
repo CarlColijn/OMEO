@@ -87,6 +87,7 @@ jazil.AddTestSet(mainPage, 'DataStream', {
 
     jazil.ShouldBe(dataState.GetLocalStorage(), '-V')
   },
+
   'Store to bookmark': (jazil) => {
     let dataState = new DataStateController(jazil)
     dataState.SetOnlyBookmark('abc')
@@ -104,12 +105,14 @@ jazil.AddTestSet(mainPage, 'DataStream', {
 
     let dataStream = new DataStream(true)
     dataStream.AddSizedInt(255, 6) // bits 7 & 8 will vanish
+    dataStream.AddBool(false)
     dataStream.AddCount(47)
     dataStream.AddSizedInt(2 + 16, 3) // the 16 in bit 5 will vanish
+    dataStream.AddBool(true)
     dataStream.AddCount(1111)
     dataStream.SaveToLocalStorage()
 
-    jazil.ShouldBe(dataState.GetLocalStorage(), '-mDKWw_')
+    jazil.ShouldBe(dataState.GetLocalStorage(), '-fUuBuV')
   },
 
   'Store and restore misc data': (jazil) => {
@@ -118,8 +121,10 @@ jazil.AddTestSet(mainPage, 'DataStream', {
 
     let dataStream = new DataStream(true)
     dataStream.AddSizedInt(255, 6)
+    dataStream.AddBool(false)
     dataStream.AddCount(47)
     dataStream.AddSizedInt(2 + 16, 3)
+    dataStream.AddBool(true)
     dataStream.AddCount(1111)
     dataStream.SaveToLocalStorage()
 
@@ -129,9 +134,26 @@ jazil.AddTestSet(mainPage, 'DataStream', {
 
     jazil.ShouldBe(loadedOK, true)
     jazil.ShouldBe(dataStream.GetSizedInt(6), 63)
+    jazil.ShouldBe(dataStream.GetBool(), false)
     jazil.ShouldBe(dataStream.GetCount(), 47)
     jazil.ShouldBe(dataStream.GetSizedInt(3), 2)
+    jazil.ShouldBe(dataStream.GetBool(), true)
     jazil.ShouldBe(dataStream.GetCount(), 1111)
+  },
+
+  'End of data stream signalled': (jazil) => {
+    let dataState = new DataStateController(jazil)
+    dataState.SetOnlyLocalStorage('q')
+
+    let loadingOptions = new DataStreamLoadingOptions()
+    let dataStream = new DataStream(false)
+    let loadedOK = dataStream.Load(loadingOptions)
+
+    jazil.ShouldBe(loadedOK, true)
+    jazil.ShouldBe(dataStream.GetSizedInt(6), 17, 'Initial data loaded incorrectly!')
+    jazil.ShouldBe(dataStream.RetrievalOK(), true, 'Stream not good anymore after initial data!')
+    jazil.ShouldBe(dataStream.GetBool(), false, 'Overflow data returned incorrectly!')
+    jazil.ShouldBe(dataStream.RetrievalOK(), false, 'Stream still good after overflow!')
   },
 
   'Restore from local storage only': (jazil) => {
