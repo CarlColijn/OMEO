@@ -129,6 +129,11 @@
           <p><em>Important highlights:</em></p>
           <ul>
             <li>OMEO works for the Java edition of Minecraft only. The Bedrock edition of Minecraft e.g., uses other cost calculations and has other enchantment incompatibilities. So, if you're not on the Java version, feel free to use OMEO but don't get disappointed if the result doesn't work out IRL.</li>
+            <li>Renaming an item will cost an additional 1 xp level. This can be done separately (this won't increase the item's prior work penalty), or in one go while combining the item with something else. Therefore, if you want to name or rename your item, you can therefore best do this:
+              <ul>
+                <li>separately at the start when the prior work penalty is not an issue, or</li>
+                <li>during one of the first combines where the cost increase is not yet an issue.</li>
+              </ul></li>
             <li>Combining a <em>damaged</em> item with another item will repair it (somewhat or in full), and this costs an additional 2 xp levels for that combine. Note that the combined item might still be (somewhat) damaged, so a follow-up item+item combine would again cost an extra 2 xp levels. These costs are not considered by OMEO, so please keep this in mind. When these repairing combines are done at the end of the combine chain (when the combine cost might already be close to the max cost of 39), this can be an unexpected deal breaker.</li>
             <li>It is quite important to correctly fill in each item's prior work penalty!  This is the most cost contributing factor when combining higher-tiered items. See the <a target="_blank" rel="noopener" href="explained.html">detailed explanation page</a> for instructions on how to get at an item's prior work penalty.</li>
             <li>Due to the direly needed optimization strategy, the combining progress cannot be predicted perfectly. For this reason you might see the progress sometimes actually count <em>down</em> instead of up, or flow in fits and starts. This is not a bug but intended behavior.</li>
@@ -208,10 +213,6 @@
               </table>
               <button type="button" name="addEnchant">Add enchantment</button>
             </td>
-          </tr>
-          <tr>
-            <td></td>
-            <td colspan="2"><label><input id="renameToo" name="renameToo" type="checkbox" value="1">Rename the item too</label> <span class="footnote">(costs 1 XP)</span></td>
           </tr>
         </tbody>
       </table>
