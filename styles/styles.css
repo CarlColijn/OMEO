@@ -142,11 +142,14 @@ input[type=number] {
 .iconWrap * {
   vertical-align: top;
 }
-.icon {
+.iconWrap .icon {
   width: 24px;
   height: 24px;
   object-fit: none;
   object-position: 0px 0px;
+}
+.iconWrap .type {
+  white-space: normal;
 }
 
 
@@ -225,6 +228,9 @@ a:visited {
 
 
 /* Special content */
+.noWrap {
+  white-space: nowrap;
+}
 .indented {
   margin-left: 2em;
 }
