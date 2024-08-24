@@ -102,7 +102,10 @@ let g_enchantInfos = [
   new EnchantInfo(36, 3, 4, 8, 'Soul Speed'),
   new EnchantInfo(37, 3, 4, 8, 'Swift Sneak'),
   // Bedrock: Sweeping Edge doesn't exist
-  new EnchantInfo(38, 3, 2, 4, 'Sweeping Edge')
+  new EnchantInfo(38, 3, 2, 4, 'Sweeping Edge'),
+  new EnchantInfo(39, 4, 2, 4, 'Breach'),
+  new EnchantInfo(40, 5, 1, 2, 'Density'),
+  new EnchantInfo(41, 3, 2, 4, 'Wind Burst')
 ].sort((a, b) => { return a.name < b.name ? -1 : a.name > b.name ? +1 : 0; })
 
 

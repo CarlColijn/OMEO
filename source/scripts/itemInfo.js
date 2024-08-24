@@ -88,7 +88,9 @@ let g_itemInfos = [
   new ItemInfo(19, 'Carrot on a Stick', ['Curse of Vanishing','Mending','Unbreaking']),
   new ItemInfo(20, 'Warped Fungus on a Stick', ['Curse of Vanishing','Mending','Unbreaking']),
   new ItemInfo(21, 'Pumpkin', ['Curse of Binding','Curse of Vanishing']),
-  new ItemInfo(22, 'Head', ['Curse of Binding','Curse of Vanishing'])
+  new ItemInfo(22, 'Head', ['Curse of Binding','Curse of Vanishing']),
+  new ItemInfo(23, 'Brush', ['Curse of Vanishing','Mending','Unbreaking']),
+  new ItemInfo(24, 'Mace', ['Bane of Arthropods','Breach','Curse of Vanishing','Density','Fire Aspect','Mending','Smite','Unbreaking','Wind Burst'])
 ].sort((a, b) => { return a.name < b.name ? -1 : a.name > b.name ? +1 : 0; })
 
 
