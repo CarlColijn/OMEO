@@ -38,15 +38,15 @@ class ItemInfo {
     this.enchantsAllowedByID = new Set()
 
     if (this.isBook) {
-      for (let enchantNr = 0; enchantNr < g_numDifferentEnchants; ++enchantNr)
-        this.enchantsAllowedByID.add(g_enchantInfos[enchantNr].id)
+      g_enchantInfos.forEach((enchantInfo) => {
+        this.enchantsAllowedByID.add(enchantInfo.id)
+      })
     }
     else {
-      for (let enchantNameNr = 0; enchantNameNr < enchantNames.length; ++enchantNameNr) {
-        let enchantName = enchantNames[enchantNameNr]
+      enchantNames.forEach((enchantName) => {
         let enchantID = g_enchantIDsByName.get(enchantName)
         this.enchantsAllowedByID.add(enchantID)
-      }
+      })
     }
 
     g_itemInfosByID.set(id, this)

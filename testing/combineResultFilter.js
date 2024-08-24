@@ -7,8 +7,9 @@ function CheckItemFilterResultOK(id, jazil, desiredItem, sourceItems, combinedIt
   jazil.ShouldBe(filterResult.items.length, expectedTags.length, 'wrong number of items returned!')
   jazil.ShouldBe(filterResult.hasSources, expectedHasSources, 'wrong hasSources returned!')
 
-  for (let itemNr = 0; itemNr < expectedTags.length; ++itemNr)
-    jazil.ShouldBe(filterResult.items[itemNr].tag, expectedTags[itemNr], `wrong item ${itemNr} got returned (${expectedTags[itemNr]})!`)
+  expectedTags.forEach((expectedTag, itemNr) => {
+    jazil.ShouldBe(filterResult.items[itemNr].tag, expectedTag, `wrong item ${itemNr} got returned (${expectedTag})!`)
+  })
 }
 
 

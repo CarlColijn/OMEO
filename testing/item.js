@@ -68,9 +68,8 @@ jazil.AddTestSet(mainPage, 'Item', {
     let foundMending = false
     let flameInfo = g_enchantInfosByID.get(g_enchantIDsByName.get('Flame'))
     let foundFlame = false
-    let numEnchantsSet = 0
+    let numEnchantsSet = pickaxe.enchantsByID.size
     pickaxe.enchantsByID.forEach((enchant) => {
-      ++numEnchantsSet
       if (enchant.id === smiteInfo.id)
         foundSmite = true
       if (enchant.id === sharpnessInfo.id)
@@ -101,9 +100,8 @@ jazil.AddTestSet(mainPage, 'Item', {
     let foundMending = false
     let flameInfo = g_enchantInfosByID.get(g_enchantIDsByName.get('Flame'))
     let foundFlame = false
-    let numEnchantsLeft = 0
+    let numEnchantsLeft = pickaxe.enchantsByID.size
     pickaxe.enchantsByID.forEach((enchant) => {
-      ++numEnchantsLeft
       if (enchant.id === smiteInfo.id)
         foundSmite = true
       if (enchant.id === sharpnessInfo.id)

@@ -180,7 +180,8 @@ class Item {
         enchantIDsToDrop.push(id)
     })
 
-    for (let enchantIDNr = 0; enchantIDNr < enchantIDsToDrop.length; ++enchantIDNr)
-      this.enchantsByID.delete(enchantIDsToDrop[enchantIDNr])
+    enchantIDsToDrop.forEach((enchantID) => {
+      this.enchantsByID.delete(enchantID)
+    })
   }
 }

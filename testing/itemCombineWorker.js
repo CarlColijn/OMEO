@@ -163,7 +163,7 @@ jazil.AddTestSet(mainPage, 'ItemCombineWorker', {
     jazil.ShouldBe(status.doneCalled, true, 'done not called!')
     jazil.ShouldBeBetween(status.timeInMSReported, status.timeInMSMeasured - 500, status.timeInMSMeasured, 'timeInMS diverges too much!')
     jazil.ShouldNotBe(status.result, undefined, 'result is not returned!')
-    TestItemListsMatch(jazil, expectedItems, 'expected', status.result.items, 'combined', g_combined)
+    TestItemListsMatch(jazil, expectedItems, 'expected', status.result.items, 'source', g_source)
   },
 
   'Progress indicators are correct': async (jazil) => {

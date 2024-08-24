@@ -31,8 +31,9 @@ class MainFormData {
 
 
   AddSourceItems(items) {
-    for (let itemNr = 0; itemNr < items.length; ++itemNr)
-      this.AddSourceItem(items[itemNr])
+    items.forEach((item) => {
+      this.AddSourceItem(item)
+    })
   }
 
 
@@ -44,12 +45,10 @@ class MainFormData {
   Serialize(stream) {
     stream.AddCount(1) // version nr
 
-    let numSources = this.sourceItems.length
-    stream.AddCount(numSources)
-    for (let sourceNr = 0; sourceNr < numSources; ++sourceNr) {
-      let sourceItem = this.sourceItems[sourceNr]
+    stream.AddCount(this.sourceItems.length)
+    this.sourceItems.forEach((sourceItem) => {
       this.SerializeItem(sourceItem, stream)
-    }
+    })
 
     this.SerializeItem(this.desiredItem, stream)
   }

@@ -57,10 +57,9 @@ class ItemTable {
     else {
       this.Clear()
 
-      for (let itemNr = 0; itemNr < items.length; ++itemNr) {
-        let item = items[itemNr]
+      items.forEach((item, itemNr) => {
         this.templateRow.CreateNew(itemNr + 1, item, false, this.addItemElemJQ)
-      }
+      })
     }
   }
 
@@ -69,8 +68,9 @@ class ItemTable {
   GetItems(itemCollector) {
     let itemRows = this.GetItemRows()
 
-    for (let rowNr = 0; rowNr < itemRows.length; ++rowNr)
-      itemCollector.ProcessRow(itemRows[rowNr])
+    itemRows.forEach((itemRow) => {
+      itemCollector.ProcessRow(itemRow)
+    })
 
     let result = itemCollector.Finalize()
 
@@ -98,25 +98,24 @@ class ItemTable {
 
 
   UpdateRowNrs(itemRows, mergeResult) {
-    for (let rowNr = 0; rowNr < mergeResult.rowsToUpdateNr.length; ++rowNr) {
-      let itemRow = mergeResult.rowsToUpdateNr[rowNr]
+    mergeResult.rowsToUpdateNr.forEach((itemRow) => {
       itemRow.SetNumber(itemRow.nr)
-    }
+    })
   }
 
 
   UpdateRowCounts(itemRows, mergeResult) {
-    for (let rowNr = 0; rowNr < mergeResult.rowsToUpdateCount.length; ++rowNr) {
-      let itemRow = mergeResult.rowsToUpdateCount[rowNr]
+    mergeResult.rowsToUpdateCount.forEach((itemRow) => {
       let item = mergeResult.itemsByRow.get(itemRow)
       itemRow.SetCount(item.count)
-    }
+    })
   }
 
 
   RemoveMergedRows(itemRows, mergeResult) {
-    for (let rowNr = 0; rowNr < mergeResult.rowsToRemove.length; ++rowNr)
-      mergeResult.rowsToRemove[rowNr].Remove()
+    mergeResult.rowsToRemove.forEach((row) => {
+      row.Remove()
+    })
   }
 
 

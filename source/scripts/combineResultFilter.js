@@ -178,8 +178,7 @@ class CombineResultFilter {
       imperfects: []
     }
 
-    for (let itemNr = 0; itemNr < items.length; ++itemNr) {
-      let item = items[itemNr]
+    items.forEach((item) => {
       let matchResult = this.CheckItemMatch(item)
 
       if (matchResult.matchesType) {
@@ -190,7 +189,7 @@ class CombineResultFilter {
         else
           groups.imperfects.push(item)
       }
-    }
+    })
 
     return groups
   }
@@ -245,7 +244,7 @@ class CombineResultFilter {
   // - item: Item
   // - rating: float // note: lower is better
   RateItems(items) {
-    return items.map((item, itemNr, array) => {
+    return items.map((item) => {
       return {
         item: item,
         rating: this.RateItem(item)
@@ -260,7 +259,7 @@ class CombineResultFilter {
 
     ratedItems.sort(this.CompareRatedItemsByFitness)
 
-    return ratedItems.map((ratedItem, itemNr, array) => {
+    return ratedItems.map((ratedItem) => {
       return ratedItem.item
     })
   }
@@ -352,20 +351,15 @@ class CombineResultFilter {
       this.AddLowestPrioAndCostItems(items, itemsToKeep)
     })
 
-    return items.filter((item, itemNr, array) => {
+    return items.filter((item) => {
       return itemsToKeep.has(item)
     })
   }
 
 
   ItemListContainsSources(items) {
-    let hasSources = false
-    items.forEach((item) => {
-      if (item.set !== g_source)
-        return true
-      hasSources = true
-      return false
+    return items.some((item) => {
+      return item.set === g_source
     })
-    return hasSources
   }
 }

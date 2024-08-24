@@ -182,8 +182,8 @@ class ItemCombineList {
 
 
   RemoveItems(items) {
-    for (let itemIndex = 0; itemIndex < items.length; ++itemIndex) {
-      let item = items[itemIndex]
+    while (items.length > 0) {
+      let item = items.pop()
       let listInfo = this.itemListInfosByItem.get(item)
 
       this.allItems.splice(listInfo.index, 1)

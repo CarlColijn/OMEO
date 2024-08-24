@@ -1,20 +1,18 @@
 // returns ItemRow[]
 function CreateItemRows(templateRowDetails, items, jumpNrs) {
-  let itemRows = []
-  for (let itemNr = 0; itemNr < items.length; ++itemNr) {
+  return items.map((item, itemNr) => {
     let rowNr = 1 + (jumpNrs ? itemNr * 2 : itemNr)
-    itemRows.push(CreateItemRow(templateRowDetails, items[itemNr], rowNr))
-  }
-
-  return itemRows
+    return CreateItemRow(templateRowDetails, item, rowNr)
+  })
 }
 
 
 // returns ItemCollectorResult
 function ProcessItemRows(itemRows, mergeRows) {
   let collector = new ItemCollector(mergeRows)
-  for (let itemNr = 0; itemNr < itemRows.length; ++itemNr)
-    collector.ProcessRow(itemRows[itemNr])
+  itemRows.forEach((itemRow) => {
+    collector.ProcessRow(itemRow)
+  })
   return collector.Finalize()
 }
 

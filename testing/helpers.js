@@ -134,8 +134,7 @@ function BuildItem(info) {
   item.totalCost = info.totalCost ?? item.cost
 
   let enchantInfos = info.enchants ?? []
-  for (let enchantNr = 0; enchantNr < enchantInfos.length; ++enchantNr) {
-    let enchantInfo = enchantInfos[enchantNr]
+  enchantInfos.forEach((enchantInfo) => {
     let enchant = new Enchant(
       g_enchantIDsByName.get(enchantInfo.name),
       enchantInfo.level ?? 1
@@ -143,7 +142,7 @@ function BuildItem(info) {
     if (enchant.info === undefined)
       throw Error(`Unknown enchant name: ${enchantInfo.name}`)
     item.SetEnchant(enchant)
-  }
+  })
 
   return item
 }
@@ -218,14 +217,13 @@ function GetAbbrItemDesciption(item) {
 function IndexItemsByHash(items) {
   let itemsByHash = new Map()
 
-  for (let itemNr = 0; itemNr < items.length; ++itemNr) {
-    let item = items[itemNr]
+  items.forEach((item) => {
     let hash = item.HashAll()
     if (itemsByHash.has(hash))
-      itemsByHash.get(hash).items.push(item)
+      itemsByHash.get(hash).push(item)
     else
-      itemsByHash.set(hash, { items: [item] })
-  }
+      itemsByHash.set(hash, [item])
+  })
 
   return itemsByHash
 }
@@ -250,7 +248,7 @@ function TestItemListsMatch(jazil, items1, item1Description, items2, item2Descri
     if (items2ByHash.has(hash1))
       jazil.ShouldBe(items1.length, items2ByHash.get(hash1).length, `unequal number of items found in ${item1Description} vs. ${item1Description}!`)
     else {
-      let item1 = items1.items[0]
+      let item1 = items1[0]
       jazil.Fail(`${ItemTagOrNr(item1)} - ${GetAbbrItemDesciption(item1)} : ${item1Description} item not found in ${item2Description}!`)
     }
   })
@@ -259,17 +257,16 @@ function TestItemListsMatch(jazil, items1, item1Description, items2, item2Descri
     if (items1ByHash.has(hash2))
       jazil.ShouldBe(items2.length, items1ByHash.get(hash2).length, `unequal number of items found in ${item2Description} vs. ${item1Description}!`)
     else {
-      let item2 = items2.items[0]
+      let item2 = items2[0]
       jazil.Fail(`${ItemTagOrNr(item2)} - ${GetAbbrItemDesciption(item2)} : ${item2Description} item not found in ${item1Description}!`)
     }
   })
 
   items2ByHash.forEach((items2, hash2) => {
-    for (let item2Nr = 0; item2Nr < items2.length; ++item2Nr) {
-      let item2 = items2[item2Nr]
+    items2.forEach((item2) => {
       jazil.ShouldBe(item2.set, item2Set, `${item2Description} item with wrong set!`)
       jazil.ShouldBe(items2.length, items1ByHash.get(hash2).length, `unequal number of items found in ${item1Description} vs. ${item2Description}!`)
-    }
+    })
   })
 }
 

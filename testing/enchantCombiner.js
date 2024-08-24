@@ -44,10 +44,9 @@ jazil.AddTestSet(mainPage, 'EnchantCombiner', {
 
     jazil.ShouldBe(combines.length, 6, 'Wrong number of combines made!')
     let combineRef = combines[0]
-    for (let combineNr = 1; combineNr < combines.length; ++combineNr) {
-      let combineComp = combines[combineNr]
+    combines.forEach((combineComp) => {
       TestCombineResultEqual(jazil, combineRef, combineComp)
-    }
+    })
   },
 
   'Symmetric combines are equal': (jazil) => {
