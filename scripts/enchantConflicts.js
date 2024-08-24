@@ -38,7 +38,7 @@ function RegisterConflictingEnchants(enchantNames) {
 
 RegisterConflictingEnchants(['Protection', 'Blast Protection', 'Fire Protection', 'Projectile Protection'])
 RegisterConflictingEnchants(['Depth Strider', 'Frost Walker'])
-RegisterConflictingEnchants(['Sharpness', 'Smite', 'Bane of Arthropods'])
+RegisterConflictingEnchants(['Sharpness', 'Smite', 'Bane of Arthropods', 'Density', 'Breach'])
 // Silk Touch & Fortune can be combined with commands
 RegisterConflictingEnchants(['Silk Touch', 'Fortune'])
 RegisterConflictingEnchants(['Infinity', 'Mending'])
