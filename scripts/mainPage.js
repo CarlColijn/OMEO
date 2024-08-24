@@ -1,18 +1,12 @@
 /*
   Main page javascript module.
 
-  Prerequisites:
-  - mainForm.js
-
   Defined classes:
-  - FormHandler
-
-  Defined globals:
-  - g_form: MainForm
+  - MainFormHandler
 */
 
 
-class FormHandler {
+class MainFormHandler {
   MakeDialogKeyboardCloseable(dialogElemJQ, exitButtonElemJQ, OnClose) {
     let keyboardListener = (event) => {
       if (
@@ -203,8 +197,3 @@ class FormHandler {
     return `Progress: ${percentageText}% of ${maxProgressText} combinations<br>Time elapsed: ${this.GetFormattedTime(timeInSeconds)} of ${this.GetFormattedTime(maxTimeInSeconds)}`
   }
 }
-
-
-
-
-let g_form = new MainForm(new FormHandler())

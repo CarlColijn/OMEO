@@ -1,18 +1,12 @@
 /*
   Recipe page javascript module.
 
-  Prerequisites:
-  - recipeForm.js
-
   Defined classes:
-  - FormHandler
-
-  Defined globals:
-  - g_form: RecipeForm
+  - RecipeFormHandler
 */
 
 
-class FormHandler {
+class RecipeFormHandler {
   MakeDialogKeyboardCloseable(dialogElemJQ, exitButtonElemJQ, OnClose) {
     let keyboardListener = (event) => {
       if (
@@ -57,8 +51,3 @@ class FormHandler {
     this.ShowSimpleDialog('#dataInErrorForLoad', undefined)
   }
 }
-
-
-
-
-let g_form = new RecipeForm(new FormHandler())
