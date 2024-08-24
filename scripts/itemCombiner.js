@@ -61,31 +61,26 @@ class ItemCombiner {
 
 
   DropNonMatchingSourceItems(tester, sourceItems, desiredItem) {
-    let filteredSourceItems = []
-    for (let itemNr = 0; itemNr < sourceItems.length; ++itemNr) {
-      let sourceItem = sourceItems[itemNr]
-      if (tester.TargetIsRelevant(sourceItem, desiredItem))
-        filteredSourceItems.push(sourceItem)
-    }
-
-    return filteredSourceItems
+    return sourceItems.filter((sourceItem) => {
+      return tester.TargetIsRelevant(sourceItem, desiredItem)
+    })
   }
 
 
   DropUnusedEnchantsFromItems(sourceItems, desiredItem) {
     desiredItem.DropUnusedEnchants()
-    for (let itemNr = 0; itemNr < sourceItems.length; ++itemNr)
-      sourceItems[itemNr].DropUnusedEnchants()
+    sourceItems.forEach((sourceItem) => {
+      sourceItem.DropUnusedEnchants()
+    })
   }
 
 
   SetupItemOrigins(sourceItems) {
     let zeroOrigin = new ZeroOrigin(sourceItems)
 
-    for (let itemNr = 0; itemNr < sourceItems.length; ++itemNr) {
-      let item = sourceItems[itemNr]
+    sourceItems.forEach((item, itemNr) => {
       item.origin = zeroOrigin.CreateOrigin(itemNr, item.count)
-    }
+    })
   }
 
 
