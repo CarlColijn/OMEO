@@ -43,8 +43,7 @@
         <Folder name="other">
             <File name="source\browserconfig.xml" />
             <File name="source\CNAME" />
-            <File name="source\scripts\index.js" />
-            <File name="source\scripts\recipe.js" />
+            <File name="source\scripts\script.js" />
             <File name="source\site.webmanifest" />
         </Folder>
     </Project>

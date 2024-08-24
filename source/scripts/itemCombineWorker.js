@@ -24,6 +24,7 @@
 */
 
 
+// scripts
 importScripts('dataSets.js')
 importScripts('enchantInfo.js')
 importScripts('enchantConflicts.js')
@@ -36,6 +37,7 @@ importScripts('itemCombineList.js')
 importScripts('itemCombineTester.js')
 importScripts('itemCombiner.js')
 importScripts('combineResultFilter.js')
+// /scripts
 
 
 // ======== PUBLIC ========

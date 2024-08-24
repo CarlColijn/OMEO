@@ -16,11 +16,16 @@ class FileInfo:
 
 class Publisher:
   def __init__(self):
-    self.indexFileInfo = None
-    self.indexJSFileInfo = None
-    self.recipeFileInfo = None
-    self.recipeJSFileInfo = None
+    # The special files to look out for.
+    self.indexHTMLFileInfo = None
+    self.recipeHTMLFileInfo = None
+    self.itemCombineWorkerJSFileInfo = None
+    self.combinedJSFileInfo = None
+
+    # All JS files found.
     self.jsFileInfosByName = dict()
+    self.includeJSFileNames = [] # added in the correct include order
+    self.includedJSFileNames = set()
 
 
 
@@ -28,45 +33,20 @@ class Publisher:
     self.webRootPath = os.path.join(ourPath, 'source')
     self.uploadRootPath = os.path.join(ourPath, 'upload')
 
-    self.StartClean()
+    self.CleanUploadFolder()
     self.ProcessFolder(self.webRootPath, self.uploadRootPath)
-    if not self.CheckAllOK():
-      return
 
     if (
-      self.ProcessSpecialFiles(self.indexFileInfo, self.indexJSFileInfo) and
-      self.ProcessSpecialFiles(self.recipeFileInfo, self.recipeJSFileInfo)
+      self.CheckAllOK() and
+      self.GetUsedScriptFileNames() and
+      self.CombineJSFiles()
     ):
       tkinter.messagebox.showinfo('Publishing done', 'All files have been published and are now ready in the folder "upload".')
 
 
-  def StartClean(self):
+  def CleanUploadFolder(self):
     if os.path.isdir(self.uploadRootPath):
       shutil.rmtree(self.uploadRootPath)
-
-
-  def ProcessIndexHTMLFile(self, file, fileUploadPath):
-    self.indexFileInfo = FileInfo(file, fileUploadPath)
-
-
-  def ProcessRecipeHTMLFile(self, file, fileUploadPath):
-    self.recipeFileInfo = FileInfo(file, fileUploadPath)
-
-
-  def ProcessIndexJSFile(self, file, fileUploadPath):
-    self.indexJSFileInfo = FileInfo(file, fileUploadPath)
-
-
-  def ProcessRecipeJSFile(self, file, fileUploadPath):
-    self.recipeJSFileInfo = FileInfo(file, fileUploadPath)
-
-
-  def ProcessJSFile(self, file, fileUploadPath):
-    self.jsFileInfosByName[file.name] = FileInfo(file, fileUploadPath)
-
-
-  def ProcessOtherFile(self, file, fileUploadPath):
-    shutil.copyfile(file.path, fileUploadPath)
 
 
   def ProcessFolder(self, folderPath, uploadPath):
@@ -78,18 +58,18 @@ class Publisher:
         entryUploadPath = os.path.join(uploadPath, entry.name)
 
         if entry.name.lower() == 'index.html':
-          self.ProcessIndexHTMLFile(entry, entryUploadPath)
+          self.indexHTMLFileInfo = FileInfo(entry, entryUploadPath)
         elif entry.name.lower() == 'recipe.html':
-          self.ProcessRecipeHTMLFile(entry, entryUploadPath)
-        elif entry.name.lower() == 'index.js':
-          self.ProcessIndexJSFile(entry, entryUploadPath)
-        elif entry.name.lower() == 'recipe.js':
-          self.ProcessRecipeJSFile(entry, entryUploadPath)
+          self.recipeHTMLFileInfo = FileInfo(entry, entryUploadPath)
+        elif entry.name.lower() == 'script.js':
+          self.combinedJSFileInfo = FileInfo(entry, entryUploadPath)
+        elif entry.name.lower() == 'itemcombineworker.js':
+          self.itemCombineWorkerJSFileInfo = FileInfo(entry, entryUploadPath)
         elif entry.is_file():
           if entry.name.endswith('.js'):
-            self.ProcessJSFile(entry, entryUploadPath)
+            self.jsFileInfosByName[entry.name] = FileInfo(entry, entryUploadPath)
           else:
-            self.ProcessOtherFile(entry, entryUploadPath)
+            shutil.copyfile(entry.path, entryUploadPath)
 
         if entry.is_dir():
           self.ProcessFolder(entry.path, entryUploadPath)
@@ -106,13 +86,17 @@ class Publisher:
 
 
   def CheckAllOK(self):
-    if self.indexFileInfo == None:
-      tkinter.messagebox.showerror('Publishing error', 'The html file "index.html" could not be found.')
-      return False
+    obligatoryFileInfos = [
+      (self.indexHTMLFileInfo, 'html file "index.html"'),
+      (self.recipeHTMLFileInfo, 'html file "recipe.html"'),
+      (self.itemCombineWorkerJSFileInfo, 'js file "itemCombineWorker.js"'),
+      (self.combinedJSFileInfo, 'js file "script.js"'),
+    ]
 
-    if self.recipeFileInfo == None:
-      tkinter.messagebox.showerror('Publishing error', 'The html file "recipe.html" could not be found.')
-      return False
+    for (fileInfo, description) in obligatoryFileInfos:
+      if fileInfo == None:
+        tkinter.messagebox.showerror('Publishing error', f'The {description} could not be found.')
+        return False
 
     return True
 
@@ -125,23 +109,54 @@ class Publisher:
     return [firstSplit[0], secondSplit[0], secondSplit[1]]
 
 
-  def ProcessSpecialFiles(self, htmlFileInfo, jsFileInfo):
-    html = self.ReadFileContent(htmlFileInfo.file)
+  def AddUsedScriptsFromFile(self, fileInfo, blockStartTag, blockEndTag, lineStartTag, lineEndTag):
     try:
-      htmlParts = self.GetSplitText(html, '<!-- scripts -->', '<!-- /scripts -->')
+      fileContent = self.ReadFileContent(fileInfo.file)
+      fileBlocks = self.GetSplitText(fileContent, blockStartTag, blockEndTag)
     except:
-      tkinter.messagebox.showerror('Publishing error', f'The scripts part in the file "{htmlFileInfo.file.name}" could not be found.')
+      tkinter.messagebox.showerror('Publishing error', f'The include part in the file "{fileInfo.file.name}" could not be found.')
       return False
 
-    scriptLines = htmlParts[1].split('\n')
+    scriptLines = fileBlocks[1].split('\n')
+
+    fileBlocks[1] = f'{lineStartTag}script.js{lineEndTag}'
+    fileContent = ''.join(fileBlocks)
+    self.WriteFileContent(fileInfo.fileUploadPath, fileContent)
+
+    jsFileNames = []
     try:
-      jsFileNames = [self.GetSplitText(scriptLine, 'src="scripts/', '"></script>')[1] for scriptLine in scriptLines]
+      for scriptLine in scriptLines:
+        scriptLine = scriptLine.strip()
+        if len(scriptLine) > 0:
+          scriptLineParts = self.GetSplitText(scriptLine, lineStartTag, lineEndTag)
+          jsFileNames.append(scriptLineParts[1])
     except:
-      tkinter.messagebox.showerror('Publishing error', f'One of the script references in the scripts part in the file "{htmlFileInfo.file.name}" cannot be processed.')
+      tkinter.messagebox.showerror('Publishing error', f'One of the script references in the scripts part in the file "{fileInfo.file.name}" cannot be processed.')
       return False
 
-    jsCodeParts = []
     for jsFileName in jsFileNames:
+      if not jsFileName in self.jsFileInfosByName:
+        tkinter.messagebox.showerror('Publishing error', f'The referenced javascript file "{jsFileName}" could not be found.')
+        return False
+      if not jsFileName in self.includedJSFileNames:
+        self.includeJSFileNames.append(jsFileName)
+        self.includedJSFileNames.add(jsFileName)
+
+    return True
+
+
+  def GetUsedScriptFileNames(self):
+    return (
+      self.AddUsedScriptsFromFile(self.indexHTMLFileInfo, '<!-- scripts -->', '<!-- /scripts -->', '<script src="scripts/', '"></script>') and
+      self.AddUsedScriptsFromFile(self.recipeHTMLFileInfo, '<!-- scripts -->', '<!-- /scripts -->', '<script src="scripts/', '"></script>') and
+      self.AddUsedScriptsFromFile(self.itemCombineWorkerJSFileInfo, '// scripts', '// /scripts', 'importScripts(\'', '\')')
+    )
+
+
+  def CombineJSFiles(self):
+    jsCodeParts = []
+
+    for jsFileName in self.includeJSFileNames:
       if not jsFileName in self.jsFileInfosByName:
         tkinter.messagebox.showerror('Publishing error', f'The referenced javascript file "{jsFileName}" could not be found.')
         return False
@@ -149,11 +164,8 @@ class Publisher:
       jsCodeParts.append(self.ReadFileContent(self.jsFileInfosByName[jsFileName].file))
 
     totalJSCode = '\n\n\n\n'.join(jsCodeParts)
-    self.WriteFileContent(jsFileInfo.fileUploadPath, totalJSCode)
+    self.WriteFileContent(self.combinedJSFileInfo.fileUploadPath, totalJSCode)
 
-    htmlParts[1] = f'<script src="scripts/{jsFileInfo.file.name}"></script>'
-    totalHTML = ''.join(htmlParts)
-    self.WriteFileContent(htmlFileInfo.fileUploadPath, totalHTML)
     return True
 
 
