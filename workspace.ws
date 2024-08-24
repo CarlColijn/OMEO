@@ -20,6 +20,7 @@
             <File name="source\scripts\enchantConflicts.js" />
             <File name="source\scripts\enchantInfo.js" />
             <File name="source\scripts\enchantRow.js" />
+            <File name="source\scripts\guiHelpers.js" />
             <File name="source\scripts\item.js" />
             <File name="source\scripts\itemCollector.js" />
             <File name="source\scripts\itemCombineList.js" />
@@ -33,6 +34,7 @@
             <File name="source\scripts\mainForm.js" />
             <File name="source\scripts\mainFormData.js" />
             <File name="source\scripts\mainPage.js" />
+            <File name="source\scripts\ratedItem.js" />
             <File name="source\scripts\recipeForm.js" />
             <File name="source\scripts\recipeFormData.js" />
             <File name="source\scripts\recipePage.js" />
@@ -78,6 +80,7 @@
         <File name="testing\itemRow.js" />
         <File name="testing\itemTable.js" />
         <File name="testing\mainFormData.js" />
+        <File name="testing\ratedItem.js" />
         <File name="testing\recipeFormData.js" />
         <File name="testing\recipeTable.js" />
         <File name="testing\test.html" />

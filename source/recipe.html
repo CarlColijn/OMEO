@@ -32,6 +32,7 @@
     <script src="scripts/item.js"></script>
     <script src="scripts/bitSerializer.js"></script>
     <script src="scripts/dataStream.js"></script>
+    <script src="scripts/guiHelpers.js"></script>
     <script src="scripts/recipeTable.js"></script>
     <script src="scripts/recipeFormData.js"></script>
     <script src="scripts/recipeForm.js"></script>
@@ -67,7 +68,7 @@
       <p>This Minecraft item recipe is created with <a href="index.html" target="_blank">OMEO</a>.</p>
     </div>
 
-    <div id="recipe" class="content turquoise">
+    <div id="recipe" class="content yellow">
       <h2>&#x25bd;&nbsp; Combining instructions &nbsp;&#x25bd;</h2>
 
       <p>You can use the checkboxes to mark your building progress. But beware; their state will <em>not</em> be saved for you!</p>
@@ -85,7 +86,7 @@
         <tbody>
           <tr class="template item" data-real="0">
             <td><span class="placement"></span></td>
-            <td><span class="description"></span></td>
+            <td><label class="noWrap"><input type="checkbox"><div class="iconWrap"><img class="icon" src="images/icons.png"><span class="type description"></span></div></label></td>
             <td><span class="enchants"></span></td>
             <td><span class="priorWork"></span></td>
             <td><span class="cost"></span></td>
@@ -100,7 +101,7 @@
       <p>If you wish to save this recipe for later, you can bookmark this page or leave it open in your browser.  If you want to use this recipe on another device or send it to your friends, just share this page's address.</p>
     </div>
 
-    <div class="content yellow">
+    <div class="content turquoise">
       <h2>&#x25bd;&nbsp; Privacy Policy &nbsp;&#x25bd;</h2>
 
       <p>This one's simple: <span class="check">&check;</span> no accounts, <span class="check">&check;</span> no server, <span class="check">&check;</span> no tracking, <span class="check">&check;</span> no selling your data, <span class="check">&check;</span> no cookies <span class="smaller">(except private ones to remember the content you entered on this page).</span>  Just a link to <a href="https://patreon.com/OMEO" target="_blank">my Patreon campaign</a> if you like to support OMEO, and that's that.</p>

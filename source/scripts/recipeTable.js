@@ -4,6 +4,7 @@
   Prerequisites:
   - dataSets.js
   - enchantInfo.js
+  - guiHelpers.js
 
   Defined classes:
   - RecipeTable
@@ -49,13 +50,13 @@ class RecipeTable {
 
   // returns string
   GetItemDescription(item) {
-    let description = '<input type="checkbox"></input> '
+    let description = ''
 
     switch (item.set) {
-      case g_combined: description += 'Combined '; break
-      case g_source:   description += 'Source '; break
-      case g_extra:    description += 'Extra '; break
-      case g_desired:  description += 'Desired '; break
+      case g_combined: description = 'Combined '; break
+      case g_source:   description = 'Source '; break
+      case g_extra:    description = 'Extra '; break
+      case g_desired:  description = 'Desired '; break
     }
 
     description += item.info.name
@@ -190,6 +191,10 @@ class RecipeTable {
     newRowInfo.rowElemJQ.find('.enchants').html(this.GetItemEnchants(item))
     newRowInfo.rowElemJQ.find('.priorWork').text(item.priorWork)
     newRowInfo.rowElemJQ.find('.cost').text(this.GetItemCost(item))
+
+    let iconElemJQ = newRowInfo.rowElemJQ.find('.icon')
+    let hasEnchants = item.enchantsByID.size > 0
+    SetIcon(iconElemJQ, item.id, hasEnchants)
 
     if (hasChildren) {
       this.AddItemTree(item.targetItem, numUnusedColumns - 1, 'l' + collapseTrail, 'Left', newRowInfo)
