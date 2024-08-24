@@ -131,6 +131,25 @@ input[type=number] {
 }
 
 
+/* Icons */
+.iconWrap {
+  display: inline;
+  white-space: nowrap;
+}
+.iconWrap img {
+  padding-right: 4px;
+}
+.iconWrap * {
+  vertical-align: top;
+}
+.icon {
+  width: 24px;
+  height: 24px;
+  object-fit: none;
+  object-position: 0px 0px;
+}
+
+
 /* Links */
 a {
   font-weight: bold;

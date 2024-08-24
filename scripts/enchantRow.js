@@ -47,11 +47,11 @@ class EnchantRow {
 
 
   // returns EnchantRow
-  CreateNew(enchant, itemID, giveFocus, focusElemJQWhenAllGone) {
+  CreateNew(enchant, itemID, giveFocus, focusElemJQWhenAllGone, RemoveCallback) {
     let newRow = this.MakeExtraRealRow()
 
     if (this.set === g_source || this.set === g_desired)
-      newRow.HookUpGUI(itemID)
+      newRow.HookUpGUI(itemID, RemoveCallback)
 
     if (enchant !== undefined)
       newRow.SetEnchant(enchant) // performs an UpdateLevelOptions as well
@@ -136,7 +136,7 @@ class EnchantRow {
   }
 
 
-  HookUpGUI(itemID) {
+  HookUpGUI(itemID, RemoveCallback) {
     this.UpdateEnchantOptions(itemID)
 
     this.idElemJQ.change(() => {
@@ -145,6 +145,8 @@ class EnchantRow {
 
     this.rowElemJQ.find('button[name="removeEnchant"]').click(() => {
       this.Remove()
+      if (RemoveCallback !== undefined)
+        RemoveCallback()
     })
   }
 

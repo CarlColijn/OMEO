@@ -6,6 +6,7 @@
   - enchantInfo.js
   - enchantRow.js
   - item.js
+  - guiHelpers.js
 
   Defined classes:
   - ItemRow
@@ -35,6 +36,7 @@ class ItemRow {
     switch (set) {
       case g_source:
         this.countElemJQ = rowElemJQ.find('input[name="count"]')
+        this.iconElemJQ = rowElemJQ.find('.icon')
         this.idElemJQ = rowElemJQ.find('select[name="itemID"]')
         this.priorWorkElemJQ = rowElemJQ.find('select[name="priorWork"]')
 
@@ -46,11 +48,13 @@ class ItemRow {
         }
         break
       case g_desired:
+        this.iconElemJQ = rowElemJQ.find('.icon')
         this.idElemJQ = rowElemJQ.find('select[name="itemID"]')
         this.SetupItemOptions()
         break
       case g_combined:
         this.countElemJQ = rowElemJQ.find('.count')
+        this.iconElemJQ = rowElemJQ.find('.icon')
         this.typeElemJQ = rowElemJQ.find('.type')
         this.priorWorkElemJQ = rowElemJQ.find('.priorWork')
         this.costElemJQ = rowElemJQ.find('.cost')
@@ -69,10 +73,17 @@ class ItemRow {
 
     newItemRow.SetNumber(nr)
 
-    newItemRow.HookUpGUI(item)
+    if (item === undefined) {
+      item = new Item(
+        1,
+        newItemRow.set,
+        parseInt(newItemRow.idElemJQ.val()),
+        0
+      )
+    }
+    newItemRow.SetItem(item)
 
-    if (item !== undefined)
-      newItemRow.SetItem(item)
+    newItemRow.HookUpGUI(item)
 
     newItemRow.focusElemJQWhenAllGone = focusElemJQWhenAllGone
     if (giveFocus && this.set === g_source || this.set === g_desired)
@@ -122,11 +133,16 @@ class ItemRow {
 
 
   AddEnchant(enchant) {
+    let RemoveEnchantCallback = () => {
+      let hasEnchants = this.rowElemJQ.find('.enchant[data-real="1"]').length > 0
+      SetIcon(this.iconElemJQ, this.itemID, hasEnchants)
+    }
+
     let itemID =
       this.set === g_source || this.set === g_desired ?
-      parseInt(this.idElemJQ.val()) :
+      this.itemID :
       undefined
-    this.enchantTemplateRow.CreateNew(enchant, itemID, true, this.addEnchantElemJQ)
+    this.enchantTemplateRow.CreateNew(enchant, itemID, true, this.addEnchantElemJQ, RemoveEnchantCallback)
   }
 
 
@@ -178,6 +194,8 @@ class ItemRow {
 
 
   SetItem(item) {
+    this.itemID = item.id
+
     switch (this.set) {
       case g_source:
         this.countElemJQ.val(item.count)
@@ -210,6 +228,9 @@ class ItemRow {
           this.showDetailsElemJQ.hide()
         break
     }
+
+    let hasEnchants = item.enchantsByID.size > 0
+    SetIcon(this.iconElemJQ, this.itemID, hasEnchants)
 
     this.SetEnchants(item.enchantsByID)
   }
@@ -244,8 +265,7 @@ class ItemRow {
   SyncEnchantOptions() {
     this.RemoveEnchants()
 
-    let itemID = parseInt(this.idElemJQ.val())
-    this.enchantTemplateRow.UpdateEnchantOptions(itemID)
+    this.enchantTemplateRow.UpdateEnchantOptions(this.itemID)
   }
 
 
@@ -262,11 +282,14 @@ class ItemRow {
 
     if (this.set === g_source || this.set === g_desired) {
       this.idElemJQ.change(() => {
+        this.itemID = parseInt(this.idElemJQ.val())
+        SetIcon(this.iconElemJQ, this.itemID, false)
         this.SyncEnchantOptions()
       })
 
       this.addEnchantElemJQ = this.rowElemJQ.find('button[name="addEnchant"]')
       this.addEnchantElemJQ.click(() => {
+        SetIcon(this.iconElemJQ, this.itemID, true)
         this.AddEnchant()
       })
     }
