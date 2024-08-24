@@ -13,6 +13,7 @@
         <Folder name="javascript">
             <File name="source\scripts\bitSerializer.js" />
             <File name="source\scripts\combinedEnchantRow.js" />
+            <File name="source\scripts\combinedItemGroup.js" />
             <File name="source\scripts\combinedItemRow.js" />
             <File name="source\scripts\combinedItemTable.js" />
             <File name="source\scripts\combineResultFilter.js" />
@@ -37,6 +38,7 @@
             <File name="source\scripts\mainForm.js" />
             <File name="source\scripts\mainFormData.js" />
             <File name="source\scripts\mainFormHandler.js" />
+            <File name="source\scripts\ratedItem.js" />
             <File name="source\scripts\recipeForm.js" />
             <File name="source\scripts\recipeFormData.js" />
             <File name="source\scripts\recipeFormHandler.js" />
@@ -69,6 +71,7 @@
         <Folder name="javascript">
             <File name="testing\bitSerializer.js" />
             <File name="testing\combinedEnchantRow.js" />
+            <File name="testing\combinedItemGroup.js" />
             <File name="testing\combinedItemRow.js" />
             <File name="testing\combinedItemTable.js" />
             <File name="testing\combineResultFilter.js" />
@@ -91,6 +94,7 @@
             <File name="testing\itemInfo.js" />
             <File name="testing\itemOrigins.js" />
             <File name="testing\mainFormData.js" />
+            <File name="testing\ratedItem.js" />
             <File name="testing\recipeFormData.js" />
             <File name="testing\recipeTable.js" />
             <File name="testing\sourceItemRow.js" />

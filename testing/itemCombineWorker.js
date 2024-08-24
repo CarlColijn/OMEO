@@ -2,7 +2,7 @@
 // - progressCalled: bool
 // - finalizeCalled: bool
 // - doneCalled: bool
-// - result: CombineResultFilter result object
+// - ratedItemGroups: RatedItemGroups
 // - stoppedResponding: bool
 async function TestWorker(sourceItems, desiredItem, progressCallback = undefined) {
   class WorkerStoppedResponding {}
@@ -12,7 +12,7 @@ async function TestWorker(sourceItems, desiredItem, progressCallback = undefined
     finalizeCalled: false,
     doneCalled: false,
     finalMaxProgress: 0,
-    result: undefined,
+    ratedItemGroups: undefined,
     timeInMSReported: 0,
     timeInMSMeasured: 0,
     stoppedResponding: false
@@ -37,7 +37,7 @@ async function TestWorker(sourceItems, desiredItem, progressCallback = undefined
           break
         case 2:
           status.doneCalled = true
-          status.result = e.data.result
+          status.ratedItemGroups = e.data.ratedItemGroups
           status.finalMaxProgress = e.data.maxProgress
           status.timeInMSMeasured = Date.now() - startTimeInMS
           status.timeInMSReported = e.data.timeInMS
@@ -52,7 +52,8 @@ async function TestWorker(sourceItems, desiredItem, progressCallback = undefined
       type: 0,
       sourceItems: sourceItems,
       desiredItem: desiredItem,
-      feedbackIntervalMS: -1
+      feedbackIntervalMS: -1,
+      numItemsToTake: 1e9
     })
 
     let intervalID = setInterval(
@@ -69,7 +70,9 @@ async function TestWorker(sourceItems, desiredItem, progressCallback = undefined
   try {
     await promise
 
-    RehydrateItems(status.result.items)
+    status.ratedItemGroups.forEach((ratedItemGroup) => {
+      RehydrateRatedItems(ratedItemGroup.ratedItems)
+    })
   }
   catch (exception) {
     if (exception instanceof WorkerStoppedResponding)
@@ -87,7 +90,16 @@ jazil.AddTestSet(mainPage, 'ItemCombineWorker', {
     let sourceItems = [
     ]
     let desiredItem = BuildItem({ set:g_desired, name:'Sword', enchants:[{ name:'Unbreaking', level:1 }, { name:'Smite', level:1 }] })
-    let expectedItems = [
+    let expectedItemGroups = [
+      [
+        // exacts
+      ], [
+        // betters
+      ], [
+        // lessers
+      ], [
+        // mixeds
+      ]
     ]
 
     let status = await TestWorker(sourceItems, desiredItem)
@@ -97,8 +109,10 @@ jazil.AddTestSet(mainPage, 'ItemCombineWorker', {
     jazil.ShouldBe(status.finalizeCalled, true, 'finalize not called!')
     jazil.ShouldBe(status.doneCalled, true, 'done not called!')
     jazil.ShouldBeBetween(status.timeInMSReported, status.timeInMSMeasured - 500, status.timeInMSMeasured, 'timeInMS diverges too much!')
-    jazil.ShouldNotBe(status.result, undefined, 'result is not returned!')
-    TestItemListsMatch(jazil, expectedItems, 'expected', status.result.items, 'combined')
+    jazil.ShouldNotBe(status.ratedItemGroups, undefined, 'ratedItemGroups is not returned!')
+    status.ratedItemGroups.forEach((ratedItemGroup, match) => {
+      TestRatedItemListsMatch(jazil, expectedItemGroups[match], `expected ${DescribeRatedItemGroup(match)}`, ratedItemGroup.ratedItems, 'combined')
+    })
   },
 
   'Worker combines basic items': async (jazil) => {
@@ -107,8 +121,19 @@ jazil.AddTestSet(mainPage, 'ItemCombineWorker', {
       BuildItem({ set:g_source, name:'Sword', enchants:[{ name:'Unbreaking', level:1 }] }),
     ]
     let desiredItem = BuildItem({ set:g_desired, name:'Sword', enchants:[{ name:'Unbreaking', level:1 }, { name:'Smite', level:1 }] })
-    let expectedItems = [
-      BuildItem({ set:g_combined, name:'Sword', priorWork:1, cost:2, count:1, enchants:[{ name:'Unbreaking', level:1 }, { name:'Smite', level:1 }] })
+    let expectedItemGroups = [
+      [
+        // exacts
+        BuildItem({ set:g_combined, name:'Sword', priorWork:1, cost:2, count:1, enchants:[{ name:'Unbreaking', level:1 }, { name:'Smite', level:1 }] }),
+      ], [
+        // betters
+      ], [
+        // lessers
+        sourceItems[0],
+        sourceItems[1],
+      ], [
+        // mixeds
+      ]
     ]
 
     let status = await TestWorker(sourceItems, desiredItem)
@@ -118,8 +143,10 @@ jazil.AddTestSet(mainPage, 'ItemCombineWorker', {
     jazil.ShouldBe(status.finalizeCalled, true, 'finalize not called!')
     jazil.ShouldBe(status.doneCalled, true, 'done not called!')
     jazil.ShouldBeBetween(status.timeInMSReported, status.timeInMSMeasured - 500, status.timeInMSMeasured, 'timeInMS diverges too much!')
-    jazil.ShouldNotBe(status.result, undefined, 'result is not returned!')
-    TestItemListsMatch(jazil, expectedItems, 'expected', status.result.items, 'combined')
+    jazil.ShouldNotBe(status.ratedItemGroups, undefined, 'ratedItemGroups is not returned!')
+    status.ratedItemGroups.forEach((ratedItemGroup, match) => {
+      TestRatedItemListsMatch(jazil, expectedItemGroups[match], `expected ${DescribeRatedItemGroup(match)}`, ratedItemGroup.ratedItems, 'combined')
+    })
   },
 
   'Max cost combine works': async (jazil) => {
@@ -128,8 +155,18 @@ jazil.AddTestSet(mainPage, 'ItemCombineWorker', {
       BuildItem({ set:g_source, tag:1, name:'Book', priorWork:5, enchants:[{ name:'Unbreaking', level:3 }, { name:'Smite', level:3 }, { name:'Mending', level:1 }]}),
     ]
     let desiredItem = BuildItem({ set:g_desired, name:'Sword', enchants:[{ name:'Unbreaking' }]})
-    let expectedItems = [
-      BuildItem({ set:g_combined, tag:2, name:'Sword', cost:39, priorWork:6, enchants:[{ name:'Unbreaking', level:3 }, { name:'Smite', level:3 }, { name:'Mending', level:1 }]}),
+    let expectedItemGroups = [
+      [
+        // exacts
+      ], [
+        // betters
+        BuildItem({ set:g_combined, tag:2, name:'Sword', cost:39, priorWork:6, enchants:[{ name:'Unbreaking', level:3 }, { name:'Smite', level:3 }, { name:'Mending', level:1 }]}),
+      ], [
+        // lessers
+        sourceItems[0],
+      ], [
+        // mixeds
+      ]
     ]
 
     let status = await TestWorker(sourceItems, desiredItem)
@@ -139,8 +176,10 @@ jazil.AddTestSet(mainPage, 'ItemCombineWorker', {
     jazil.ShouldBe(status.finalizeCalled, true, 'finalize not called!')
     jazil.ShouldBe(status.doneCalled, true, 'done not called!')
     jazil.ShouldBeBetween(status.timeInMSReported, status.timeInMSMeasured - 500, status.timeInMSMeasured, 'timeInMS diverges too much!')
-    jazil.ShouldNotBe(status.result, undefined, 'result is not returned!')
-    TestItemListsMatch(jazil, expectedItems, 'expected', status.result.items, 'combined')
+    jazil.ShouldNotBe(status.ratedItemGroups, undefined, 'ratedItemGroups is not returned!')
+    status.ratedItemGroups.forEach((ratedItemGroup, match) => {
+      TestRatedItemListsMatch(jazil, expectedItemGroups[match], `expected ${DescribeRatedItemGroup(match)}`, ratedItemGroup.ratedItems, 'combined')
+    })
   },
 
   'Too costly combine gives nothing back': async (jazil) => {
@@ -149,10 +188,18 @@ jazil.AddTestSet(mainPage, 'ItemCombineWorker', {
       BuildItem({ set:g_source, tag:1, name:'Book', priorWork:5, enchants:[{ name:'Unbreaking', level:3 }, { name:'Smite', level:4 }, { name:'Mending', level:1 }]}),
     ]
     let desiredItem = BuildItem({ set:g_desired, name:'Sword', enchants:[{ name:'Unbreaking' }]})
-    let expectedItems = [
-      //BuildItem({ set:g_combined, tag:2, name:'Sword', cost:40, priorWork:6, enchants:[{ name:'Unbreaking', level:3 }, { name:'Smite', level:4 }, { name:'Mending', level:1 }]}),
-      // Item list filtering will revert back to source item
-      sourceItems[0]
+    let expectedItemGroups = [
+      [
+        // exacts
+      ], [
+        // betters
+        //BuildItem({ set:g_combined, tag:2, name:'Sword', cost:40, priorWork:6, enchants:[{ name:'Unbreaking', level:3 }, { name:'Smite', level:4 }, { name:'Mending', level:1 }]}),
+      ], [
+        // lessers
+        sourceItems[0],
+      ], [
+        // mixeds
+      ]
     ]
 
     let status = await TestWorker(sourceItems, desiredItem)
@@ -162,8 +209,10 @@ jazil.AddTestSet(mainPage, 'ItemCombineWorker', {
     jazil.ShouldBe(status.finalizeCalled, true, 'finalize not called!')
     jazil.ShouldBe(status.doneCalled, true, 'done not called!')
     jazil.ShouldBeBetween(status.timeInMSReported, status.timeInMSMeasured - 500, status.timeInMSMeasured, 'timeInMS diverges too much!')
-    jazil.ShouldNotBe(status.result, undefined, 'result is not returned!')
-    TestItemListsMatch(jazil, expectedItems, 'expected', status.result.items, 'source')
+    jazil.ShouldNotBe(status.ratedItemGroups, undefined, 'ratedItemGroups is not returned!')
+    status.ratedItemGroups.forEach((ratedItemGroup, match) => {
+      TestRatedItemListsMatch(jazil, expectedItemGroups[match], `expected ${DescribeRatedItemGroup(match)}`, ratedItemGroup.ratedItems, 'source')
+    })
   },
 
   'Progress indicators are correct': async (jazil) => {
@@ -207,8 +256,8 @@ jazil.AddTestSet(mainPage, 'ItemCombineWorker', {
     jazil.ShouldBe(status.finalizeCalled, true, 'finalize not called!')
     jazil.ShouldBe(status.doneCalled, true, 'done not called!')
     jazil.ShouldBeBetween(status.timeInMSReported, status.timeInMSMeasured - 500, status.timeInMSMeasured, 'timeInMS diverges too much!')
-    jazil.ShouldNotBe(status.result, undefined, 'result is not returned!')
-    // We won't test with TestItemListsMatch; this is covered by other unit tests
+    jazil.ShouldNotBe(status.ratedItemGroups, undefined, 'ratedItemGroups is not returned!')
+    // We won't test with TestRatedItemListsMatch; this is covered by other unit tests
     // anyway and we want a more time consuming thus more complex combine round
     // for this test.
   },
@@ -219,9 +268,6 @@ jazil.AddTestSet(mainPage, 'ItemCombineWorker', {
       BuildItem({ set:g_source, name:'Sword', enchants:[{ name:'Unbreaking', level:1 }] }),
     ]
     let desiredItem = BuildItem({ set:g_desired, name:'Sword', enchants:[{ name:'Unbreaking', level:1 }, { name:'Smite', level:1 }] })
-    let expectedItems = [
-      BuildItem({ set:g_combined, name:'Sword', priorWork:1, cost:2, count:1, enchants:[{ name:'Unbreaking', level:1 }, { name:'Smite', level:1 }] })
-    ]
 
     let progressCallback = (combineWorker, progress, maxProgress) => {
       if (progress > 3)
@@ -233,7 +279,7 @@ jazil.AddTestSet(mainPage, 'ItemCombineWorker', {
     jazil.ShouldBe(status.finalizeCalled, false, 'finalize called!')
     jazil.ShouldBe(status.doneCalled, false, 'done called!')
     jazil.ShouldBeBetween(status.timeInMSReported, status.timeInMSMeasured - 500, status.timeInMSMeasured, 'timeInMS diverges too much!')
-    jazil.ShouldBe(status.result, undefined, 'result is returned!')
+    jazil.ShouldBe(status.ratedItemGroups, undefined, 'ratedItemGroups is returned!')
     jazil.ShouldBe(status.stoppedResponding, true, 'didn\'t stop responding!')
   },
 

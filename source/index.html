@@ -43,6 +43,7 @@
     <script src="scripts/sourceItemRow.js"></script>
     <script src="scripts/desiredItemRow.js"></script>
     <script src="scripts/combinedItemRow.js"></script>
+    <script src="scripts/combinedItemGroup.js"></script>
     <script src="scripts/sourceItemTable.js"></script>
     <script src="scripts/desiredItemTable.js"></script>
     <script src="scripts/combinedItemTable.js"></script>
@@ -51,6 +52,7 @@
     <script src="scripts/itemCombineList.js"></script>
     <script src="scripts/itemCombineTester.js"></script>
     <script src="scripts/itemCombiner.js"></script>
+    <script src="scripts/ratedItem.js"></script>
     <script src="scripts/combineResultFilter.js"></script>
     <script src="scripts/mainFormHandler.js"></script>
     <script src="scripts/mainForm.js"></script>
@@ -236,8 +238,16 @@
       <p>Press <button type="button" id="divine">Make it happen!</button> and I'll try to see what you can get. After the divination is complete, press the &quot;Show&quot; buttons to show the recipe for that item.</p>
 
       <table class="table items">
-        <thead>
-          <tr>
+        <tbody class="template group" data-real="0" data-nr="0">
+          <tr class="forcedSkip">
+            <td colspan="6">
+              <span class="template descriptionExact">Items with requested enchantments</span>
+              <span class="template descriptionBetter">Items with even more enchantments</span>
+              <span class="template descriptionLesser">Items with less enchantments</span>
+              <span class="template descriptionMixed">Items with both more and less enchantments</span>
+            </td>
+          </tr>
+          <tr class="forcedHeader">
             <th>Count</th>
             <th>Type</th>
             <th>Enchantments</th>
@@ -245,8 +255,6 @@
             <th>Cost</th>
             <th></th>
           </tr>
-        </thead>
-        <tbody>
           <tr class="template item" data-real="0" data-nr="0">
             <td><span class="count"></span></td>
             <td><div class="iconWrap"><img class="icon" src="images/icons.png"><span class="type"></span></div></td>

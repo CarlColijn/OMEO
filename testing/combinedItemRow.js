@@ -1,15 +1,16 @@
-function GetCombinedItemTemplateRow() {
+function GetCombinedItemRowTemplate() {
   let CallbackHandlerMock = {
     click: () => {}
   }
 
   let templateRowElemJQ = $('#combinedItemRow .template.item')
-  return new CombinedItemRowTemplate(CallbackHandlerMock, templateRowElemJQ)
+  return new CombinedItemRowTemplate(templateRowElemJQ, CallbackHandlerMock)
 }
 
 
 function CreateCombinedItemRow(templateRow, item) {
-  return templateRow.CreateNew(item)
+  let ratedItem = new RatedItem(item, item)
+  return templateRow.CreateNew(ratedItem)
 }
 
 
@@ -19,7 +20,6 @@ function GetCombinedItemRowDetails(itemRowElemJQ) {
     return value === '' ? undefined : parseInt(value)
   }
 
-  let nr = MakeNumberSafe(itemRowElemJQ.find('.nr'))
   let cost = MakeNumberSafe(itemRowElemJQ.find('.cost'))
   let count = MakeNumberSafe(itemRowElemJQ.find('.count'))
   let typeDetails
@@ -54,7 +54,6 @@ function GetCombinedItemRowDetails(itemRowElemJQ) {
   })
 
   return {
-    'nr': nr,
     'cost': cost,
     'count': count,
     'type': type,
@@ -104,13 +103,13 @@ function GetCombinedTypeAndDetailsForItemInTable(item) {
 
 jazil.AddTestSet(mainPage, 'CombinedItemRow', {
   'Template row is not real': (jazil) => {
-    let templateRow = GetCombinedItemTemplateRow()
+    let templateRow = GetCombinedItemRowTemplate()
 
     jazil.ShouldBe(templateRow.IsReal(), false)
   },
 
   'New row is real': (jazil) => {
-    let templateRow = GetCombinedItemTemplateRow()
+    let templateRow = GetCombinedItemRowTemplate()
     let item = BuildItem({ set:g_combined, name:'Book', count:1, priorWork:4, cost:5 })
     let itemRow = CreateCombinedItemRow(templateRow, item)
 
@@ -118,7 +117,7 @@ jazil.AddTestSet(mainPage, 'CombinedItemRow', {
   },
 
   'Create new row with item from template': (jazil) => {
-    let templateRow = GetCombinedItemTemplateRow()
+    let templateRow = GetCombinedItemRowTemplate()
     let item = BuildItem({ set:g_combined, name:'Pickaxe', count:9, priorWork:2, cost:15 })
     let itemRow = CreateCombinedItemRow(templateRow, item)
 
@@ -136,7 +135,7 @@ jazil.AddTestSet(mainPage, 'CombinedItemRow', {
   },
 
   'Create new row with item+enchants from template': (jazil) => {
-    let templateRow = GetCombinedItemTemplateRow()
+    let templateRow = GetCombinedItemRowTemplate()
     // Note: enchantments are re-ordered in alphabetical order
     let item = BuildItem({ set:g_combined, name:'Turtle Shell', count:1, priorWork:4, cost:9, enchants:[{ name:'Unbreaking', level:3 }, { name:'Mending', level:1 }] })
     let itemRow = CreateCombinedItemRow(templateRow, item, 15)
@@ -155,7 +154,7 @@ jazil.AddTestSet(mainPage, 'CombinedItemRow', {
   },
 
   'Added row count is OK': (jazil) => {
-    let templateRow = GetCombinedItemTemplateRow()
+    let templateRow = GetCombinedItemRowTemplate()
     let numRowsPre = $('#combinedItemRow tr.item').length
     let item1 = BuildItem({ set:g_combined, name:'Chestplate', count:14, priorWork:4, cost:3 })
     let item2 = BuildItem({ set:g_combined, name:'Shovel', count:15, priorWork:5, cost:4 })
@@ -168,7 +167,7 @@ jazil.AddTestSet(mainPage, 'CombinedItemRow', {
   },
 
   'Rows can be removed': (jazil) => {
-    let templateRow = GetCombinedItemTemplateRow()
+    let templateRow = GetCombinedItemRowTemplate()
     let item1 = BuildItem({ set:g_combined, name:'Elytra', count:19, priorWork:3, cost:13 })
     let item2 = BuildItem({ set:g_combined, name:'Trident', count:18, priorWork:2, cost:14 })
     let item3 = BuildItem({ set:g_combined, name:'Shield', count:17, priorWork:1, cost:15 })

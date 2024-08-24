@@ -5,6 +5,7 @@
   - desiredItem: Item (dehydrated}
   - sourceItems: Item[] (dehydrated)
   - feedbackIntervalMS: int
+  - numItemsToTake: int
 
   Feedback messages:
   - progress:
@@ -16,7 +17,7 @@
     - type: 1
   - done:
     - type: 2
-    - result: Item[] (dehydrated)
+    - ratedItemGroups: RatedItemGroups (dehydrated)
     - maxProgress: int
     - timeInMS: int
 */
@@ -34,6 +35,7 @@ importScripts('item.js')
 importScripts('itemCombineList.js')
 importScripts('itemCombineTester.js')
 importScripts('itemCombiner.js')
+importScripts('ratedItem.js')
 importScripts('combineResultFilter.js')
 // /scripts
 
@@ -80,10 +82,10 @@ class FeedbackHandler {
   }
 
 
-  TellDone(cleanedUpItemsResult, maxProgress) {
+  TellDone(ratedItemGroups, maxProgress) {
     postMessage({
       type: 2,
-      result: cleanedUpItemsResult,
+      ratedItemGroups: ratedItemGroups,
       maxProgress: maxProgress,
       timeInMS: Date.now() - this.startTimeMS
     })
@@ -97,6 +99,7 @@ onmessage = (e) => {
   let sourceItems = e.data.sourceItems
   RehydrateItems(sourceItems)
   let feedbackIntervalMS = e.data.feedbackIntervalMS
+  let numItemsToTake = e.data.numItemsToTake
 
   let feedbackHandler = new FeedbackHandler(feedbackIntervalMS)
 
@@ -105,7 +108,7 @@ onmessage = (e) => {
 
   feedbackHandler.TellFinalizing()
   let combineResultFilter = new CombineResultFilter(desiredItem)
-  let cleanedUpItemsResult = combineResultFilter.GetCleanedUpItemList(sourceItems, combineResult.combinedItems)
+  let ratedItemGroups = combineResultFilter.FilterItems(sourceItems, combineResult.combinedItems, numItemsToTake)
 
-  feedbackHandler.TellDone(cleanedUpItemsResult, combineResult.maxProgress)
+  feedbackHandler.TellDone(ratedItemGroups, combineResult.maxProgress)
 }

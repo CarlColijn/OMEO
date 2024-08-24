@@ -56,6 +56,7 @@
     <script src="itemCombineTester.js"></script>
     <script src="itemCombiner.js"></script>
     <script src="itemCombineWorker.js"></script>
+    <script src="ratedItem.js"></script>
     <script src="combineResultFilter.js"></script>
     <script src="templateElement.js"></script>
     <script src="enchantRow.js"></script>
@@ -63,6 +64,7 @@
     <script src="sourceItemRow.js"></script>
     <script src="desiredItemRow.js"></script>
     <script src="combinedItemRow.js"></script>
+    <script src="combinedItemGroup.js"></script>
     <script src="sourceItemTable.js"></script>
     <script src="desiredItemTable.js"></script>
     <script src="combinedItemTable.js"></script>
@@ -152,7 +154,36 @@
       <table id="combinedItemRow" class="combines table items">
         <caption>Combine item rows</caption>
         <tbody>
-          <tr class="template item" data-real="0" data-nr="0">
+          <tr class="template item" data-real="0">
+            <td><span class="count"></span></td>
+            <td><span class="type"></span></td>
+            <td>
+              <table class="enchants">
+                <tbody>
+                  <tr class="template enchant" data-real="0">
+                    <td><span class="name"></span> <span class="level"></span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </td>
+            <td><span class="priorWork"></span></td>
+            <td><span class="cost"></span></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <table id="combinedItemGroup" class="combines table items">
+        <caption>Combine item groups</caption>
+        <tbody class="template group" data-real="0">
+          <tr class="forcedSkip">
+            <td colspan="6" class="heading">
+              <span class="template descriptionExact">exact</span>
+              <span class="template descriptionBetter">better</span>
+              <span class="template descriptionLesser">lesser</span>
+              <span class="template descriptionMixed">mixed</span>
+            </td>
+          </tr>
+          <tr class="template item" data-real="0">
             <td><span class="count"></span></td>
             <td><span class="type"></span></td>
             <td>
@@ -216,8 +247,16 @@
 
       <table id="combinedItemTable" class="combines table items">
         <caption>Combined item table</caption>
-        <tbody>
-          <tr class="template item" data-real="0" data-nr="0">
+        <tbody class="template group" data-real="0">
+          <tr class="forcedSkip">
+            <td colspan="6" class="heading">
+              <span class="template descriptionExact">exact</span>
+              <span class="template descriptionBetter">better</span>
+              <span class="template descriptionLesser">lesser</span>
+              <span class="template descriptionMixed">mixed</span>
+            </td>
+          </tr>
+          <tr class="template item" data-real="0">
             <td><span class="count"></span></td>
             <td><span class="type"></span></td>
             <td>

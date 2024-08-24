@@ -18,7 +18,7 @@
 
 
 class CombinedItemRowTemplate extends TemplateElement {
-  constructor(ShowDetails, rowElemJQ) {
+  constructor(rowElemJQ, ShowDetails) {
     super(rowElemJQ)
 
     // ==== PRIVATE ====
@@ -27,11 +27,12 @@ class CombinedItemRowTemplate extends TemplateElement {
 
 
   // returns CombinedItemRow
-  CreateNew(item) {
+  CreateNew(ratedItem) {
     let newRowElemJQ = super.CreateExtraElement()
-    let newItemRow = new CombinedItemRow(this.ShowDetails, newRowElemJQ)
+    let newItemRow = new CombinedItemRow(newRowElemJQ, this.ShowDetails)
 
-    newItemRow.SetItem(item)
+    let item = ratedItem.item
+    newItemRow.SetItem(ratedItem)
 
     let hasEnchants = item.enchantsByID.size > 0
     SetIcon(newItemRow.elemJQ.find('.icon'), item.id, hasEnchants)
@@ -47,7 +48,7 @@ class CombinedItemRowTemplate extends TemplateElement {
 
 
 class CombinedItemRow extends RealElement {
-  constructor(ShowDetails, rowElemJQ) {
+  constructor(rowElemJQ, ShowDetails) {
     super(rowElemJQ)
 
     // ==== PRIVATE ====
@@ -61,7 +62,9 @@ class CombinedItemRow extends RealElement {
   // ======== PRIVATE ========
 
 
-  SetItem(item) {
+  SetItem(ratedItem) {
+    let item = ratedItem.item
+
     this.elemJQ.find('.count').text(item.count)
     this.elemJQ.find('.type').text(item.info.name + this.GetItemSuffix(item))
     this.elemJQ.find('.priorWork').text(item.priorWork)

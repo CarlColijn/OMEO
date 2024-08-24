@@ -40,6 +40,8 @@ let mainAccessObjectNames = [
   'CombinedEnchantRowTemplate',
   'CombinedItemRow',
   'CombinedItemRowTemplate',
+  'CombinedItemGroup',
+  'CombinedItemGroupTemplate',
   'CombinedItemTable',
   'CombineResultFilter',
   'DataStream',
@@ -56,27 +58,28 @@ let mainAccessObjectNames = [
   'ItemCombiner',
   'ItemCombineTester',
   'MainFormData',
+  'RatedItem',
   'RealElement',
   'RehydrateItems',
+  'RehydrateRatedItems',
   'SourceItemRow',
   'SourceItemRowTemplate',
   'SourceItemTable',
   'TemplateElement',
   'ZeroOrigin',
+  'g_betterMatch',
   'g_combined',
   'g_dataSetsByID',
   'g_desired',
   'g_enchantIDsByName',
   'g_enchantInfos',
   'g_enchantInfosByID',
+  'g_exactMatch',
   'g_extra',
   'g_itemInfos',
   'g_itemInfosByID',
-  'g_noCombines',
-  'g_onlyImperfectCombines',
-  'g_onlyPerfectCombines',
-  'g_onlyPerfectWithExtrasCombines',
-  'g_perfectAndPerfectWithExtrasCombines',
+  'g_lesserMatch',
+  'g_mixedMatch',
   'g_source'
 ]
 let mainTrackObjectNames = [
@@ -277,6 +280,28 @@ function TestItemListsMatch(jazil, items1, item1Description, items2, item2Descri
       jazil.ShouldBe(items2.length, items1ByHash.get(hash2).length, `unequal number of items found in ${item1Description} vs. ${item2Description}!`)
     })
   })
+}
+
+
+function DescribeRatedItemGroup(match) {
+  switch (match) {
+    case g_lesserMatch: return 'lesser'
+    case g_mixedMatch: return 'mixed'
+    case g_exactMatch: return 'exact'
+    case g_betterMatch: return 'better'
+  }
+  return '???'
+}
+
+
+function TestRatedItemListsMatch(jazil, items1, item1Description, ratedItems2, item2Description) {
+  TestItemListsMatch(
+    jazil,
+    items1,
+    item1Description,
+    ratedItems2.map((ratedItem) => { return ratedItem.item }),
+    item2Description
+  )
 }
 
 
