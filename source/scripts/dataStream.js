@@ -122,9 +122,14 @@ class DataStream {
   }
 
 
+  GetData() {
+    return this.storer.Finalize()
+  }
+
+
   GetAsURL(url) {
     let urlBase = url.href.replace(url.search, '')
-    let serialized = this.storer.Finalize()
+    let serialized = this.GetData()
     return `${urlBase}?form=${serialized}`
   }
 

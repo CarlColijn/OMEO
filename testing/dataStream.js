@@ -77,6 +77,14 @@ jazil.AddTestSet(mainPage, 'DataStreamLoadingOptions', {
 
 
 jazil.AddTestSet(mainPage, 'DataStream', {
+  'Get just the data': (jazil) => {
+    let dataStream = new DataStream(true)
+    dataStream.AddSizedInt(255, 8)
+    let data = dataStream.GetData()
+
+    jazil.ShouldBe(data, '-V')
+  },
+
   'Store to local storage': (jazil) => {
     let dataState = new DataStateController(jazil)
     dataState.SetOnlyLocalStorage('abc')
