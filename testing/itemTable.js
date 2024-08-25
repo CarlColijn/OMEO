@@ -13,9 +13,9 @@ function CreateTestSet(setDescription, testContainerID, setLetter) {
       jazil.ShouldBe(table.tableElemJQ.find('tr.item').length, numExpectedRowsTotal, 'wrong number of rows by default!')
     },
 
-    'Adding a row works': (jazil) => {
+    'Adding an empty row works': (jazil) => {
       let set = GetSet(setLetter)
-      if (set === g_desired)
+      if (set !== g_source)
         jazil.SkipTest()
 
       let tableDetails = GetItemTable(testContainerID, set)
@@ -47,15 +47,16 @@ function CreateTestSet(setDescription, testContainerID, setLetter) {
       table.SetItems(testItems)
       let numRowsPost = table.tableElemJQ.find('tr.item').length
 
-      // Note: the previous test left a single unset row in there;
-      let numRowsToAdd = 3
-      let numItemRowsInTable = 3
-      if (set !== g_desired)
-        numRowsPre -= 1
-      else {
+      let numRowsToAdd
+      let numItemRowsInTable
+      if (set === g_source)
+        // Note: the previous test left a single unset row in there
+        numRowsToAdd = 2
+      else if (set === g_combined)
+        // ... except for combine tables (we skipped the test)
+        numRowsToAdd = 3
+      else if (set === g_desired)
         numRowsToAdd = 0
-        numItemRowsInTable = 1
-      }
       jazil.ShouldBe(numRowsPost - numRowsPre, numRowsToAdd, 'wrong number of rows added!')
 
       jazil.ShouldBe(ItemRowInTable(testContainerID, 'Shield', set), true, 'New shield not in table!')

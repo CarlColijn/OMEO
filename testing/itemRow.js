@@ -10,13 +10,17 @@ function CreateTestSet(setDescription, testContainerID, setLetter) {
     'New row is real': (jazil) => {
       let set = GetSet(setLetter)
       let templateRowDetails = GetItemTemplateRow(testContainerID, set)
-      let itemRow = CreateItemRow(templateRowDetails, undefined)
+      let item = BuildItem({ name:'Book', count:1, priorWork:4, cost:5 })
+      let itemRow = CreateItemRow(templateRowDetails, item)
 
       jazil.ShouldBe(itemRow.IsReal(), true)
     },
 
     'Create new row without item from template': (jazil) => {
       let set = GetSet(setLetter)
+      if (set === g_combined)
+        jazil.SkipTest()
+
       let templateRowDetails = GetItemTemplateRow(testContainerID, set)
       let itemRow = CreateItemRow(templateRowDetails, undefined, 6)
 

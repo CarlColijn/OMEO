@@ -62,8 +62,14 @@ class ItemRow {
         break
     }
 
-    if (hookUpGUI)
-      this.HookUpGUI(undefined)
+    if (hookUpGUI) {
+      let item = undefined
+      if (this.isReal) {
+        item = this.EnsureAppropriateItemUsed(item)
+        this.SetItem(item)
+      }
+      this.HookUpGUI(item)
+    }
   }
 
 
@@ -73,20 +79,13 @@ class ItemRow {
 
     newItemRow.SetNumber(nr)
 
-    if (item === undefined) {
-      item = new Item(
-        1,
-        newItemRow.set,
-        parseInt(newItemRow.idElemJQ.val()),
-        0
-      )
-    }
+    item = newItemRow.EnsureAppropriateItemUsed(item)
     newItemRow.SetItem(item)
 
     newItemRow.HookUpGUI(item)
 
     newItemRow.focusElemJQWhenAllGone = focusElemJQWhenAllGone
-    if (giveFocus && this.set === g_source || this.set === g_desired)
+    if (giveFocus && newItemRow.set === g_source || newItemRow.set === g_desired)
       newItemRow.idElemJQ[0].focus()
 
     return newItemRow
@@ -194,7 +193,8 @@ class ItemRow {
 
 
   SetItem(item) {
-    this.itemID = item.id
+    if (item !== undefined)
+      this.itemID = item.id
 
     switch (this.set) {
       case g_source:
@@ -237,6 +237,21 @@ class ItemRow {
 
 
   // ======== PRIVATE ========
+
+
+  // returns Item
+  EnsureAppropriateItemUsed(item) {
+    if (item === undefined && this.set !== g_combined) {
+      item = new Item(
+        1,
+        this.set,
+        parseInt(this.idElemJQ.val()),
+        0
+      )
+    }
+
+    return item
+  }
 
 
   SetupItemOptions() {
