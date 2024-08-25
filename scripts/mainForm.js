@@ -58,14 +58,20 @@ class MainForm {
 
 
   ShowRecipePage(item) {
-    let dataStream = new DataStream(true)
+    let recipeStream = new DataStream(true)
 
     let recipeFormData = new RecipeFormData()
     recipeFormData.SetItem(item)
-    recipeFormData.Serialize(dataStream)
+    recipeFormData.Serialize(recipeStream)
+
+    let ourStream = new DataStream(true)
+    let extraData =
+      this.SaveToStream(ourStream) ?
+      '&data=' + ourStream.GetData() :
+      ''
 
     let baseURL = new URL('recipe.html', document.baseURI)
-    let recipeUrl = dataStream.GetAsURL(baseURL)
+    let recipeUrl = recipeStream.GetAsURL(baseURL) + extraData
     window.open(recipeUrl)
   }
 
@@ -73,7 +79,7 @@ class MainForm {
   InitializeSubObjects() {
     this.sourceItemTable = new ItemTable(undefined, $('#sources table'), $('#addSourceItem'), g_source)
     this.desiredItemTable = new ItemTable(undefined, $('#desired table'), undefined, g_desired)
-    this.combineItemTable = new ItemTable(this.ShowRecipePage, $('#combines table'), undefined, g_combined)
+    this.combineItemTable = new ItemTable((item) => { this.ShowRecipePage(item) }, $('#combines table'), undefined, g_combined)
   }
 
 
@@ -289,22 +295,30 @@ class MainForm {
   }
 
 
+  // returns bool
+  SaveToStream(stream) {
+    let dataInContext = this.GetData(false)
+    if (dataInContext.withCountErrors || dataInContext.withEnchantDupes)
+      return false
+
+    dataInContext.data.Serialize(stream)
+    return true
+  }
+
+
   // returns bool (if saving was successful)
   Save(toURL) {
     this.ClearErrors()
 
-    let dataInContext = this.GetData(false)
-    let dataOK = !dataInContext.withCountErrors && !dataInContext.withEnchantDupes
-    if (dataOK) {
-      let stream = new DataStream(true)
-      dataInContext.data.Serialize(stream)
+    let stream = new DataStream(true)
+    if (!this.SaveToStream(stream))
+      return false
 
-      if (toURL)
-        stream.SaveToBookmarkLink()
-      else
-        stream.SaveToLocalStorage()
-    }
+    if (toURL)
+      stream.SaveToBookmarkLink()
+    else
+      stream.SaveToLocalStorage()
 
-    return dataOK
+    return true
   }
 }

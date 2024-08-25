@@ -24,7 +24,7 @@ class RecipeForm {
 
     $(() => {
       // only execute once the DOM is fully loaded
-      this.recipeTable = new RecipeTable($('#recipe table'))
+      this.SetBacklink()
 
       this.Load()
     })
@@ -32,6 +32,20 @@ class RecipeForm {
 
 
   // ======== PRIVATE ========
+
+
+  SetBacklink() {
+    let urlDataMatches = RegExp('[?&]data=([^&#]*)').exec(location.search)
+    let data = urlDataMatches ? urlDataMatches[1] : ''
+    if (data.length == 0)
+      // hmmm... no backlink; leave it like it is
+      return
+
+    this.backlinkElemJQ = $('#backlink')
+    let dataLink = this.backlinkElemJQ.attr('href')
+    dataLink += `?form=${data}`
+    this.backlinkElemJQ.attr('href', dataLink)
+  }
 
 
   Load() {
@@ -43,8 +57,10 @@ class RecipeForm {
     if (stream.Load(loadingOptions)) {
       let data = new RecipeFormData()
       allOK = data.Deserialize(stream)
-      if (allOK)
-        this.recipeTable.SetItem(data.item)
+      if (allOK) {
+        let recipeTable = new RecipeTable($('#recipe table'))
+        recipeTable.SetItem(data.item)
+      }
     }
 
     if (!allOK)
