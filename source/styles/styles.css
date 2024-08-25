@@ -129,6 +129,9 @@ input[type=number] {
   /* Note: needs to be adjusted if longer enchant names come along... */
   width: 11em;
 }
+.levelInput {
+  width: 2.7em;
+}
 
 
 /* Icons */
