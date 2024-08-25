@@ -193,7 +193,8 @@ class ItemRow {
 
 
   SetItem(item) {
-    this.itemID = item.id
+    if (item !== undefined)
+      this.itemID = item.id
 
     switch (this.set) {
       case g_source:
@@ -240,7 +241,7 @@ class ItemRow {
 
   // returns Item
   EnsureAppropriateItemUsed(item) {
-    if (item === undefined) {
+    if (item === undefined && this.set !== g_combined) {
       item = new Item(
         1,
         this.set,
