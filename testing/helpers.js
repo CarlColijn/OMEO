@@ -104,13 +104,13 @@ function BuildEnchant(name, level) {
 
 // info should be a hasmap with:
 // - tag (for testing)
+// - set
 // - name
 // - count (default: 1)
 // - cost (default: 0)
 // - nr (for g_source only, no default)
 // - totalCost (default: cost)
 // - priorWork (default: 0)
-// - set (default: g_source)
 // - enchants: array of enchantInfo (default: [])
 // enchantInfo should be a hashmap with:
 // - name
@@ -120,15 +120,14 @@ function BuildItem(info) {
   if (itemInfo === undefined)
     throw Error(`Unknown item name: ${info.name}`)
 
-  let set = info.set ?? g_source
   let item = new Item(
     info.count ?? 1,
-    set,
+    info.set,
     itemInfo.id,
     info.priorWork ?? 0
   )
   item.tag = info.tag
-  if (set === g_source)
+  if (info.set === g_source)
     item.nr = info.nr
   item.cost = info.cost ?? 0
   item.totalCost = info.totalCost ?? item.cost
@@ -237,7 +236,7 @@ function ItemTagOrNr(item) {
 }
 
 
-function TestItemListsMatch(jazil, items1, item1Description, items2, item2Description, item2Set) {
+function TestItemListsMatch(jazil, items1, item1Description, items2, item2Description) {
   let items1ByHash = IndexItemsByHash(items1)
   let items2ByHash = IndexItemsByHash(items2)
 
@@ -264,7 +263,6 @@ function TestItemListsMatch(jazil, items1, item1Description, items2, item2Descri
 
   items2ByHash.forEach((items2, hash2) => {
     items2.forEach((item2) => {
-      jazil.ShouldBe(item2.set, item2Set, `${item2Description} item with wrong set!`)
       jazil.ShouldBe(items2.length, items1ByHash.get(hash2).length, `unequal number of items found in ${item1Description} vs. ${item2Description}!`)
     })
   })
@@ -740,43 +738,43 @@ jazil.AddTestSet(mainPage, 'own GetItemInfo', {
 jazil.AddTestSet(mainPage, 'own BuildItem', {
   'BuildItem returns correct item type for all items': (jazil) => {
     g_itemInfosByID.forEach((itemInfo) => {
-      let item = BuildItem({ name:itemInfo.name })
+      let item = BuildItem({ set:g_source, name:itemInfo.name })
       jazil.ShouldBe(item.info, itemInfo, `info for ${itemInfo.name} is wrong!`)
     })
   },
 
   'BuildItem returns correct item with defaults': (jazil) => {
-    let leggings = BuildItem({ tag:'x', name:'Leggings', nr:3 })
+    let leggings = BuildItem({ set:g_source, tag:'x', name:'Leggings', nr:3 })
     let leggingsInfo = GetItemInfo('Leggings')
 
     jazil.ShouldBe(leggings.info, leggingsInfo, 'info is wrong!')
     jazil.ShouldBe(leggings.tag, 'x', 'tag is wrong!')
     jazil.ShouldBe(leggings.nr, 3, 'nr is wrong!')
+    jazil.ShouldBe(leggings.set, g_source, 'default set is wrong!')
     jazil.ShouldBe(leggings.count, 1, 'default count is wrong!')
     jazil.ShouldBe(leggings.cost, 0, 'default cost is wrong!')
     jazil.ShouldBe(leggings.totalCost, 0, 'default totalCost is wrong!')
     jazil.ShouldBe(leggings.priorWork, 0, 'default priorWork is wrong!')
-    jazil.ShouldBe(leggings.set, g_source, 'default set is wrong!')
     jazil.ShouldBe(leggings.enchantsByID.size, 0, 'default enchants is wrong!')
   },
 
   'BuildItem returns correct item': (jazil) => {
-    let leggings = BuildItem({ tag:'t', name:'Leggings', nr:4, count:5, cost:7, priorWork:9, set:g_extra })
+    let leggings = BuildItem({ set:g_extra, tag:'t', name:'Leggings', nr:4, count:5, cost:7, priorWork:9 })
     let leggingsInfo = GetItemInfo('Leggings')
 
     jazil.ShouldBe(leggings.info, leggingsInfo, 'info is wrong!')
     jazil.ShouldBe(leggings.tag, 't', 'tag is wrong!')
     jazil.ShouldBe(leggings.nr, undefined, 'nr is set!')
+    jazil.ShouldBe(leggings.set, g_extra, 'set is wrong!')
     jazil.ShouldBe(leggings.count, 5, 'count is wrong!')
     jazil.ShouldBe(leggings.cost, 7, 'cost is wrong!')
     jazil.ShouldBe(leggings.totalCost, 7, 'totalCost is wrong!')
     jazil.ShouldBe(leggings.priorWork, 9, 'priorWork is wrong!')
-    jazil.ShouldBe(leggings.set, g_extra, 'set is wrong!')
     jazil.ShouldBe(leggings.enchantsByID.size, 0, 'default enchants is wrong!')
   },
 
   'BuildItem returns correct item with enchants with defaults': (jazil) => {
-    let leggings = BuildItem({ name:'Leggings', enchants:[{ name:'Protection', level:3 }, { name:'Unbreaking' }] })
+    let leggings = BuildItem({ set:g_source, name:'Leggings', enchants:[{ name:'Protection', level:3 }, { name:'Unbreaking' }] })
     let leggingsInfo = GetItemInfo('Leggings')
     let protectionInfo = g_enchantInfosByID.get(g_enchantIDsByName.get('Protection'))
     let unbreakingInfo = g_enchantInfosByID.get(g_enchantIDsByName.get('Unbreaking'))

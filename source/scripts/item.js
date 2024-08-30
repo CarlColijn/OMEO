@@ -131,24 +131,24 @@ class Item {
 
   // returns string
   HashTypeAndPriorWork() {
-    return this.Hash(true, false, false)
+    return this.Hash(true, false, false, false)
   }
 
 
   // returns string
   HashTypeAndPriorWorkAndCost() {
-    return this.Hash(true, true, false)
+    return this.Hash(true, true, false, false)
   }
 
 
   // returns string
   HashAll() {
-    return this.Hash(true, true, true)
+    return this.Hash(true, true, true, true)
   }
 
 
   // returns string
-  Hash(withPriorWork, withCost, withCount) {
+  Hash(withPriorWork, withCost, withCount, withSet) {
     // note: no fancy stuff for now with bit fiddling, just a big 'ol string concat
 
     let allData = this.id
@@ -167,6 +167,9 @@ class Item {
 
     if (withCount)
       allData += `|${this.count}`
+
+    if (withSet)
+      allData += `|${this.set.id}`
 
     return allData
   }

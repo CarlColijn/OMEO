@@ -70,7 +70,7 @@ jazil.AddTestSet(recipePage, 'RecipeTable - common', {
 
   'Showing a single item results in 1 row': (jazil) => {
     let tester = new RecipeTableTester()
-    let item = BuildItem({ name:'Sword', nr:1, count:4, cost:2, totalCost:3, priorWork:4, enchants:[{ name:'Looting' }, { name:'Unbreaking', level:2 }]})
+    let item = BuildItem({ set:g_source, name:'Sword', nr:1, count:4, cost:2, totalCost:3, priorWork:4, enchants:[{ name:'Looting' }, { name:'Unbreaking', level:2 }]})
     tester.table.SetItem(item)
     tester.Finalize()
 
@@ -85,7 +85,7 @@ function CreateTestSet(setDescription, setLetter) {
     'Simple item without enchants is shown OK': (jazil) => {
       let tester = new RecipeTableTester()
       let set = GetSet(setLetter)
-      let item = BuildItem({ name:'Axe', nr:3, count:2, cost:4, totalCost:10, priorWork:3, set:set })
+      let item = BuildItem({ set:set, name:'Axe', nr:3, count:2, cost:4, totalCost:10, priorWork:3 })
       tester.table.SetItem(item)
       tester.Finalize()
 
@@ -95,7 +95,7 @@ function CreateTestSet(setDescription, setLetter) {
     'Simple item with enchants is shown OK': (jazil) => {
       let tester = new RecipeTableTester()
       let set = GetSet(setLetter)
-      let item = BuildItem({ name:'Boots', nr:2, count:5, cost:2, totalCost:21, priorWork:1, set:set, enchants:[{ name:'Mending' }, { name:'Protection', level:3 }]})
+      let item = BuildItem({ set:set, name:'Boots', nr:2, count:5, cost:2, totalCost:21, priorWork:1, enchants:[{ name:'Mending' }, { name:'Protection', level:3 }]})
       tester.table.SetItem(item)
       tester.Finalize()
 
@@ -105,7 +105,7 @@ function CreateTestSet(setDescription, setLetter) {
     'Simple item with no extra costs is shown OK': (jazil) => {
       let tester = new RecipeTableTester()
       let set = GetSet(setLetter)
-      let item = BuildItem({ name:'Leggings', nr:8, count:2, cost:5, totalCost:5, priorWork:4, set:set })
+      let item = BuildItem({ set:set, name:'Leggings', nr:8, count:2, cost:5, totalCost:5, priorWork:4 })
       tester.table.SetItem(item)
       tester.Finalize()
 
@@ -124,13 +124,13 @@ CreateTestSet('combined', 'c')
 jazil.AddTestSet(recipePage, 'RecipeTable - complex combined listings', {
   'Complex item tree is shown OK - v1': (jazil) => {
     let tester = new RecipeTableTester()
-    let item0_s_t = BuildItem({ name:'Book', nr:1, count:4, cost:0, totalCost:0, priorWork:0, enchants:[{ name:'Unbreaking', level:3 }] })
-    let item0_s_s = BuildItem({ name:'Book', nr:2, count:2, cost:0, totalCost:0, priorWork:0, enchants:[{ name:'Mending' }] })
-    let item0_s = BuildItem({ name:'Shovel', count:6, cost:3, totalCost:12, priorWork:3, set:g_combined, enchants:[{ name:'Mending' }, { name:'Unbreaking', level:3 }] })
+    let item0_s_t = BuildItem({ set:g_source, name:'Book', nr:1, count:4, cost:0, totalCost:0, priorWork:0, enchants:[{ name:'Unbreaking', level:3 }] })
+    let item0_s_s = BuildItem({ set:g_source, name:'Book', nr:2, count:2, cost:0, totalCost:0, priorWork:0, enchants:[{ name:'Mending' }] })
+    let item0_s = BuildItem({ set:g_combined, name:'Shovel', count:6, cost:3, totalCost:12, priorWork:3, enchants:[{ name:'Mending' }, { name:'Unbreaking', level:3 }] })
     item0_s.targetItem = item0_s_t
     item0_s.sacrificeItem = item0_s_s
-    let item0_t = BuildItem({ name:'Shovel', count:1, cost:0, totalCost:0, priorWork:0, set:g_extra })
-    let item0 = BuildItem({ name:'Shovel', count:8, cost:6, totalCost:22, priorWork:4, set:g_combined, enchants:[{ name:'Mending' }, { name:'Unbreaking', level:3 }]})
+    let item0_t = BuildItem({ set:g_extra, name:'Shovel', count:1, cost:0, totalCost:0, priorWork:0 })
+    let item0 = BuildItem({ set:g_combined, name:'Shovel', count:8, cost:6, totalCost:22, priorWork:4, enchants:[{ name:'Mending' }, { name:'Unbreaking', level:3 }]})
     item0.targetItem = item0_t
     item0.sacrificeItem = item0_s
 
@@ -146,13 +146,13 @@ jazil.AddTestSet(recipePage, 'RecipeTable - complex combined listings', {
 
   'Complex item tree is shown OK - v2': (jazil) => {
     let tester = new RecipeTableTester()
-    let item0_t_t = BuildItem({ name:'Book', nr:1, count:4, cost:0, totalCost:0, priorWork:0, enchants:[{ name:'Unbreaking', level:3 }] })
-    let item0_t_s = BuildItem({ name:'Book', nr:2, count:2, cost:0, totalCost:0, priorWork:0, enchants:[{ name:'Mending' }] })
-    let item0_t = BuildItem({ name:'Shovel', count:1, cost:3, totalCost:12, priorWork:0, set:g_combined, enchants:[{ name:'Mending' }, { name:'Unbreaking', level:3 }] })
+    let item0_t_t = BuildItem({ set:g_source, name:'Book', nr:1, count:4, cost:0, totalCost:0, priorWork:0, enchants:[{ name:'Unbreaking', level:3 }] })
+    let item0_t_s = BuildItem({ set:g_source, name:'Book', nr:2, count:2, cost:0, totalCost:0, priorWork:0, enchants:[{ name:'Mending' }] })
+    let item0_t = BuildItem({ set:g_combined, name:'Shovel', count:1, cost:3, totalCost:12, priorWork:0, enchants:[{ name:'Mending' }, { name:'Unbreaking', level:3 }] })
     item0_t.targetItem = item0_t_t
     item0_t.sacrificeItem = item0_t_s
-    let item0_s = BuildItem({ name:'Shovel', count:6, cost:0, totalCost:0, priorWork:3, set:g_extra })
-    let item0 = BuildItem({ name:'Shovel', count:8, cost:6, totalCost:22, priorWork:4, set:g_combined, enchants:[{ name:'Mending' }, { name:'Unbreaking', level:3 }]})
+    let item0_s = BuildItem({ set:g_extra, name:'Shovel', count:6, cost:0, totalCost:0, priorWork:3 })
+    let item0 = BuildItem({ set:g_combined, name:'Shovel', count:8, cost:6, totalCost:22, priorWork:4, enchants:[{ name:'Mending' }, { name:'Unbreaking', level:3 }]})
     item0.targetItem = item0_t
     item0.sacrificeItem = item0_s
 

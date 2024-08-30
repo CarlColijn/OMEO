@@ -26,7 +26,7 @@ class ItemCreatorForFilter {
   }
 
   GetDesired() {
-    return BuildItem({ tag:0, name:this.name, set:g_desired, enchants:this.enchants })
+    return BuildItem({ set:g_desired, tag:0, name:this.name, enchants:this.enchants })
   }
 
   // valid override options:
@@ -232,20 +232,20 @@ jazil.AddTestSet(mainPage, 'CombineResultFilter', {
 
     CheckItemFilterResultOK('Minimal permutations of prior work and total cost',
       jazil,
-      BuildItem({ tag:0, name:'Helmet', set:g_desired }),
+      BuildItem({ set:g_desired, tag:0, name:'Helmet' }),
       [],
       [
-        BuildItem({ tag:1,  name:'Helmet', set:g_combined, priorWork:1, totalCost:22 }),
-        BuildItem({ tag:2,  name:'Helmet', set:g_combined, priorWork:2, totalCost:21 }),
-        BuildItem({ tag:3,  name:'Helmet', set:g_combined, priorWork:1, totalCost:21 }),
-        BuildItem({ tag:4,  name:'Helmet', set:g_combined, priorWork:1, totalCost:23 }),
-        BuildItem({ tag:5,  name:'Helmet', set:g_combined, priorWork:5, totalCost:2  }),
-        BuildItem({ tag:6,  name:'Helmet', set:g_combined, priorWork:5, totalCost:1  }),
-        BuildItem({ tag:7,  name:'Helmet', set:g_combined, priorWork:5, totalCost:3  }),
-        BuildItem({ tag:8,  name:'Helmet', set:g_combined, priorWork:3, totalCost:12 }),
-        BuildItem({ tag:9,  name:'Helmet', set:g_combined, priorWork:4, totalCost:11 }),
-        BuildItem({ tag:10, name:'Helmet', set:g_combined, priorWork:3, totalCost:11 }),
-        BuildItem({ tag:11, name:'Helmet', set:g_combined, priorWork:3, totalCost:13 }),
+        BuildItem({ set:g_combined, tag:1,  name:'Helmet', priorWork:1, totalCost:22 }),
+        BuildItem({ set:g_combined, tag:2,  name:'Helmet', priorWork:2, totalCost:21 }),
+        BuildItem({ set:g_combined, tag:3,  name:'Helmet', priorWork:1, totalCost:21 }),
+        BuildItem({ set:g_combined, tag:4,  name:'Helmet', priorWork:1, totalCost:23 }),
+        BuildItem({ set:g_combined, tag:5,  name:'Helmet', priorWork:5, totalCost:2  }),
+        BuildItem({ set:g_combined, tag:6,  name:'Helmet', priorWork:5, totalCost:1  }),
+        BuildItem({ set:g_combined, tag:7,  name:'Helmet', priorWork:5, totalCost:3  }),
+        BuildItem({ set:g_combined, tag:8,  name:'Helmet', priorWork:3, totalCost:12 }),
+        BuildItem({ set:g_combined, tag:9,  name:'Helmet', priorWork:4, totalCost:11 }),
+        BuildItem({ set:g_combined, tag:10, name:'Helmet', priorWork:3, totalCost:11 }),
+        BuildItem({ set:g_combined, tag:11, name:'Helmet', priorWork:3, totalCost:13 }),
       ],
       g_onlyPerfectCombines,
       [3, 10, 6],

@@ -38,9 +38,9 @@ function CreateTestSet(setDescription, testContainerID, setLetter) {
       let table = tableDetails.table
 
       let testItems = [
-        BuildItem({ name:'Shield', count:2, priorWork:3, set:set }),
-        BuildItem({ name:'Helmet', count:3, priorWork:4, set:set, enchants:[{ name:'Aqua Affinity', level:1 }, { name:'Unbreaking', level:3 }] }),
-        BuildItem({ name:'Boots', count:4, priorWork:5, set:set }),
+        BuildItem({ set:set, name:'Shield', count:2, priorWork:3 }),
+        BuildItem({ set:set, name:'Helmet', count:3, priorWork:4, enchants:[{ name:'Aqua Affinity', level:1 }, { name:'Unbreaking', level:3 }] }),
+        BuildItem({ set:set, name:'Boots', count:4, priorWork:5 }),
       ]
 
       let numRowsPre = table.tableElemJQ.find('tr.item').length
@@ -75,7 +75,7 @@ function CreateTestSet(setDescription, testContainerID, setLetter) {
           }
         })
 
-        TestItemListsMatch(jazil, testItems, 'test', retrievedItems, 'retrieved', set)
+        TestItemListsMatch(jazil, testItems, 'test', retrievedItems, 'retrieved')
       }
       else if (set === g_desired) {
         let rowElemJQ = $(tableDetails.tableElemJQ.find('tr.item')[0])
@@ -88,7 +88,7 @@ function CreateTestSet(setDescription, testContainerID, setLetter) {
         retrievedItem.count = testItem.count
         retrievedItem.priorWork = testItem.priorWork
 
-        TestItemListsMatch(jazil, [testItem], 'test', [retrievedItem], 'retrieved', set)
+        TestItemListsMatch(jazil, [testItem], 'test', [retrievedItem], 'retrieved')
       }
     },
 
@@ -101,9 +101,9 @@ function CreateTestSet(setDescription, testContainerID, setLetter) {
       let table = tableDetails.table
 
       let testItems = [
-        BuildItem({ name:'Chestplate', count:12, priorWork:1, set:set }),
-        BuildItem({ name:'Sword', count:13, priorWork:2, set:set, enchants:[{ name:'Smite', level:2 }, { name:'Looting', level:3 }] }),
-        BuildItem({ name:'Leggings', count:14, priorWork:3, set:set }),
+        BuildItem({ set:set, name:'Chestplate', count:12, priorWork:1 }),
+        BuildItem({ set:set, name:'Sword', count:13, priorWork:2, enchants:[{ name:'Smite', level:2 }, { name:'Looting', level:3 }] }),
+        BuildItem({ set:set, name:'Leggings', count:14, priorWork:3 }),
       ]
 
       table.SetItems(testItems)
@@ -113,7 +113,7 @@ function CreateTestSet(setDescription, testContainerID, setLetter) {
       jazil.ShouldBe(collectedItemDetails.mergedItems, false, 'Items marked as merged!')
 
       if (set === g_source)
-        TestItemListsMatch(jazil, testItems, 'test', collectedItemDetails.items, 'retrieved', set)
+        TestItemListsMatch(jazil, testItems, 'test', collectedItemDetails.items, 'retrieved')
       else if (set === g_desired) {
         // augment the retrieved item's data since g_desired item tables only
         // return a subset of the data
@@ -122,7 +122,7 @@ function CreateTestSet(setDescription, testContainerID, setLetter) {
         retrievedItem.count = testItem.count
         retrievedItem.priorWork = testItem.priorWork
 
-        TestItemListsMatch(jazil, [testItem], 'test', [retrievedItem], 'retrieved', set)
+        TestItemListsMatch(jazil, [testItem], 'test', [retrievedItem], 'retrieved')
       }
     },
 
@@ -135,13 +135,13 @@ function CreateTestSet(setDescription, testContainerID, setLetter) {
       let table = tableDetails.table
 
       let testItems = [
-        BuildItem({ name:'Book', count:1, priorWork:2, set:set }),
-        BuildItem({ name:'Book', count:5, priorWork:3, set:set, enchants:[{ name:'Smite', level:2 }, { name:'Looting', level:3 }] }),
+        BuildItem({ set:set, name:'Book', count:1, priorWork:2 }),
+        BuildItem({ set:set, name:'Book', count:5, priorWork:3, enchants:[{ name:'Smite', level:2 }, { name:'Looting', level:3 }] }),
         // 3 to be merged with 1
-        BuildItem({ name:'Book', count:10, priorWork:2, set:set }),
-        BuildItem({ name:'Book', count:50, priorWork:1, set:set }),
+        BuildItem({ set:set, name:'Book', count:10, priorWork:2 }),
+        BuildItem({ set:set, name:'Book', count:50, priorWork:1 }),
         // 5 to be merged with 2; reversed enchant order as extra test
-        BuildItem({ name:'Book', count:5, priorWork:3, set:set, enchants:[{ name:'Looting', level:3 }, { name:'Smite', level:2 }] }),
+        BuildItem({ set:set, name:'Book', count:5, priorWork:3, enchants:[{ name:'Looting', level:3 }, { name:'Smite', level:2 }] }),
       ]
 
       table.SetItems(testItems)
@@ -158,7 +158,7 @@ function CreateTestSet(setDescription, testContainerID, setLetter) {
       testItems[0].count += testItems[2].count
       testItems.splice(2, 1)
 
-      TestItemListsMatch(jazil, testItems, 'test', collectedItemDetails.items, 'retrieved', set)
+      TestItemListsMatch(jazil, testItems, 'test', collectedItemDetails.items, 'retrieved')
     },
 
     'Explicitly not merging items when retrieving works': (jazil) => {
@@ -170,13 +170,13 @@ function CreateTestSet(setDescription, testContainerID, setLetter) {
       let table = tableDetails.table
 
       let testItems = [
-        BuildItem({ name:'Sword', count:1, priorWork:2, set:set }),
-        BuildItem({ name:'Sword', count:5, priorWork:3, set:set, enchants:[{ name:'Smite', level:1 }, { name:'Mending', level:1 }] }),
+        BuildItem({ set:set, name:'Sword', count:1, priorWork:2 }),
+        BuildItem({ set:set, name:'Sword', count:5, priorWork:3, enchants:[{ name:'Smite', level:1 }, { name:'Mending', level:1 }] }),
         // 3 can be merged with 1
-        BuildItem({ name:'Sword', count:10, priorWork:2, set:set }),
-        BuildItem({ name:'Sword', count:50, priorWork:1, set:set }),
+        BuildItem({ set:set, name:'Sword', count:10, priorWork:2 }),
+        BuildItem({ set:set, name:'Sword', count:50, priorWork:1 }),
         // 5 can be merged with 2; reversed enchant order as extra test
-        BuildItem({ name:'Sword', count:5, priorWork:3, set:set, enchants:[{ name:'Mending', level:1 }, { name:'Smite', level:1 }] }),
+        BuildItem({ set:set, name:'Sword', count:5, priorWork:3, enchants:[{ name:'Mending', level:1 }, { name:'Smite', level:1 }] }),
       ]
 
       table.SetItems(testItems)
@@ -185,7 +185,7 @@ function CreateTestSet(setDescription, testContainerID, setLetter) {
       jazil.ShouldBe(collectedItemDetails.countErrorElemJQs.length, 0, 'count error elements are reported!')
       jazil.ShouldBe(collectedItemDetails.mergedItems, false, 'Items marked as merged!')
 
-      TestItemListsMatch(jazil, testItems, 'test', collectedItemDetails.items, 'retrieved', set)
+      TestItemListsMatch(jazil, testItems, 'test', collectedItemDetails.items, 'retrieved')
     },
 
     'Errors in counts get returned when retrieving items': (jazil) => {
@@ -197,9 +197,9 @@ function CreateTestSet(setDescription, testContainerID, setLetter) {
       let table = tableDetails.table
 
       let testItems = [
-        BuildItem({ name:'Boots', count:1, priorWork:1, set:set }),
-        BuildItem({ name:'Boots', count:2, priorWork:1, set:set, enchants:[{ name:'Protection', level:3 }, { name:'Feather Falling', level:1 }] }),
-        BuildItem({ name:'Boots', count:5, priorWork:1, set:set }),
+        BuildItem({ set:set, name:'Boots', count:1, priorWork:1 }),
+        BuildItem({ set:set, name:'Boots', count:2, priorWork:1, enchants:[{ name:'Protection', level:3 }, { name:'Feather Falling', level:1 }] }),
+        BuildItem({ set:set, name:'Boots', count:5, priorWork:1 }),
       ]
 
       table.SetItems(testItems)
@@ -215,7 +215,7 @@ function CreateTestSet(setDescription, testContainerID, setLetter) {
       // Update the test item to reflect the NaN state.
       testItems[1].count = NaN
 
-      TestItemListsMatch(jazil, testItems, 'test', collectedItemDetails.items, 'retrieved', set)
+      TestItemListsMatch(jazil, testItems, 'test', collectedItemDetails.items, 'retrieved')
     },
 
   })

@@ -86,7 +86,7 @@ jazil.AddTestSet(mainPage, 'ItemCombineWorker', {
   'Worker goes through the motions with no items': async (jazil) => {
     let sourceItems = [
     ]
-    let desiredItem = BuildItem({ name:'Sword', enchants:[{ name:'Unbreaking', level:1 }, { name:'Smite', level:1 }] })
+    let desiredItem = BuildItem({ set:g_desired, name:'Sword', enchants:[{ name:'Unbreaking', level:1 }, { name:'Smite', level:1 }] })
     let expectedItems = [
     ]
 
@@ -98,17 +98,17 @@ jazil.AddTestSet(mainPage, 'ItemCombineWorker', {
     jazil.ShouldBe(status.doneCalled, true, 'done not called!')
     jazil.ShouldBeBetween(status.timeInMSReported, status.timeInMSMeasured - 500, status.timeInMSMeasured, 'timeInMS diverges too much!')
     jazil.ShouldNotBe(status.result, undefined, 'result is not returned!')
-    TestItemListsMatch(jazil, expectedItems, 'expected', status.result.items, 'combined', g_combined)
+    TestItemListsMatch(jazil, expectedItems, 'expected', status.result.items, 'combined')
   },
 
   'Worker combines basic items': async (jazil) => {
     let sourceItems = [
-      BuildItem({ name:'Sword', enchants:[{ name:'Smite', level:1 }] }),
-      BuildItem({ name:'Sword', enchants:[{ name:'Unbreaking', level:1 }] }),
+      BuildItem({ set:g_source, name:'Sword', enchants:[{ name:'Smite', level:1 }] }),
+      BuildItem({ set:g_source, name:'Sword', enchants:[{ name:'Unbreaking', level:1 }] }),
     ]
-    let desiredItem = BuildItem({ name:'Sword', enchants:[{ name:'Unbreaking', level:1 }, { name:'Smite', level:1 }] })
+    let desiredItem = BuildItem({ set:g_desired, name:'Sword', enchants:[{ name:'Unbreaking', level:1 }, { name:'Smite', level:1 }] })
     let expectedItems = [
-      BuildItem({ name:'Sword', priorWork:1, cost:2, count:1, enchants:[{ name:'Unbreaking', level:1 }, { name:'Smite', level:1 }] })
+      BuildItem({ set:g_combined, name:'Sword', priorWork:1, cost:2, count:1, enchants:[{ name:'Unbreaking', level:1 }, { name:'Smite', level:1 }] })
     ]
 
     let status = await TestWorker(sourceItems, desiredItem)
@@ -119,17 +119,17 @@ jazil.AddTestSet(mainPage, 'ItemCombineWorker', {
     jazil.ShouldBe(status.doneCalled, true, 'done not called!')
     jazil.ShouldBeBetween(status.timeInMSReported, status.timeInMSMeasured - 500, status.timeInMSMeasured, 'timeInMS diverges too much!')
     jazil.ShouldNotBe(status.result, undefined, 'result is not returned!')
-    TestItemListsMatch(jazil, expectedItems, 'expected', status.result.items, 'combined', g_combined)
+    TestItemListsMatch(jazil, expectedItems, 'expected', status.result.items, 'combined')
   },
 
   'Max cost combine works': async (jazil) => {
     let sourceItems = [
-      BuildItem({ tag:0, name:'Sword' }),
-      BuildItem({ tag:1, name:'Book', priorWork:5, enchants:[{ name:'Unbreaking', level:3 }, { name:'Smite', level:3 }, { name:'Mending', level:1 }]}),
+      BuildItem({ set:g_source, tag:0, name:'Sword' }),
+      BuildItem({ set:g_source, tag:1, name:'Book', priorWork:5, enchants:[{ name:'Unbreaking', level:3 }, { name:'Smite', level:3 }, { name:'Mending', level:1 }]}),
     ]
-    let desiredItem = BuildItem({ name:'Sword', set:g_desired, enchants:[{ name:'Unbreaking' }]})
+    let desiredItem = BuildItem({ set:g_desired, name:'Sword', enchants:[{ name:'Unbreaking' }]})
     let expectedItems = [
-      BuildItem({ tag:2, name:'Sword', cost:39, priorWork:6, enchants:[{ name:'Unbreaking', level:3 }, { name:'Smite', level:3 }, { name:'Mending', level:1 }]}),
+      BuildItem({ set:g_combined, tag:2, name:'Sword', cost:39, priorWork:6, enchants:[{ name:'Unbreaking', level:3 }, { name:'Smite', level:3 }, { name:'Mending', level:1 }]}),
     ]
 
     let status = await TestWorker(sourceItems, desiredItem)
@@ -140,17 +140,17 @@ jazil.AddTestSet(mainPage, 'ItemCombineWorker', {
     jazil.ShouldBe(status.doneCalled, true, 'done not called!')
     jazil.ShouldBeBetween(status.timeInMSReported, status.timeInMSMeasured - 500, status.timeInMSMeasured, 'timeInMS diverges too much!')
     jazil.ShouldNotBe(status.result, undefined, 'result is not returned!')
-    TestItemListsMatch(jazil, expectedItems, 'expected', status.result.items, 'combined', g_combined)
+    TestItemListsMatch(jazil, expectedItems, 'expected', status.result.items, 'combined')
   },
 
   'Too costly combine gives nothing back': async (jazil) => {
     let sourceItems = [
-      BuildItem({ tag:0, name:'Sword' }),
-      BuildItem({ tag:1, name:'Book', priorWork:5, enchants:[{ name:'Unbreaking', level:3 }, { name:'Smite', level:4 }, { name:'Mending', level:1 }]}),
+      BuildItem({ set:g_source, tag:0, name:'Sword' }),
+      BuildItem({ set:g_source, tag:1, name:'Book', priorWork:5, enchants:[{ name:'Unbreaking', level:3 }, { name:'Smite', level:4 }, { name:'Mending', level:1 }]}),
     ]
-    let desiredItem = BuildItem({ name:'Sword', set:g_desired, enchants:[{ name:'Unbreaking' }]})
+    let desiredItem = BuildItem({ set:g_desired, name:'Sword', enchants:[{ name:'Unbreaking' }]})
     let expectedItems = [
-      //BuildItem({ tag:2, name:'Sword', cost:40, priorWork:6, enchants:[{ name:'Unbreaking', level:3 }, { name:'Smite', level:4 }, { name:'Mending', level:1 }]}),
+      //BuildItem({ set:g_combined, tag:2, name:'Sword', cost:40, priorWork:6, enchants:[{ name:'Unbreaking', level:3 }, { name:'Smite', level:4 }, { name:'Mending', level:1 }]}),
       // Item list filtering will revert back to source item
       sourceItems[0]
     ]
@@ -163,17 +163,17 @@ jazil.AddTestSet(mainPage, 'ItemCombineWorker', {
     jazil.ShouldBe(status.doneCalled, true, 'done not called!')
     jazil.ShouldBeBetween(status.timeInMSReported, status.timeInMSMeasured - 500, status.timeInMSMeasured, 'timeInMS diverges too much!')
     jazil.ShouldNotBe(status.result, undefined, 'result is not returned!')
-    TestItemListsMatch(jazil, expectedItems, 'expected', status.result.items, 'source', g_source)
+    TestItemListsMatch(jazil, expectedItems, 'expected', status.result.items, 'source')
   },
 
   'Progress indicators are correct': async (jazil) => {
     let sourceItems = [
-      BuildItem({ name:'Sword', count:20, enchants:[{ name:'Smite', level:1 }] }),
-      BuildItem({ name:'Sword', count:20, enchants:[{ name:'Unbreaking', level:1 }] }),
-      BuildItem({ name:'Book', count:20, enchants:[{ name:'Looting', level:1 }] }),
-      BuildItem({ name:'Book', count:20, enchants:[{ name:'Bane of Arthropods', level:1 }] }),
+      BuildItem({ set:g_source, name:'Sword', count:20, enchants:[{ name:'Smite', level:1 }] }),
+      BuildItem({ set:g_source, name:'Sword', count:20, enchants:[{ name:'Unbreaking', level:1 }] }),
+      BuildItem({ set:g_source, name:'Book', count:20, enchants:[{ name:'Looting', level:1 }] }),
+      BuildItem({ set:g_source, name:'Book', count:20, enchants:[{ name:'Bane of Arthropods', level:1 }] }),
     ]
-    let desiredItem = BuildItem({ name:'Sword', enchants:[{ name:'Unbreaking', level:3 }, { name:'Smite', level:5 }, { name:'Looting', level:3}, { name:'Bane of Arthropods', level:5 }] })
+    let desiredItem = BuildItem({ set:g_desired, name:'Sword', enchants:[{ name:'Unbreaking', level:3 }, { name:'Smite', level:5 }, { name:'Looting', level:3}, { name:'Bane of Arthropods', level:5 }] })
 
     let prevProgress = -1
     let prevMaxProgress = -1
@@ -215,12 +215,12 @@ jazil.AddTestSet(mainPage, 'ItemCombineWorker', {
 
   'Worker can be cancelled': async (jazil) => {
     let sourceItems = [
-      BuildItem({ name:'Sword', enchants:[{ name:'Smite', level:1 }] }),
-      BuildItem({ name:'Sword', enchants:[{ name:'Unbreaking', level:1 }] }),
+      BuildItem({ set:g_source, name:'Sword', enchants:[{ name:'Smite', level:1 }] }),
+      BuildItem({ set:g_source, name:'Sword', enchants:[{ name:'Unbreaking', level:1 }] }),
     ]
-    let desiredItem = BuildItem({ name:'Sword', enchants:[{ name:'Unbreaking', level:1 }, { name:'Smite', level:1 }] })
+    let desiredItem = BuildItem({ set:g_desired, name:'Sword', enchants:[{ name:'Unbreaking', level:1 }, { name:'Smite', level:1 }] })
     let expectedItems = [
-      BuildItem({ name:'Sword', priorWork:1, cost:2, count:1, enchants:[{ name:'Unbreaking', level:1 }, { name:'Smite', level:1 }] })
+      BuildItem({ set:g_combined, name:'Sword', priorWork:1, cost:2, count:1, enchants:[{ name:'Unbreaking', level:1 }, { name:'Smite', level:1 }] })
     ]
 
     let progressCallback = (combineWorker, progress, maxProgress) => {

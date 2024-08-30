@@ -10,7 +10,7 @@ function CreateTestSet(setDescription, testContainerID, setLetter) {
     'New row is real': (jazil) => {
       let set = GetSet(setLetter)
       let templateRowDetails = GetItemTemplateRow(testContainerID, set)
-      let item = BuildItem({ name:'Book', count:1, priorWork:4, cost:5 })
+      let item = BuildItem({ set:set, name:'Book', count:1, priorWork:4, cost:5 })
       let itemRow = CreateItemRow(templateRowDetails, item)
 
       jazil.ShouldBe(itemRow.IsReal(), true)
@@ -40,7 +40,7 @@ function CreateTestSet(setDescription, testContainerID, setLetter) {
     'Create new row with item from template': (jazil) => {
       let set = GetSet(setLetter)
       let templateRowDetails = GetItemTemplateRow(testContainerID, set)
-      let item = BuildItem({ name:'Pickaxe', count:9, priorWork:2, cost:15 })
+      let item = BuildItem({ set:set, name:'Pickaxe', count:9, priorWork:2, cost:15 })
       let itemRow = CreateItemRow(templateRowDetails, item, 5)
 
       let details = GetItemRowDetails(itemRow.rowElemJQ, set)
@@ -62,7 +62,7 @@ function CreateTestSet(setDescription, testContainerID, setLetter) {
       let set = GetSet(setLetter)
       let templateRowDetails = GetItemTemplateRow(testContainerID, set)
       // Note: enchantments are re-ordered in alphabetical order
-      let item = BuildItem({ name:'Turtle Shell', count:1, priorWork:4, cost:9, enchants:[{ name:'Unbreaking', level:3 }, { name:'Mending', level:1 }] })
+      let item = BuildItem({ set:set, name:'Turtle Shell', count:1, priorWork:4, cost:9, enchants:[{ name:'Unbreaking', level:3 }, { name:'Mending', level:1 }] })
       let itemRow = CreateItemRow(templateRowDetails, item, 15)
 
       let details = GetItemRowDetails(itemRow.rowElemJQ, set)
@@ -87,7 +87,7 @@ function CreateTestSet(setDescription, testContainerID, setLetter) {
 
       let templateRowDetails = GetItemTemplateRow(testContainerID, set)
       // Note: enchantments are re-ordered in alphabetical order
-      let item = BuildItem({ name:'Shears', count:2, priorWork:5, cost:3, enchants:[{ name:'Unbreaking', level:1 }, { name:'Efficiency', level:2 }] })
+      let item = BuildItem({ set:set, name:'Shears', count:2, priorWork:5, cost:3, enchants:[{ name:'Unbreaking', level:1 }, { name:'Efficiency', level:2 }] })
       let itemRow = CreateItemRow(templateRowDetails, item, 31)
 
       let itemDetails = itemRow.GetItem()
@@ -128,7 +128,7 @@ function CreateTestSet(setDescription, testContainerID, setLetter) {
         jazil.SkipTest()
 
       let templateRowDetails = GetItemTemplateRow(testContainerID, set)
-      let item = BuildItem({ name:'Book', count:23, priorWork:5, cost:3, enchants:[{ name:'Projectile Protection', level:1 }] })
+      let item = BuildItem({ set:set, name:'Book', count:23, priorWork:5, cost:3, enchants:[{ name:'Projectile Protection', level:1 }] })
       let itemRow = CreateItemRow(templateRowDetails, item, 25)
 
       // Update the item row's count to something non-numeric.
@@ -167,7 +167,7 @@ function CreateTestSet(setDescription, testContainerID, setLetter) {
         jazil.SkipTest()
 
       let templateRowDetails = GetItemTemplateRow(testContainerID, set)
-      let item = BuildItem({ name:'Leggings', count:23, priorWork:5, cost:3, enchants:[{ name:'Fire Protection', level:1 }, { name:'Blast Protection', level:1 }] })
+      let item = BuildItem({ set:set, name:'Leggings', count:23, priorWork:5, cost:3, enchants:[{ name:'Fire Protection', level:1 }, { name:'Blast Protection', level:1 }] })
       let itemRow = CreateItemRow(templateRowDetails, item, 63)
 
       let itemDetails = itemRow.GetItem()
@@ -202,7 +202,7 @@ function CreateTestSet(setDescription, testContainerID, setLetter) {
         jazil.SkipTest()
 
       let templateRowDetails = GetItemTemplateRow(testContainerID, set)
-      let item = BuildItem({ name:'Pumpkin', count:23, priorWork:5, cost:3, enchants:[] })
+      let item = BuildItem({ set:set, name:'Pumpkin', count:23, priorWork:5, cost:3, enchants:[] })
       let itemRow = CreateItemRow(templateRowDetails, item, 46)
       let enchant = new Enchant(g_enchantIDsByName.get('Curse of Vanishing'), 1)
       itemRow.AddEnchant(enchant)
@@ -238,9 +238,9 @@ function CreateTestSet(setDescription, testContainerID, setLetter) {
       let set = GetSet(setLetter)
       let templateRowDetails = GetItemTemplateRow(testContainerID, set)
       let numRowsPre = $(`#${testContainerID} tr.item`).length
-      let item1 = BuildItem({ name:'Chestplate', count:14, priorWork:4, cost:3 })
-      let item2 = BuildItem({ name:'Shovel', count:15, priorWork:5, cost:4 })
-      let item3 = BuildItem({ name:'Bow', count:16, priorWork:6, cost:5 })
+      let item1 = BuildItem({ set:set, name:'Chestplate', count:14, priorWork:4, cost:3 })
+      let item2 = BuildItem({ set:set, name:'Shovel', count:15, priorWork:5, cost:4 })
+      let item3 = BuildItem({ set:set, name:'Bow', count:16, priorWork:6, cost:5 })
       let itemRow1 = CreateItemRow(templateRowDetails, item1)
       let itemRow2 = CreateItemRow(templateRowDetails, item2)
       let itemRow3 = CreateItemRow(templateRowDetails, item3)
@@ -251,9 +251,9 @@ function CreateTestSet(setDescription, testContainerID, setLetter) {
     'Rows can be removed': (jazil) => {
       let set = GetSet(setLetter)
       let templateRowDetails = GetItemTemplateRow(testContainerID, set)
-      let item1 = BuildItem({ name:'Elytra', count:19, priorWork:3, cost:13 })
-      let item2 = BuildItem({ name:'Trident', count:18, priorWork:2, cost:14 })
-      let item3 = BuildItem({ name:'Shield', count:17, priorWork:1, cost:15 })
+      let item1 = BuildItem({ set:set, name:'Elytra', count:19, priorWork:3, cost:13 })
+      let item2 = BuildItem({ set:set, name:'Trident', count:18, priorWork:2, cost:14 })
+      let item3 = BuildItem({ set:set, name:'Shield', count:17, priorWork:1, cost:15 })
       let itemRow1 = CreateItemRow(templateRowDetails, item1)
       let itemRow2 = CreateItemRow(templateRowDetails, item2)
       let itemRow3 = CreateItemRow(templateRowDetails, item3)
@@ -271,7 +271,7 @@ function CreateTestSet(setDescription, testContainerID, setLetter) {
       let set = GetSet(setLetter)
       let templateRowDetails = GetItemTemplateRow(testContainerID, set)
       // Note: enchantments are re-ordered in alphabetical order
-      let item = BuildItem({ name:'Chestplate', count:4, priorWork:5, cost:3, enchants:[{ name:'Protection', level:2 }, { name:'Thorns', level:3 }] })
+      let item = BuildItem({ set:set, name:'Chestplate', count:4, priorWork:5, cost:3, enchants:[{ name:'Protection', level:2 }, { name:'Thorns', level:3 }] })
       let itemRow = CreateItemRow(templateRowDetails, item, 1)
       itemRow.SetNumber(8)
 
@@ -297,7 +297,7 @@ function CreateTestSet(setDescription, testContainerID, setLetter) {
 
       let templateRowDetails = GetItemTemplateRow(testContainerID, set)
       // Note: enchantments are re-ordered in alphabetical order
-      let item = BuildItem({ name:'Crossbow', count:1, priorWork:3, cost:6 })
+      let item = BuildItem({ set:set, name:'Crossbow', count:1, priorWork:3, cost:6 })
       let itemRow = CreateItemRow(templateRowDetails, item, 31)
       itemRow.SetCount(5)
 
@@ -319,7 +319,7 @@ function CreateTestSet(setDescription, testContainerID, setLetter) {
     'Item can get extra enchants': (jazil) => {
       let set = GetSet(setLetter)
       let templateRowDetails = GetItemTemplateRow(testContainerID, set)
-      let item = BuildItem({ name:'Flint & Steel', count:1, priorWork:0, cost:8 })
+      let item = BuildItem({ set:set, name:'Flint & Steel', count:1, priorWork:0, cost:8 })
       let itemRow = CreateItemRow(templateRowDetails, item, 28)
       // Note: enchantments are ordered in addition order
       itemRow.AddEnchant(BuildEnchant('Unbreaking', 2))
@@ -343,7 +343,7 @@ function CreateTestSet(setDescription, testContainerID, setLetter) {
     'Item enchants can be removed': (jazil) => {
       let set = GetSet(setLetter)
       let templateRowDetails = GetItemTemplateRow(testContainerID, set)
-      let item = BuildItem({ name:'Fishing Rod', count:3, priorWork:2, cost:1 })
+      let item = BuildItem({ set:set, name:'Fishing Rod', count:3, priorWork:2, cost:1 })
       let itemRow = CreateItemRow(templateRowDetails, item, 26)
       // Note: enchantments are ordered in addition order
       itemRow.AddEnchant(BuildEnchant('Unbreaking', 2))
@@ -368,10 +368,10 @@ function CreateTestSet(setDescription, testContainerID, setLetter) {
     'Item can be changed': (jazil) => {
       let set = GetSet(setLetter)
       let templateRowDetails = GetItemTemplateRow(testContainerID, set)
-      let item = BuildItem({ name:'Hoe', count:2, priorWork:1, cost:7, enchants:[{ name:'Unbreaking', level:2 }, { name:'Fortune', level:3 }] })
+      let item = BuildItem({ set:set, name:'Hoe', count:2, priorWork:1, cost:7, enchants:[{ name:'Unbreaking', level:2 }, { name:'Fortune', level:3 }] })
       let itemRow = CreateItemRow(templateRowDetails, item, 3)
       // Note: enchantments are re-ordered in alphabetical order
-      let updatedItem = BuildItem({ name:'Helmet', count:6, priorWork:4, cost:5, enchants:[{ name:'Blast Protection', level:4 }, { name:'Aqua Affinity', level:1 }] })
+      let updatedItem = BuildItem({ set:set, name:'Helmet', count:6, priorWork:4, cost:5, enchants:[{ name:'Blast Protection', level:4 }, { name:'Aqua Affinity', level:1 }] })
       itemRow.SetItem(updatedItem)
 
       let details = GetItemRowDetails(itemRow.rowElemJQ, set)

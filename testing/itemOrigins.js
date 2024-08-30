@@ -4,9 +4,9 @@
 // nr 2: 5x book2
 function CreateZeroOrigin(jazil) {
   let items = [
-    BuildItem({ name:'Pickaxe', count:3, priorWork:6 }),
-    BuildItem({ name:'Book', count:4, priorWork:7 }),
-    BuildItem({ name:'Book', count:5, priorWork:8 })
+    BuildItem({ set:g_source, name:'Pickaxe', count:3, priorWork:6 }),
+    BuildItem({ set:g_source, name:'Book', count:4, priorWork:7 }),
+    BuildItem({ set:g_source, name:'Book', count:5, priorWork:8 })
   ]
   return new ZeroOrigin(items)
 }

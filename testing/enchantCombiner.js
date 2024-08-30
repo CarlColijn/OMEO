@@ -15,8 +15,8 @@ jazil.AddTestSet(mainPage, 'EnchantCombiner', {
   'Same lvl 1 enchants combine': (jazil) => {
     let smite = BuildEnchant('Smite')
 
-    let sword1 = BuildItem({ name:'Sword', enchants:[{ name:'Smite' }] })
-    let sword2 = BuildItem({ name:'Sword', enchants:[{ name:'Smite' }] })
+    let sword1 = BuildItem({ set:g_source, name:'Sword', enchants:[{ name:'Smite' }] })
+    let sword2 = BuildItem({ set:g_source, name:'Sword', enchants:[{ name:'Smite' }] })
 
     let combiner = new EnchantCombiner(sword1, sword2, smite.info)
     let combineResult = combiner.Combine()
@@ -31,10 +31,10 @@ jazil.AddTestSet(mainPage, 'EnchantCombiner', {
   'Set doesn\'t matter': (jazil) => {
     let smite = BuildEnchant('Smite')
 
-    let sword1 = BuildItem({ name:'Sword', set:g_source, enchants:[{ name:'Smite' }] })
-    let sword2 = BuildItem({ name:'Sword', set:g_desired, enchants:[{ name:'Smite' }] })
-    let sword3 = BuildItem({ name:'Sword', set:g_combined, enchants:[{ name:'Smite' }] })
-    let sword4 = BuildItem({ name:'Sword', set:g_extra, enchants:[{ name:'Smite' }] })
+    let sword1 = BuildItem({ set:g_source, name:'Sword', enchants:[{ name:'Smite' }] })
+    let sword2 = BuildItem({ set:g_desired, name:'Sword', enchants:[{ name:'Smite' }] })
+    let sword3 = BuildItem({ set:g_combined, name:'Sword', enchants:[{ name:'Smite' }] })
+    let sword4 = BuildItem({ set:g_extra, name:'Sword', enchants:[{ name:'Smite' }] })
     let swords = [sword1, sword2, sword3, sword4]
 
     let combines = []
@@ -52,8 +52,8 @@ jazil.AddTestSet(mainPage, 'EnchantCombiner', {
   'Symmetric combines are equal': (jazil) => {
     let smite = BuildEnchant('Smite')
 
-    let sword1 = BuildItem({ name:'Sword', set:g_source, enchants:[{ name:'Smite' }] })
-    let sword2 = BuildItem({ name:'Sword', set:g_source, enchants:[{ name:'Smite' }] })
+    let sword1 = BuildItem({ set:g_source, name:'Sword', enchants:[{ name:'Smite' }] })
+    let sword2 = BuildItem({ set:g_source, name:'Sword', enchants:[{ name:'Smite' }] })
 
     let combiner1 = new EnchantCombiner(sword1, sword2, smite.info)
     let combiner2 = new EnchantCombiner(sword2, sword1, smite.info)
@@ -66,10 +66,10 @@ jazil.AddTestSet(mainPage, 'EnchantCombiner', {
     let bookInfo = GetItemInfo('Book')
     let impaling = BuildEnchant('Impaling')
 
-    let trident1 = BuildItem({ name:'Trident', enchants:[{ name:'Impaling', level:1 }] })
-    let trident2 = BuildItem({ name:'Trident', enchants:[{ name:'Impaling', level:2 }] })
-    let book1 = BuildItem({ name:'Book', enchants:[{ name:'Impaling', level:1 }] })
-    let book2 = BuildItem({ name:'Book', enchants:[{ name:'Impaling', level:2 }] })
+    let trident1 = BuildItem({ set:g_source, name:'Trident', enchants:[{ name:'Impaling', level:1 }] })
+    let trident2 = BuildItem({ set:g_source, name:'Trident', enchants:[{ name:'Impaling', level:2 }] })
+    let book1 = BuildItem({ set:g_source, name:'Book', enchants:[{ name:'Impaling', level:1 }] })
+    let book2 = BuildItem({ set:g_source, name:'Book', enchants:[{ name:'Impaling', level:2 }] })
 
     let combiner1 = new EnchantCombiner(trident1, book2, impaling.info)
     let combiner2 = new EnchantCombiner(trident2, book1, impaling.info)
@@ -81,9 +81,9 @@ jazil.AddTestSet(mainPage, 'EnchantCombiner', {
   'Order doesn\'t matter for cost wrt prior work': (jazil) => {
     let impaling = BuildEnchant('Impaling')
 
-    let trident1 = BuildItem({ name:'Trident', priorWork:1, enchants:[{ name:'Impaling' }] })
-    let trident2 = BuildItem({ name:'Trident', priorWork:2, enchants:[{ name:'Impaling' }] })
-    let trident3 = BuildItem({ name:'Trident', priorWork:3, enchants:[{ name:'Impaling' }] })
+    let trident1 = BuildItem({ set:g_source, name:'Trident', priorWork:1, enchants:[{ name:'Impaling' }] })
+    let trident2 = BuildItem({ set:g_source, name:'Trident', priorWork:2, enchants:[{ name:'Impaling' }] })
+    let trident3 = BuildItem({ set:g_source, name:'Trident', priorWork:3, enchants:[{ name:'Impaling' }] })
 
     let combiner1 = new EnchantCombiner(trident1, trident2, impaling.info)
     let combiner2 = new EnchantCombiner(trident1, trident3, impaling.info)
@@ -97,12 +97,12 @@ jazil.AddTestSet(mainPage, 'EnchantCombiner', {
   'Enchant level combines correctly': (jazil) => {
     let smite = BuildEnchant('Smite')
 
-    let sword1a = BuildItem({ name:'Sword', enchants:[{ name:'Smite', level:1 }] })
-    let sword1b = BuildItem({ name:'Sword', enchants:[{ name:'Smite', level:1 }] })
-    let sword2a = BuildItem({ name:'Sword', enchants:[{ name:'Smite', level:2 }] })
-    let sword2b = BuildItem({ name:'Sword', enchants:[{ name:'Smite', level:2 }] })
-    let sword5a = BuildItem({ name:'Sword', enchants:[{ name:'Smite', level:5 }] })
-    let sword5b = BuildItem({ name:'Sword', enchants:[{ name:'Smite', level:5 }] })
+    let sword1a = BuildItem({ set:g_source, name:'Sword', enchants:[{ name:'Smite', level:1 }] })
+    let sword1b = BuildItem({ set:g_source, name:'Sword', enchants:[{ name:'Smite', level:1 }] })
+    let sword2a = BuildItem({ set:g_source, name:'Sword', enchants:[{ name:'Smite', level:2 }] })
+    let sword2b = BuildItem({ set:g_source, name:'Sword', enchants:[{ name:'Smite', level:2 }] })
+    let sword5a = BuildItem({ set:g_source, name:'Sword', enchants:[{ name:'Smite', level:5 }] })
+    let sword5b = BuildItem({ set:g_source, name:'Sword', enchants:[{ name:'Smite', level:5 }] })
 
     jazil.ShouldBe(new EnchantCombiner(sword1a, sword1b, smite.info).Combine().combinedLevel, 2, 'Resulting enchant of wrong level!')
     jazil.ShouldBe(new EnchantCombiner(sword1a, sword2a, smite.info).Combine().combinedLevel, 2, 'Resulting enchant of wrong level!')
@@ -116,10 +116,10 @@ jazil.AddTestSet(mainPage, 'EnchantCombiner', {
   'Books vs. items have correct cost': (jazil) => {
     let impaling = BuildEnchant('Impaling')
 
-    let trident1 = BuildItem({ name:'Trident', enchants:[{ name:'Impaling', level:1 }] })
-    let trident2 = BuildItem({ name:'Trident', enchants:[{ name:'Impaling', level:2 }] })
-    let book1 = BuildItem({ name:'Book', enchants:[{ name:'Impaling', level:1 }] })
-    let book2 = BuildItem({ name:'Book', enchants:[{ name:'Impaling', level:2 }] })
+    let trident1 = BuildItem({ set:g_source, name:'Trident', enchants:[{ name:'Impaling', level:1 }] })
+    let trident2 = BuildItem({ set:g_source, name:'Trident', enchants:[{ name:'Impaling', level:2 }] })
+    let book1 = BuildItem({ set:g_source, name:'Book', enchants:[{ name:'Impaling', level:1 }] })
+    let book2 = BuildItem({ set:g_source, name:'Book', enchants:[{ name:'Impaling', level:2 }] })
 
     let combiner1 = new EnchantCombiner(trident1, book2, impaling.info)
     let combiner2 = new EnchantCombiner(book1, trident2, impaling.info)
@@ -131,8 +131,8 @@ jazil.AddTestSet(mainPage, 'EnchantCombiner', {
   'Different enchants don\'t combine': (jazil) => {
     let smite = BuildEnchant('Smite')
 
-    let sword1 = BuildItem({ name:'Sword', enchants:[{ name:'Smite' }] })
-    let sword2 = BuildItem({ name:'Sword', enchants:[{ name:'Sharpness' }] })
+    let sword1 = BuildItem({ set:g_source, name:'Sword', enchants:[{ name:'Smite' }] })
+    let sword2 = BuildItem({ set:g_source, name:'Sword', enchants:[{ name:'Sharpness' }] })
 
     let combiner = new EnchantCombiner(sword1, sword2, smite.info)
     let combineResult = combiner.Combine()
@@ -148,8 +148,8 @@ jazil.AddTestSet(mainPage, 'EnchantCombiner', {
     let smite = BuildEnchant('Smite')
     let sharpness = BuildEnchant('Sharpness')
 
-    let sword1 = BuildItem({ name:'Sword', enchants:[{ name:'Smite' }] })
-    let sword2 = BuildItem({ name:'Sword', enchants:[{ name:'Sharpness' }] })
+    let sword1 = BuildItem({ set:g_source, name:'Sword', enchants:[{ name:'Smite' }] })
+    let sword2 = BuildItem({ set:g_source, name:'Sword', enchants:[{ name:'Sharpness' }] })
 
     let combiner1 = new EnchantCombiner(sword1, sword2, smite.info)
     let combineResult1 = combiner1.Combine()
@@ -167,9 +167,9 @@ jazil.AddTestSet(mainPage, 'EnchantCombiner', {
   'Enchant usage is recognized correctly': (jazil) => {
     let smite = BuildEnchant('Smite')
 
-    let sword0 = BuildItem({ name:'Sword', enchants:[] })
-    let sword1 = BuildItem({ name:'Sword', enchants:[{ name:'Smite', level:1 }] })
-    let sword5 = BuildItem({ name:'Sword', enchants:[{ name:'Smite', level:5 }] })
+    let sword0 = BuildItem({ set:g_source, name:'Sword', enchants:[] })
+    let sword1 = BuildItem({ set:g_source, name:'Sword', enchants:[{ name:'Smite', level:1 }] })
+    let sword5 = BuildItem({ set:g_source, name:'Sword', enchants:[{ name:'Smite', level:5 }] })
 
     let combines = [
       { tItem:sword0, sItem:sword0, tUsed:false, sUsed:false, desc:'sword0+sword0' },
@@ -193,8 +193,8 @@ jazil.AddTestSet(mainPage, 'EnchantCombiner', {
   'Irrelevant enchants get skipped': (jazil) => {
     let flame = BuildEnchant('Flame')
 
-    let sword1 = BuildItem({ name:'Sword', enchants:[{ name:'Smite' }] })
-    let sword2 = BuildItem({ name:'Sword', enchants:[{ name:'Sharpness' }] })
+    let sword1 = BuildItem({ set:g_source, name:'Sword', enchants:[{ name:'Smite' }] })
+    let sword2 = BuildItem({ set:g_source, name:'Sword', enchants:[{ name:'Sharpness' }] })
 
     let combiner = new EnchantCombiner(sword1, sword2, flame.info)
     let combineResult = combiner.Combine()

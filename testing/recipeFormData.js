@@ -37,12 +37,12 @@ jazil.AddTestSet(recipePage, 'RecipeFormData', {
   'Item gets set': (jazil) => {
     let data = new RecipeFormData
 
-    let axe = BuildItem({ name:'Axe' })
+    let axe = BuildItem({ set:g_source, name:'Axe' })
     data.SetItem(axe)
 
     jazil.ShouldBe(data.item, axe, 'Initial item not set correctly!')
 
-    let sword = BuildItem({ name:'Sword' })
+    let sword = BuildItem({ set:g_source, name:'Sword' })
     data.SetItem(sword)
 
     jazil.ShouldBe(data.item, sword, 'Updated item not set correctly!')
@@ -52,7 +52,7 @@ jazil.AddTestSet(recipePage, 'RecipeFormData', {
     let dataState = new DataStateController(jazil)
     dataState.Reset()
 
-    let item = BuildItem({ name:'Pickaxe', count:11, set:g_source, nr:5, priorWork:0, cost:4, totalCost:55 })
+    let item = BuildItem({ set:g_source, name:'Pickaxe', count:11, nr:5, priorWork:0, cost:4, totalCost:55 })
 
     let storedData = new RecipeFormData
     storedData.SetItem(item)
@@ -78,7 +78,7 @@ jazil.AddTestSet(recipePage, 'RecipeFormData', {
     let dataState = new DataStateController(jazil)
     dataState.Reset()
 
-    let item = BuildItem({ name:'Sword', count:11, set:g_combined, priorWork:1, cost:66, totalCost:11, enchants:[{ name:'Sharpness', level:4 }] })
+    let item = BuildItem({ set:g_combined, name:'Sword', count:11, priorWork:1, cost:66, totalCost:11, enchants:[{ name:'Sharpness', level:4 }] })
 
     let storedData = new RecipeFormData
     storedData.SetItem(item)
@@ -104,11 +104,11 @@ jazil.AddTestSet(recipePage, 'RecipeFormData', {
     let dataState = new DataStateController(jazil)
     dataState.Reset()
 
-    let itemF = BuildItem({ name:'Sword', count:11, set:g_combined, priorWork:1, cost:22, totalCost:90, enchants:[{ name:'Looting', level:2 }] })
-    let itemL = BuildItem({ name:'Axe', count:22, set:g_source, nr:7, priorWork:2, cost:66, totalCost:9, enchants:[{ name:'Mending' }] })
-    let itemLL = BuildItem({ name:'Pumpkin', count:12, set:g_desired, priorWork:0, cost:22, totalCost:12, enchants:[{ name:'Curse of Binding' }] })
-    let itemLR = BuildItem({ name:'Chestplate', count:22, set:g_combined, priorWork:2, cost:7, totalCost:4, enchants:[{ name:'Protection', level:3 }, { name:'Thorns'}] })
-    let itemR = BuildItem({ name:'Book', count:33, set:g_extra, priorWork:4, cost:1, totalCost:11 })
+    let itemF = BuildItem({ set:g_combined, name:'Sword', count:11, priorWork:1, cost:22, totalCost:90, enchants:[{ name:'Looting', level:2 }] })
+    let itemL = BuildItem({ set:g_source, name:'Axe', count:22, nr:7, priorWork:2, cost:66, totalCost:9, enchants:[{ name:'Mending' }] })
+    let itemLL = BuildItem({ set:g_desired, name:'Pumpkin', count:12, priorWork:0, cost:22, totalCost:12, enchants:[{ name:'Curse of Binding' }] })
+    let itemLR = BuildItem({ set:g_combined, name:'Chestplate', count:22, priorWork:2, cost:7, totalCost:4, enchants:[{ name:'Protection', level:3 }, { name:'Thorns'}] })
+    let itemR = BuildItem({ set:g_extra, name:'Book', count:33, priorWork:4, cost:1, totalCost:11 })
 
     itemL.targetItem = itemLL
     itemL.sacrificeItem = itemLR
@@ -153,7 +153,7 @@ jazil.AddTestSet(recipePage, 'RecipeFormData', {
     let dataState = new DataStateController(jazil)
     dataState.Reset()
 
-    let sword = BuildItem({ name:'Sword', count:11, set:g_source, nr:9, priorWork:1, cost:22, totalCost:12, enchants:[{ name:'Looting' }] })
+    let sword = BuildItem({ set:g_source, name:'Sword', count:11, nr:9, priorWork:1, cost:22, totalCost:12, enchants:[{ name:'Looting' }] })
 
     let storedData = new RecipeFormData
     storedData.SetItem(sword)
@@ -179,7 +179,7 @@ jazil.AddTestSet(recipePage, 'RecipeFormData', {
     let dataState = new DataStateController(jazil)
     dataState.Reset()
 
-    let sword = BuildItem({ name:'Sword', count:11, set:g_combined, priorWork:1, cost:9, totalCost:33 })
+    let sword = BuildItem({ set:g_combined, name:'Sword', count:11, priorWork:1, cost:9, totalCost:33 })
     GiveItemBrokenEnchant(sword)
 
     let storedData = new RecipeFormData

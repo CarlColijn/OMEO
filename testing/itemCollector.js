@@ -22,9 +22,9 @@ jazil.AddTestSet(mainPage, 'ItemCollector', {
     let templateRowDetails = GetItemTemplateRow('collectingItemRow', g_source)
 
     let testItems = [
-      BuildItem({ name:'Chestplate', count:12, priorWork:1 }),
-      BuildItem({ name:'Sword', count:13, priorWork:2, enchants:[{ name:'Smite', level:2 }, { name:'Looting', level:3 }] }),
-      BuildItem({ name:'Leggings', count:14, priorWork:3 }),
+      BuildItem({ set:g_source, name:'Chestplate', count:12, priorWork:1 }),
+      BuildItem({ set:g_source, name:'Sword', count:13, priorWork:2, enchants:[{ name:'Smite', level:2 }, { name:'Looting', level:3 }] }),
+      BuildItem({ set:g_source, name:'Leggings', count:14, priorWork:3 }),
     ]
 
     let itemRows = CreateItemRows(templateRowDetails, testItems, false)
@@ -43,9 +43,9 @@ jazil.AddTestSet(mainPage, 'ItemCollector', {
     let templateRowDetails = GetItemTemplateRow('collectingItemRow', g_source)
 
     let testItems = [
-      BuildItem({ name:'Hoe', count:3, priorWork:1 }),
-      BuildItem({ name:'Axe', count:4, priorWork:2, enchants:[{ name:'Unbreaking', level:3 }, { name:'Mending', level:1 }] }),
-      BuildItem({ name:'Shield', count:5, priorWork:3 }),
+      BuildItem({ set:g_source, name:'Hoe', count:3, priorWork:1 }),
+      BuildItem({ set:g_source, name:'Axe', count:4, priorWork:2, enchants:[{ name:'Unbreaking', level:3 }, { name:'Mending', level:1 }] }),
+      BuildItem({ set:g_source, name:'Shield', count:5, priorWork:3 }),
     ]
 
     let itemRows = CreateItemRows(templateRowDetails, testItems, true)
@@ -73,13 +73,13 @@ jazil.AddTestSet(mainPage, 'ItemCollector', {
     let templateRowDetails = GetItemTemplateRow('collectingItemRow', g_source)
 
     let testItems = [
-      BuildItem({ name:'Book', tag:1, count:1, priorWork:2 }),
-      BuildItem({ name:'Book', tag:2, count:5, priorWork:3, enchants:[{ name:'Smite', level:2 }, { name:'Looting', level:3 }] }),
+      BuildItem({ set:g_source, name:'Book', tag:1, count:1, priorWork:2 }),
+      BuildItem({ set:g_source, name:'Book', tag:2, count:5, priorWork:3, enchants:[{ name:'Smite', level:2 }, { name:'Looting', level:3 }] }),
       // 3 to be merged with 1
-      BuildItem({ name:'Book', tag:3, count:10, priorWork:2 }),
-      BuildItem({ name:'Book', tag:4, count:50, priorWork:1 }),
+      BuildItem({ set:g_source, name:'Book', tag:3, count:10, priorWork:2 }),
+      BuildItem({ set:g_source, name:'Book', tag:4, count:50, priorWork:1 }),
       // 5 to be merged with 2; reversed enchant order as extra test
-      BuildItem({ name:'Book', tag:5, count:100, priorWork:3, enchants:[{ name:'Looting', level:3 }, { name:'Smite', level:2 }] }),
+      BuildItem({ set:g_source, name:'Book', tag:5, count:100, priorWork:3, enchants:[{ name:'Looting', level:3 }, { name:'Smite', level:2 }] }),
     ]
 
     let itemRows = CreateItemRows(templateRowDetails, testItems, false)
@@ -121,20 +121,20 @@ jazil.AddTestSet(mainPage, 'ItemCollector', {
     jazil.ShouldBe(result.rowsToRemove[1], itemRows[4], 'Wrong 2nd item row marked to remove!')
     jazil.ShouldBe(result.itemsByRow.get(result.rowsToRemove[1]).HashTypeAndPriorWork(), testItems[4].HashTypeAndPriorWork(), 'Wrong 2nd item marked to remove!')
 
-    TestItemListsMatch(jazil, mergedTestItems, 'test', result.items, 'retrieved', g_source)
+    TestItemListsMatch(jazil, mergedTestItems, 'test', result.items, 'retrieved')
   },
 
   'Explicitly not merging items works': (jazil) => {
     let templateRowDetails = GetItemTemplateRow('collectingItemRow', g_source)
 
     let testItems = [
-      BuildItem({ name:'Sword', tag:1, count:1, priorWork:2 }),
-      BuildItem({ name:'Sword', tag:2, count:5, priorWork:3, enchants:[{ name:'Smite', level:1 }, { name:'Mending', level:1 }] }),
+      BuildItem({ set:g_source, name:'Sword', tag:1, count:1, priorWork:2 }),
+      BuildItem({ set:g_source, name:'Sword', tag:2, count:5, priorWork:3, enchants:[{ name:'Smite', level:1 }, { name:'Mending', level:1 }] }),
       // 3 can be merged with 1
-      BuildItem({ name:'Sword', tag:3, count:10, priorWork:2 }),
-      BuildItem({ name:'Sword', tag:4, count:50, priorWork:1 }),
+      BuildItem({ set:g_source, name:'Sword', tag:3, count:10, priorWork:2 }),
+      BuildItem({ set:g_source, name:'Sword', tag:4, count:50, priorWork:1 }),
       // 5 can be merged with 2; reversed enchant order as extra test
-      BuildItem({ name:'Sword', tag:5, count:5, priorWork:3, enchants:[{ name:'Mending', level:1 }, { name:'Smite', level:1 }] }),
+      BuildItem({ set:g_source, name:'Sword', tag:5, count:5, priorWork:3, enchants:[{ name:'Mending', level:1 }, { name:'Smite', level:1 }] }),
     ]
 
     let itemRows = CreateItemRows(templateRowDetails, testItems, false)
@@ -151,16 +151,16 @@ jazil.AddTestSet(mainPage, 'ItemCollector', {
     jazil.ShouldBe(result.items[0].count, testItems[0].count, 'Wrong 1st merged item row count!')
     jazil.ShouldBe(result.items[1].count, testItems[1].count, 'Wrong 2nd merged item row count!')
 
-    TestItemListsMatch(jazil, testItems, 'test', result.items, 'retrieved', g_source)
+    TestItemListsMatch(jazil, testItems, 'test', result.items, 'retrieved')
   },
 
   'Errors in counts get returned': (jazil) => {
     let templateRowDetails = GetItemTemplateRow('collectingItemRow', g_source)
 
     let testItems = [
-      BuildItem({ name:'Boots', tag:1, count:1, priorWork:1 }),
-      BuildItem({ name:'Boots', tag:2, count:2, priorWork:1, enchants:[{ name:'Protection', level:3 }, { name:'Feather Falling', level:1 }] }),
-      BuildItem({ name:'Boots', tag:3, count:5, priorWork:1 }),
+      BuildItem({ set:g_source, name:'Boots', tag:1, count:1, priorWork:1 }),
+      BuildItem({ set:g_source, name:'Boots', tag:2, count:2, priorWork:1, enchants:[{ name:'Protection', level:3 }, { name:'Feather Falling', level:1 }] }),
+      BuildItem({ set:g_source, name:'Boots', tag:3, count:5, priorWork:1 }),
     ]
 
     let itemRows = CreateItemRows(templateRowDetails, testItems, false)
@@ -182,7 +182,7 @@ jazil.AddTestSet(mainPage, 'ItemCollector', {
     jazil.ShouldBe(result.rowsToUpdateCount.length, 0, 'Wrong number of rows marked to update!')
     jazil.ShouldBe(result.rowsToRemove.length, 0, 'Wrong number of rows marked to remove!')
 
-    TestItemListsMatch(jazil, testItems, 'test', result.items, 'retrieved', g_source)
+    TestItemListsMatch(jazil, testItems, 'test', result.items, 'retrieved')
   },
 
 })

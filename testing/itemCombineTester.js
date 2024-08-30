@@ -3,8 +3,8 @@ jazil.AddTestSet(mainPage, 'ItemCombineTester', {
   // TargetIsRelevant
 
   'Identical items are relevant': (jazil) => {
-    let pickaxe1 = BuildItem({ name:'Pickaxe' })
-    let pickaxe2 = BuildItem({ name:'Pickaxe' })
+    let pickaxe1 = BuildItem({ set:g_source, name:'Pickaxe' })
+    let pickaxe2 = BuildItem({ set:g_source, name:'Pickaxe' })
 
     let tester = new ItemCombineTester()
     jazil.ShouldBe(
@@ -14,8 +14,8 @@ jazil.AddTestSet(mainPage, 'ItemCombineTester', {
   },
 
   'Different items are irrelevant': (jazil) => {
-    let pickaxe = BuildItem({ name:'Pickaxe' })
-    let sword = BuildItem({ name:'Sword' })
+    let pickaxe = BuildItem({ set:g_source, name:'Pickaxe' })
+    let sword = BuildItem({ set:g_source, name:'Sword' })
 
     let tester = new ItemCombineTester()
     jazil.ShouldBe(
@@ -25,8 +25,8 @@ jazil.AddTestSet(mainPage, 'ItemCombineTester', {
   },
 
   'Book-on-tool is relevant': (jazil) => {
-    let book = BuildItem({ name:'Book' })
-    let sword = BuildItem({ name:'Sword' })
+    let book = BuildItem({ set:g_source, name:'Book' })
+    let sword = BuildItem({ set:g_source, name:'Sword' })
 
     let tester = new ItemCombineTester()
     jazil.ShouldBe(
@@ -36,8 +36,8 @@ jazil.AddTestSet(mainPage, 'ItemCombineTester', {
   },
 
   'Book-on-book is relevant': (jazil) => {
-    let book1 = BuildItem({ name:'Book' })
-    let book2 = BuildItem({ name:'Book' })
+    let book1 = BuildItem({ set:g_source, name:'Book' })
+    let book2 = BuildItem({ set:g_source, name:'Book' })
 
     let tester = new ItemCombineTester()
     jazil.ShouldBe(
@@ -47,8 +47,8 @@ jazil.AddTestSet(mainPage, 'ItemCombineTester', {
   },
 
   'Tool-on-book is irrelevant': (jazil) => {
-    let sword = BuildItem({ name:'Sword' })
-    let book = BuildItem({ name:'Book' })
+    let sword = BuildItem({ set:g_source, name:'Sword' })
+    let book = BuildItem({ set:g_source, name:'Book' })
 
     let tester = new ItemCombineTester()
     jazil.ShouldBe(
@@ -60,8 +60,8 @@ jazil.AddTestSet(mainPage, 'ItemCombineTester', {
   // ItemsCompatible
 
   'Identical items are compatible': (jazil) => {
-    let pickaxe1 = BuildItem({ name:'Pickaxe' })
-    let pickaxe2 = BuildItem({ name:'Pickaxe' })
+    let pickaxe1 = BuildItem({ set:g_source, name:'Pickaxe' })
+    let pickaxe2 = BuildItem({ set:g_source, name:'Pickaxe' })
 
     let tester = new ItemCombineTester()
     jazil.ShouldBe(
@@ -71,8 +71,8 @@ jazil.AddTestSet(mainPage, 'ItemCombineTester', {
   },
 
   'Different items are not compatible': (jazil) => {
-    let pickaxe = BuildItem({ name:'Pickaxe' })
-    let sword = BuildItem({ name:'Sword' })
+    let pickaxe = BuildItem({ set:g_source, name:'Pickaxe' })
+    let sword = BuildItem({ set:g_source, name:'Sword' })
 
     let tester = new ItemCombineTester()
     jazil.ShouldBe(
@@ -82,8 +82,8 @@ jazil.AddTestSet(mainPage, 'ItemCombineTester', {
   },
 
   'Book-on-tool is compatible': (jazil) => {
-    let sword = BuildItem({ name:'Sword' })
-    let book = BuildItem({ name:'Book' })
+    let sword = BuildItem({ set:g_source, name:'Sword' })
+    let book = BuildItem({ set:g_source, name:'Book' })
 
     let tester = new ItemCombineTester()
     jazil.ShouldBe(
@@ -93,8 +93,8 @@ jazil.AddTestSet(mainPage, 'ItemCombineTester', {
   },
 
   'Book-on-book is compatible': (jazil) => {
-    let book1 = BuildItem({ name:'Book' })
-    let book2 = BuildItem({ name:'Book' })
+    let book1 = BuildItem({ set:g_source, name:'Book' })
+    let book2 = BuildItem({ set:g_source, name:'Book' })
 
     let tester = new ItemCombineTester()
     jazil.ShouldBe(
@@ -104,8 +104,8 @@ jazil.AddTestSet(mainPage, 'ItemCombineTester', {
   },
 
   'Tool-on-book is not compatible': (jazil) => {
-    let book = BuildItem({ name:'Book' })
-    let sword = BuildItem({ name:'Sword' })
+    let book = BuildItem({ set:g_source, name:'Book' })
+    let sword = BuildItem({ set:g_source, name:'Sword' })
 
     let tester = new ItemCombineTester()
     jazil.ShouldBe(
@@ -117,8 +117,8 @@ jazil.AddTestSet(mainPage, 'ItemCombineTester', {
   // CombineIsWasteful
 
   'Tool-on-tool is not wasteful if both get used': (jazil) => {
-    let pickaxe1 = BuildItem({ name:'Pickaxe' })
-    let pickaxe2 = BuildItem({ name:'Pickaxe' })
+    let pickaxe1 = BuildItem({ set:g_source, name:'Pickaxe' })
+    let pickaxe2 = BuildItem({ set:g_source, name:'Pickaxe' })
 
     let tester = new ItemCombineTester()
     jazil.ShouldBe(
@@ -128,8 +128,8 @@ jazil.AddTestSet(mainPage, 'ItemCombineTester', {
   },
 
   'Tool-on-tool is wasteful if sacrifice tool not used': (jazil) => {
-    let pickaxe1 = BuildItem({ name:'Pickaxe' })
-    let pickaxe2 = BuildItem({ name:'Pickaxe' })
+    let pickaxe1 = BuildItem({ set:g_source, name:'Pickaxe' })
+    let pickaxe2 = BuildItem({ set:g_source, name:'Pickaxe' })
 
     let tester = new ItemCombineTester()
     jazil.ShouldBe(
@@ -139,8 +139,8 @@ jazil.AddTestSet(mainPage, 'ItemCombineTester', {
   },
 
   'Tool-on-tool is wasteful if target tool not used': (jazil) => {
-    let pickaxe1 = BuildItem({ name:'Pickaxe' })
-    let pickaxe2 = BuildItem({ name:'Pickaxe' })
+    let pickaxe1 = BuildItem({ set:g_source, name:'Pickaxe' })
+    let pickaxe2 = BuildItem({ set:g_source, name:'Pickaxe' })
 
     let tester = new ItemCombineTester()
     jazil.ShouldBe(
@@ -150,8 +150,8 @@ jazil.AddTestSet(mainPage, 'ItemCombineTester', {
   },
 
   'Tool-on-tool is wasteful if both not used': (jazil) => {
-    let pickaxe1 = BuildItem({ name:'Pickaxe' })
-    let pickaxe2 = BuildItem({ name:'Pickaxe' })
+    let pickaxe1 = BuildItem({ set:g_source, name:'Pickaxe' })
+    let pickaxe2 = BuildItem({ set:g_source, name:'Pickaxe' })
 
     let tester = new ItemCombineTester()
     jazil.ShouldBe(
@@ -162,8 +162,8 @@ jazil.AddTestSet(mainPage, 'ItemCombineTester', {
   },
 
   'Book-on-tool is not wasteful if book is used': (jazil) => {
-    let pickaxe = BuildItem({ name:'Pickaxe' })
-    let book = BuildItem({ name:'Book' })
+    let pickaxe = BuildItem({ set:g_source, name:'Pickaxe' })
+    let book = BuildItem({ set:g_source, name:'Book' })
 
     let tester = new ItemCombineTester()
     jazil.ShouldBe(
@@ -173,8 +173,8 @@ jazil.AddTestSet(mainPage, 'ItemCombineTester', {
   },
 
   'Book-on-tool is wasteful if book is not used': (jazil) => {
-    let pickaxe = BuildItem({ name:'Pickaxe' })
-    let book = BuildItem({ name:'Book' })
+    let pickaxe = BuildItem({ set:g_source, name:'Pickaxe' })
+    let book = BuildItem({ set:g_source, name:'Book' })
 
     let tester = new ItemCombineTester()
     jazil.ShouldBe(
@@ -184,8 +184,8 @@ jazil.AddTestSet(mainPage, 'ItemCombineTester', {
   },
 
   'Book-on-tool is not wasteful if tool is not used': (jazil) => {
-    let pickaxe = BuildItem({ name:'Pickaxe' })
-    let book = BuildItem({ name:'Book' })
+    let pickaxe = BuildItem({ set:g_source, name:'Pickaxe' })
+    let book = BuildItem({ set:g_source, name:'Book' })
 
     let tester = new ItemCombineTester()
     jazil.ShouldBe(
@@ -195,8 +195,8 @@ jazil.AddTestSet(mainPage, 'ItemCombineTester', {
   },
 
   'Book-on-tool is wasteful only if both not used': (jazil) => {
-    let pickaxe = BuildItem({ name:'Pickaxe' })
-    let book = BuildItem({ name:'Book' })
+    let pickaxe = BuildItem({ set:g_source, name:'Pickaxe' })
+    let book = BuildItem({ set:g_source, name:'Book' })
 
     let tester = new ItemCombineTester()
     jazil.ShouldBe(
@@ -208,7 +208,7 @@ jazil.AddTestSet(mainPage, 'ItemCombineTester', {
   // BareSourcePresent
 
   'Empty source list doesn\'t contain bare item': (jazil) => {
-    let barePickaxe = BuildItem({ name:'Pickaxe' })
+    let barePickaxe = BuildItem({ set:g_source, name:'Pickaxe' })
 
     let tester = new ItemCombineTester()
     jazil.ShouldBe(
@@ -218,9 +218,9 @@ jazil.AddTestSet(mainPage, 'ItemCombineTester', {
   },
 
   'Source list without relevant tools doesn\'t contain bare item': (jazil) => {
-    let barePickaxe = BuildItem({ name:'Pickaxe' })
-    let bareBook = BuildItem({ name:'Book' })
-    let enchantedBook = BuildItem({ name:'Book', enchants:[{ name:'Smite' }] })
+    let barePickaxe = BuildItem({ set:g_source, name:'Pickaxe' })
+    let bareBook = BuildItem({ set:g_source, name:'Book' })
+    let enchantedBook = BuildItem({ set:g_source, name:'Book', enchants:[{ name:'Smite' }] })
 
     let tester = new ItemCombineTester()
     jazil.ShouldBe(
@@ -230,9 +230,9 @@ jazil.AddTestSet(mainPage, 'ItemCombineTester', {
   },
 
   'Source list with only enchanted relevant tools doesn\'t contain bare item': (jazil) => {
-    let barePickaxe = BuildItem({ name:'Pickaxe' })
-    let enchantedPickaxe = BuildItem({ name:'Pickaxe', enchants:[{ name:'Mending' }] })
-    let enchantedBook = BuildItem({ name:'Book', enchants:[{ name:'Smite' }] })
+    let barePickaxe = BuildItem({ set:g_source, name:'Pickaxe' })
+    let enchantedPickaxe = BuildItem({ set:g_source, name:'Pickaxe', enchants:[{ name:'Mending' }] })
+    let enchantedBook = BuildItem({ set:g_source, name:'Book', enchants:[{ name:'Smite' }] })
 
     let tester = new ItemCombineTester()
     jazil.ShouldBe(
@@ -242,9 +242,9 @@ jazil.AddTestSet(mainPage, 'ItemCombineTester', {
   },
 
   'Source list with only prioWorked relevant tools doesn\'t contain bare item': (jazil) => {
-    let barePickaxe = BuildItem({ name:'Pickaxe' })
-    let priorWorkPickaxe = BuildItem({ name:'Pickaxe', priorWork:3 })
-    let enchantedBook = BuildItem({ name:'Book', enchants:[{ name:'Smite' }] })
+    let barePickaxe = BuildItem({ set:g_source, name:'Pickaxe' })
+    let priorWorkPickaxe = BuildItem({ set:g_source, name:'Pickaxe', priorWork:3 })
+    let enchantedBook = BuildItem({ set:g_source, name:'Book', enchants:[{ name:'Smite' }] })
 
     let tester = new ItemCombineTester()
     jazil.ShouldBe(
@@ -254,10 +254,10 @@ jazil.AddTestSet(mainPage, 'ItemCombineTester', {
   },
 
   'Source list with only prioWorked + enchanted relevant tools doesn\'t contain bare item': (jazil) => {
-    let barePickaxe = BuildItem({ name:'Pickaxe' })
-    let enchantedPickaxe = BuildItem({ name:'Pickaxe', enchants:[{ name:'Mending' }] })
-    let priorWorkPickaxe = BuildItem({ name:'Pickaxe', priorWork:3 })
-    let enchantedBook = BuildItem({ name:'Book', enchants:[{ name:'Smite' }] })
+    let barePickaxe = BuildItem({ set:g_source, name:'Pickaxe' })
+    let enchantedPickaxe = BuildItem({ set:g_source, name:'Pickaxe', enchants:[{ name:'Mending' }] })
+    let priorWorkPickaxe = BuildItem({ set:g_source, name:'Pickaxe', priorWork:3 })
+    let enchantedBook = BuildItem({ set:g_source, name:'Book', enchants:[{ name:'Smite' }] })
 
     let tester = new ItemCombineTester()
     jazil.ShouldBe(
@@ -267,8 +267,8 @@ jazil.AddTestSet(mainPage, 'ItemCombineTester', {
   },
 
   'Source list with bare relevant tool contains bare item': (jazil) => {
-    let barePickaxe = BuildItem({ name:'Pickaxe' })
-    let enchantedPickaxe = BuildItem({ name:'Pickaxe', enchants:[{ name:'Mending' }] })
+    let barePickaxe = BuildItem({ set:g_source, name:'Pickaxe' })
+    let enchantedPickaxe = BuildItem({ set:g_source, name:'Pickaxe', enchants:[{ name:'Mending' }] })
 
     let tester = new ItemCombineTester()
     jazil.ShouldBe(
@@ -280,7 +280,7 @@ jazil.AddTestSet(mainPage, 'ItemCombineTester', {
   // EnchantConflictsForItem
 
   'Vanilla item doesn\'t conflict with enchant': (jazil) => {
-    let vanillaPickaxe = BuildItem({ name:'Pickaxe' })
+    let vanillaPickaxe = BuildItem({ set:g_source, name:'Pickaxe' })
     let mending = g_enchantInfosByID.get(g_enchantIDsByName.get('Mending'))
 
     let tester = new ItemCombineTester()
@@ -291,8 +291,8 @@ jazil.AddTestSet(mainPage, 'ItemCombineTester', {
   },
 
   'Enchanted item doesn\'t conflict with same enchant': (jazil) => {
-    let mendingFirstPickaxe = BuildItem({ name:'Pickaxe', enchants:[{ name:'Mending' }, { name:'Unbreaking' }] })
-    let mendingLastPickaxe = BuildItem({ name:'Pickaxe', enchants:[{ name:'Unbreaking' }, { name:'Mending' }] })
+    let mendingFirstPickaxe = BuildItem({ set:g_source, name:'Pickaxe', enchants:[{ name:'Mending' }, { name:'Unbreaking' }] })
+    let mendingLastPickaxe = BuildItem({ set:g_source, name:'Pickaxe', enchants:[{ name:'Unbreaking' }, { name:'Mending' }] })
     let mending = g_enchantInfosByID.get(g_enchantIDsByName.get('Mending'))
 
     let tester = new ItemCombineTester()
@@ -309,8 +309,8 @@ jazil.AddTestSet(mainPage, 'ItemCombineTester', {
   },
 
   'Enchanted item conflicts with incompatible enchant': (jazil) => {
-    let mendingFirstPickaxe = BuildItem({ name:'Pickaxe', enchants:[{ name:'Mending' }, { name:'Unbreaking' }] })
-    let mendingLastPickaxe = BuildItem({ name:'Pickaxe', enchants:[{ name:'Unbreaking' }, { name:'Mending' }] })
+    let mendingFirstPickaxe = BuildItem({ set:g_source, name:'Pickaxe', enchants:[{ name:'Mending' }, { name:'Unbreaking' }] })
+    let mendingLastPickaxe = BuildItem({ set:g_source, name:'Pickaxe', enchants:[{ name:'Unbreaking' }, { name:'Mending' }] })
     let infinity = g_enchantInfosByID.get(g_enchantIDsByName.get('Infinity'))
 
     let tester = new ItemCombineTester()

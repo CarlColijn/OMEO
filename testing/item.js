@@ -1,6 +1,6 @@
 jazil.AddTestSet(mainPage, 'Item', {
   'Pickaxe gets created with passed details': (jazil) => {
-    let pickaxe = BuildItem({ name:'Pickaxe', nr:22, count:44, priorWork:11 })
+    let pickaxe = BuildItem({ set:g_source, name:'Pickaxe', nr:22, count:44, priorWork:11 })
 
     let pickaxeInfo = GetItemInfo('Pickaxe')
 
@@ -17,13 +17,13 @@ jazil.AddTestSet(mainPage, 'Item', {
 
   'Identical items get the same hash': (jazil) => {
     let items = [
-      BuildItem({ name:'Pickaxe', count:11, priorWork:77, cost:1, set:g_source }),
-      BuildItem({ name:'Pickaxe', count:22, priorWork:77, cost:1, set:g_extra }),
-      BuildItem({ name:'Pickaxe', count:33, priorWork:88, cost:2, set:g_combined }),
-      BuildItem({ name:'Pickaxe', count:44, priorWork:88, cost:3, set:g_desired }),
-      BuildItem({ name:'Pickaxe', count:44, priorWork:88, cost:3, set:g_source, enchants:[{ name:'Fortune', level:2 }, { name:'Unbreaking', level:3 }] }),
-      BuildItem({ name:'Pickaxe', count:44, priorWork:88, cost:3, set:g_desired, enchants:[{ name:'Fortune', level:3 }, { name:'Unbreaking', level:2 }] }),
-      BuildItem({ name:'Pickaxe', count:44, priorWork:88, cost:4, set:g_combined, enchants:[{ name:'Fortune', level:2 }, { name:'Unbreaking', level:3 }] })
+      BuildItem({ set:g_source, name:'Pickaxe', count:11, priorWork:77, cost:1 }),
+      BuildItem({ set:g_extra, name:'Pickaxe', count:22, priorWork:77, cost:1 }),
+      BuildItem({ set:g_combined, name:'Pickaxe', count:33, priorWork:88, cost:2 }),
+      BuildItem({ set:g_desired, name:'Pickaxe', count:44, priorWork:88, cost:3 }),
+      BuildItem({ set:g_source, name:'Pickaxe', count:44, priorWork:88, cost:3, enchants:[{ name:'Fortune', level:2 }, { name:'Unbreaking', level:3 }] }),
+      BuildItem({ set:g_desired, name:'Pickaxe', count:44, priorWork:88, cost:3, enchants:[{ name:'Fortune', level:3 }, { name:'Unbreaking', level:2 }] }),
+      BuildItem({ set:g_combined, name:'Pickaxe', count:44, priorWork:88, cost:4, enchants:[{ name:'Fortune', level:2 }, { name:'Unbreaking', level:3 }] })
     ]
 
     let sameCombosWithoutCost = new Set()
@@ -58,7 +58,7 @@ jazil.AddTestSet(mainPage, 'Item', {
   },
 
   'Set enchants get set': (jazil) => {
-    let pickaxe = BuildItem({ name:'Pickaxe', enchants:[{ name:'Smite', level:40 }, { name:'Sharpness', level:0 }, { name:'Mending', level:10 }, { name:'Flame', level:0 }] })
+    let pickaxe = BuildItem({ set:g_combined, name:'Pickaxe', enchants:[{ name:'Smite', level:40 }, { name:'Sharpness', level:0 }, { name:'Mending', level:10 }, { name:'Flame', level:0 }] })
 
     let smiteInfo = g_enchantInfosByID.get(g_enchantIDsByName.get('Smite'))
     let foundSmite = false
@@ -88,7 +88,7 @@ jazil.AddTestSet(mainPage, 'Item', {
   },
 
   'Unused enchants (lvl 0) get dropped': (jazil) => {
-    let pickaxe = BuildItem({ name:'Pickaxe', enchants:[{ name:'Smite', level:40 }, { name:'Sharpness', level:0 }, { name:'Mending', level:10 }, { name:'Flame', level:0 }] })
+    let pickaxe = BuildItem({ set:g_combined, name:'Pickaxe', enchants:[{ name:'Smite', level:40 }, { name:'Sharpness', level:0 }, { name:'Mending', level:10 }, { name:'Flame', level:0 }] })
 
     pickaxe.DropUnusedEnchants()
 
@@ -120,14 +120,14 @@ jazil.AddTestSet(mainPage, 'Item', {
   },
 
   'CollapseTree returns all items': (jazil) => {
-    let itemR = BuildItem({ name:'Shield', count:19, set:g_combined, cost:10, totalCost:12, priorWork:3, enchants:[{ name:'Mending', level:1 }] })
-    let itemRT = BuildItem({ name:'Shield', count:2, set:g_combined, renamePoint:true, cost:2, totalCost:55, priorWork:1, enchants:[{ name:'Mending', level:1 }] })
+    let itemR = BuildItem({ set:g_combined, name:'Shield', count:19, cost:10, totalCost:12, priorWork:3, enchants:[{ name:'Mending', level:1 }] })
+    let itemRT = BuildItem({ set:g_combined, name:'Shield', count:2, renamePoint:true, cost:2, totalCost:55, priorWork:1, enchants:[{ name:'Mending', level:1 }] })
     itemR.targetItem = itemRT
-    let itemRTT = BuildItem({ name:'Shield', count:22, set:g_source, nr:3, priorWork:2 })
+    let itemRTT = BuildItem({ set:g_source, nr:3, name:'Shield', count:22, priorWork:2 })
     itemRT.targetItem = itemRTT
-    let itemRTS = BuildItem({ name:'Book', count:15, set:g_source, nr:1, priorWork:3, enchants:[{ name:'Mending', level:1 }] })
+    let itemRTS = BuildItem({ set:g_source, nr:1, name:'Book', count:15, priorWork:3, enchants:[{ name:'Mending', level:1 }] })
     itemRT.sacrificeItem = itemRTS
-    let itemRS = BuildItem({ name:'Book', count:6, set:g_extra, priorWork:3 })
+    let itemRS = BuildItem({ set:g_extra, name:'Book', count:6, priorWork:3 })
     itemR.sacrificeItem = itemRS
 
     let allItems = itemR.CollapseTree()
@@ -141,14 +141,14 @@ jazil.AddTestSet(mainPage, 'Item', {
   },
 
   'Clone returns all items as clone': (jazil) => {
-    let itemR = BuildItem({ name:'Shield', count:19, set:g_combined, cost:10, totalCost:12, priorWork:3, enchants:[{ name:'Mending', level:1 }] })
-    let itemRT = BuildItem({ name:'Shield', count:2, set:g_combined, renamePoint:true, cost:2, totalCost:55, priorWork:1, enchants:[{ name:'Mending', level:1 }] })
+    let itemR = BuildItem({ set:g_combined, name:'Shield', count:19, cost:10, totalCost:12, priorWork:3, enchants:[{ name:'Mending', level:1 }] })
+    let itemRT = BuildItem({ set:g_combined, name:'Shield', count:2, renamePoint:true, cost:2, totalCost:55, priorWork:1, enchants:[{ name:'Mending', level:1 }] })
     itemR.targetItem = itemRT
-    let itemRTT = BuildItem({ name:'Shield', count:22, set:g_source, nr:3, priorWork:2 })
+    let itemRTT = BuildItem({ set:g_source, nr:3, name:'Shield', count:22, priorWork:2 })
     itemRT.targetItem = itemRTT
-    let itemRTS = BuildItem({ name:'Book', count:15, set:g_source, nr:1, priorWork:3, enchants:[{ name:'Mending', level:1 }] })
+    let itemRTS = BuildItem({ set:g_source, nr:1, name:'Book', count:15, priorWork:3, enchants:[{ name:'Mending', level:1 }] })
     itemRT.sacrificeItem = itemRTS
-    let itemRS = BuildItem({ name:'Book', count:6, set:g_extra, priorWork:3 })
+    let itemRS = BuildItem({ set:g_extra, name:'Book', count:6, priorWork:3 })
     itemR.sacrificeItem = itemRS
 
     let cloneR = itemR.Clone()

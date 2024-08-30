@@ -35,12 +35,12 @@ jazil.AddTestSet(mainPage, 'MainFormData', {
   'Desired item gets set': (jazil) => {
     let data = new MainFormData
 
-    let axe = BuildItem({ name:'Axe', set:g_desired })
+    let axe = BuildItem({ set:g_desired, name:'Axe' })
     data.SetDesiredItem(axe)
 
     jazil.ShouldBe(data.desiredItem, axe, 'Initial desired item not set correctly!')
 
-    let sword = BuildItem({ name:'Sword', set:g_desired })
+    let sword = BuildItem({ set:g_desired, name:'Sword' })
     data.SetDesiredItem(sword)
 
     jazil.ShouldBe(data.desiredItem, sword, 'Updated desired item not set correctly!')
@@ -50,7 +50,7 @@ jazil.AddTestSet(mainPage, 'MainFormData', {
     let data = new MainFormData
 
     for (let swordNr = 0; swordNr < 10; ++swordNr) {
-      let sword = BuildItem({ name:'Sword', count:44 })
+      let sword = BuildItem({ set:g_source, name:'Sword', count:44 })
       data.AddSourceItem(sword)
 
       jazil.ShouldBe(data.sourceItems.length, swordNr + 1, `Item ${swordNr} not added to source items!`)
@@ -64,7 +64,7 @@ jazil.AddTestSet(mainPage, 'MainFormData', {
     let swords = []
     let numSwords = 10
     for (let swordNr = 0; swordNr < numSwords; ++swordNr)
-      swords.push(BuildItem({ name:'Sword', count:44 }))
+      swords.push(BuildItem({ set:g_source, name:'Sword', count:44 }))
 
     data.AddSourceItems(swords)
 
@@ -77,10 +77,10 @@ jazil.AddTestSet(mainPage, 'MainFormData', {
     let dataState = new DataStateController(jazil)
     dataState.Reset()
 
-    let pickaxe = BuildItem({ name:'Pickaxe', count:11, set:g_desired, priorWork:0 })
-    let axe = BuildItem({ name:'Axe', count:22, set:g_source, priorWork:1 })
-    let sword = BuildItem({ name:'Sword', count:33, set:g_source, priorWork:2 })
-    let helmet = BuildItem({ name:'Helmet', count:44, set:g_source, priorWork:3 })
+    let pickaxe = BuildItem({ set:g_desired, name:'Pickaxe', count:11, priorWork:0 })
+    let axe = BuildItem({ set:g_source, name:'Axe', count:22, priorWork:1 })
+    let sword = BuildItem({ set:g_source, name:'Sword', count:33, priorWork:2 })
+    let helmet = BuildItem({ set:g_source, name:'Helmet', count:44, priorWork:3 })
 
     let storedData = new MainFormData
     storedData.SetDesiredItem(pickaxe)
@@ -114,9 +114,9 @@ jazil.AddTestSet(mainPage, 'MainFormData', {
     let dataState = new DataStateController(jazil)
     dataState.Reset()
 
-    let sword = BuildItem({ name:'Sword', count:11, set:g_desired, priorWork:1, enchants:[{ name:'Looting' }] })
-    let book = BuildItem({ name:'Book', count:33, set:g_source, priorWork:3, enchants:[{ name:'Fortune', level:3 }, { name:'Smite', level:1 }, { name:'Efficiency', level:2 }] })
-    let axe = BuildItem({ name:'Axe', count:22, set:g_source, priorWork:2, enchants:[{ name:'Fortune', level:3 }] })
+    let sword = BuildItem({ set:g_desired, name:'Sword', count:11, priorWork:1, enchants:[{ name:'Looting' }] })
+    let book = BuildItem({ set:g_source, name:'Book', count:33, priorWork:3, enchants:[{ name:'Fortune', level:3 }, { name:'Smite', level:1 }, { name:'Efficiency', level:2 }] })
+    let axe = BuildItem({ set:g_source, name:'Axe', count:22, priorWork:2, enchants:[{ name:'Fortune', level:3 }] })
 
     let storedData = new MainFormData
     storedData.SetDesiredItem(sword)
@@ -149,8 +149,8 @@ jazil.AddTestSet(mainPage, 'MainFormData', {
     let dataState = new DataStateController(jazil)
     dataState.Reset()
 
-    let sword = BuildItem({ name:'Sword', count:11, set:g_desired, priorWork:1, enchants:[{ name:'Looting' }] })
-    let book = BuildItem({ name:'Book', count:33, set:g_source, priorWork:3, enchants:[{ name:'Fortune', level:3 }] })
+    let sword = BuildItem({ set:g_desired, name:'Sword', count:11, priorWork:1, enchants:[{ name:'Looting' }] })
+    let book = BuildItem({ set:g_source, name:'Book', count:33, priorWork:3, enchants:[{ name:'Fortune', level:3 }] })
 
     let storedData = new MainFormData
     storedData.SetDesiredItem(sword)
@@ -178,8 +178,8 @@ jazil.AddTestSet(mainPage, 'MainFormData', {
     let dataState = new DataStateController(jazil)
     dataState.Reset()
 
-    let sword = BuildItem({ name:'Sword', count:11, set:g_desired, priorWork:1 })
-    let book = BuildItem({ name:'Book', count:33, set:g_source, priorWork:3, enchants:[{ name:'Fortune', level:3 }] })
+    let sword = BuildItem({ set:g_desired, name:'Sword', count:11, priorWork:1 })
+    let book = BuildItem({ set:g_source, name:'Book', count:33, priorWork:3, enchants:[{ name:'Fortune', level:3 }] })
     GiveItemBrokenEnchant(sword)
 
     let storedData = new MainFormData
