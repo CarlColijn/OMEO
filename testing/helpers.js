@@ -344,15 +344,20 @@ function GetEnchantLevelFromGUIText(guiText) {
 }
 
 
-function GetDescriptionForItemInTable(set, item) {
-  let name = item.info.name
+// returns { type, typeDetails }
+function GetTypeAndDetailsForItemInTable(set, item) {
+  let type = item.info.name
+  let typeDetails = ''
   if (set === g_combined) {
     if (item.set === g_source)
-      name += ` (source nr. ${item.nr})`
+      typeDetails = `source nr. ${item.nr}`
     else if (item.set === g_extra)
-      name += ` (extra)`
+      typeDetails = 'extra'
   }
-  return name
+  return {
+    type: type,
+    typeDetails: typeDetails
+  }
 }
 
 
@@ -363,8 +368,7 @@ function GetItemRowDetails(itemRowElemJQ, set) {
   }
 
   let MakeTextSafe = (textElemJQ) => {
-    let value = textElemJQ.text()
-    return value === '' ? undefined : value
+    return textElemJQ.text()
   }
 
   let nr = MakeNumberSafe(itemRowElemJQ.find('.nr'))
@@ -392,6 +396,7 @@ function GetItemRowDetails(itemRowElemJQ, set) {
       break
   }
   let type
+  let typeDetails
   switch (set) {
     case g_source:
     case g_desired:
@@ -399,9 +404,17 @@ function GetItemRowDetails(itemRowElemJQ, set) {
       let typeID = typeElemJQ.val()
       typeID = typeID === undefined ? undefined : parseInt(typeID)
       type = g_itemInfosByID.get(typeID).name
+      typeDetails = ''
       break
     case g_combined:
       type = MakeTextSafe(itemRowElemJQ.find('.type'))
+      let detailsStart = type.indexOf(' (')
+      if (detailsStart == -1)
+        typeDetails = ''
+      else {
+        typeDetails = type.slice(detailsStart + 2, -1)
+        type = type.slice(0, detailsStart)
+      }
       break
   }
   let priorWork
@@ -480,6 +493,7 @@ function GetItemRowDetails(itemRowElemJQ, set) {
     'cost': cost,
     'count': count,
     'type': type,
+    'typeDetails': typeDetails,
     'priorWork': priorWork,
     'enchantNames': enchantNames,
     'enchantLevels': enchantLevels
@@ -487,12 +501,12 @@ function GetItemRowDetails(itemRowElemJQ, set) {
 }
 
 
-function ItemRowInTable(testContainerID, itemName, set) {
+function ItemRowInTable(testContainerID, type, typeDetails, set) {
   let foundRow = false
   $(`#${testContainerID} tr.item`).each((rowNr, itemRowElem) => {
     let itemRowElemJQ = $(itemRowElem)
     let details = GetItemRowDetails(itemRowElemJQ, set)
-    if (details.type == itemName) {
+    if (details.type == type && details.typeDetails == typeDetails) {
       foundRow = true
       return false
     }

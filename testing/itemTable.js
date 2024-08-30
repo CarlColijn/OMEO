@@ -59,10 +59,10 @@ function CreateTestSet(setDescription, testContainerID, setLetter) {
         numRowsToAdd = 0
       jazil.ShouldBe(numRowsPost - numRowsPre, numRowsToAdd, 'wrong number of rows added!')
 
-      jazil.ShouldBe(ItemRowInTable(testContainerID, 'Shield', set), true, 'New shield not in table!')
+      jazil.ShouldBe(ItemRowInTable(testContainerID, 'Shield', '', set), true, 'New shield not in table!')
       if (set !== g_desired) {
-        jazil.ShouldBe(ItemRowInTable(testContainerID, 'Helmet', set), true, 'New helmet not in table!')
-        jazil.ShouldBe(ItemRowInTable(testContainerID, 'Boots', set), true, 'New boots not in table!')
+        jazil.ShouldBe(ItemRowInTable(testContainerID, 'Helmet', '', set), true, 'New helmet not in table!')
+        jazil.ShouldBe(ItemRowInTable(testContainerID, 'Boots', '', set), true, 'New boots not in table!')
       }
 
       if (set === g_source) {
