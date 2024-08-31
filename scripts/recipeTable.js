@@ -152,6 +152,7 @@ class RecipeTable {
 
     let placementTDElemJQ = newRowInfo.rowElemJQ.find('td:first')
 
+    let isExpandableNode = false
     for (let tdElemNr = 0; tdElemNr < collapseTrail.length; ++tdElemNr) {
       let tdElemJQ = $('<td class="treeNode"></td>')
 
@@ -169,6 +170,7 @@ class RecipeTable {
         newRowInfo.mainTDElemJQ = tdElemJQ
 
       if (isExpandableLeafNode) {
+        isExpandableNode = true
         tdElemJQ.addClass('treeClick')
         tdElemJQ.html('&boxminus;')
         newRowInfo.mainTDElemJQ.click(() => {
@@ -186,7 +188,14 @@ class RecipeTable {
     }
 
     placementTDElemJQ.attr('colspan', numUnusedColumns)
-    newRowInfo.rowElemJQ.find('.placement').html(placement)
+    let placementElemJQ = newRowInfo.rowElemJQ.find('.placement')
+    if (isExpandableNode) {
+      placementElemJQ.addClass('treeClick')
+      placementElemJQ.click(() => {
+        this.NodeClicked(newRowInfo)
+      })
+    }
+    placementElemJQ.html(placement)
     newRowInfo.rowElemJQ.find('.description').html(this.GetItemDescription(item))
     newRowInfo.rowElemJQ.find('.enchants').html(this.GetItemEnchants(item))
     newRowInfo.rowElemJQ.find('.priorWork').text(item.priorWork)
