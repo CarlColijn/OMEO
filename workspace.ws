@@ -33,11 +33,11 @@
             <File name="source\scripts\itemTable.js" />
             <File name="source\scripts\mainForm.js" />
             <File name="source\scripts\mainFormData.js" />
-            <File name="source\scripts\mainPage.js" />
+            <File name="source\scripts\mainFormHandler.js" />
             <File name="source\scripts\ratedItem.js" />
             <File name="source\scripts\recipeForm.js" />
             <File name="source\scripts\recipeFormData.js" />
-            <File name="source\scripts\recipePage.js" />
+            <File name="source\scripts\recipeFormHandler.js" />
             <File name="source\scripts\recipeTable.js" />
         </Folder>
         <Folder name="other">
