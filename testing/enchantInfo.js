@@ -61,4 +61,14 @@ jazil.AddTestSet(mainPage, 'EnchantInfo', {
     jazil.ShouldBe(testInfo.name, 'Fire Protection', 'name')
   },
 
+  'Curses are labeled appropriately': (jazil) => {
+    let numCurses = 0
+    g_enchantInfosByID.forEach((info, id) => {
+      if (info.isCurse)
+        ++numCurses
+      jazil.ShouldBe(info.isCurse, info.name.toLowerCase().includes('curse'), 'isCurse mismatch with name!')
+    })
+    jazil.ShouldBe(numCurses, 2, 'wrong number of curses found!')
+  },
+
 })
