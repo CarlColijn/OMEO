@@ -1,26 +1,24 @@
 /*
   Web worker for doing the actual item combining.
 
-  Input:
-  object with:
-  - sourceItems: Item[]
-  - desiredItem: Item
+  Startup message data:
+  - desiredItem: Item (dehydrated}
+  - sourceItems: Item[] (dehydrated)
+  - feedbackIntervalMS: int
 
-  Output:
-  cleanedUpItemsResult:
-
-  Instruction messages:
-  - start;
-    - desiredItem: Item (dehydrated}
-    - sourceItems: Item[] (dehydrated)
-    - feedbackIntervalMS: int
   Feedback messages:
-  - type: 0 = progress; extra data items:
+  - progress:
+    - type: 0
     - progress: int
     - maxProgress: int
-  - type: 1 = finalizing; no extra data items
-  - type: 2 = done; extra data items:
+    - timeInMS: int
+  - finalizing:
+    - type: 1
+  - done:
+    - type: 2
     - result: Item[] (dehydrated)
+    - maxProgress: int
+    - timeInMS: int
 */
 
 
