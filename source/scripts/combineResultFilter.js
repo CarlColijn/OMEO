@@ -6,15 +6,20 @@
   Prerequisites:
   - item.js
 
-  Defined classes:
-  - CombineResultFilter
-
   Defined globals:
-  - g_onlyPerfectCombines
-  - g_perfectAndPerfectWithExtrasCombines
-  - g_onlyPerfectWithExtrasCombines
-  - g_onlyImperfectCombines
-  - g_noCombines
+  - g_onlyPerfectCombines: CombineResultLevel
+  - g_perfectAndPerfectWithExtrasCombines: CombineResultLevel
+  - g_onlyPerfectWithExtrasCombines: CombineResultLevel
+  - g_onlyImperfectCombines: CombineResultLevel
+  - g_noCombines: CombineResultLevel
+
+  Defined classes:
+  - CleanedUpItemList
+    - level: CombineResultLevel
+    - items: Item[]
+    - hasSources: bool
+
+  - CombineResultFilter
 
   Desired match sorting order:
   - Put the single most fit perfect match (item + enchants) first.
@@ -64,10 +69,7 @@ class CombineResultFilter {
   }
 
 
-  // returns object;
-  // - level: CombineResultLevel
-  // - items: Item[]
-  // - hasSources: bool
+  // returns CleanedUpItemList
   GetCleanedUpItemList(sourceItems, combinedItems) {
     let itemGroups = this.SortItemsInGroups([...sourceItems, ...combinedItems])
 
