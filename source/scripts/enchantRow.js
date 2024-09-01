@@ -8,7 +8,6 @@
 
   Defined classes:
   - EnchantRow
-    - set: DataSet
 */
 
 
@@ -16,21 +15,12 @@
 
 
 class EnchantRow extends TableRow {
-  constructor(rowElemJQ, set) {
+  constructor(rowElemJQ) {
     super(rowElemJQ)
 
-    // ==== PUBLIC ====
-    this.set = set
-
     // ==== PRIVATE ====
-    if (set === g_source || set === g_desired) {
-      this.idElemJQ = rowElemJQ.find('select[name="enchantID"]')
-      this.levelElemJQ = rowElemJQ.find('select[name="level"]')
-    }
-    else if (set === g_combined) {
-      this.nameElemJQ = rowElemJQ.find('.name')
-      this.levelElemJQ = rowElemJQ.find('.level')
-    }
+    this.idElemJQ = rowElemJQ.find('select[name="enchantID"]')
+    this.levelElemJQ = rowElemJQ.find('select[name="level"]')
   }
 
 
@@ -43,10 +33,9 @@ class EnchantRow extends TableRow {
   // returns EnchantRow
   CreateNew(enchant, itemID, giveFocus, focusElemJQWhenAllGone, RemoveCallback) {
     let newRowElemJQ = super.MakeExtraRealRow()
-    let newRow = new EnchantRow(newRowElemJQ, this.set)
+    let newRow = new EnchantRow(newRowElemJQ)
 
-    if (this.set === g_source || this.set === g_desired)
-      newRow.HookUpGUI(itemID, RemoveCallback)
+    newRow.HookUpGUI(itemID, RemoveCallback)
 
     if (enchant !== undefined)
       newRow.SetEnchant(enchant) // performs an UpdateLevelOptions as well
@@ -54,7 +43,7 @@ class EnchantRow extends TableRow {
       newRow.UpdateLevelOptions()
 
     newRow.focusElemJQWhenAllGone = focusElemJQWhenAllGone
-    if (giveFocus && this.set === g_source || this.set === g_desired)
+    if (giveFocus)
       newRow.idElemJQ[0].focus()
 
     return newRow
@@ -62,20 +51,18 @@ class EnchantRow extends TableRow {
 
 
   Remove() {
-    if (this.set === g_source || this.set === g_desired) {
-      let focusRowElemJQ = this.rowElemJQ.next()
-      if (focusRowElemJQ.length == 0)
-        focusRowElemJQ = this.rowElemJQ.prev()
+    let focusRowElemJQ = this.rowElemJQ.next()
+    if (focusRowElemJQ.length == 0)
+      focusRowElemJQ = this.rowElemJQ.prev()
 
-      let focusElemJQ
-      if (focusRowElemJQ.length > 0 && focusRowElemJQ.attr('data-real') != 0)
-        focusElemJQ = focusRowElemJQ.find('button[name="removeEnchant"]')
-      else
-        focusElemJQ = this.focusElemJQWhenAllGone
+    let focusElemJQ
+    if (focusRowElemJQ.length > 0 && focusRowElemJQ.attr('data-real') != 0)
+      focusElemJQ = focusRowElemJQ.find('button[name="removeEnchant"]')
+    else
+      focusElemJQ = this.focusElemJQWhenAllGone
 
-      if (focusElemJQ?.length > 0)
-        focusElemJQ[0].focus()
-    }
+    if (focusElemJQ?.length > 0)
+      focusElemJQ[0].focus()
 
     super.Remove()
   }
@@ -91,15 +78,9 @@ class EnchantRow extends TableRow {
 
 
   SetEnchant(enchant) {
-    if (this.set === g_source || this.set === g_desired) {
-      this.idElemJQ.val(enchant.id)
-      this.UpdateLevelOptions(this.idElemJQ, this.levelElemJQ)
-      this.levelElemJQ.val(enchant.level)
-    }
-    else if (this.set === g_combined) {
-      this.nameElemJQ.text(enchant.info.name)
-      this.levelElemJQ.text(GetRomanNumeralForLevel(enchant.level))
-    }
+    this.idElemJQ.val(enchant.id)
+    this.UpdateLevelOptions(this.idElemJQ, this.levelElemJQ)
+    this.levelElemJQ.val(enchant.level)
   }
 
 

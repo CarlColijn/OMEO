@@ -12,10 +12,15 @@
         </Folder>
         <Folder name="javascript">
             <File name="source\scripts\bitSerializer.js" />
+            <File name="source\scripts\combinedEnchantRow.js" />
+            <File name="source\scripts\combinedItemRow.js" />
+            <File name="source\scripts\combinedItemTable.js" />
             <File name="source\scripts\combineResultFilter.js" />
             <File name="source\scripts\dataSets.js" />
             <File name="source\scripts\dataStream.js" />
             <File name="source\scripts\enchant.js" />
+            <File name="source\scripts\desiredItemRow.js" />
+            <File name="source\scripts\desiredItemTable.js" />
             <File name="source\scripts\enchantCombiner.js" />
             <File name="source\scripts\enchantConflicts.js" />
             <File name="source\scripts\enchantInfo.js" />
@@ -29,8 +34,6 @@
             <File name="source\scripts\itemCombineWorker.js" />
             <File name="source\scripts\itemInfo.js" />
             <File name="source\scripts\itemOrigins.js" />
-            <File name="source\scripts\itemRow.js" />
-            <File name="source\scripts\itemTable.js" />
             <File name="source\scripts\mainForm.js" />
             <File name="source\scripts\mainFormData.js" />
             <File name="source\scripts\mainFormHandler.js" />
@@ -38,6 +41,8 @@
             <File name="source\scripts\recipeFormData.js" />
             <File name="source\scripts\recipeFormHandler.js" />
             <File name="source\scripts\recipeTable.js" />
+            <File name="source\scripts\sourceItemRow.js" />
+            <File name="source\scripts\sourceItemTable.js" />
             <File name="source\scripts\tableRow.js" />
         </Folder>
         <Folder name="other">
@@ -60,9 +65,14 @@
     <Project name="testing">
         <Folder name="javascript">
             <File name="testing\bitSerializer.js" />
+            <File name="testing\combinedEnchantRow.js" />
+            <File name="testing\combinedItemRow.js" />
+            <File name="testing\combinedItemTable.js" />
             <File name="testing\combineResultFilter.js" />
             <File name="testing\dataSets.js" />
             <File name="testing\dataStream.js" />
+            <File name="testing\desiredItemRow.js" />
+            <File name="testing\desiredItemTable.js" />
             <File name="testing\enchant.js" />
             <File name="testing\enchantCombiner.js" />
             <File name="testing\enchantConflicts.js" />
@@ -77,11 +87,11 @@
             <File name="testing\itemCombineWorker.js" />
             <File name="testing\itemInfo.js" />
             <File name="testing\itemOrigins.js" />
-            <File name="testing\itemRow.js" />
-            <File name="testing\itemTable.js" />
             <File name="testing\mainFormData.js" />
             <File name="testing\recipeFormData.js" />
             <File name="testing\recipeTable.js" />
+            <File name="testing\sourceItemRow.js" />
+            <File name="testing\sourceItemTable.js" />
             <File name="testing\tableRow.js" />
         </Folder>
         <Folder name="html">

@@ -36,9 +36,14 @@ let mainAccessObjectNames = [
   'EnchantIDsConflict',
   'BitRestorer',
   'BitStorer',
+  'CombinedEnchantRow',
+  'CombinedItemRow',
+  'CombinedItemTable',
   'CombineResultFilter',
   'DataStream',
   'DataStreamLoadingOptions',
+  'DesiredItemRow',
+  'DesiredItemTable',
   'Enchant',
   'EnchantCombiner',
   'EnchantRow',
@@ -47,10 +52,10 @@ let mainAccessObjectNames = [
   'ItemCombineList',
   'ItemCombiner',
   'ItemCombineTester',
-  'ItemRow',
-  'ItemTable',
   'MainFormData',
   'RehydrateItems',
+  'SourceItemRow',
+  'SourceItemTable',
   'TableRow',
   'ZeroOrigin',
   'g_combined',
@@ -294,30 +299,6 @@ function GetSetName(set) {
 
 
 
-class TemplateRowDetails {
-  constructor() {
-    this.row = undefined // ItemRow; to be filled in later
-    this.ShowDetails = MakeCallbackFunctionMock()
-  }
-}
-
-
-// returns TemplateRowDetails
-function GetItemTemplateRow(testContainerID, set) {
-  let templateRowElemJQ = $(`#${testContainerID} .template.item`)
-  let details = new TemplateRowDetails()
-  details.row = new ItemRow(details.ShowDetails, templateRowElemJQ, set, false)
-  return details
-}
-
-
-function CreateItemRow(templateRowDetails, item, nr) {
-  return templateRowDetails.row.CreateNew(nr ?? 1, item, false, undefined)
-}
-
-
-
-
 function GetGUITextForEnchantLevel(enchant) {
   let text = ['-','I','II','III','IV','V','VI','VII','VII','VIII','IX','X'][enchant.level]
   if (text === undefined)
@@ -342,210 +323,6 @@ function GetEnchantLevelFromGUIText(guiText) {
   if (level === undefined)
     level = '!ERR!'
   return level
-}
-
-
-// returns { type, typeDetails }
-function GetTypeAndDetailsForItemInTable(set, item) {
-  let type = item.info.name
-  let typeDetails = ''
-  if (set === g_combined) {
-    if (item.set === g_source)
-      typeDetails = `source nr. ${item.nr}`
-    else if (item.set === g_extra)
-      typeDetails = 'extra'
-  }
-  return {
-    type: type,
-    typeDetails: typeDetails
-  }
-}
-
-
-function GetItemRowDetails(itemRowElemJQ, set) {
-  let MakeNumberSafe = (numberElemJQ) => {
-    let value = numberElemJQ.text()
-    return value === '' ? undefined : parseInt(value)
-  }
-
-  let MakeTextSafe = (textElemJQ) => {
-    return textElemJQ.text()
-  }
-
-  let nr = MakeNumberSafe(itemRowElemJQ.find('.nr'))
-  let cost
-  switch (set) {
-    case g_source:
-    case g_desired:
-      cost = undefined
-      break
-    case g_combined:
-      cost = MakeNumberSafe(itemRowElemJQ.find('.cost'))
-      break
-  }
-  let count
-  switch (set) {
-    case g_source:
-      let countElemJQ = itemRowElemJQ.find('[name=count]')
-      count = parseInt(countElemJQ.val())
-      break
-    case g_desired:
-      count = undefined
-      break
-    case g_combined:
-      count = MakeNumberSafe(itemRowElemJQ.find('.count'))
-      break
-  }
-  let type
-  let typeDetails
-  switch (set) {
-    case g_source:
-    case g_desired:
-      let typeElemJQ = itemRowElemJQ.find('[name=itemID]')
-      let typeID = typeElemJQ.val()
-      typeID = typeID === undefined ? undefined : parseInt(typeID)
-      type = g_itemInfosByID.get(typeID).name
-      typeDetails = ''
-      break
-    case g_combined:
-      type = MakeTextSafe(itemRowElemJQ.find('.type'))
-      let detailsStart = type.indexOf(' (')
-      if (detailsStart == -1)
-        typeDetails = ''
-      else {
-        typeDetails = type.slice(detailsStart + 2, -1)
-        type = type.slice(0, detailsStart)
-      }
-      break
-  }
-  let priorWork
-  switch (set) {
-    case g_source:
-      let priorWorkElemJQ = itemRowElemJQ.find('[name=priorWork]')
-      priorWork = parseInt(priorWorkElemJQ.val())
-      break
-    case g_desired:
-      priorWork = undefined
-      break
-    case g_combined:
-      priorWork = MakeNumberSafe(itemRowElemJQ.find('.priorWork'))
-      break
-  }
-  let enchantNames
-  switch (set) {
-    case g_source:
-    case g_desired:
-      enchantNames = ''
-      itemRowElemJQ.find('[name=enchantID]').each((inputNr, inputElem) => {
-        let inputElemJQ = $(inputElem)
-        let rowElemJQ = inputElemJQ.parent().parent()
-        if (rowElemJQ.attr('data-real') != 0) {
-          let enchantID = parseInt(inputElemJQ.val())
-          if (enchantNames != '')
-            enchantNames += '/'
-          enchantNames += g_enchantInfosByID.get(enchantID).name
-        }
-      })
-      break
-    case g_combined:
-      enchantNames = ''
-      itemRowElemJQ.find('.enchant .name').each((enchantNr, nameElem) => {
-        let nameElemJQ = $(nameElem)
-        let rowElemJQ = nameElemJQ.parent().parent()
-        if (rowElemJQ.attr('data-real') != 0) {
-          if (enchantNames != '')
-            enchantNames += '/'
-          enchantNames += MakeTextSafe(nameElemJQ)
-        }
-      })
-      break
-  }
-  let enchantLevels
-  switch (set) {
-    case g_source:
-    case g_desired:
-      enchantLevels = ''
-      itemRowElemJQ.find('[name=level]').each((inputNr, inputElem) => {
-        let inputElemJQ = $(inputElem)
-        let rowElemJQ = inputElemJQ.parent().parent()
-        if (rowElemJQ.attr('data-real') != 0) {
-          if (enchantLevels != '')
-            enchantLevels += '/'
-          enchantLevels += inputElemJQ.val()
-        }
-      })
-      break
-    case g_combined:
-      enchantLevels = ''
-      itemRowElemJQ.find('.enchant .level').each((enchantNr, levelElem) => {
-        let levelElemJQ = $(levelElem)
-        let rowElemJQ = levelElemJQ.parent().parent()
-        if (rowElemJQ.attr('data-real') != 0) {
-          if (enchantLevels != '')
-            enchantLevels += '/'
-          enchantLevels += GetEnchantLevelFromGUIText(MakeTextSafe(levelElemJQ))
-        }
-      })
-      break
-  }
-
-  return {
-    'nr': nr,
-    'cost': cost,
-    'count': count,
-    'type': type,
-    'typeDetails': typeDetails,
-    'priorWork': priorWork,
-    'enchantNames': enchantNames,
-    'enchantLevels': enchantLevels
-  }
-}
-
-
-function ItemRowInTable(testContainerID, type, typeDetails, set) {
-  let foundRow = false
-  $(`#${testContainerID} tr.item`).each((rowNr, itemRowElem) => {
-    let itemRowElemJQ = $(itemRowElem)
-    let details = GetItemRowDetails(itemRowElemJQ, set)
-    if (details.type == type && details.typeDetails == typeDetails) {
-      foundRow = true
-      return false
-    }
-    return true
-  })
-
-  return foundRow
-}
-
-
-
-
-function MakeCallbackFunctionMock() {
-  let functor = () => {
-    functor.called = true
-  }
-  functor.called = false
-  return functor
-}
-
-
-
-
-class ItemTableDetails {
-  constructor() {
-    this.table = undefined // ItemTable; to be filled in later
-    this.ShowDetails = MakeCallbackFunctionMock()
-  }
-}
-
-
-// returns ItemTableDetails
-function GetItemTable(testContainerID, set) {
-  let tableElemJQ = $(`#${testContainerID}`)
-  let details = new ItemTableDetails()
-  details.tableElemJQ = tableElemJQ
-  details.table = new ItemTable(details.ShowDetails, tableElemJQ, undefined, set)
-  return details
 }
 
 

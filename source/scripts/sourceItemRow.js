@@ -10,8 +10,7 @@
   - guiHelpers.js
 
   Defined classes:
-  - ItemRow
-    - set: DataSet
+  - SourceItemRow
     - nr: int
 */
 
@@ -19,47 +18,27 @@
 // ======== PUBLIC ========
 
 
-class ItemRow extends TableRow {
-  constructor(ShowDetails, rowElemJQ, set, hookUpGUI) {
+class SourceItemRow extends TableRow {
+  constructor(rowElemJQ, hookUpGUI) {
     super(rowElemJQ)
 
     // ==== PUBLIC ====
-    this.set = set
     this.nr = -1 // to be filled in later
 
     // ==== PRIVATE ====
-    this.ShowDetails = ShowDetails
-
     let enchantTemplateRowElemJQ = this.rowElemJQ.find('.template').first()
-    this.enchantTemplateRow = new EnchantRow(enchantTemplateRowElemJQ, this.set)
+    this.enchantTemplateRow = new EnchantRow(enchantTemplateRowElemJQ)
 
-    switch (set) {
-      case g_source:
-        this.countElemJQ = rowElemJQ.find('input[name="count"]')
-        this.iconElemJQ = rowElemJQ.find('.icon')
-        this.idElemJQ = rowElemJQ.find('select[name="itemID"]')
-        this.priorWorkElemJQ = rowElemJQ.find('select[name="priorWork"]')
+    this.countElemJQ = rowElemJQ.find('input[name="count"]')
+    this.iconElemJQ = rowElemJQ.find('.icon')
+    this.idElemJQ = rowElemJQ.find('select[name="itemID"]')
+    this.priorWorkElemJQ = rowElemJQ.find('select[name="priorWork"]')
 
-        // only once set up the item options in the template row;
-        // all created rows will inherit the options.
-        if (!this.IsReal()) {
-          this.SetupItemOptions()
-          this.SetupPriorWorkOptions()
-        }
-        break
-      case g_desired:
-        this.iconElemJQ = rowElemJQ.find('.icon')
-        this.idElemJQ = rowElemJQ.find('select[name="itemID"]')
-        this.SetupItemOptions()
-        break
-      case g_combined:
-        this.countElemJQ = rowElemJQ.find('.count')
-        this.iconElemJQ = rowElemJQ.find('.icon')
-        this.typeElemJQ = rowElemJQ.find('.type')
-        this.priorWorkElemJQ = rowElemJQ.find('.priorWork')
-        this.costElemJQ = rowElemJQ.find('.cost')
-        this.showDetailsElemJQ = rowElemJQ.find('[name=show]')
-        break
+    // only once set up the item options in the template row;
+    // all created rows will inherit the options.
+    if (!this.IsReal()) {
+      this.SetupItemOptions()
+      this.SetupPriorWorkOptions()
     }
 
     if (hookUpGUI) {
@@ -73,10 +52,10 @@ class ItemRow extends TableRow {
   }
 
 
-  // returns ItemRow
+  // returns SourceItemRow
   CreateNew(nr, item, giveFocus, focusElemJQWhenAllGone) {
     let newRowElemJQ = super.MakeExtraRealRow()
-    let newItemRow = new ItemRow(this.ShowDetails, newRowElemJQ, this.set, false)
+    let newItemRow = new SourceItemRow(newRowElemJQ, false)
 
     newItemRow.SetNumber(nr)
 
@@ -86,7 +65,7 @@ class ItemRow extends TableRow {
     newItemRow.HookUpGUI(item)
 
     newItemRow.focusElemJQWhenAllGone = focusElemJQWhenAllGone
-    if (giveFocus && newItemRow.set === g_source || newItemRow.set === g_desired)
+    if (giveFocus)
       newItemRow.idElemJQ[0].focus()
 
     return newItemRow
@@ -94,20 +73,18 @@ class ItemRow extends TableRow {
 
 
   Remove() {
-    if (this.set === g_source || this.set === g_desired) {
-      let focusRowElemJQ = this.rowElemJQ.next()
-      if (focusRowElemJQ.length == 0)
-        focusRowElemJQ = this.rowElemJQ.prev()
+    let focusRowElemJQ = this.rowElemJQ.next()
+    if (focusRowElemJQ.length == 0)
+      focusRowElemJQ = this.rowElemJQ.prev()
 
-      let focusElemJQ
-      if (focusRowElemJQ.length > 0 && focusRowElemJQ.attr('data-real') != 0)
-        focusElemJQ = focusRowElemJQ.find('button[name="removeItem"]')
-      else
-        focusElemJQ = this.focusElemJQWhenAllGone
+    let focusElemJQ
+    if (focusRowElemJQ.length > 0 && focusRowElemJQ.attr('data-real') != 0)
+      focusElemJQ = focusRowElemJQ.find('button[name="removeItem"]')
+    else
+      focusElemJQ = this.focusElemJQWhenAllGone
 
-      if (focusElemJQ?.length > 0)
-        focusElemJQ[0].focus()
-    }
+    if (focusElemJQ?.length > 0)
+      focusElemJQ[0].focus()
 
     super.Remove()
   }
@@ -116,12 +93,10 @@ class ItemRow extends TableRow {
   SetNumber(nr) {
     this.nr = nr
     this.rowElemJQ.attr('data-nr', nr)
-    if (this.set != g_combined)
-      this.rowElemJQ.find('.nr').text(nr)
+    this.rowElemJQ.find('.nr').text(nr)
   }
 
 
-  // only for source and desired
   SetCount(newCount) {
     this.countElemJQ.val(newCount)
   }
@@ -133,17 +108,13 @@ class ItemRow extends TableRow {
       SetIcon(this.iconElemJQ, this.itemID, hasEnchants)
     }
 
-    let itemID =
-      this.set === g_source || this.set === g_desired ?
-      this.itemID :
-      undefined
-    this.enchantTemplateRow.CreateNew(enchant, itemID, true, this.addEnchantElemJQ, RemoveEnchantCallback)
+    this.enchantTemplateRow.CreateNew(enchant, this.itemID, true, this.addEnchantElemJQ, RemoveEnchantCallback)
   }
 
 
   RemoveEnchants() {
     this.rowElemJQ.find('.enchants .enchant').each((rowNr, enchantRowElem) => {
-      let enchantRow = new EnchantRow($(enchantRowElem), this.set)
+      let enchantRow = new EnchantRow($(enchantRowElem))
       if (enchantRow.IsReal())
         enchantRow.Remove()
       return true
@@ -151,7 +122,6 @@ class ItemRow extends TableRow {
   }
 
 
-  // only for source and desired
   // returns object:
   // - item: Item
   // - withCountError: bool
@@ -168,13 +138,12 @@ class ItemRow extends TableRow {
 
     let item = new Item(
       countResult.count,
-      this.set,
+      g_source,
       parseInt(this.idElemJQ.val()),
-      this.set === g_source ? parseInt(this.priorWorkElemJQ.val()) : 0
+      parseInt(this.priorWorkElemJQ.val())
     )
     let enchantResult = this.AddItemEnchants(item)
-    if (this.set === g_source)
-      item.nr = parseInt(this.rowElemJQ.attr('data-nr'))
+    item.nr = parseInt(this.rowElemJQ.attr('data-nr'))
 
     return {
       item: item,
@@ -192,38 +161,9 @@ class ItemRow extends TableRow {
     if (item !== undefined)
       this.itemID = item.id
 
-    switch (this.set) {
-      case g_source:
-        this.countElemJQ.val(item.count)
-        this.idElemJQ.val(item.id)
-        this.priorWorkElemJQ.val(item.priorWork)
-        break
-      case g_desired:
-        this.idElemJQ.val(item.id)
-        break
-      case g_combined:
-        let itemSuffix
-        let hideDetailsButton = false
-        switch (item.set) {
-          case g_source:
-            itemSuffix = ` (source nr. ${item.nr})`
-            hideDetailsButton = true
-            break
-          case g_extra:
-            itemSuffix = ' (extra)'
-            break
-          case g_combined:
-            itemSuffix = ''
-            break
-        }
-        this.countElemJQ.text(item.count)
-        this.typeElemJQ.text(item.info.name + itemSuffix)
-        this.priorWorkElemJQ.text(item.priorWork)
-        this.costElemJQ.text(item.totalCost)
-        if (hideDetailsButton)
-          this.showDetailsElemJQ.hide()
-        break
-    }
+    this.countElemJQ.val(item.count)
+    this.idElemJQ.val(item.id)
+    this.priorWorkElemJQ.val(item.priorWork)
 
     let hasEnchants = item.enchantsByID.size > 0
     SetIcon(this.iconElemJQ, this.itemID, hasEnchants)
@@ -237,10 +177,10 @@ class ItemRow extends TableRow {
 
   // returns Item
   EnsureAppropriateItemUsed(item) {
-    if (item === undefined && this.set !== g_combined) {
+    if (item === undefined) {
       item = new Item(
         1,
-        this.set,
+        g_source,
         parseInt(this.idElemJQ.val()),
         0
       )
@@ -268,7 +208,7 @@ class ItemRow extends TableRow {
 
   RenumberAllRows(tbodyElemJQ) {
     tbodyElemJQ.find('.item').each((rowNr, rowElem) => {
-      new ItemRow(this.ShowDetails, $(rowElem), g_source, false).SetNumber(rowNr)
+      new SourceItemRow($(rowElem), false).SetNumber(rowNr)
     })
   }
 
@@ -281,35 +221,25 @@ class ItemRow extends TableRow {
 
 
   HookUpGUI(item) {
-    if (this.set === g_source) {
-      this.rowElemJQ.find('button[name="removeItem"]').click(() => {
-        let tbodyElemJQ = this.rowElemJQ.parent()
+    this.rowElemJQ.find('button[name="removeItem"]').click(() => {
+      let tbodyElemJQ = this.rowElemJQ.parent()
 
-        this.Remove()
+      this.Remove()
 
-        this.RenumberAllRows(tbodyElemJQ)
-      })
-    }
+      this.RenumberAllRows(tbodyElemJQ)
+    })
 
-    if (this.set === g_source || this.set === g_desired) {
-      this.idElemJQ.change(() => {
-        this.itemID = parseInt(this.idElemJQ.val())
-        SetIcon(this.iconElemJQ, this.itemID, false)
-        this.SyncEnchantOptions()
-      })
+    this.idElemJQ.change(() => {
+      this.itemID = parseInt(this.idElemJQ.val())
+      SetIcon(this.iconElemJQ, this.itemID, false)
+      this.SyncEnchantOptions()
+    })
 
-      this.addEnchantElemJQ = this.rowElemJQ.find('button[name="addEnchant"]')
-      this.addEnchantElemJQ.click(() => {
-        SetIcon(this.iconElemJQ, this.itemID, true)
-        this.AddEnchant()
-      })
-    }
-
-    if (this.set === g_combined) {
-      this.rowElemJQ.find('button[name="show"]').click(() => {
-        this.ShowDetails(item)
-      })
-    }
+    this.addEnchantElemJQ = this.rowElemJQ.find('button[name="addEnchant"]')
+    this.addEnchantElemJQ.click(() => {
+      SetIcon(this.iconElemJQ, this.itemID, true)
+      this.AddEnchant(undefined)
+    })
   }
 
 
@@ -318,12 +248,9 @@ class ItemRow extends TableRow {
   // - inError: bool
   // - errorElemJQ: JQuery-wrapped input element, if applicable
   GetValidatedCount() {
-    let count = 1
-    let inError = false
-    if (this.set === g_source) {
-      count = parseInt(this.countElemJQ.val())
-      inError = isNaN(count)
-    }
+    let count = parseInt(this.countElemJQ.val())
+    let inError = isNaN(count)
+
     return {
       count: count,
       inError: inError,
@@ -353,7 +280,7 @@ class ItemRow extends TableRow {
     let foundEnchants = []
     this.rowElemJQ.find('.enchants .enchant').each((rowNr, enchantRowElem) => {
       let enchantRowElemJQ = $(enchantRowElem)
-      let enchantRow = new EnchantRow(enchantRowElemJQ, this.set)
+      let enchantRow = new EnchantRow(enchantRowElemJQ)
       if (enchantRow.IsReal()) {
         let enchant = enchantRow.GetEnchant()
         foundEnchants.forEach((previousEnchant) => {

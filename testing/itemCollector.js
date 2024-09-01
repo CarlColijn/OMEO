@@ -1,8 +1,8 @@
 // returns ItemRow[]
-function CreateItemRows(templateRowDetails, items, jumpNrs) {
+function CreateSourceItemRows(templateRow, items, jumpNrs) {
   return items.map((item, itemNr) => {
     let rowNr = 1 + (jumpNrs ? itemNr * 2 : itemNr)
-    return CreateItemRow(templateRowDetails, item, rowNr)
+    return CreateSourceItemRow(templateRow, item, rowNr)
   })
 }
 
@@ -19,7 +19,7 @@ function ProcessItemRows(itemRows, mergeRows) {
 
 jazil.AddTestSet(mainPage, 'ItemCollector', {
   'Processing rows without issues goes OK': (jazil) => {
-    let templateRowDetails = GetItemTemplateRow('collectingItemRow', g_source)
+    let templateRow = GetSourceItemTemplateRow()
 
     let testItems = [
       BuildItem({ set:g_source, name:'Chestplate', count:12, priorWork:1 }),
@@ -27,7 +27,7 @@ jazil.AddTestSet(mainPage, 'ItemCollector', {
       BuildItem({ set:g_source, name:'Leggings', count:14, priorWork:3 }),
     ]
 
-    let itemRows = CreateItemRows(templateRowDetails, testItems, false)
+    let itemRows = CreateSourceItemRows(templateRow, testItems, false)
     let result = ProcessItemRows(itemRows, false)
 
     jazil.ShouldBe(result.withCountErrors, false, 'collector says there were count errors!')
@@ -40,7 +40,7 @@ jazil.AddTestSet(mainPage, 'ItemCollector', {
   },
 
   'Faulty row numbers get corrected': (jazil) => {
-    let templateRowDetails = GetItemTemplateRow('collectingItemRow', g_source)
+    let templateRow = GetSourceItemTemplateRow()
 
     let testItems = [
       BuildItem({ set:g_source, name:'Hoe', count:3, priorWork:1 }),
@@ -48,7 +48,7 @@ jazil.AddTestSet(mainPage, 'ItemCollector', {
       BuildItem({ set:g_source, name:'Shield', count:5, priorWork:3 }),
     ]
 
-    let itemRows = CreateItemRows(templateRowDetails, testItems, true)
+    let itemRows = CreateSourceItemRows(templateRow, testItems, true)
     let result = ProcessItemRows(itemRows, false)
 
     jazil.ShouldBe(result.withCountErrors, false, 'collector says there were count errors!')
@@ -70,7 +70,7 @@ jazil.AddTestSet(mainPage, 'ItemCollector', {
   },
 
   'Merging items works': (jazil) => {
-    let templateRowDetails = GetItemTemplateRow('collectingItemRow', g_source)
+    let templateRow = GetSourceItemTemplateRow()
 
     let testItems = [
       BuildItem({ set:g_source, name:'Book', tag:1, count:1, priorWork:2 }),
@@ -82,7 +82,7 @@ jazil.AddTestSet(mainPage, 'ItemCollector', {
       BuildItem({ set:g_source, name:'Book', tag:5, count:100, priorWork:3, enchants:[{ name:'Looting', level:3 }, { name:'Smite', level:2 }] }),
     ]
 
-    let itemRows = CreateItemRows(templateRowDetails, testItems, false)
+    let itemRows = CreateSourceItemRows(templateRow, testItems, false)
 
     // mimick what the merge has done to compare the result
     testItems[0].count += testItems[2].count
@@ -125,7 +125,7 @@ jazil.AddTestSet(mainPage, 'ItemCollector', {
   },
 
   'Explicitly not merging items works': (jazil) => {
-    let templateRowDetails = GetItemTemplateRow('collectingItemRow', g_source)
+    let templateRow = GetSourceItemTemplateRow()
 
     let testItems = [
       BuildItem({ set:g_source, name:'Sword', tag:1, count:1, priorWork:2 }),
@@ -137,7 +137,7 @@ jazil.AddTestSet(mainPage, 'ItemCollector', {
       BuildItem({ set:g_source, name:'Sword', tag:5, count:5, priorWork:3, enchants:[{ name:'Mending', level:1 }, { name:'Smite', level:1 }] }),
     ]
 
-    let itemRows = CreateItemRows(templateRowDetails, testItems, false)
+    let itemRows = CreateSourceItemRows(templateRow, testItems, false)
     let result = ProcessItemRows(itemRows, false)
 
     jazil.ShouldBe(result.withCountErrors, false, 'collector says there were count errors!')
@@ -155,7 +155,7 @@ jazil.AddTestSet(mainPage, 'ItemCollector', {
   },
 
   'Errors in counts get returned': (jazil) => {
-    let templateRowDetails = GetItemTemplateRow('collectingItemRow', g_source)
+    let templateRow = GetSourceItemTemplateRow()
 
     let testItems = [
       BuildItem({ set:g_source, name:'Boots', tag:1, count:1, priorWork:1 }),
@@ -163,7 +163,7 @@ jazil.AddTestSet(mainPage, 'ItemCollector', {
       BuildItem({ set:g_source, name:'Boots', tag:3, count:5, priorWork:1 }),
     ]
 
-    let itemRows = CreateItemRows(templateRowDetails, testItems, false)
+    let itemRows = CreateSourceItemRows(templateRow, testItems, false)
 
     // Update the middle item row's count to something non-numeric.
     // Just empty is the most cross-browser way to do so.

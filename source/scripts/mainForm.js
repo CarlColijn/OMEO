@@ -6,7 +6,9 @@
   - dataSets.js
   - enchantInfo.js
   - itemInfo.js
-  - itemTable.js
+  - sourceItemTable.js
+  - desiredItemTable.js
+  - combinedItemTable.js
   - itemRow.js
   - mainFormData.js
   - dataStream.js
@@ -77,9 +79,13 @@ class MainForm {
 
 
   InitializeSubObjects() {
-    this.sourceItemTable = new ItemTable(undefined, $('#sources table'), $('#addSourceItem'), g_source)
-    this.desiredItemTable = new ItemTable(undefined, $('#desired table'), undefined, g_desired)
-    this.combineItemTable = new ItemTable((item) => { this.ShowRecipePage(item) }, $('#combines table'), undefined, g_combined)
+    this.sourceItemTable = new SourceItemTable($('#sources table'), $('#addSourceItem'))
+    this.desiredItemTable = new DesiredItemTable($('#desired table'))
+
+    let ShowDetailsCallback = (item) => {
+      this.ShowRecipePage(item)
+    }
+    this.combineItemTable = new CombinedItemTable($('#combined table'), ShowDetailsCallback)
   }
 
 
@@ -210,7 +216,7 @@ class MainForm {
   // - mergedSourceItems: bool
   GetData(mergeSourceItems) {
     let sourceItemsResult = this.sourceItemTable.GetItems(new ItemCollector(mergeSourceItems))
-    let desiredItemResult = this.desiredItemTable.GetItems(new ItemCollector(false))
+    let desiredItemResult = this.desiredItemTable.GetItem(new ItemCollector(false))
 
     let data = new MainFormData()
     data.AddSourceItems(sourceItemsResult.items)
@@ -259,7 +265,7 @@ class MainForm {
   SetData(data) {
     this.ClearResult()
     this.sourceItemTable.SetItems(data.sourceItems)
-    this.desiredItemTable.SetItems([data.desiredItem])
+    this.desiredItemTable.SetItem(data.desiredItem)
   }
 
 

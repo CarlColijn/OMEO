@@ -59,9 +59,14 @@
     <script src="combineResultFilter.js"></script>
     <script src="tableRow.js"></script>
     <script src="enchantRow.js"></script>
-    <script src="itemRow.js"></script>
+    <script src="combinedEnchantRow.js"></script>
+    <script src="sourceItemRow.js"></script>
+    <script src="desiredItemRow.js"></script>
+    <script src="combinedItemRow.js"></script>
+    <script src="sourceItemTable.js"></script>
+    <script src="desiredItemTable.js"></script>
+    <script src="combinedItemTable.js"></script>
     <script src="itemCollector.js"></script>
-    <script src="itemTable.js"></script>
     <script src="recipeFormData.js"></script>
     <script src="recipeTable.js"></script>
   </head>
@@ -80,8 +85,8 @@
         </tbody>
       </table>
 
-      <table id="sourceEnchantRow" class="source table enchants">
-        <caption>Enchant rows, source style</caption>
+      <table id="enchantRow" class="source table enchants">
+        <caption>Enchant rows</caption>
         <tbody>
           <tr class="template enchant" data-real="0">
             <td><select name="enchantID" class="enchantInput"></select></td>
@@ -91,19 +96,8 @@
         </tbody>
       </table>
 
-      <table id="desiredEnchantRow" class="desired table enchants">
-        <caption>Enchant rows, desired style</caption>
-        <tbody>
-          <tr class="template enchant" data-real="0">
-            <td><select name="enchantID" class="enchantInput"></select></td>
-            <td><select name="level"></select></td>
-            <td><button type="button" name="removeEnchant">Remove enchantment</button></td>
-          </tr>
-        </tbody>
-      </table>
-
-      <table id="combinesEnchantRow" class="combines table enchants">
-        <caption>Enchant rows, combine style</caption>
+      <table id="combinedEnchantRow" class="combines table enchants">
+        <caption>Combine enchant rows</caption>
         <tbody>
           <tr class="template enchant" data-real="0">
             <td><span class="name"></span> <span class="level"></span></td>
@@ -112,7 +106,7 @@
       </table>
 
       <table id="sourceItemRow" class="source table items">
-        <caption>Item rows, source style</caption>
+        <caption>Source item rows</caption>
         <tbody>
           <tr class="template item" data-real="0" data-nr="0">
             <td><span class="nr"></span></td>
@@ -135,9 +129,9 @@
       </table>
 
       <table id="desiredItemRow" class="desired table items">
-        <caption>Item rows, desired style</caption>
+        <caption>Desired item rows</caption>
         <tbody>
-          <tr class="template item" data-real="0" data-nr="0">
+          <tr class="item" data-real="1">
             <td><span class="nr"></span></td>
             <td><select name="itemID"></select></td>
             <td>
@@ -155,8 +149,8 @@
         </tbody>
       </table>
 
-      <table id="combinesItemRow" class="combines table items">
-        <caption>Item rows, combine style</caption>
+      <table id="combinedItemRow" class="combines table items">
+        <caption>Combine item rows</caption>
         <tbody>
           <tr class="template item" data-real="0" data-nr="0">
             <td><span class="count"></span></td>
@@ -176,31 +170,8 @@
         </tbody>
       </table>
 
-      <table id="collectingItemRow" class="source table items">
-        <caption>Item rows, for collecting</caption>
-        <tbody>
-          <tr class="template item" data-real="0" data-nr="0">
-            <td><span class="nr"></span></td>
-            <td><input name="count" type="number" min="1" value="1"></td>
-            <td><select name="itemID"></select></td>
-            <td>
-              <table class="enchants">
-                <tbody>
-                  <tr class="template enchant" data-real="0">
-                    <td><select name="enchantID" class="enchantInput"></select></td>
-                    <td><select name="level"></select></td>
-                    <td><button type="button" name="removeEnchant">Remove enchantment</button></td>
-                  </tr>
-                </tbody>
-              </table>
-            </td>
-            <td><select name="priorWork" class="priorWork"></select></td>
-          </tr>
-        </tbody>
-      </table>
-
       <table id="sourceItemTable" class="source table items">
-        <caption>Item table, source style</caption>
+        <caption>Source item table</caption>
         <tbody>
           <tr class="template item" data-real="0" data-nr="0">
             <td><span class="nr"></span></td>
@@ -223,7 +194,7 @@
       </table>
 
       <table id="desiredItemTable" class="desired table items">
-        <caption>Item table, desired style</caption>
+        <caption>Desired item table</caption>
         <tbody>
           <tr class="item" data-real="1" data-nr="1">
             <td><span class="nr"></span></td>
@@ -243,8 +214,8 @@
         </tbody>
       </table>
 
-      <table id="combinesItemTable" class="combines table items">
-        <caption>Item table, combine style</caption>
+      <table id="combinedItemTable" class="combines table items">
+        <caption>Combined item table</caption>
         <tbody>
           <tr class="template item" data-real="0" data-nr="0">
             <td><span class="count"></span></td>
