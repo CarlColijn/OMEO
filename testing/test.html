@@ -57,6 +57,7 @@
     <script src="itemCombiner.js"></script>
     <script src="itemCombineWorker.js"></script>
     <script src="combineResultFilter.js"></script>
+    <script src="tableRow.js"></script>
     <script src="enchantRow.js"></script>
     <script src="itemRow.js"></script>
     <script src="itemCollector.js"></script>
@@ -70,6 +71,15 @@
     </div>
 
     <div id="testObjects">
+      <table id="tableRow" class="table">
+        <caption>Table rows</caption>
+        <tbody>
+          <tr class="template tableRow" data-real="0">
+            <td><span class="description"></span></td>
+          </tr>
+        </tbody>
+      </table>
+
       <table id="sourceEnchantRow" class="source table enchants">
         <caption>Enchant rows, source style</caption>
         <tbody>

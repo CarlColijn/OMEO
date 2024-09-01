@@ -2,6 +2,7 @@
   Wrapper for a single row in an enchant table.
 
   Prerequisites:
+  - tableRow.js
   - dataSets.js
   - enchant.js
 
@@ -14,13 +15,14 @@
 // ======== PUBLIC ========
 
 
-class EnchantRow {
+class EnchantRow extends TableRow {
   constructor(rowElemJQ, set) {
+    super(rowElemJQ)
+
     // ==== PUBLIC ====
     this.set = set
 
     // ==== PRIVATE ====
-    this.rowElemJQ = rowElemJQ
     if (set === g_source || set === g_desired) {
       this.idElemJQ = rowElemJQ.find('select[name="enchantID"]')
       this.levelElemJQ = rowElemJQ.find('select[name="level"]')
@@ -29,14 +31,6 @@ class EnchantRow {
       this.nameElemJQ = rowElemJQ.find('.name')
       this.levelElemJQ = rowElemJQ.find('.level')
     }
-
-    this.isReal = rowElemJQ.attr('data-real') != 0
-  }
-
-
-  // returns bool
-  IsReal() {
-    return this.isReal
   }
 
 
@@ -48,7 +42,8 @@ class EnchantRow {
 
   // returns EnchantRow
   CreateNew(enchant, itemID, giveFocus, focusElemJQWhenAllGone, RemoveCallback) {
-    let newRow = this.MakeExtraRealRow()
+    let newRowElemJQ = super.MakeExtraRealRow()
+    let newRow = new EnchantRow(newRowElemJQ, this.set)
 
     if (this.set === g_source || this.set === g_desired)
       newRow.HookUpGUI(itemID, RemoveCallback)
@@ -82,7 +77,7 @@ class EnchantRow {
         focusElemJQ[0].focus()
     }
 
-    this.rowElemJQ.remove()
+    super.Remove()
   }
 
 
@@ -121,18 +116,6 @@ class EnchantRow {
       if (itemInfo.CanHaveEnchant(enchantInfo.id))
         this.idElemJQ.append(`<option value="${enchantInfo.id}">${enchantInfo.name}</option>`)
     }
-  }
-
-
-  // returns EnchantRow
-  MakeExtraRealRow() {
-    let newRowElemJQ = this.rowElemJQ.clone()
-    let rowParentElemJQ = this.rowElemJQ.parent()
-    newRowElemJQ.appendTo(rowParentElemJQ)
-    newRowElemJQ.removeClass('template')
-    newRowElemJQ.attr('data-real', '1')
-
-    return new EnchantRow(newRowElemJQ, this.set)
   }
 
 

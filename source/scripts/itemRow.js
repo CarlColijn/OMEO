@@ -2,6 +2,7 @@
   Wrapper for a single row in an item table.
 
   Prerequisites:
+  - tableRow.js
   - dataSets.js
   - enchantInfo.js
   - enchantRow.js
@@ -18,17 +19,16 @@
 // ======== PUBLIC ========
 
 
-class ItemRow {
+class ItemRow extends TableRow {
   constructor(ShowDetails, rowElemJQ, set, hookUpGUI) {
+    super(rowElemJQ)
+
     // ==== PUBLIC ====
     this.set = set
     this.nr = -1 // to be filled in later
 
     // ==== PRIVATE ====
     this.ShowDetails = ShowDetails
-
-    this.rowElemJQ = rowElemJQ
-    this.isReal = rowElemJQ.attr('data-real') != 0
 
     let enchantTemplateRowElemJQ = this.rowElemJQ.find('.template').first()
     this.enchantTemplateRow = new EnchantRow(enchantTemplateRowElemJQ, this.set)
@@ -42,7 +42,7 @@ class ItemRow {
 
         // only once set up the item options in the template row;
         // all created rows will inherit the options.
-        if (!this.isReal) {
+        if (!this.IsReal()) {
           this.SetupItemOptions()
           this.SetupPriorWorkOptions()
         }
@@ -64,7 +64,7 @@ class ItemRow {
 
     if (hookUpGUI) {
       let item = undefined
-      if (this.isReal) {
+      if (this.IsReal()) {
         item = this.EnsureAppropriateItemUsed(item)
         this.SetItem(item)
       }
@@ -75,7 +75,8 @@ class ItemRow {
 
   // returns ItemRow
   CreateNew(nr, item, giveFocus, focusElemJQWhenAllGone) {
-    let newItemRow = this.MakeExtraRealRow()
+    let newRowElemJQ = super.MakeExtraRealRow()
+    let newItemRow = new ItemRow(this.ShowDetails, newRowElemJQ, this.set, false)
 
     newItemRow.SetNumber(nr)
 
@@ -89,11 +90,6 @@ class ItemRow {
       newItemRow.idElemJQ[0].focus()
 
     return newItemRow
-  }
-
-
-  IsReal() {
-    return this.isReal
   }
 
 
@@ -113,7 +109,7 @@ class ItemRow {
         focusElemJQ[0].focus()
     }
 
-    this.rowElemJQ.remove()
+    super.Remove()
   }
 
 
@@ -314,18 +310,6 @@ class ItemRow {
         this.ShowDetails(item)
       })
     }
-  }
-
-
-  // returns ItemRow
-  MakeExtraRealRow() {
-    let newRowElemJQ = this.rowElemJQ.clone()
-    newRowElemJQ.appendTo(this.rowElemJQ.parent())
-
-    newRowElemJQ.removeClass('template')
-    newRowElemJQ.attr('data-real', 1)
-
-    return new ItemRow(this.ShowDetails, newRowElemJQ, this.set, false)
   }
 
 

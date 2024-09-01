@@ -51,6 +51,7 @@ let mainAccessObjectNames = [
   'ItemTable',
   'MainFormData',
   'RehydrateItems',
+  'TableRow',
   'ZeroOrigin',
   'g_combined',
   'g_dataSetsByID',

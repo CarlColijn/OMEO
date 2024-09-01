@@ -39,6 +39,7 @@
             <File name="source\scripts\recipeFormData.js" />
             <File name="source\scripts\recipeFormHandler.js" />
             <File name="source\scripts\recipeTable.js" />
+            <File name="source\scripts\tableRow.js" />
         </Folder>
         <Folder name="other">
             <File name="source\browserconfig.xml" />
@@ -82,6 +83,7 @@
         <File name="testing\ratedItem.js" />
         <File name="testing\recipeFormData.js" />
         <File name="testing\recipeTable.js" />
+        <File name="testing\tableRow.js" />
         <File name="testing\test.html" />
         <File name="startTests.py" />
     </Project>
