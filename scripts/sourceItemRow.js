@@ -2,7 +2,7 @@
   Wrapper for a single row in an item table.
 
   Prerequisites:
-  - tableRow.js
+  - templateElement.js
   - dataSets.js
   - enchantInfo.js
   - enchantRow.js
@@ -10,6 +10,7 @@
   - guiHelpers.js
 
   Defined classes:
+  - SourceItemRowTemplate
   - SourceItemRow
     - nr: int
 */
@@ -18,43 +19,18 @@
 // ======== PUBLIC ========
 
 
-class SourceItemRow extends TableRow {
+class SourceItemRowTemplate extends TemplateElement {
   constructor(rowElemJQ, hookUpGUI) {
     super(rowElemJQ)
 
-    // ==== PUBLIC ====
-    this.nr = -1 // to be filled in later
-
-    // ==== PRIVATE ====
-    let enchantTemplateRowElemJQ = this.rowElemJQ.find('.template').first()
-    this.enchantTemplateRow = new EnchantRow(enchantTemplateRowElemJQ)
-
-    this.countElemJQ = rowElemJQ.find('input[name="count"]')
-    this.iconElemJQ = rowElemJQ.find('.icon')
-    this.idElemJQ = rowElemJQ.find('select[name="itemID"]')
-    this.priorWorkElemJQ = rowElemJQ.find('select[name="priorWork"]')
-
-    // only once set up the item options in the template row;
-    // all created rows will inherit the options.
-    if (!this.IsReal()) {
-      this.SetupItemOptions()
-      this.SetupPriorWorkOptions()
-    }
-
-    if (hookUpGUI) {
-      let item = undefined
-      if (this.IsReal()) {
-        item = this.EnsureAppropriateItemUsed(item)
-        this.SetItem(item)
-      }
-      this.HookUpGUI(item)
-    }
+    this.SetupItemOptions()
+    this.SetupPriorWorkOptions()
   }
 
 
   // returns SourceItemRow
   CreateNew(nr, item, giveFocus, focusElemJQWhenAllGone) {
-    let newRowElemJQ = super.MakeExtraRealRow()
+    let newRowElemJQ = super.CreateExtraElement()
     let newItemRow = new SourceItemRow(newRowElemJQ, false)
 
     newItemRow.SetNumber(nr)
@@ -72,10 +48,59 @@ class SourceItemRow extends TableRow {
   }
 
 
+  // ======== PRIVATE ========
+
+
+  SetupItemOptions() {
+    let itemSelectElemJQs = this.elemJQ.find('select[name="itemID"]')
+    for (let itemNr = 0; itemNr < g_numDifferentItems; ++itemNr) {
+      let itemInfo = g_itemInfos[itemNr]
+      itemSelectElemJQs.append(`<option value="${itemInfo.id}">${itemInfo.name}</option>`)
+    }
+  }
+
+
+  SetupPriorWorkOptions() {
+    let priorWorkSelectElemJQs = this.elemJQ.find('select[name="priorWork"]')
+    for (let priorWork = 0; priorWork <= 6; ++priorWork)
+      priorWorkSelectElemJQs.append(`<option value="${priorWork}">${priorWork}</option>`)
+  }
+}
+
+
+
+
+class SourceItemRow extends RealElement {
+  constructor(rowElemJQ, hookUpGUI) {
+    super(rowElemJQ)
+
+    // ==== PUBLIC ====
+    this.nr = -1 // to be filled in later
+
+    // ==== PRIVATE ====
+    let enchantTemplateRowElemJQ = this.elemJQ.find('.template').first()
+    this.enchantTemplateRow = new EnchantRowTemplate(enchantTemplateRowElemJQ)
+
+    this.countElemJQ = rowElemJQ.find('input[name="count"]')
+    this.iconElemJQ = rowElemJQ.find('.icon')
+    this.idElemJQ = rowElemJQ.find('select[name="itemID"]')
+    this.priorWorkElemJQ = rowElemJQ.find('select[name="priorWork"]')
+
+    if (hookUpGUI) {
+      let item = undefined
+      if (this.IsReal()) {
+        item = this.EnsureAppropriateItemUsed(item)
+        this.SetItem(item)
+      }
+      this.HookUpGUI(item)
+    }
+  }
+
+
   Remove() {
-    let focusRowElemJQ = this.rowElemJQ.next()
+    let focusRowElemJQ = this.elemJQ.next()
     if (focusRowElemJQ.length == 0)
-      focusRowElemJQ = this.rowElemJQ.prev()
+      focusRowElemJQ = this.elemJQ.prev()
 
     let focusElemJQ
     if (focusRowElemJQ.length > 0 && focusRowElemJQ.attr('data-real') != 0)
@@ -92,8 +117,8 @@ class SourceItemRow extends TableRow {
 
   SetNumber(nr) {
     this.nr = nr
-    this.rowElemJQ.attr('data-nr', nr)
-    this.rowElemJQ.find('.nr').text(nr)
+    this.elemJQ.attr('data-nr', nr)
+    this.elemJQ.find('.nr').text(nr)
   }
 
 
@@ -104,7 +129,7 @@ class SourceItemRow extends TableRow {
 
   AddEnchant(enchant) {
     let RemoveEnchantCallback = () => {
-      let hasEnchants = this.rowElemJQ.find('.enchant[data-real="1"]').length > 0
+      let hasEnchants = this.elemJQ.find('.enchant[data-real="1"]').length > 0
       SetIcon(this.iconElemJQ, this.itemID, hasEnchants)
     }
 
@@ -113,7 +138,7 @@ class SourceItemRow extends TableRow {
 
 
   RemoveEnchants() {
-    this.rowElemJQ.find('.enchants .enchant').each((rowNr, enchantRowElem) => {
+    this.elemJQ.find('.enchants .enchant').each((rowNr, enchantRowElem) => {
       let enchantRow = new EnchantRow($(enchantRowElem))
       if (enchantRow.IsReal())
         enchantRow.Remove()
@@ -143,7 +168,7 @@ class SourceItemRow extends TableRow {
       parseInt(this.priorWorkElemJQ.val())
     )
     let enchantResult = this.AddItemEnchants(item)
-    item.nr = parseInt(this.rowElemJQ.attr('data-nr'))
+    item.nr = parseInt(this.elemJQ.attr('data-nr'))
 
     return {
       item: item,
@@ -190,22 +215,6 @@ class SourceItemRow extends TableRow {
   }
 
 
-  SetupItemOptions() {
-    let itemSelectElemJQs = this.rowElemJQ.find('select[name="itemID"]')
-    for (let itemNr = 0; itemNr < g_numDifferentItems; ++itemNr) {
-      let itemInfo = g_itemInfos[itemNr]
-      itemSelectElemJQs.append(`<option value="${itemInfo.id}">${itemInfo.name}</option>`)
-    }
-  }
-
-
-  SetupPriorWorkOptions() {
-    let priorWorkSelectElemJQs = this.rowElemJQ.find('select[name="priorWork"]')
-    for (let priorWork = 0; priorWork <= 6; ++priorWork)
-      priorWorkSelectElemJQs.append(`<option value="${priorWork}">${priorWork}</option>`)
-  }
-
-
   RenumberAllRows(tbodyElemJQ) {
     tbodyElemJQ.find('.item').each((rowNr, rowElem) => {
       new SourceItemRow($(rowElem), false).SetNumber(rowNr)
@@ -221,8 +230,8 @@ class SourceItemRow extends TableRow {
 
 
   HookUpGUI(item) {
-    this.rowElemJQ.find('button[name="removeItem"]').click(() => {
-      let tbodyElemJQ = this.rowElemJQ.parent()
+    this.elemJQ.find('button[name="removeItem"]').click(() => {
+      let tbodyElemJQ = this.elemJQ.parent()
 
       this.Remove()
 
@@ -235,7 +244,7 @@ class SourceItemRow extends TableRow {
       this.SyncEnchantOptions()
     })
 
-    this.addEnchantElemJQ = this.rowElemJQ.find('button[name="addEnchant"]')
+    this.addEnchantElemJQ = this.elemJQ.find('button[name="addEnchant"]')
     this.addEnchantElemJQ.click(() => {
       SetIcon(this.iconElemJQ, this.itemID, true)
       this.AddEnchant(undefined)
@@ -278,7 +287,7 @@ class SourceItemRow extends TableRow {
       dupeElemJQ: undefined
     }
     let foundEnchants = []
-    this.rowElemJQ.find('.enchants .enchant').each((rowNr, enchantRowElem) => {
+    this.elemJQ.find('.enchants .enchant').each((rowNr, enchantRowElem) => {
       let enchantRowElemJQ = $(enchantRowElem)
       let enchantRow = new EnchantRow(enchantRowElemJQ)
       if (enchantRow.IsReal()) {

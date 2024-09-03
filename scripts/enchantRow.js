@@ -2,11 +2,12 @@
   Wrapper for a single row in an enchant table.
 
   Prerequisites:
-  - tableRow.js
+  - templateElement.js
   - dataSets.js
   - enchant.js
 
   Defined classes:
+  - EnchantRowTemplate
   - EnchantRow
 */
 
@@ -14,25 +15,15 @@
 // ======== PUBLIC ========
 
 
-class EnchantRow extends TableRow {
+class EnchantRowTemplate extends TemplateElement {
   constructor(rowElemJQ) {
     super(rowElemJQ)
-
-    // ==== PRIVATE ====
-    this.idElemJQ = rowElemJQ.find('select[name="enchantID"]')
-    this.levelElemJQ = rowElemJQ.find('select[name="level"]')
-  }
-
-
-  // returns jQuery-wrapped input element
-  GetIDElemJQ() {
-    return this.idElemJQ
   }
 
 
   // returns EnchantRow
   CreateNew(enchant, itemID, giveFocus, focusElemJQWhenAllGone, RemoveCallback) {
-    let newRowElemJQ = super.MakeExtraRealRow()
+    let newRowElemJQ = super.CreateExtraElement()
     let newRow = new EnchantRow(newRowElemJQ)
 
     newRow.HookUpGUI(itemID, RemoveCallback)
@@ -48,12 +39,31 @@ class EnchantRow extends TableRow {
 
     return newRow
   }
+}
+
+
+
+
+class EnchantRow extends RealElement {
+  constructor(rowElemJQ) {
+    super(rowElemJQ)
+
+    // ==== PRIVATE ====
+    this.idElemJQ = rowElemJQ.find('select[name="enchantID"]')
+    this.levelElemJQ = rowElemJQ.find('select[name="level"]')
+  }
+
+
+  // returns jQuery-wrapped input element
+  GetIDElemJQ() {
+    return this.idElemJQ
+  }
 
 
   Remove() {
-    let focusRowElemJQ = this.rowElemJQ.next()
+    let focusRowElemJQ = this.elemJQ.next()
     if (focusRowElemJQ.length == 0)
-      focusRowElemJQ = this.rowElemJQ.prev()
+      focusRowElemJQ = this.elemJQ.prev()
 
     let focusElemJQ
     if (focusRowElemJQ.length > 0 && focusRowElemJQ.attr('data-real') != 0)
@@ -107,7 +117,7 @@ class EnchantRow extends TableRow {
       this.UpdateLevelOptions()
     })
 
-    this.rowElemJQ.find('button[name="removeEnchant"]').click(() => {
+    this.elemJQ.find('button[name="removeEnchant"]').click(() => {
       this.Remove()
       if (RemoveCallback !== undefined)
         RemoveCallback()

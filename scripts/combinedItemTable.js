@@ -22,7 +22,7 @@ class CombinedItemTable {
     this.ShowDetails = ShowDetails
 
     let templateRowElemJQ = this.tableElemJQ.find('.template').first()
-    this.templateRow = new CombinedItemRow(this.ShowDetails, templateRowElemJQ)
+    this.templateRow = new CombinedItemRowTemplate(this.ShowDetails, templateRowElemJQ)
   }
 
 
