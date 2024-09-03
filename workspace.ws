@@ -18,9 +18,9 @@
             <File name="source\scripts\combineResultFilter.js" />
             <File name="source\scripts\dataSets.js" />
             <File name="source\scripts\dataStream.js" />
-            <File name="source\scripts\enchant.js" />
             <File name="source\scripts\desiredItemRow.js" />
             <File name="source\scripts\desiredItemTable.js" />
+            <File name="source\scripts\enchant.js" />
             <File name="source\scripts\enchantCombiner.js" />
             <File name="source\scripts\enchantConflicts.js" />
             <File name="source\scripts\enchantInfo.js" />
@@ -63,6 +63,9 @@
         <File name=".github\workflows\web.yml" />
     </Project>
     <Project name="testing">
+        <Folder name="html">
+            <File name="testing\test.html" />
+        </Folder>
         <Folder name="javascript">
             <File name="testing\bitSerializer.js" />
             <File name="testing\combinedEnchantRow.js" />
@@ -93,9 +96,6 @@
             <File name="testing\sourceItemRow.js" />
             <File name="testing\sourceItemTable.js" />
             <File name="testing\tableRow.js" />
-        </Folder>
-        <Folder name="html">
-            <File name="testing\test.html" />
         </Folder>
         <Folder name="other">
             <File name="startTests.py" />
