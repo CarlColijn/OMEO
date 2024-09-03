@@ -1,5 +1,5 @@
 function GetEnchantTemplateRow() {
-  return new EnchantRow($('#enchantRow .template'))
+  return new EnchantRowTemplate($('#enchantRow .template'))
 }
 
 
@@ -57,7 +57,7 @@ jazil.AddTestSet(mainPage, 'EnchantRow', {
   'Create new row from template': (jazil) => {
     let templateRow = GetEnchantTemplateRow()
     let enchantRow = CreateEnchantRow(templateRow, 'Unbreaking', 3, 'Axe')
-    let details = GetEnchantRowDetails(enchantRow.rowElemJQ)
+    let details = GetEnchantRowDetails(enchantRow.elemJQ)
     jazil.ShouldBe(details.name, 'Unbreaking', 'name is off!')
     jazil.ShouldBe(details.level, 3, 'level is off!')
     jazil.ShouldBe(EnchantRowInTable('Unbreaking'), true, 'added row is not present!')
@@ -89,7 +89,7 @@ jazil.AddTestSet(mainPage, 'EnchantRow', {
     let templateRow = GetEnchantTemplateRow()
     let enchantRow = CreateEnchantRow(templateRow, 'Feather Falling', 2, 'Boots')
     enchantRow.SetEnchant(BuildEnchant('Depth Strider', 1))
-    let details = GetEnchantRowDetails(enchantRow.rowElemJQ)
+    let details = GetEnchantRowDetails(enchantRow.elemJQ)
     jazil.ShouldBe(details.name, 'Depth Strider', 'name is off!')
     jazil.ShouldBe(details.level, 1, 'level is off!')
     jazil.ShouldBe(EnchantRowInTable('Depth Strider'), true, 'added row is not present!')

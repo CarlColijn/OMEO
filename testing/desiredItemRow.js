@@ -67,7 +67,7 @@ jazil.AddTestSet(mainPage, 'DesiredItemRow', {
   'Initial row is correct': (jazil) => {
     let itemRow = GetDesiredItemRow()
 
-    let details = GetDesiredItemRowDetails(itemRow.rowElemJQ)
+    let details = GetDesiredItemRowDetails(itemRow.elemJQ)
 
     jazil.ShouldBe(itemRow.IsReal(), true, 'IsReal is off!')
     jazil.ShouldBe(details.type, 'Axe', 'name is off!')
@@ -80,7 +80,7 @@ jazil.AddTestSet(mainPage, 'DesiredItemRow', {
     let item = BuildItem({ set:g_desired, name:'Pickaxe', count:9, priorWork:2, cost:15 })
     itemRow.SetItem(item)
 
-    let details = GetDesiredItemRowDetails(itemRow.rowElemJQ)
+    let details = GetDesiredItemRowDetails(itemRow.elemJQ)
 
     jazil.ShouldBe(details.type, item.info.name, 'type is off!')
     jazil.ShouldBe(details.enchantNames, '', 'enchant names are off!')
@@ -94,7 +94,7 @@ jazil.AddTestSet(mainPage, 'DesiredItemRow', {
     let item = BuildItem({ set:g_desired, name:'Turtle Shell', count:1, priorWork:4, cost:9, enchants:[{ name:'Unbreaking', level:3 }, { name:'Mending', level:1 }] })
     itemRow.SetItem(item)
 
-    let details = GetDesiredItemRowDetails(itemRow.rowElemJQ)
+    let details = GetDesiredItemRowDetails(itemRow.elemJQ)
 
     jazil.ShouldBe(details.type, item.info.name, 'type is off!')
     jazil.ShouldBe(details.enchantNames, 'Mending/Unbreaking', 'enchant names are off!')
@@ -205,7 +205,7 @@ jazil.AddTestSet(mainPage, 'DesiredItemRow', {
     itemRow.AddEnchant(BuildEnchant('Unbreaking', 2))
     itemRow.AddEnchant(BuildEnchant('Mending', 1))
 
-    let details = GetDesiredItemRowDetails(itemRow.rowElemJQ)
+    let details = GetDesiredItemRowDetails(itemRow.elemJQ)
 
     jazil.ShouldBe(details.type, item.info.name, 'type is off!')
     jazil.ShouldBe(details.enchantNames, 'Unbreaking/Mending', 'enchant names are off!')
@@ -222,7 +222,7 @@ jazil.AddTestSet(mainPage, 'DesiredItemRow', {
     itemRow.AddEnchant(BuildEnchant('Lure', 3))
     itemRow.RemoveEnchants()
 
-    let details = GetDesiredItemRowDetails(itemRow.rowElemJQ)
+    let details = GetDesiredItemRowDetails(itemRow.elemJQ)
 
     jazil.ShouldBe(details.type, item.info.name, 'type is off!')
     jazil.ShouldBe(details.enchantNames, '', 'enchant names are off!')
@@ -238,7 +238,7 @@ jazil.AddTestSet(mainPage, 'DesiredItemRow', {
     let updatedItem = BuildItem({ set:g_desired, name:'Helmet', count:6, priorWork:4, cost:5, enchants:[{ name:'Blast Protection', level:4 }, { name:'Aqua Affinity', level:1 }] })
     itemRow.SetItem(updatedItem)
 
-    let details = GetDesiredItemRowDetails(itemRow.rowElemJQ)
+    let details = GetDesiredItemRowDetails(itemRow.elemJQ)
 
     jazil.ShouldBe(details.type, updatedItem.info.name, 'type is off!')
     jazil.ShouldBe(details.enchantNames, 'Aqua Affinity/Blast Protection', 'enchant names are off!')

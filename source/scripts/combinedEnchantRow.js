@@ -2,11 +2,12 @@
   Wrapper for a single row in a combined enchant table.
 
   Prerequisites:
-  - tableRow.js
+  - templateElement.js
   - dataSets.js
   - enchant.js
 
   Defined classes:
+  - CombinedEnchantRowTemplate
   - CombinedEnchantRow
 */
 
@@ -14,7 +15,7 @@
 // ======== PUBLIC ========
 
 
-class CombinedEnchantRow extends TableRow {
+class CombinedEnchantRowTemplate extends TemplateElement {
   constructor(rowElemJQ) {
     super(rowElemJQ)
   }
@@ -22,11 +23,18 @@ class CombinedEnchantRow extends TableRow {
 
   // returns CombinedEnchantRow
   CreateNew(enchant) {
-    let newRowElemJQ = super.MakeExtraRealRow()
+    let newRowElemJQ = super.CreateExtraElement()
 
-    newRowElemJQ.find('.name').text(enchant.info.name)
-    newRowElemJQ.find('.level').text(GetRomanNumeralForLevel(enchant.level))
+    return new CombinedEnchantRow(newRowElemJQ, enchant)
+  }
+}
 
-    return new CombinedEnchantRow(newRowElemJQ)
+
+class CombinedEnchantRow extends TemplateElement {
+  constructor(rowElemJQ, enchant) {
+    super(rowElemJQ, enchant)
+
+    this.elemJQ.find('.name').text(enchant.info.name)
+    this.elemJQ.find('.level').text(GetRomanNumeralForLevel(enchant.level))
   }
 }

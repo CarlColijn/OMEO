@@ -25,7 +25,7 @@ jazil.AddTestSet(mainPage, 'SourceItemTable', {
     let numRowsPost = table.tableElemJQ.find('tr.item').length
     jazil.ShouldBe(numRowsPost - numRowsPre, 1, 'wrong number of rows added!')
 
-    let newRowDetails = GetSourceItemRowDetails(newRow.rowElemJQ, g_source)
+    let newRowDetails = GetSourceItemRowDetails(newRow.elemJQ, g_source)
     jazil.ShouldBe(newRowDetails.nr, 1, 'wrong row nrs assigned!')
   },
 

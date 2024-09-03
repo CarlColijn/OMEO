@@ -1,6 +1,6 @@
 function GetCombinedEnchantTemplateRow() {
   let templateRowElemJQ = $('#combinedEnchantRow .template')
-  return new CombinedEnchantRow(templateRowElemJQ)
+  return new CombinedEnchantRowTemplate(templateRowElemJQ)
 }
 
 
@@ -52,7 +52,7 @@ jazil.AddTestSet(mainPage, 'CombinedEnchantRow', {
   'Create new row from template': (jazil) => {
     let templateRow = GetCombinedEnchantTemplateRow()
     let enchantRow = CreateCombinedEnchantRow(templateRow, 'Unbreaking', 3)
-    let details = GetCombinedEnchantRowDetails(enchantRow.rowElemJQ)
+    let details = GetCombinedEnchantRowDetails(enchantRow.elemJQ)
     jazil.ShouldBe(details.name, 'Unbreaking', 'name is off!')
     jazil.ShouldBe(details.level, 3, 'level is off!')
     jazil.ShouldBe(CombinedEnchantRowInTable('Unbreaking'), true, 'added row is not present!')

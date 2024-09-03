@@ -4,7 +4,7 @@ function GetCombinedItemTemplateRow() {
   }
 
   let templateRowElemJQ = $('#combinedItemRow .template.item')
-  return new CombinedItemRow(CallbackHandlerMock, templateRowElemJQ)
+  return new CombinedItemRowTemplate(CallbackHandlerMock, templateRowElemJQ)
 }
 
 
@@ -122,7 +122,7 @@ jazil.AddTestSet(mainPage, 'CombinedItemRow', {
     let item = BuildItem({ set:g_combined, name:'Pickaxe', count:9, priorWork:2, cost:15 })
     let itemRow = CreateCombinedItemRow(templateRow, item)
 
-    let details = GetCombinedItemRowDetails(itemRow.rowElemJQ)
+    let details = GetCombinedItemRowDetails(itemRow.elemJQ)
     let { type, typeDetails } = GetCombinedTypeAndDetailsForItemInTable(item)
 
     jazil.ShouldBe(details.cost, 15, 'cost is off!')
@@ -141,7 +141,7 @@ jazil.AddTestSet(mainPage, 'CombinedItemRow', {
     let item = BuildItem({ set:g_combined, name:'Turtle Shell', count:1, priorWork:4, cost:9, enchants:[{ name:'Unbreaking', level:3 }, { name:'Mending', level:1 }] })
     let itemRow = CreateCombinedItemRow(templateRow, item, 15)
 
-    let details = GetCombinedItemRowDetails(itemRow.rowElemJQ)
+    let details = GetCombinedItemRowDetails(itemRow.elemJQ)
     let { type, typeDetails } = GetCombinedTypeAndDetailsForItemInTable(item)
 
     jazil.ShouldBe(details.cost, 9, 'cost is off!')

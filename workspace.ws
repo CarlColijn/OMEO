@@ -43,7 +43,7 @@
             <File name="source\scripts\recipeTable.js" />
             <File name="source\scripts\sourceItemRow.js" />
             <File name="source\scripts\sourceItemTable.js" />
-            <File name="source\scripts\tableRow.js" />
+            <File name="source\scripts\templateElement.js" />
         </Folder>
         <Folder name="other">
             <File name="source\browserconfig.xml" />
@@ -95,7 +95,7 @@
             <File name="testing\recipeTable.js" />
             <File name="testing\sourceItemRow.js" />
             <File name="testing\sourceItemTable.js" />
-            <File name="testing\tableRow.js" />
+            <File name="testing\templateElement.js" />
         </Folder>
         <Folder name="other">
             <File name="startTests.py" />

@@ -1,5 +1,5 @@
 function GetSourceItemTemplateRow() {
-  return new SourceItemRow($('#sourceItemRow .template.item'), false)
+  return new SourceItemRowTemplate($('#sourceItemRow .template.item'), false)
 }
 
 
@@ -98,7 +98,7 @@ jazil.AddTestSet(mainPage, 'SourceItemRow', {
     let templateRow = GetSourceItemTemplateRow()
     let itemRow = CreateSourceItemRow(templateRow, undefined, 6)
 
-    let details = GetSourceItemRowDetails(itemRow.rowElemJQ)
+    let details = GetSourceItemRowDetails(itemRow.elemJQ)
 
     jazil.ShouldBe(details.nr, 6, 'nr is off!')
     jazil.ShouldBe(details.count, 1, 'count is off!')
@@ -113,7 +113,7 @@ jazil.AddTestSet(mainPage, 'SourceItemRow', {
     let item = BuildItem({ set:g_source, name:'Pickaxe', count:9, priorWork:2, cost:15 })
     let itemRow = CreateSourceItemRow(templateRow, item, 5)
 
-    let details = GetSourceItemRowDetails(itemRow.rowElemJQ)
+    let details = GetSourceItemRowDetails(itemRow.elemJQ)
 
     jazil.ShouldBe(details.nr, 5, 'nr is off!')
     jazil.ShouldBe(details.count, 9, 'count is off!')
@@ -130,7 +130,7 @@ jazil.AddTestSet(mainPage, 'SourceItemRow', {
     let item = BuildItem({ set:g_source, name:'Turtle Shell', count:1, priorWork:4, cost:9, enchants:[{ name:'Unbreaking', level:3 }, { name:'Mending', level:1 }] })
     let itemRow = CreateSourceItemRow(templateRow, item, 15)
 
-    let details = GetSourceItemRowDetails(itemRow.rowElemJQ)
+    let details = GetSourceItemRowDetails(itemRow.elemJQ)
 
     jazil.ShouldBe(details.nr, 15, 'nr is off!')
     jazil.ShouldBe(details.count, 1, 'count is off!')
@@ -184,7 +184,7 @@ jazil.AddTestSet(mainPage, 'SourceItemRow', {
 
     // Update the item row's count to something non-numeric.
     // Just empty is the most cross-browser way to do so.
-    itemRow.rowElemJQ.find('[name=count]').val('')
+    itemRow.elemJQ.find('[name=count]').val('')
 
     let itemDetails = itemRow.GetItem()
     let retrievedItem = itemDetails.item
@@ -307,7 +307,7 @@ jazil.AddTestSet(mainPage, 'SourceItemRow', {
     let itemRow = CreateSourceItemRow(templateRow, item, 1)
     itemRow.SetNumber(8)
 
-    let details = GetSourceItemRowDetails(itemRow.rowElemJQ)
+    let details = GetSourceItemRowDetails(itemRow.elemJQ)
 
     jazil.ShouldBe(details.nr, 8, 'nr is off!')
     jazil.ShouldBe(details.count, 4, 'count is off!')
@@ -325,7 +325,7 @@ jazil.AddTestSet(mainPage, 'SourceItemRow', {
     let itemRow = CreateSourceItemRow(templateRow, item, 31)
     itemRow.SetCount(5)
 
-    let details = GetSourceItemRowDetails(itemRow.rowElemJQ)
+    let details = GetSourceItemRowDetails(itemRow.elemJQ)
 
     jazil.ShouldBe(details.nr, 31, 'nr is off!')
     jazil.ShouldBe(details.count, 5, 'count is off!')
@@ -344,7 +344,7 @@ jazil.AddTestSet(mainPage, 'SourceItemRow', {
     itemRow.AddEnchant(BuildEnchant('Unbreaking', 2))
     itemRow.AddEnchant(BuildEnchant('Mending', 1))
 
-    let details = GetSourceItemRowDetails(itemRow.rowElemJQ)
+    let details = GetSourceItemRowDetails(itemRow.elemJQ)
 
     jazil.ShouldBe(details.nr, 28, 'nr is off!')
     jazil.ShouldBe(details.count, 1, 'count is off!')
@@ -364,7 +364,7 @@ jazil.AddTestSet(mainPage, 'SourceItemRow', {
     itemRow.AddEnchant(BuildEnchant('Lure', 3))
     itemRow.RemoveEnchants()
 
-    let details = GetSourceItemRowDetails(itemRow.rowElemJQ)
+    let details = GetSourceItemRowDetails(itemRow.elemJQ)
 
     jazil.ShouldBe(details.nr, 26, 'nr is off!')
     jazil.ShouldBe(details.count, 3, 'count is off!')
@@ -383,7 +383,7 @@ jazil.AddTestSet(mainPage, 'SourceItemRow', {
     let updatedItem = BuildItem({ set:g_source, name:'Helmet', count:6, priorWork:4, cost:5, enchants:[{ name:'Blast Protection', level:4 }, { name:'Aqua Affinity', level:1 }] })
     itemRow.SetItem(updatedItem)
 
-    let details = GetSourceItemRowDetails(itemRow.rowElemJQ)
+    let details = GetSourceItemRowDetails(itemRow.elemJQ)
 
     jazil.ShouldBe(details.count, 6, 'count is off!')
     jazil.ShouldBe(details.type, updatedItem.info.name, 'type is off!')
