@@ -1,14 +1,13 @@
 /*
-  Wrapper for item tables (source, desired, combined).
+  Wrapper for source item tables.
 
   Prerequisites:
   - dataSets.js
-  - itemRow.js
+  - sourceItemRow.js
   - itemCollector.js
 
   Defined classes:
-  - ItemTable
-    - set: DataSet
+  - SourceItemTable
     - tableElemJQ: the main table's jQuery element
 */
 
@@ -16,30 +15,19 @@
 // ======== PUBLIC ========
 
 
-class ItemTable {
-  constructor(ShowDetails, tableElemJQ, addItemElemJQ, set) {
+class SourceItemTable {
+  constructor(tableElemJQ, addItemElemJQ) {
     // ==== PUBLIC ====
-    this.set = set
     this.tableElemJQ = tableElemJQ
 
     // ==== PRIVATE ====
-    this.ShowDetails = ShowDetails
-
     this.addItemElemJQ = addItemElemJQ
-    if (this.addItemElemJQ !== undefined) {
-      addItemElemJQ.click(() => {
-        this.AddRow()
-      })
-    }
+    addItemElemJQ.click(() => {
+      this.AddRow()
+    })
 
-    if (this.set === g_desired) {
-      let itemRowElemJQ = this.tableElemJQ.find('.item').first()
-      this.itemRow = new ItemRow(this.ShowDetails, itemRowElemJQ, this.set, true)
-    }
-    else {
-      let templateRowElemJQ = this.tableElemJQ.find('.template').first()
-      this.templateRow = new ItemRow(this.ShowDetails, templateRowElemJQ, this.set, false)
-    }
+    let templateRowElemJQ = this.tableElemJQ.find('.template').first()
+    this.templateRow = new SourceItemRow(templateRowElemJQ, false)
   }
 
 
@@ -52,15 +40,11 @@ class ItemTable {
 
   // note: for g_desired tables, only the 1st item is used.
   SetItems(items) {
-    if (this.set === g_desired)
-      this.itemRow.SetItem(items[0])
-    else {
-      this.Clear()
+    this.Clear()
 
-      items.forEach((item, itemNr) => {
-        this.templateRow.CreateNew(itemNr + 1, item, false, this.addItemElemJQ)
-      })
-    }
+    items.forEach((item, itemNr) => {
+      this.templateRow.CreateNew(itemNr + 1, item, false, this.addItemElemJQ)
+    })
   }
 
 
@@ -89,7 +73,7 @@ class ItemTable {
 
   Clear() {
     this.tableElemJQ.find('.item').each((rowNr, rowElem) => {
-      let itemRow = new ItemRow(this.ShowDetails, $(rowElem), this.set, false)
+      let itemRow = new SourceItemRow($(rowElem), false)
       if (itemRow.IsReal())
         itemRow.Remove()
       return true
@@ -119,17 +103,17 @@ class ItemTable {
   }
 
 
-  // returns ItemRow[]
+  // returns SourceItemRow[]
   GetItemRows() {
-    let itemRows = []
+    let realItemRows = []
     this.tableElemJQ.find('.item').each((rowNr, itemRowElem) => {
-      let itemRow = new ItemRow(this.ShowDetails, $(itemRowElem), this.set, false)
+      let itemRow = new SourceItemRow($(itemRowElem), false)
       if (itemRow.IsReal()) {
-        itemRow.nr = itemRows.length
-        itemRows.push(itemRow)
+        itemRow.nr = realItemRows.length
+        realItemRows.push(itemRow)
       }
       return true
     })
-    return itemRows
+    return realItemRows
   }
 }
