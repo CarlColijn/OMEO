@@ -69,7 +69,7 @@ class CombinedItemRow extends RealElement {
     this.elemJQ.find('.count').text(item.count)
     this.elemJQ.find('.type').text(item.info.name)
     this.elemJQ.find('.priorWork').text(item.priorWork)
-    this.elemJQ.find('.cost').text(item.totalCost)
+    this.elemJQ.find('.cost').text(item.totalCost + (item.includesRename ? 1 : 0))
     let showDetailsElemJQ = this.elemJQ.find('[name=show]')
     if (item.set === g_source)
       showDetailsElemJQ.hide()

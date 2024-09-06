@@ -16,13 +16,15 @@
     - info: ItemInfo
     - enchantsByID: Map(int -> Enchant)
     - priorWork: int
-    - cost: int
+    - cost: int // this is excl. rename, to make costs comparable
     - totalCost: int
     source and desired items only:
     - nr: int
     combined items only:
     - targetItem: Item
     - sacrificeItem: Item
+    - renamePoint: bool
+    - includesRename: bool
     all items except desired items:
     - origin: effectively an array(bool)
 */
@@ -87,6 +89,7 @@ class Item {
     }
     else if (this.set === g_combined) {
       clone.renamePoint = this.renamePoint
+      clone.includesRename = this.includesRename
 
       if (this.targetItem === undefined) {
         clone.targetItem = undefined
@@ -148,7 +151,7 @@ class Item {
 
 
   // returns string
-  Hash(withPriorWork, withCost, withCount, withSet) {
+  Hash(withPriorWork, withCost, withCountAndRenamePoint, withSet) {
     // note: no fancy stuff for now with bit fiddling, just a big 'ol string concat
 
     let allData = this.id
@@ -165,8 +168,8 @@ class Item {
     if (withCost)
       allData += `|${this.cost}|${this.totalCost}`
 
-    if (withCount)
-      allData += `|${this.count}`
+    if (withCountAndRenamePoint)
+      allData += `|${this.count}|${this.renamePoint === undefined ? '-' : this.renamePoint == true ? 'y' : 'n'}|${this.includesRename === undefined ? '-' : this.includesRename == true ? 'y' : 'n'}`
 
     if (withSet)
       allData += `|${this.set.id}`

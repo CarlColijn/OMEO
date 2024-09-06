@@ -144,22 +144,28 @@ class MainFormHandler {
 
     let title = 'Divination is compete!'
     let message = `${this.GetProgressMessage(maxProgress, maxProgress, timeInMilliseconds)}<br><br>`
+    if (filteredCombinedItems.exactOnlyWithoutRename)
+      message += 'An exact match cannot be made when renaming; it would be too costly.<br><br>Consider not renaming the item to see what is possible.'
 
     if (!hasExactMatches && !hasBetterMatches && !hasLesserMatches && !hasMixedMatches) {
       title = 'Divination is unsuccessful'
-      message += 'Sorry, I couldn\'t come up with your desired item at all.<br><br>Please look at your source items and desired item and make sure there is some sort of match.'
+      if (!filteredCombinedItems.exactOnlyWithoutRename)
+        message += 'Sorry, I couldn\'t come up with your desired item at all.<br><br>Please look at your source items and desired item and make sure there is some sort of match.'
     }
     else if (hasExactMatches) {
       if (hasBetterMatches)
-        message += 'I could also create combinations with even more enchantments.<br>I\'ll also show these combinations.'
+        message += 'I could also create combinations with even more enchantments.<br><br>I\'ll also show these combinations.'
       else
         message += 'I\'ll show how to get at your desired item.'
     }
     else {
+      if (!filteredCombinedItems.exactOnlyWithoutRename)
+        message += 'An exact match cannot be made.'
+
       if (hasBetterMatches)
-        message += 'An exact match cannot be made, but I could create combinations with even more enchantments.<br>I\'ll show these instead.'
+        message += '<br><br>I could create other combinations with even more enchantments; I\'ll show these instead.'
       else
-        message += 'An exact match cannot be made.<br>I\'ll show you what can be made.'
+        message += '<br><br>I\'ll show you what can be made.'
     }
 
     $('#divineTitle').html(title)

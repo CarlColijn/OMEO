@@ -9,6 +9,7 @@
 
   Defined classes:
   - FilteredCombinedItems: {
+      exactOnlyWithoutRename: bool,
       ratedItemsByMatch: RatedItem[][] // 1st index is one of the g_xxxMatch consts
     }
 
@@ -23,19 +24,25 @@ class CombineResultFilter {
   // ======== PUBLIC ========
 
 
-  constructor(desiredItem) {
+  constructor(desiredItem, renameToo) {
     this.desiredItem = desiredItem
+    this.renameToo = renameToo
   }
 
 
   // returns FilteredCombinedItems
   FilterItems(combinedItems, numItemsToTake) {
     let relevantItems = this.GetRelevantItems(combinedItems)
-    relevantItems = this.GetLowestPrioAndCostItems(relevantItems)
 
     let ratedItems = this.RateItems(relevantItems)
 
-    let filteredCombinedItems = this.GroupRatedItems(ratedItems)
+    let foundUnrenamedExact = this.HasUnrenamedExact(ratedItems)
+
+    ratedItems = this.RemoveRenameMismatches(ratedItems)
+
+    ratedItems = this.GetLowestPrioAndCostItems(ratedItems)
+
+    let filteredCombinedItems = this.GroupRatedItems(ratedItems, foundUnrenamedExact)
 
     this.SortGroups(filteredCombinedItems)
 
@@ -56,7 +63,40 @@ class CombineResultFilter {
   }
 
 
-  AddLowestPrioAndCostItemsFromGroup(items, itemsToKeep) {
+  // returns RatedItem[]
+  RateItems(items) {
+    return items.map((item) => {
+      return new RatedItem(item, this.desiredItem)
+    })
+  }
+
+
+  // returns bool
+  HasUnrenamedExact(ratedItems) {
+    if (!this.renameToo)
+      return false
+
+    return ratedItems.some((ratedItem) => {
+      return (
+        ratedItem.enchantMatch == g_exactMatch &&
+        !ratedItem.item.includesRename
+      )
+    })
+  }
+
+
+  // return RatedItem[]
+  RemoveRenameMismatches(ratedItems) {
+    if (!this.renameToo)
+      return ratedItems
+
+    return ratedItems.filter((ratedItem) => {
+      return ratedItem.item.includesRename
+    })
+  }
+
+
+  AddLowestPrioAndCostItemsFromGroup(ratedItems, ratedItemsToKeep) {
     /*
       Strategy:
       - For each priorWork and totalCost, decide which item has the lowest
@@ -72,19 +112,19 @@ class CombineResultFilter {
 
     let minTotalCostItemByPriorWork = new Map()
     let minPriorWorkItemByTotalCost = new Map()
-    items.forEach((item) => {
-      if ((minTotalCostItemByPriorWork.get(item.priorWork)?.totalCost ?? 9e9) > item.totalCost)
-        minTotalCostItemByPriorWork.set(item.priorWork, item)
-      if ((minPriorWorkItemByTotalCost.get(item.totalCost)?.priorWork ?? 9e9) > item.priorWork)
-        minPriorWorkItemByTotalCost.set(item.totalCost, item)
+    ratedItems.forEach((ratedItem) => {
+      if ((minTotalCostItemByPriorWork.get(ratedItem.item.priorWork)?.item.totalCost ?? 9e9) > ratedItem.item.totalCost)
+        minTotalCostItemByPriorWork.set(ratedItem.item.priorWork, ratedItem)
+      if ((minPriorWorkItemByTotalCost.get(ratedItem.item.totalCost)?.item.priorWork ?? 9e9) > ratedItem.item.priorWork)
+        minPriorWorkItemByTotalCost.set(ratedItem.item.totalCost, ratedItem)
     })
 
-    let CheckNoBetterItemPresent = (item, itemsByKey) => {
+    let CheckNoBetterItemPresent = (ratedItem, ratedItemsByKey) => {
       let noBetterItemPresent = true
-      itemsByKey.forEach((otherItem) => {
+      ratedItemsByKey.forEach((otherRatedItem) => {
         if (
-          otherItem.priorWork < item.priorWork &&
-          otherItem.totalCost < item.totalCost
+          otherRatedItem.item.priorWork < ratedItem.item.priorWork &&
+          otherRatedItem.item.totalCost < ratedItem.item.totalCost
         )
           noBetterItemPresent = false
         return noBetterItemPresent
@@ -92,81 +132,76 @@ class CombineResultFilter {
       return noBetterItemPresent
     }
 
-    let selectedItems = new Set()
-    minTotalCostItemByPriorWork.forEach((item) => {
+    let selectedRatedItems = new Set()
+    minTotalCostItemByPriorWork.forEach((ratedItem) => {
       if (
-        minPriorWorkItemByTotalCost.get(item.totalCost) === item &&
-        CheckNoBetterItemPresent(item, minTotalCostItemByPriorWork)
+        minPriorWorkItemByTotalCost.get(ratedItem.item.totalCost) === ratedItem &&
+        CheckNoBetterItemPresent(ratedItem, minTotalCostItemByPriorWork)
       ) {
-        itemsToKeep.push(item)
-        selectedItems.add(item)
+        ratedItemsToKeep.push(ratedItem)
+        selectedRatedItems.add(ratedItem)
       }
     })
-    minPriorWorkItemByTotalCost.forEach((item) => {
+    minPriorWorkItemByTotalCost.forEach((ratedItem) => {
       if (
-        !selectedItems.has(item) &&
-        minTotalCostItemByPriorWork.get(item.priorWork) === item &&
-        CheckNoBetterItemPresent(item, minPriorWorkItemByTotalCost)
+        !selectedRatedItems.has(ratedItem) &&
+        minTotalCostItemByPriorWork.get(ratedItem.item.priorWork) === ratedItem &&
+        CheckNoBetterItemPresent(ratedItem, minPriorWorkItemByTotalCost)
       )
-        itemsToKeep.push(item)
+        ratedItemsToKeep.push(ratedItem)
     })
   }
 
 
   // returns Item[]
-  GetLowestPrioAndCostItems(items) {
-    let itemsToKeep = []
+  GetLowestPrioAndCostItems(ratedItems) {
+    let ratedItemsToKeep = []
 
-    let itemsByType = new Map()
-    items.forEach((item) => {
-      let itemHash = item.HashType()
-      if (itemsByType.has(itemHash))
-        itemsByType.get(itemHash).push(item)
+    let ratedItemsByType = new Map()
+    ratedItems.forEach((ratedItem) => {
+      let itemHash = ratedItem.item.HashType()
+      if (ratedItemsByType.has(itemHash))
+        ratedItemsByType.get(itemHash).push(ratedItem)
       else
-        itemsByType.set(itemHash, [item])
+        ratedItemsByType.set(itemHash, [ratedItem])
     })
 
-    itemsByType.forEach((items) => {
-      this.AddLowestPrioAndCostItemsFromGroup(items, itemsToKeep)
+    ratedItemsByType.forEach((ratedItems) => {
+      this.AddLowestPrioAndCostItemsFromGroup(ratedItems, ratedItemsToKeep)
     })
 
-    return itemsToKeep
-  }
-
-
-  // returns RatedItem[]
-  RateItems(items) {
-    return items.map((item) => {
-      return new RatedItem(item, this.desiredItem)
-    })
+    return ratedItemsToKeep
   }
 
 
   // returns FilteredCombinedItems
-  GroupRatedItems(ratedItems) {
+  GroupRatedItems(ratedItems, foundUnrenamedExact) {
     let exacts = []
     let betters = []
     let lessers = []
     let mixeds = []
 
     ratedItems.forEach((ratedItem) => {
-      switch (ratedItem.enchantMatch) {
-        case g_exactMatch:
-          exacts.push(ratedItem)
-          break
-        case g_betterMatch:
-          betters.push(ratedItem)
-          break
-        case g_lesserMatch:
-          lessers.push(ratedItem)
-          break
-        case g_mixedMatch:
-          mixeds.push(ratedItem)
-          break
+      if (!this.renameToo || ratedItem.item.includesRename) {
+        switch (ratedItem.enchantMatch) {
+          case g_exactMatch:
+            exacts.push(ratedItem)
+            break
+          case g_betterMatch:
+            betters.push(ratedItem)
+            break
+          case g_lesserMatch:
+            lessers.push(ratedItem)
+            break
+          case g_mixedMatch:
+            mixeds.push(ratedItem)
+            break
+        }
       }
     })
 
     return {
+      exactOnlyWithoutRename: foundUnrenamedExact && exacts.length == 0,
       ratedItemsByMatch: [exacts, betters, lessers, mixeds]
     }
   }

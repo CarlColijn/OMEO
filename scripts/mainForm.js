@@ -16,6 +16,7 @@
   - itemCombiner.js
   - combineResultFilter.js
   - recipeFormData.js
+  - itemCostTreeFinalizer.js
 
   Defined classes:
   - MainForm
@@ -63,8 +64,10 @@ class MainForm {
   ShowRecipePage(item) {
     let recipeStream = new DataStream(true)
 
+    let clone = new ItemCostTreeFinalizer(item).UpdateCostsForRename()
+
     let recipeFormData = new RecipeFormData()
-    recipeFormData.SetItem(item)
+    recipeFormData.SetItem(clone)
     recipeFormData.Serialize(recipeStream)
 
     let ourStream = new DataStream(true)
@@ -82,6 +85,7 @@ class MainForm {
   InitializeSubObjects() {
     this.sourceItemTable = new SourceItemTable($('#sources table'), $('#addSourceItem'))
     this.desiredItemTable = new DesiredItemTable($('#desired table'))
+    this.renameTooElemJQ = $('#desired #renameToo')
 
     let ShowDetailsCallback = (item) => {
       this.ShowRecipePage(item)
@@ -135,6 +139,7 @@ class MainForm {
       type: 0,
       sourceItems: dataInContext.data.sourceItems,
       desiredItem: dataInContext.data.desiredItem,
+      renameToo: dataInContext.data.renameToo,
       feedbackIntervalMS: g_mfSettings.feedbackIntervalMS,
       numItemsToTake: g_mfSettings.numItemsPerGroup
     })
@@ -220,10 +225,12 @@ class MainForm {
   GetData(mergeSourceItems) {
     let sourceItemsResult = this.sourceItemTable.GetItems(new ItemCollector(mergeSourceItems))
     let desiredItemResult = this.desiredItemTable.GetItem(new ItemCollector(false))
+    let renameToo = this.renameTooElemJQ.prop('checked')
 
     let data = new MainFormData()
     data.AddSourceItems(sourceItemsResult.items)
     data.SetDesiredItem(desiredItemResult.items[0])
+    data.SetRenameToo(renameToo)
 
     let withCountErrors =
       sourceItemsResult.withCountErrors ||
@@ -269,6 +276,7 @@ class MainForm {
     this.ClearResult()
     this.sourceItemTable.SetItems(data.sourceItems)
     this.desiredItemTable.SetItem(data.desiredItem)
+    this.renameTooElemJQ.prop('checked', data.renameToo)
   }
 
 

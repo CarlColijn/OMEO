@@ -10,6 +10,7 @@
 
   Defined classes:
   - RecipeFormData
+    - item: Item
 */
 
 
@@ -61,7 +62,7 @@ class RecipeFormData {
   // returns bool (if the data was OK)
   DeserializeV1(stream) {
     this.item = this.DeserializeItem(stream)
-    return this.item !== undefined
+    return this.item !== undefined && stream.RetrievalOK()
   }
 
 
@@ -82,9 +83,14 @@ class RecipeFormData {
     stream.AddSizedInt(item.priorWork, 3)
     stream.AddCount(item.cost)
     stream.AddCount(item.totalCost)
+
     if (item.set === g_source)
       stream.AddCount(item.nr, 3)
+    else if (item.set === g_combined)
+      stream.AddBool(item.renamePoint)
+
     this.SerializeEnchants(item.enchantsByID, stream)
+
     let withChildren = item.targetItem !== undefined
     stream.AddBool(withChildren)
     if (withChildren) {
@@ -122,6 +128,9 @@ class RecipeFormData {
     )
     if (item.set === g_source)
       item.nr = stream.GetCount(3)
+    else if (item.set === g_combined)
+      item.renamePoint = stream.GetBool()
+
     if (
       !this.DeserializeEnchants(stream, item) ||
       !stream.RetrievalOK()
