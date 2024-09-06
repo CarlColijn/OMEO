@@ -2,6 +2,7 @@
   Rating details for combine result items.
 
   Prerequisites:
+  - settings.js
   - item.js
 
   Defined constants:
@@ -39,13 +40,6 @@ function RehydrateRatedItems(ratedItems) {
 }
 
 
-// ======== PRIVATE ========
-
-
-const g_enchantWeight = 50
-const g_unwantedCurseWeight = 10
-const g_priorWorkWeight = 1
-const g_totalCostWeight = 1/50
 
 
 class RatedItem {
@@ -106,12 +100,12 @@ class RatedItem {
     this.item.enchantsByID.forEach((itemEnchant, id) => {
       if (!desiredItem.enchantsByID.has(id)) {
         extraEnchants = true
-        let extraPenalty = itemEnchant.info.isCurse ? g_unwantedCurseWeight : 1
+        let extraPenalty = itemEnchant.info.isCurse ? g_riSettings.unwantedCurseWeight : 1
         this.enchantRating -= (itemEnchant.level / itemEnchant.info.maxLevel) * extraPenalty
       }
     })
 
-    this.enchantRating *= g_enchantWeight
+    this.enchantRating *= g_riSettings.enchantWeight
 
     this.enchantMatch =
       (missesEnchants ? g_lesserMatch : 0) +
@@ -120,12 +114,12 @@ class RatedItem {
 
 
   AddPriorWorkDetails() {
-    this.priorWorkRating = this.item.priorWork * g_priorWorkWeight
+    this.priorWorkRating = this.item.priorWork * g_riSettings.priorWorkWeight
   }
 
 
   AddTotalCostDetails() {
-    this.totalCostRating = this.item.totalCost * g_totalCostWeight
+    this.totalCostRating = this.item.totalCost * g_riSettings.totalCostWeight
   }
 
 
