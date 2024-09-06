@@ -84,13 +84,16 @@ th, td {
   cursor: pointer;
 }
 .treeTop {
-  box-shadow: inset 0px 4px 0px 0px black;
+  --treeLinesColor: #000000;
+  box-shadow: inset 0px 2px 0px 0px var(--treeLinesColor);
 }
 .treeLeft {
-  box-shadow: inset 4px 0px 0px 0px black;
+  --treeLinesColor: #000000;
+  box-shadow: inset 3px 0px 0px 0px var(--treeLinesColor);
 }
 .treeTop.treeLeft {
-  box-shadow: inset 4px 4px 0px 0px black;
+  --treeLinesColor: #000000;
+  box-shadow: inset 3px 2px 0px 0px var(--treeLinesColor);
 }
 .treeNode {
   width: 1em;
@@ -321,6 +324,11 @@ em {
 .grey h2 {
   background-color: #3c3c3c;
 }
+.grey .treeTop,
+.grey .treeLeft,
+.grey .treeTop.treeLeft {
+  --treeLinesColor: #3c3c3c;
+}
 .grey em,
 .grey .table > tbody.group > tr.forcedHeader,
 .grey .table > thead > tr {
@@ -340,6 +348,11 @@ em {
 .red h1,
 .red h2 {
   background-color: #5b1d1d;
+}
+.red .treeTop,
+.red .treeLeft,
+.red .treeTop.treeLeft {
+  --treeLinesColor: #5b1d1d;
 }
 .red em,
 .red .table > tbody.group > tr.forcedHeader,
@@ -361,6 +374,11 @@ em {
 .yellow h2 {
   background-color: #6b5f0d;
 }
+.yellow .treeTop,
+.yellow .treeLeft,
+.yellow .treeTop.treeLeft {
+  --treeLinesColor: #6b5f0d;
+}
 .yellow em,
 .yellow .table > tbody.group > tr.forcedHeader,
 .yellow .table > thead > tr {
@@ -380,6 +398,11 @@ em {
 .olive h1,
 .olive h2 {
   background-color: #495b1d;
+}
+.olive .treeTop,
+.olive .treeLeft,
+.olive .treeTop.treeLeft {
+  --treeLinesColor: #495b1d;
 }
 .olive em,
 .olive .table > tbody.group > tr.forcedHeader,
@@ -401,6 +424,11 @@ em {
 .turquoise h2 {
   background-color: #1d5b41;
 }
+.turquoise .treeTop,
+.turquoise .treeLeft,
+.turquoise .treeTop.treeLeft {
+  --treeLinesColor: #1d5b41;
+}
 .turquoise em,
 .turquoise .table > tbody.group > tr.forcedHeader,
 .turquoise .table > thead > tr {
@@ -420,6 +448,11 @@ em {
 .azure h1,
 .azure h2 {
   background-color: #1d335b;
+}
+.azure .treeTop,
+.azure .treeLeft,
+.azure .treeTop.treeLeft {
+  --treeLinesColor: #1d335b;
 }
 .azure em,
 .azure .table > tbody.group > tr.forcedHeader,
@@ -441,6 +474,11 @@ em {
 .violet h2 {
   background-color: #2c1d5b;
 }
+.violet .treeTop,
+.violet .treeLeft,
+.violet .treeTop.treeLeft {
+  --treeLinesColor: #2c1d5b;
+}
 .violet em,
 .violet .table > tbody.group > tr.forcedHeader,
 .violet .table > thead > tr {
@@ -460,6 +498,11 @@ em {
 .fuchsia h1,
 .fuchsia h2 {
   background-color: #491d5b;
+}
+.fuchsia .treeTop,
+.fuchsia .treeLeft,
+.fuchsia .treeTop.treeLeft {
+  --treeLinesColor: #491d5b;
 }
 .fuchsia em,
 .fuchsia .table > tbody.group > tr.forcedHeader,
