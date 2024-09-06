@@ -17,7 +17,7 @@
     - type: 1
   - done:
     - type: 2
-    - ratedItemGroups: RatedItemGroups (dehydrated)
+    - filteredCombinedItems: FilteredCombinedItems (dehydrated)
     - maxProgress: int
     - timeInMS: int
 */
@@ -83,10 +83,10 @@ class FeedbackHandler {
   }
 
 
-  TellDone(ratedItemGroups, maxProgress) {
+  TellDone(filteredCombinedItems, maxProgress) {
     postMessage({
       type: 2,
-      ratedItemGroups: ratedItemGroups,
+      filteredCombinedItems: filteredCombinedItems,
       maxProgress: maxProgress,
       timeInMS: Date.now() - this.startTimeMS
     })
@@ -109,7 +109,7 @@ onmessage = (e) => {
 
   feedbackHandler.TellFinalizing()
   let combineResultFilter = new CombineResultFilter(desiredItem)
-  let ratedItemGroups = combineResultFilter.FilterItems(combineResult.combinedItems, numItemsToTake)
+  let filteredCombinedItems = combineResultFilter.FilterItems(combineResult.combinedItems, numItemsToTake)
 
-  feedbackHandler.TellDone(ratedItemGroups, combineResult.maxProgress)
+  feedbackHandler.TellDone(filteredCombinedItems, combineResult.maxProgress)
 }
