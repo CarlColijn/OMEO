@@ -35,12 +35,9 @@ jazil.AddTestSet(mainPage, 'CombinedItemTable', {
         })
       })
 
-      return {
-        ratedItems: items.map((item) => {
-          return new RatedItem(item, item)
-        }),
-        hasSources: true
-      }
+      return items.map((item) => {
+        return new RatedItem(item, item)
+      })
     })
 
     let numGroupsPre = table.tableElemJQ.find('tbody.group').length
@@ -54,11 +51,7 @@ jazil.AddTestSet(mainPage, 'CombinedItemTable', {
     // 3 per group, plus 1 for the template
     jazil.ShouldBe(numRowsPost - numRowsPre, 16, 'wrong number of rows added!')
     itemInfos.forEach((itemInfo) => {
-      typeDescription =
-        itemInfo.set === g_source ?
-        `source nr. ${itemInfo.nr}` :
-        ''
-      jazil.ShouldBe(CombinedItemRowInTable('combinedItemTable', itemInfo.name, typeDescription), true, `New ${itemInfo.name} not in table!`)
+      jazil.ShouldBe(CombinedItemRowInTable('combinedItemTable', itemInfo.name), true, `New ${itemInfo.name} not in table!`)
     })
   },
 

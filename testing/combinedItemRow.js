@@ -22,15 +22,7 @@ function GetCombinedItemRowDetails(itemRowElemJQ) {
 
   let cost = MakeNumberSafe(itemRowElemJQ.find('.cost'))
   let count = MakeNumberSafe(itemRowElemJQ.find('.count'))
-  let typeDetails
   let type = itemRowElemJQ.find('.type').text()
-  let detailsStart = type.indexOf(' (')
-  if (detailsStart == -1)
-    typeDetails = ''
-  else {
-    typeDetails = type.slice(detailsStart + 2, -1)
-    type = type.slice(0, detailsStart)
-  }
   let priorWork = MakeNumberSafe(itemRowElemJQ.find('.priorWork'))
   enchantNames = ''
   itemRowElemJQ.find('.enchant .name').each((enchantNr, nameElem) => {
@@ -57,7 +49,6 @@ function GetCombinedItemRowDetails(itemRowElemJQ) {
     'cost': cost,
     'count': count,
     'type': type,
-    'typeDetails': typeDetails,
     'priorWork': priorWork,
     'enchantNames': enchantNames,
     'enchantLevels': enchantLevels
@@ -65,12 +56,12 @@ function GetCombinedItemRowDetails(itemRowElemJQ) {
 }
 
 
-function CombinedItemRowInTable(testContainerID, type, typeDetails) {
+function CombinedItemRowInTable(testContainerID, type) {
   let foundRow = false
   $(`#${testContainerID} tr.item`).each((rowNr, itemRowElem) => {
     let itemRowElemJQ = $(itemRowElem)
     let details = GetCombinedItemRowDetails(itemRowElemJQ)
-    if (details.type == type && details.typeDetails == typeDetails) {
+    if (details.type == type) {
       foundRow = true
       return false
     }
@@ -78,24 +69,6 @@ function CombinedItemRowInTable(testContainerID, type, typeDetails) {
   })
 
   return foundRow
-}
-
-
-// returns { type, typeDetails }
-function GetCombinedTypeAndDetailsForItemInTable(item) {
-  let type = item.info.name
-  let typeDetails
-  if (item.set === g_source)
-    typeDetails = `source nr. ${item.nr}`
-  else if (item.set === g_extra)
-    typeDetails = 'extra'
-  else
-    typeDetails = ''
-
-  return {
-    type: type,
-    typeDetails: typeDetails
-  }
 }
 
 
@@ -122,16 +95,14 @@ jazil.AddTestSet(mainPage, 'CombinedItemRow', {
     let itemRow = CreateCombinedItemRow(templateRow, item)
 
     let details = GetCombinedItemRowDetails(itemRow.elemJQ)
-    let { type, typeDetails } = GetCombinedTypeAndDetailsForItemInTable(item)
 
-    jazil.ShouldBe(details.cost, 15, 'cost is off!')
-    jazil.ShouldBe(details.count, 9, 'count is off!')
-    jazil.ShouldBe(details.type, type, 'type is off!')
-    jazil.ShouldBe(details.typeDetails, typeDetails, 'typeDetails is off!')
-    jazil.ShouldBe(details.priorWork, 2, 'priorWork is off!')
+    jazil.ShouldBe(details.cost, item.cost, 'cost is off!')
+    jazil.ShouldBe(details.count, item.count, 'count is off!')
+    jazil.ShouldBe(details.type, item.info.name, 'type is off!')
+    jazil.ShouldBe(details.priorWork, item.priorWork, 'priorWork is off!')
     jazil.ShouldBe(details.enchantNames, '', 'enchant names are off!')
     jazil.ShouldBe(details.enchantLevels, '', 'enchant levels are off!')
-    jazil.ShouldBe(CombinedItemRowInTable('combinedItemRow', type, typeDetails), true, 'added row is not present!')
+    jazil.ShouldBe(CombinedItemRowInTable('combinedItemRow', item.info.name), true, 'added row is not present!')
   },
 
   'Create new row with item+enchants from template': (jazil) => {
@@ -141,16 +112,14 @@ jazil.AddTestSet(mainPage, 'CombinedItemRow', {
     let itemRow = CreateCombinedItemRow(templateRow, item, 15)
 
     let details = GetCombinedItemRowDetails(itemRow.elemJQ)
-    let { type, typeDetails } = GetCombinedTypeAndDetailsForItemInTable(item)
 
-    jazil.ShouldBe(details.cost, 9, 'cost is off!')
-    jazil.ShouldBe(details.count, 1, 'count is off!')
-    jazil.ShouldBe(details.type, type, 'type is off!')
-    jazil.ShouldBe(details.typeDetails, typeDetails, 'typeDetails is off!')
-    jazil.ShouldBe(details.priorWork, 4, 'priorWork is off!')
+    jazil.ShouldBe(details.cost, item.cost, 'cost is off!')
+    jazil.ShouldBe(details.count, item.count, 'count is off!')
+    jazil.ShouldBe(details.type, item.info.name, 'type is off!')
+    jazil.ShouldBe(details.priorWork, item.priorWork, 'priorWork is off!')
     jazil.ShouldBe(details.enchantNames, 'Mending/Unbreaking', 'enchant names are off!')
     jazil.ShouldBe(details.enchantLevels, '1/3', 'enchant levels are off!')
-    jazil.ShouldBe(CombinedItemRowInTable('combinedItemRow', type, typeDetails), true, 'added row is not present!')
+    jazil.ShouldBe(CombinedItemRowInTable('combinedItemRow', item.info.name), true, 'added row is not present!')
   },
 
   'Added row count is OK': (jazil) => {
@@ -178,10 +147,8 @@ jazil.AddTestSet(mainPage, 'CombinedItemRow', {
     itemRow2.Remove()
     let numRowsPost = $('#combinedItemRow tr.item').length
 
-    let { type, typeDetails } = GetCombinedTypeAndDetailsForItemInTable(item2)
-
     jazil.ShouldBe(numRowsPost - numRowsPre, -1, 'amount of rows removed is off!')
-    jazil.ShouldBe(CombinedItemRowInTable('combinedItemRow', type, typeDetails), false, 'removed row is still present!')
+    jazil.ShouldBe(CombinedItemRowInTable('combinedItemRow', item2.info.name), false, 'removed row is still present!')
   },
 
 })

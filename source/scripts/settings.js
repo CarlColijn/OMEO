@@ -6,12 +6,6 @@
 // ======== PUBLIC ========
 
 
-// For combinedItemRow.js
-const g_cirSettings = {
-  sourceItemSuffix: ' (source nr. #)',
-  extraItemSuffix: ' (extra)',
-}
-
 // For mainForm.js
 const g_mfSettings = {
   webWorkerURLVersion: '2',

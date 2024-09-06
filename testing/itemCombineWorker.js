@@ -71,7 +71,7 @@ async function TestWorker(sourceItems, desiredItem, progressCallback = undefined
     await promise
 
     status.ratedItemGroups.forEach((ratedItemGroup) => {
-      RehydrateRatedItems(ratedItemGroup.ratedItems)
+      RehydrateRatedItems(ratedItemGroup)
     })
   }
   catch (exception) {
@@ -111,7 +111,7 @@ jazil.AddTestSet(mainPage, 'ItemCombineWorker', {
     jazil.ShouldBeBetween(status.timeInMSReported, status.timeInMSMeasured - 500, status.timeInMSMeasured, 'timeInMS diverges too much!')
     jazil.ShouldNotBe(status.ratedItemGroups, undefined, 'ratedItemGroups is not returned!')
     status.ratedItemGroups.forEach((ratedItemGroup, match) => {
-      TestRatedItemListsMatch(jazil, expectedItemGroups[match], `expected ${DescribeRatedItemGroup(match)}`, ratedItemGroup.ratedItems, 'combined')
+      TestRatedItemListsMatch(jazil, expectedItemGroups[match], `expected ${DescribeRatedItemGroup(match)}`, ratedItemGroup, 'combined')
     })
   },
 
@@ -129,8 +129,6 @@ jazil.AddTestSet(mainPage, 'ItemCombineWorker', {
         // betters
       ], [
         // lessers
-        sourceItems[0],
-        sourceItems[1],
       ], [
         // mixeds
       ]
@@ -145,7 +143,7 @@ jazil.AddTestSet(mainPage, 'ItemCombineWorker', {
     jazil.ShouldBeBetween(status.timeInMSReported, status.timeInMSMeasured - 500, status.timeInMSMeasured, 'timeInMS diverges too much!')
     jazil.ShouldNotBe(status.ratedItemGroups, undefined, 'ratedItemGroups is not returned!')
     status.ratedItemGroups.forEach((ratedItemGroup, match) => {
-      TestRatedItemListsMatch(jazil, expectedItemGroups[match], `expected ${DescribeRatedItemGroup(match)}`, ratedItemGroup.ratedItems, 'combined')
+      TestRatedItemListsMatch(jazil, expectedItemGroups[match], `expected ${DescribeRatedItemGroup(match)}`, ratedItemGroup, 'combined')
     })
   },
 
@@ -163,7 +161,6 @@ jazil.AddTestSet(mainPage, 'ItemCombineWorker', {
         BuildItem({ set:g_combined, tag:2, name:'Sword', cost:39, priorWork:6, enchants:[{ name:'Unbreaking', level:3 }, { name:'Smite', level:3 }, { name:'Mending', level:1 }]}),
       ], [
         // lessers
-        sourceItems[0],
       ], [
         // mixeds
       ]
@@ -178,7 +175,7 @@ jazil.AddTestSet(mainPage, 'ItemCombineWorker', {
     jazil.ShouldBeBetween(status.timeInMSReported, status.timeInMSMeasured - 500, status.timeInMSMeasured, 'timeInMS diverges too much!')
     jazil.ShouldNotBe(status.ratedItemGroups, undefined, 'ratedItemGroups is not returned!')
     status.ratedItemGroups.forEach((ratedItemGroup, match) => {
-      TestRatedItemListsMatch(jazil, expectedItemGroups[match], `expected ${DescribeRatedItemGroup(match)}`, ratedItemGroup.ratedItems, 'combined')
+      TestRatedItemListsMatch(jazil, expectedItemGroups[match], `expected ${DescribeRatedItemGroup(match)}`, ratedItemGroup, 'combined')
     })
   },
 
@@ -196,7 +193,6 @@ jazil.AddTestSet(mainPage, 'ItemCombineWorker', {
         //BuildItem({ set:g_combined, tag:2, name:'Sword', cost:40, priorWork:6, enchants:[{ name:'Unbreaking', level:3 }, { name:'Smite', level:4 }, { name:'Mending', level:1 }]}),
       ], [
         // lessers
-        sourceItems[0],
       ], [
         // mixeds
       ]
@@ -211,7 +207,7 @@ jazil.AddTestSet(mainPage, 'ItemCombineWorker', {
     jazil.ShouldBeBetween(status.timeInMSReported, status.timeInMSMeasured - 500, status.timeInMSMeasured, 'timeInMS diverges too much!')
     jazil.ShouldNotBe(status.ratedItemGroups, undefined, 'ratedItemGroups is not returned!')
     status.ratedItemGroups.forEach((ratedItemGroup, match) => {
-      TestRatedItemListsMatch(jazil, expectedItemGroups[match], `expected ${DescribeRatedItemGroup(match)}`, ratedItemGroup.ratedItems, 'source')
+      TestRatedItemListsMatch(jazil, expectedItemGroups[match], `expected ${DescribeRatedItemGroup(match)}`, ratedItemGroup, 'source')
     })
   },
 

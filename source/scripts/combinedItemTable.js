@@ -38,10 +38,10 @@ class CombinedItemTable {
 
   SetRatedItemGroup(ratedItemGroups, match) {
     let ratedItemGroup = ratedItemGroups[match]
-    if (ratedItemGroup.ratedItems.length > 0) {
+    if (ratedItemGroup.length > 0) {
       let itemGroup = this.itemTemplateGroup.CreateNew(match)
 
-      ratedItemGroup.ratedItems.forEach((ratedItem) => {
+      ratedItemGroup.forEach((ratedItem) => {
         itemGroup.AddItem(ratedItem)
       })
     }

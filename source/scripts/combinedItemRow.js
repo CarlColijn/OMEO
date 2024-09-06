@@ -67,7 +67,7 @@ class CombinedItemRow extends RealElement {
     let item = ratedItem.item
 
     this.elemJQ.find('.count').text(item.count)
-    this.elemJQ.find('.type').text(item.info.name + this.GetItemSuffix(item))
+    this.elemJQ.find('.type').text(item.info.name)
     this.elemJQ.find('.priorWork').text(item.priorWork)
     this.elemJQ.find('.cost').text(item.totalCost)
     let showDetailsElemJQ = this.elemJQ.find('[name=show]')
@@ -77,20 +77,6 @@ class CombinedItemRow extends RealElement {
       showDetailsElemJQ.click(() => {
         this.ShowDetails(item)
       })
-  }
-
-
-  GetItemSuffix(item) {
-    switch (item.set) {
-      case g_source:
-        return g_cirSettings.sourceItemSuffix.replace('#', item.nr)
-      case g_extra:
-        return g_cirSettings.extraItemSuffix
-      case g_combined:
-        return ''
-    }
-
-    return ''
   }
 
 

@@ -1,26 +1,23 @@
 // Passed in options should be: {
 //   desiredItem: Item,
-//   sourceItems: Item[],
 //   combinedItems: Item[],
 //   numResultItems: int (default:1e9),
 //   groups: {
-//     expectedTags: string[],
-//     hasSource: bool,
+//     expectedTags: string[]
 //   }[4] // index equal to the g_xxxMatch constants
 // }
 function CheckItemFilterResultOK(jazil, options) {
   let filter = new CombineResultFilter(options.desiredItem)
-  let ratedItemGroups = filter.FilterItems(options.sourceItems, options.combinedItems, options.numResultItems ?? 1e9)
+  let ratedItemGroups = filter.FilterItems(options.combinedItems, options.numResultItems ?? 1e9)
 
   options.groups.forEach((ownGroup, match) => {
     let groupDescription = DescribeRatedItemGroup(match)
 
     let ratedItemGroup = ratedItemGroups[match]
-    jazil.ShouldBe(ratedItemGroup.ratedItems.length, ownGroup.expectedTags.length, `wrong number of items returned in ${groupDescription} group!`)
-    jazil.ShouldBe(ratedItemGroup.hasSources, ownGroup.hasSources, `wrong hasSources returned in ${groupDescription} group!`)
+    jazil.ShouldBe(ratedItemGroup.length, ownGroup.expectedTags.length, `wrong number of items returned in ${groupDescription} group!`)
 
     ownGroup.expectedTags.forEach((expectedTag, itemNr) => {
-      jazil.ShouldBe(ratedItemGroup.ratedItems[itemNr].item.tag, expectedTag, `wrong item #${itemNr} got returned in ${groupDescription} group!`)
+      jazil.ShouldBe(ratedItemGroup[itemNr].item.tag, expectedTag, `wrong item #${itemNr} got returned in ${groupDescription} group!`)
     })
   })
 }
@@ -33,15 +30,13 @@ jazil.AddTestSet(mainPage, 'CombineResultFilter', {
     CheckItemFilterResultOK(jazil, {
       desiredItem:
         undefined,
-      sourceItems:[
-      ],
       combinedItems:[
       ],
       groups:[
-        { expectedTags:[], hasSources:false }, // exacts
-        { expectedTags:[], hasSources:false }, // betters
-        { expectedTags:[], hasSources:false }, // lessers
-        { expectedTags:[], hasSources:false } // mixeds
+        { expectedTags:[] }, // exacts
+        { expectedTags:[] }, // betters
+        { expectedTags:[] }, // lessers
+        { expectedTags:[] } // mixeds
       ]
     })
   },
@@ -50,19 +45,15 @@ jazil.AddTestSet(mainPage, 'CombineResultFilter', {
     CheckItemFilterResultOK(jazil, {
       desiredItem:
         BuildItem({ set:g_desired, name:'Helmet' }),
-      sourceItems:[
-        BuildItem({ set:g_extra, tag:1, name:'Sword' }),
-        BuildItem({ set:g_source, tag:2, name:'Axe' }),
-      ],
       combinedItems:[
-        BuildItem({ set:g_combined, tag:3, name:'Book' }),
-        BuildItem({ set:g_combined, tag:4, name:'Chestplate' }),
+        BuildItem({ set:g_combined, tag:1, name:'Book' }),
+        BuildItem({ set:g_combined, tag:2, name:'Chestplate' }),
       ],
       groups:[
-        { expectedTags:[], hasSources:false }, // exacts
-        { expectedTags:[], hasSources:false }, // betters
-        { expectedTags:[], hasSources:false }, // lessers
-        { expectedTags:[], hasSources:false } // mixeds
+        { expectedTags:[] }, // exacts
+        { expectedTags:[] }, // betters
+        { expectedTags:[] }, // lessers
+        { expectedTags:[] } // mixeds
       ]
     })
   },
@@ -71,19 +62,15 @@ jazil.AddTestSet(mainPage, 'CombineResultFilter', {
     CheckItemFilterResultOK(jazil, {
       desiredItem:
         BuildItem({ set:g_desired, name:'Axe', enchants:[{ name:'Efficiency' }] }),
-      sourceItems:[
-        BuildItem({ set:g_extra, tag:1, name:'Sword', enchants:[{ name:'Smite', level:2 }, { name:'Mending' }] }),
-        BuildItem({ set:g_source, tag:2, name:'Book', enchants:[{ name:'Aqua Affinity' }] }),
-      ],
       combinedItems:[
-        BuildItem({ set:g_combined, tag:3, name:'Helmet', enchants:[{ name:'Unbreaking', level:3 }] }),
-        BuildItem({ set:g_combined, tag:4, name:'Chestplate', enchants:[{ name:'Protection', level:3 }] }),
+        BuildItem({ set:g_combined, tag:1, name:'Helmet', enchants:[{ name:'Unbreaking', level:3 }] }),
+        BuildItem({ set:g_combined, tag:2, name:'Chestplate', enchants:[{ name:'Protection', level:3 }] }),
       ],
       groups:[
-        { expectedTags:[], hasSources:false }, // exacts
-        { expectedTags:[], hasSources:false }, // betters
-        { expectedTags:[], hasSources:false }, // lessers
-        { expectedTags:[], hasSources:false } // mixeds
+        { expectedTags:[] }, // exacts
+        { expectedTags:[] }, // betters
+        { expectedTags:[] }, // lessers
+        { expectedTags:[] } // mixeds
       ]
     })
   },
@@ -92,8 +79,6 @@ jazil.AddTestSet(mainPage, 'CombineResultFilter', {
     CheckItemFilterResultOK(jazil, {
       desiredItem:
         BuildItem({ set:g_desired, name:'Helmet', enchants:[{ name:'Protection', level:3 }] }),
-      sourceItems:[
-      ],
       combinedItems:[
         BuildItem({ set:g_combined, tag:1, name:'Helmet', enchants:[{ name:'Protection', level:1 }] }),
         BuildItem({ set:g_combined, tag:2, name:'Helmet', enchants:[{ name:'Protection', level:2 }] }),
@@ -105,68 +90,18 @@ jazil.AddTestSet(mainPage, 'CombineResultFilter', {
         BuildItem({ set:g_combined, tag:8, name:'Helmet', enchants:[{ name:'Protection', level:4 }, { name:'Mending' }] }),
       ],
       groups:[
-        { expectedTags:[3], hasSources:false }, // exacts
-        { expectedTags:[8,7,4], hasSources:false }, // betters
-        { expectedTags:[2,1], hasSources:false }, // lessers
-        { expectedTags:[6,5], hasSources:false } // mixeds
+        { expectedTags:[3] }, // exacts
+        { expectedTags:[8,7,4] }, // betters
+        { expectedTags:[2,1] }, // lessers
+        { expectedTags:[6,5] } // mixeds
       ]
     })
   },
 
-  'Extra items filtered out': (jazil) => {
-    CheckItemFilterResultOK(jazil, {
-      desiredItem:
-        BuildItem({ set:g_desired, name:'Helmet', enchants:[{ name:'Protection', level:3 }] }),
-      sourceItems:[
-        BuildItem({ set:g_combined, tag:1, name:'Helmet', enchants:[{ name:'Protection', level:1 }] }),
-        BuildItem({ set:g_combined, tag:2, name:'Helmet', enchants:[{ name:'Protection', level:2 }] }),
-        BuildItem({ set:g_extra, tag:3, name:'Helmet', enchants:[{ name:'Protection', level:3 }] }),
-        BuildItem({ set:g_combined, tag:4, name:'Helmet', enchants:[{ name:'Protection', level:4 }] }),
-        BuildItem({ set:g_extra, tag:5, name:'Helmet', enchants:[{ name:'Protection', level:1 }, { name:'Mending' }] }),
-        BuildItem({ set:g_combined, tag:6, name:'Helmet', enchants:[{ name:'Protection', level:2 }, { name:'Mending' }] }),
-        BuildItem({ set:g_extra, tag:7, name:'Helmet', enchants:[{ name:'Protection', level:3 }, { name:'Mending' }] }),
-        BuildItem({ set:g_combined, tag:8, name:'Helmet', enchants:[{ name:'Protection', level:4 }, { name:'Mending' }] }),
-      ],
-      combinedItems:[
-      ],
-      groups:[
-        { expectedTags:[], hasSources:false }, // exacts
-        { expectedTags:[8,4], hasSources:false }, // betters
-        { expectedTags:[2,1], hasSources:false }, // lessers
-        { expectedTags:[6], hasSources:false } // mixeds
-      ]
-    })
-  },
-
-  'Source items detected OK': (jazil) => {
-    CheckItemFilterResultOK(jazil, {
-      desiredItem:
-        BuildItem({ set:g_desired, name:'Helmet', enchants:[{ name:'Protection', level:3 }] }),
-      sourceItems:[
-        BuildItem({ set:g_source, tag:1, name:'Helmet', enchants:[{ name:'Protection', level:1 }] }),
-        BuildItem({ set:g_combined, tag:2, name:'Helmet', enchants:[{ name:'Protection', level:2 }] }),
-        BuildItem({ set:g_source, tag:3, name:'Helmet', enchants:[{ name:'Protection', level:3 }] }),
-        BuildItem({ set:g_source, tag:4, name:'Helmet', enchants:[{ name:'Protection', level:4 }] }),
-        BuildItem({ set:g_source, tag:5, name:'Helmet', enchants:[{ name:'Protection', level:1 }, { name:'Mending' }] }),
-        BuildItem({ set:g_combined, tag:6, name:'Helmet', enchants:[{ name:'Protection', level:2 }, { name:'Mending' }] }),
-        BuildItem({ set:g_source, tag:7, name:'Helmet', enchants:[{ name:'Protection', level:3 }, { name:'Mending' }] }),
-        BuildItem({ set:g_combined, tag:8, name:'Helmet', enchants:[{ name:'Protection', level:4 }, { name:'Mending' }] }),
-      ],
-      combinedItems:[
-      ],
-      groups:[
-        { expectedTags:[3], hasSources:true }, // exacts
-        { expectedTags:[8,7,4], hasSources:true }, // betters
-        { expectedTags:[2,1], hasSources:true }, // lessers
-        { expectedTags:[6,5], hasSources:true } // mixeds
-      ]
-    })
-  },
 
   'Only first of matching identical plain items returned': (jazil) => {
     CheckItemFilterResultOK(jazil, {
       desiredItem:BuildItem({ set:g_desired, name:'Axe' }),
-      sourceItems:[],
       combinedItems:[
         BuildItem({ set:g_combined, tag:1, name:'Book' }),
         BuildItem({ set:g_combined, tag:2, name:'Axe' }),
@@ -174,10 +109,10 @@ jazil.AddTestSet(mainPage, 'CombineResultFilter', {
         BuildItem({ set:g_combined, tag:4, name:'Axe' }),
       ],
       groups:[
-        { expectedTags:[2], hasSources:false }, // exacts
-        { expectedTags:[], hasSources:false }, // betters
-        { expectedTags:[], hasSources:false }, // lessers
-        { expectedTags:[], hasSources:false } // mixeds
+        { expectedTags:[2] }, // exacts
+        { expectedTags:[] }, // betters
+        { expectedTags:[] }, // lessers
+        { expectedTags:[] } // mixeds
       ]
     })
   },
@@ -185,7 +120,6 @@ jazil.AddTestSet(mainPage, 'CombineResultFilter', {
   'Only first of matching identical enchanted items returned': (jazil) => {
     CheckItemFilterResultOK(jazil, {
       desiredItem:BuildItem({ set:g_desired, name:'Helmet', enchants:[{ name:'Unbreaking', level:3 }] }),
-      sourceItems:[],
       combinedItems:[
         BuildItem({ set:g_combined, tag:1, name:'Helmet', enchants:[{ name:'Unbreaking', level:3 }] }),
         BuildItem({ set:g_combined, tag:2, name:'Book' }),
@@ -193,10 +127,10 @@ jazil.AddTestSet(mainPage, 'CombineResultFilter', {
         BuildItem({ set:g_combined, tag:4, name:'Helmet', enchants:[{ name:'Unbreaking', level:3 }] }),
       ],
       groups:[
-        { expectedTags:[1], hasSources:false }, // exacts
-        { expectedTags:[], hasSources:false }, // betters
-        { expectedTags:[], hasSources:false }, // lessers
-        { expectedTags:[], hasSources:false } // mixeds
+        { expectedTags:[1] }, // exacts
+        { expectedTags:[] }, // betters
+        { expectedTags:[] }, // lessers
+        { expectedTags:[] } // mixeds
       ]
     })
   },
@@ -204,7 +138,6 @@ jazil.AddTestSet(mainPage, 'CombineResultFilter', {
   'Correct lowest selection of mixed prior work and total cost': (jazil) => {
     CheckItemFilterResultOK(jazil, {
       desiredItem:BuildItem({ set:g_desired, tag:0, name:'Helmet' }),
-      sourceItems:[],
       combinedItems:[
         BuildItem({ set:g_combined, tag:1,  name:'Helmet', priorWork:1, totalCost:22 }),
         BuildItem({ set:g_combined, tag:2,  name:'Helmet', priorWork:2, totalCost:21 }),
@@ -219,10 +152,10 @@ jazil.AddTestSet(mainPage, 'CombineResultFilter', {
         BuildItem({ set:g_combined, tag:11, name:'Helmet', priorWork:3, totalCost:13 }),
       ],
       groups:[
-        { expectedTags:[3,10,6], hasSources:false }, // exacts
-        { expectedTags:[], hasSources:false }, // betters
-        { expectedTags:[], hasSources:false }, // lessers
-        { expectedTags:[], hasSources:false } // mixeds
+        { expectedTags:[3,10,6] }, // exacts
+        { expectedTags:[] }, // betters
+        { expectedTags:[] }, // lessers
+        { expectedTags:[] } // mixeds
       ]
     })
   },
@@ -230,7 +163,6 @@ jazil.AddTestSet(mainPage, 'CombineResultFilter', {
   'Sorting OK for enchant level': (jazil) => {
     CheckItemFilterResultOK(jazil, {
       desiredItem:BuildItem({ set:g_desired, name:'Helmet', enchants:[{ name:'Protection', level:3 }] }),
-      sourceItems:[],
       combinedItems:[
         BuildItem({ set:g_combined, tag:1, name:'Helmet', enchants:[{ name:'Protection', level:2 }] }),
         BuildItem({ set:g_combined, tag:2, name:'Helmet', enchants:[{ name:'Protection', level:0 }] }),
@@ -240,10 +172,10 @@ jazil.AddTestSet(mainPage, 'CombineResultFilter', {
         BuildItem({ set:g_combined, tag:6, name:'Helmet', enchants:[{ name:'Protection', level:4 }] }),
       ],
       groups:[
-        { expectedTags:[3], hasSources:false }, // exacts
-        { expectedTags:[4,6], hasSources:false }, // betters
-        { expectedTags:[1,5,2], hasSources:false }, // lessers
-        { expectedTags:[], hasSources:false } // mixeds
+        { expectedTags:[3] }, // exacts
+        { expectedTags:[4,6] }, // betters
+        { expectedTags:[1,5,2] }, // lessers
+        { expectedTags:[] } // mixeds
       ]
     })
   },
@@ -251,7 +183,6 @@ jazil.AddTestSet(mainPage, 'CombineResultFilter', {
   'Sorting OK for prior work': (jazil) => {
     CheckItemFilterResultOK(jazil, {
       desiredItem:BuildItem({ set:g_desired, tag:0, name:'Helmet' }),
-      sourceItems:[],
       combinedItems:[
         // Note: we need to also give a reverse-sorted totalCost, otherwise the filter
         // will just deduplicate the options and give the lowest priorWork one.
@@ -264,10 +195,10 @@ jazil.AddTestSet(mainPage, 'CombineResultFilter', {
         BuildItem({ set:g_combined, tag:6, name:'Helmet', priorWork:0, totalCost:6e-9 }),
       ],
       groups:[
-        { expectedTags:[6,2,1,4,5,3], hasSources:false }, // exacts
-        { expectedTags:[], hasSources:false }, // betters
-        { expectedTags:[], hasSources:false }, // lessers
-        { expectedTags:[], hasSources:false } // mixeds
+        { expectedTags:[6,2,1,4,5,3] }, // exacts
+        { expectedTags:[] }, // betters
+        { expectedTags:[] }, // lessers
+        { expectedTags:[] } // mixeds
       ]
     })
   },
@@ -275,7 +206,6 @@ jazil.AddTestSet(mainPage, 'CombineResultFilter', {
   'Sorting OK for total cost': (jazil) => {
     CheckItemFilterResultOK(jazil, {
       desiredItem:BuildItem({ set:g_desired, tag:0, name:'Helmet' }),
-      sourceItems:[],
       combinedItems:[
         // Note: we need to also give a reverse-sorted priorWork, otherwise the filter
         // will just deduplicate the options and give the lowest totalCost one.
@@ -291,10 +221,10 @@ jazil.AddTestSet(mainPage, 'CombineResultFilter', {
         BuildItem({ set:g_combined, tag:9, name:'Helmet', priorWork:4e-9, totalCost:13 }),
       ],
       groups:[
-        { expectedTags:[5,4,6,8,7,9,2,1,3], hasSources:false }, // exacts
-        { expectedTags:[], hasSources:false }, // betters
-        { expectedTags:[], hasSources:false }, // lessers
-        { expectedTags:[], hasSources:false } // mixeds
+        { expectedTags:[5,4,6,8,7,9,2,1,3] }, // exacts
+        { expectedTags:[] }, // betters
+        { expectedTags:[] }, // lessers
+        { expectedTags:[] } // mixeds
       ]
     })
   },
@@ -302,7 +232,6 @@ jazil.AddTestSet(mainPage, 'CombineResultFilter', {
   'Result limited to given nr. of entries': (jazil) => {
     CheckItemFilterResultOK(jazil, {
       desiredItem:BuildItem({ set:g_desired, tag:0, name:'Helmet', enchants:[{ name:'Protection', level:3 }] }),
-      sourceItems:[],
       combinedItems:[
         // lesser
         BuildItem({ set:g_combined, tag:1,  name:'Helmet', enchants:[{ name:'Protection', level:1 }] }),
@@ -318,10 +247,10 @@ jazil.AddTestSet(mainPage, 'CombineResultFilter', {
       ],
       numResultItems:1,
       groups:[
-        { expectedTags:[3], hasSources:false }, // exacts
-        { expectedTags:[5], hasSources:false }, // betters
-        { expectedTags:[2], hasSources:false }, // lessers
-        { expectedTags:[7], hasSources:false } // mixeds
+        { expectedTags:[3] }, // exacts
+        { expectedTags:[5] }, // betters
+        { expectedTags:[2] }, // lessers
+        { expectedTags:[7] } // mixeds
       ]
     })
   },
