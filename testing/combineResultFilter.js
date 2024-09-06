@@ -8,16 +8,16 @@
 // }
 function CheckItemFilterResultOK(jazil, options) {
   let filter = new CombineResultFilter(options.desiredItem)
-  let ratedItemGroups = filter.FilterItems(options.combinedItems, options.numResultItems ?? 1e9)
+  let filteredCombinedItems = filter.FilterItems(options.combinedItems, options.numResultItems ?? 1e9)
 
   options.groups.forEach((ownGroup, match) => {
     let groupDescription = DescribeRatedItemGroup(match)
 
-    let ratedItemGroup = ratedItemGroups[match]
-    jazil.ShouldBe(ratedItemGroup.length, ownGroup.expectedTags.length, `wrong number of items returned in ${groupDescription} group!`)
+    let ratedItems = filteredCombinedItems.ratedItemsByMatch[match]
+    jazil.ShouldBe(ratedItems.length, ownGroup.expectedTags.length, `wrong number of items returned in ${groupDescription} group!`)
 
     ownGroup.expectedTags.forEach((expectedTag, itemNr) => {
-      jazil.ShouldBe(ratedItemGroup[itemNr].item.tag, expectedTag, `wrong item #${itemNr} got returned in ${groupDescription} group!`)
+      jazil.ShouldBe(ratedItems[itemNr].item.tag, expectedTag, `wrong item #${itemNr} got returned in ${groupDescription} group!`)
     })
   })
 }

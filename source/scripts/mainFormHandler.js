@@ -135,12 +135,12 @@ class MainFormHandler {
   }
 
 
-  TellCombineDone(ratedItemGroups, maxProgress, timeInMilliseconds) {
+  TellCombineDone(filteredCombinedItems, maxProgress, timeInMilliseconds) {
     let timeInSeconds = Math.round(timeInMilliseconds / 1000)
-    let hasExactMatches = ratedItemGroups[g_exactMatch].length > 0
-    let hasBetterMatches = ratedItemGroups[g_betterMatch].length > 0
-    let hasLesserMatches = ratedItemGroups[g_lesserMatch].length > 0
-    let hasMixedMatches = ratedItemGroups[g_mixedMatch].length > 0
+    let hasExactMatches = filteredCombinedItems.ratedItemsByMatch[g_exactMatch].length > 0
+    let hasBetterMatches = filteredCombinedItems.ratedItemsByMatch[g_betterMatch].length > 0
+    let hasLesserMatches = filteredCombinedItems.ratedItemsByMatch[g_lesserMatch].length > 0
+    let hasMixedMatches = filteredCombinedItems.ratedItemsByMatch[g_mixedMatch].length > 0
 
     let title = 'Divination is compete!'
     let message = `${this.GetProgressMessage(maxProgress, maxProgress, timeInMilliseconds)}<br><br>`

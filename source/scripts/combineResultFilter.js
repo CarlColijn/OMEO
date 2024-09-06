@@ -8,9 +8,9 @@
   - ratedItem.js
 
   Defined classes:
-  - RatedItemGroup: RatedItem[]
-
-  - RatedItemGroups: RatedItemGroup[] // index is one of the g_xxxMatch consts
+  - FilteredCombinedItems: {
+      ratedItemsByMatch: RatedItem[][] // 1st index is one of the g_xxxMatch consts
+    }
 
   - CombineResultFilter
 */
@@ -28,20 +28,20 @@ class CombineResultFilter {
   }
 
 
-  // returns RatedItemGroups
+  // returns FilteredCombinedItems
   FilterItems(combinedItems, numItemsToTake) {
     let relevantItems = this.GetRelevantItems(combinedItems)
     relevantItems = this.GetLowestPrioAndCostItems(relevantItems)
 
     let ratedItems = this.RateItems(relevantItems)
 
-    let ratedItemGroups = this.GroupRatedItems(ratedItems)
+    let filteredCombinedItems = this.GroupRatedItems(ratedItems)
 
-    this.SortGroups(ratedItemGroups)
+    this.SortGroups(filteredCombinedItems)
 
-    this.KeepBestInGroup(ratedItemGroups, numItemsToTake)
+    this.KeepBestInGroup(filteredCombinedItems, numItemsToTake)
 
-    return ratedItemGroups
+    return filteredCombinedItems
   }
 
 
@@ -142,7 +142,7 @@ class CombineResultFilter {
   }
 
 
-  // returns RatedItemGroups
+  // returns FilteredCombinedItems
   GroupRatedItems(ratedItems) {
     let exacts = []
     let betters = []
@@ -166,13 +166,15 @@ class CombineResultFilter {
       }
     })
 
-    return [exacts, betters, lessers, mixeds]
+    return {
+      ratedItemsByMatch: [exacts, betters, lessers, mixeds]
+    }
   }
 
 
-  SortGroups(ratedItemGroups) {
-    ratedItemGroups.forEach((group) => {
-      group.sort((ratedItem1, ratedItem2) => {
+  SortGroups(filteredCombinedItems) {
+    filteredCombinedItems.ratedItemsByMatch.forEach((ratedItems) => {
+      ratedItems.sort((ratedItem1, ratedItem2) => {
         // note: lower is better, so the - order is inverted
         return ratedItem1.totalRating - ratedItem2.totalRating
       })
@@ -180,9 +182,9 @@ class CombineResultFilter {
   }
 
 
-  KeepBestInGroup(ratedItemGroups, numItemsToTake) {
-    ratedItemGroups.forEach((group) => {
-      group.splice(numItemsToTake, Infinity)
+  KeepBestInGroup(filteredCombinedItems, numItemsToTake) {
+    filteredCombinedItems.ratedItemsByMatch.forEach((ratedItems) => {
+      ratedItems.splice(numItemsToTake, Infinity)
     })
   }
 }

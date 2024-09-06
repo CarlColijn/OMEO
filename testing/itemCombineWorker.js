@@ -2,7 +2,7 @@
 // - progressCalled: bool
 // - finalizeCalled: bool
 // - doneCalled: bool
-// - ratedItemGroups: RatedItemGroups
+// - filteredCombinedItems: FilteredCombinedItems
 // - stoppedResponding: bool
 async function TestWorker(sourceItems, desiredItem, progressCallback = undefined) {
   class WorkerStoppedResponding {}
@@ -12,7 +12,7 @@ async function TestWorker(sourceItems, desiredItem, progressCallback = undefined
     finalizeCalled: false,
     doneCalled: false,
     finalMaxProgress: 0,
-    ratedItemGroups: undefined,
+    filteredCombinedItems: undefined,
     timeInMSReported: 0,
     timeInMSMeasured: 0,
     stoppedResponding: false
@@ -37,7 +37,7 @@ async function TestWorker(sourceItems, desiredItem, progressCallback = undefined
           break
         case 2:
           status.doneCalled = true
-          status.ratedItemGroups = e.data.ratedItemGroups
+          status.filteredCombinedItems = e.data.filteredCombinedItems
           status.finalMaxProgress = e.data.maxProgress
           status.timeInMSMeasured = Date.now() - startTimeInMS
           status.timeInMSReported = e.data.timeInMS
@@ -70,8 +70,8 @@ async function TestWorker(sourceItems, desiredItem, progressCallback = undefined
   try {
     await promise
 
-    status.ratedItemGroups.forEach((ratedItemGroup) => {
-      RehydrateRatedItems(ratedItemGroup)
+    status.filteredCombinedItems.ratedItemsByMatch.forEach((ratedItems) => {
+      RehydrateRatedItems(ratedItems)
     })
   }
   catch (exception) {
@@ -109,9 +109,9 @@ jazil.AddTestSet(mainPage, 'ItemCombineWorker', {
     jazil.ShouldBe(status.finalizeCalled, true, 'finalize not called!')
     jazil.ShouldBe(status.doneCalled, true, 'done not called!')
     jazil.ShouldBeBetween(status.timeInMSReported, status.timeInMSMeasured - 500, status.timeInMSMeasured, 'timeInMS diverges too much!')
-    jazil.ShouldNotBe(status.ratedItemGroups, undefined, 'ratedItemGroups is not returned!')
-    status.ratedItemGroups.forEach((ratedItemGroup, match) => {
-      TestRatedItemListsMatch(jazil, expectedItemGroups[match], `expected ${DescribeRatedItemGroup(match)}`, ratedItemGroup, 'combined')
+    jazil.ShouldNotBe(status.filteredCombinedItems, undefined, 'filteredCombinedItems is not returned!')
+    status.filteredCombinedItems.ratedItemsByMatch.forEach((ratedItems, match) => {
+      TestRatedItemListsMatch(jazil, expectedItemGroups[match], `expected ${DescribeRatedItemGroup(match)}`, ratedItems, 'combined')
     })
   },
 
@@ -141,9 +141,9 @@ jazil.AddTestSet(mainPage, 'ItemCombineWorker', {
     jazil.ShouldBe(status.finalizeCalled, true, 'finalize not called!')
     jazil.ShouldBe(status.doneCalled, true, 'done not called!')
     jazil.ShouldBeBetween(status.timeInMSReported, status.timeInMSMeasured - 500, status.timeInMSMeasured, 'timeInMS diverges too much!')
-    jazil.ShouldNotBe(status.ratedItemGroups, undefined, 'ratedItemGroups is not returned!')
-    status.ratedItemGroups.forEach((ratedItemGroup, match) => {
-      TestRatedItemListsMatch(jazil, expectedItemGroups[match], `expected ${DescribeRatedItemGroup(match)}`, ratedItemGroup, 'combined')
+    jazil.ShouldNotBe(status.filteredCombinedItems, undefined, 'filteredCombinedItems is not returned!')
+    status.filteredCombinedItems.ratedItemsByMatch.forEach((ratedItems, match) => {
+      TestRatedItemListsMatch(jazil, expectedItemGroups[match], `expected ${DescribeRatedItemGroup(match)}`, ratedItems, 'combined')
     })
   },
 
@@ -173,9 +173,9 @@ jazil.AddTestSet(mainPage, 'ItemCombineWorker', {
     jazil.ShouldBe(status.finalizeCalled, true, 'finalize not called!')
     jazil.ShouldBe(status.doneCalled, true, 'done not called!')
     jazil.ShouldBeBetween(status.timeInMSReported, status.timeInMSMeasured - 500, status.timeInMSMeasured, 'timeInMS diverges too much!')
-    jazil.ShouldNotBe(status.ratedItemGroups, undefined, 'ratedItemGroups is not returned!')
-    status.ratedItemGroups.forEach((ratedItemGroup, match) => {
-      TestRatedItemListsMatch(jazil, expectedItemGroups[match], `expected ${DescribeRatedItemGroup(match)}`, ratedItemGroup, 'combined')
+    jazil.ShouldNotBe(status.filteredCombinedItems, undefined, 'filteredCombinedItems is not returned!')
+    status.filteredCombinedItems.ratedItemsByMatch.forEach((ratedItems, match) => {
+      TestRatedItemListsMatch(jazil, expectedItemGroups[match], `expected ${DescribeRatedItemGroup(match)}`, ratedItems, 'combined')
     })
   },
 
@@ -205,9 +205,9 @@ jazil.AddTestSet(mainPage, 'ItemCombineWorker', {
     jazil.ShouldBe(status.finalizeCalled, true, 'finalize not called!')
     jazil.ShouldBe(status.doneCalled, true, 'done not called!')
     jazil.ShouldBeBetween(status.timeInMSReported, status.timeInMSMeasured - 500, status.timeInMSMeasured, 'timeInMS diverges too much!')
-    jazil.ShouldNotBe(status.ratedItemGroups, undefined, 'ratedItemGroups is not returned!')
-    status.ratedItemGroups.forEach((ratedItemGroup, match) => {
-      TestRatedItemListsMatch(jazil, expectedItemGroups[match], `expected ${DescribeRatedItemGroup(match)}`, ratedItemGroup, 'source')
+    jazil.ShouldNotBe(status.filteredCombinedItems, undefined, 'filteredCombinedItems is not returned!')
+    status.filteredCombinedItems.ratedItemsByMatch.forEach((ratedItems, match) => {
+      TestRatedItemListsMatch(jazil, expectedItemGroups[match], `expected ${DescribeRatedItemGroup(match)}`, ratedItems, 'source')
     })
   },
 
@@ -252,7 +252,7 @@ jazil.AddTestSet(mainPage, 'ItemCombineWorker', {
     jazil.ShouldBe(status.finalizeCalled, true, 'finalize not called!')
     jazil.ShouldBe(status.doneCalled, true, 'done not called!')
     jazil.ShouldBeBetween(status.timeInMSReported, status.timeInMSMeasured - 500, status.timeInMSMeasured, 'timeInMS diverges too much!')
-    jazil.ShouldNotBe(status.ratedItemGroups, undefined, 'ratedItemGroups is not returned!')
+    jazil.ShouldNotBe(status.filteredCombinedItems, undefined, 'filteredCombinedItems is not returned!')
     // We won't test with TestRatedItemListsMatch; this is covered by other unit tests
     // anyway and we want a more time consuming thus more complex combine round
     // for this test.
@@ -275,7 +275,7 @@ jazil.AddTestSet(mainPage, 'ItemCombineWorker', {
     jazil.ShouldBe(status.finalizeCalled, false, 'finalize called!')
     jazil.ShouldBe(status.doneCalled, false, 'done called!')
     jazil.ShouldBeBetween(status.timeInMSReported, status.timeInMSMeasured - 500, status.timeInMSMeasured, 'timeInMS diverges too much!')
-    jazil.ShouldBe(status.ratedItemGroups, undefined, 'ratedItemGroups is returned!')
+    jazil.ShouldBe(status.filteredCombinedItems, undefined, 'filteredCombinedItems is returned!')
     jazil.ShouldBe(status.stoppedResponding, true, 'didn\'t stop responding!')
   },
 

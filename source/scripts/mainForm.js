@@ -119,14 +119,14 @@ class MainForm {
           this.formHandler.TellCombineFinalizing()
           break
         case 2:
-          let ratedItemGroups = e.data.ratedItemGroups
-          ratedItemGroups.forEach((ratedItemGroup) => {
-            RehydrateRatedItems(ratedItemGroup)
+          let filteredCombinedItems = e.data.filteredCombinedItems
+          filteredCombinedItems.ratedItemsByMatch.forEach((ratedItems) => {
+            RehydrateRatedItems(ratedItems)
           })
 
-          this.ShowCombinedItems(ratedItemGroups)
+          this.ShowCombinedItems(filteredCombinedItems)
 
-          this.formHandler.TellCombineDone(ratedItemGroups, e.data.maxProgress, e.data.timeInMS)
+          this.formHandler.TellCombineDone(filteredCombinedItems, e.data.maxProgress, e.data.timeInMS)
           break
       }
     }
@@ -206,8 +206,8 @@ class MainForm {
   }
 
 
-  ShowCombinedItems(ratedItemGroups) {
-    this.combineItemTable.SetRatedItemGroups(ratedItemGroups)
+  ShowCombinedItems(filteredCombinedItems) {
+    this.combineItemTable.SetCombinedItems(filteredCombinedItems)
   }
 
 

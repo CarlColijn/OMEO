@@ -36,24 +36,24 @@ class CombinedItemTable {
   }
 
 
-  SetRatedItemGroup(ratedItemGroups, match) {
-    let ratedItemGroup = ratedItemGroups[match]
-    if (ratedItemGroup.length > 0) {
+  SetRatedItemGroup(filteredCombinedItems, match) {
+    let ratedItems = filteredCombinedItems.ratedItemsByMatch[match]
+    if (ratedItems.length > 0) {
       let itemGroup = this.itemTemplateGroup.CreateNew(match)
 
-      ratedItemGroup.forEach((ratedItem) => {
+      ratedItems.forEach((ratedItem) => {
         itemGroup.AddItem(ratedItem)
       })
     }
   }
 
 
-  SetRatedItemGroups(ratedItemGroups) {
+  SetCombinedItems(filteredCombinedItems) {
     this.Clear()
 
-    this.SetRatedItemGroup(ratedItemGroups, g_exactMatch)
-    this.SetRatedItemGroup(ratedItemGroups, g_betterMatch)
-    this.SetRatedItemGroup(ratedItemGroups, g_mixedMatch)
-    this.SetRatedItemGroup(ratedItemGroups, g_lesserMatch)
+    this.SetRatedItemGroup(filteredCombinedItems, g_exactMatch)
+    this.SetRatedItemGroup(filteredCombinedItems, g_betterMatch)
+    this.SetRatedItemGroup(filteredCombinedItems, g_mixedMatch)
+    this.SetRatedItemGroup(filteredCombinedItems, g_lesserMatch)
   }
 }
