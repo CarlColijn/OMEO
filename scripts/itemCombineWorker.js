@@ -109,7 +109,7 @@ onmessage = (e) => {
 
   feedbackHandler.TellFinalizing()
   let combineResultFilter = new CombineResultFilter(desiredItem)
-  let ratedItemGroups = combineResultFilter.FilterItems(sourceItems, combineResult.combinedItems, numItemsToTake)
+  let ratedItemGroups = combineResultFilter.FilterItems(combineResult.combinedItems, numItemsToTake)
 
   feedbackHandler.TellDone(ratedItemGroups, combineResult.maxProgress)
 }

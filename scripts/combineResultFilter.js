@@ -8,9 +8,7 @@
   - ratedItem.js
 
   Defined classes:
-  - RatedItemGroup:
-    - ratedItems: RatedItem[]
-    - hasSources: bool
+  - RatedItemGroup: RatedItem[]
 
   - RatedItemGroups: RatedItemGroup[] // index is one of the g_xxxMatch consts
 
@@ -31,9 +29,8 @@ class CombineResultFilter {
 
 
   // returns RatedItemGroups
-  FilterItems(sourceItems, combinedItems, numItemsToTake) {
-    let relevantItems = [...sourceItems, ...combinedItems]
-    relevantItems = this.GetRelevantItems(relevantItems)
+  FilterItems(combinedItems, numItemsToTake) {
+    let relevantItems = this.GetRelevantItems(combinedItems)
     relevantItems = this.GetLowestPrioAndCostItems(relevantItems)
 
     let ratedItems = this.RateItems(relevantItems)
@@ -43,8 +40,6 @@ class CombineResultFilter {
     this.SortGroups(ratedItemGroups)
 
     this.KeepBestInGroup(ratedItemGroups, numItemsToTake)
-
-    this.FindSourcesInGroups(ratedItemGroups)
 
     return ratedItemGroups
   }
@@ -56,10 +51,7 @@ class CombineResultFilter {
   // returns Item[]
   GetRelevantItems(items) {
     return items.filter((item) => {
-      return (
-        item.info === this.desiredItem.info &&
-        item.set !== g_extra
-      )
+      return item.info === this.desiredItem.info
     })
   }
 
@@ -174,25 +166,13 @@ class CombineResultFilter {
       }
     })
 
-    return [{
-      ratedItems: exacts,
-      hasSources: false
-    }, {
-      ratedItems: betters,
-      hasSources: false
-    }, {
-      ratedItems: lessers,
-      hasSources: false
-    }, {
-      ratedItems: mixeds,
-      hasSources: false
-    }]
+    return [exacts, betters, lessers, mixeds]
   }
 
 
   SortGroups(ratedItemGroups) {
     ratedItemGroups.forEach((group) => {
-      group.ratedItems.sort((ratedItem1, ratedItem2) => {
+      group.sort((ratedItem1, ratedItem2) => {
         // note: lower is better, so the - order is inverted
         return ratedItem1.totalRating - ratedItem2.totalRating
       })
@@ -202,16 +182,7 @@ class CombineResultFilter {
 
   KeepBestInGroup(ratedItemGroups, numItemsToTake) {
     ratedItemGroups.forEach((group) => {
-      group.ratedItems.splice(numItemsToTake, Infinity)
-    })
-  }
-
-
-  FindSourcesInGroups(ratedItemGroups) {
-    ratedItemGroups.forEach((group) => {
-      group.hasSources = group.ratedItems.some((ratedItem) => {
-        return ratedItem.isSource
-      })
+      group.splice(numItemsToTake, Infinity)
     })
   }
 }

@@ -121,7 +121,7 @@ class MainForm {
         case 2:
           let ratedItemGroups = e.data.ratedItemGroups
           ratedItemGroups.forEach((ratedItemGroup) => {
-            RehydrateRatedItems(ratedItemGroup.ratedItems)
+            RehydrateRatedItems(ratedItemGroup)
           })
 
           this.ShowCombinedItems(ratedItemGroups)

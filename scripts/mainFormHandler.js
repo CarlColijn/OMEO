@@ -137,13 +137,10 @@ class MainFormHandler {
 
   TellCombineDone(ratedItemGroups, maxProgress, timeInMilliseconds) {
     let timeInSeconds = Math.round(timeInMilliseconds / 1000)
-    let hasExactMatches = ratedItemGroups[g_exactMatch].ratedItems.length > 0
-    let hasBetterMatches = ratedItemGroups[g_betterMatch].ratedItems.length > 0
-    let hasLesserMatches = ratedItemGroups[g_lesserMatch].ratedItems.length > 0
-    let hasMixedMatches = ratedItemGroups[g_mixedMatch].ratedItems.length > 0
-    let hasSources = ratedItemGroups.some((ratedItemGroup) => {
-      return ratedItemGroup.hasSources
-    })
+    let hasExactMatches = ratedItemGroups[g_exactMatch].length > 0
+    let hasBetterMatches = ratedItemGroups[g_betterMatch].length > 0
+    let hasLesserMatches = ratedItemGroups[g_lesserMatch].length > 0
+    let hasMixedMatches = ratedItemGroups[g_mixedMatch].length > 0
 
     let title = 'Divination is compete!'
     let message = `${this.GetProgressMessage(maxProgress, maxProgress, timeInMilliseconds)}<br><br>`
@@ -164,9 +161,6 @@ class MainFormHandler {
       else
         message += 'An exact match cannot be made.<br>I\'ll show you what can be made.'
     }
-
-    if (hasSources)
-      message += '<br><br>Some of your source item(s) are also nice matches for what you requested.<br>I\'ve also listed these and marked them for you.'
 
     $('#divineTitle').html(title)
     $('#divineProgress').html(message)
