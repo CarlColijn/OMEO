@@ -21,26 +21,39 @@ class CombinedItemTable {
     // ==== PRIVATE ====
     this.ShowDetails = ShowDetails
 
-    let templateRowElemJQ = this.tableElemJQ.find('.template').first()
-    this.templateRow = new CombinedItemRowTemplate(this.ShowDetails, templateRowElemJQ)
+    let templateGroupElemJQ = this.tableElemJQ.find('.template').first()
+    this.itemTemplateGroup = new CombinedItemGroupTemplate(templateGroupElemJQ, ShowDetails)
   }
 
 
   Clear() {
-    this.tableElemJQ.find('.item').each((rowNr, rowElem) => {
-      let rowElemJQ = $(rowElem)
-      if (rowElemJQ.attr('data-real') != 0)
-        rowElemJQ.remove()
+    this.tableElemJQ.find('.group').each((groupNr, groupElem) => {
+      let groupElemJQ = $(groupElem)
+      if (groupElemJQ.attr('data-real') != 0)
+        groupElemJQ.remove()
       return true
     })
   }
 
 
-  SetItems(items) {
+  SetRatedItemGroup(ratedItemGroups, match) {
+    let ratedItemGroup = ratedItemGroups[match]
+    if (ratedItemGroup.ratedItems.length > 0) {
+      let itemGroup = this.itemTemplateGroup.CreateNew(match)
+
+      ratedItemGroup.ratedItems.forEach((ratedItem) => {
+        itemGroup.AddItem(ratedItem)
+      })
+    }
+  }
+
+
+  SetRatedItemGroups(ratedItemGroups) {
     this.Clear()
 
-    items.forEach((item) => {
-      this.templateRow.CreateNew(item)
-    })
+    this.SetRatedItemGroup(ratedItemGroups, g_exactMatch)
+    this.SetRatedItemGroup(ratedItemGroups, g_betterMatch)
+    this.SetRatedItemGroup(ratedItemGroups, g_mixedMatch)
+    this.SetRatedItemGroup(ratedItemGroups, g_lesserMatch)
   }
 }

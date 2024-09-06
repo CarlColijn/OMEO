@@ -118,13 +118,14 @@ class MainForm {
           this.formHandler.TellCombineFinalizing()
           break
         case 2:
-          let cleanedUpItemsResult = e.data.result
-          RehydrateItems(cleanedUpItemsResult.items)
-          cleanedUpItemsResult.level = CombineResultLevel.GetRehydrated(cleanedUpItemsResult.level)
+          let ratedItemGroups = e.data.ratedItemGroups
+          ratedItemGroups.forEach((ratedItemGroup) => {
+            RehydrateRatedItems(ratedItemGroup.ratedItems)
+          })
 
-          this.ShowCombinedItems(cleanedUpItemsResult.items)
+          this.ShowCombinedItems(ratedItemGroups)
 
-          this.formHandler.TellCombineDone(cleanedUpItemsResult.level, cleanedUpItemsResult.hasSources, e.data.maxProgress, e.data.timeInMS)
+          this.formHandler.TellCombineDone(ratedItemGroups, e.data.maxProgress, e.data.timeInMS)
           break
       }
     }
@@ -133,7 +134,8 @@ class MainForm {
       type: 0,
       sourceItems: dataInContext.data.sourceItems,
       desiredItem: dataInContext.data.desiredItem,
-      feedbackIntervalMS: 100
+      feedbackIntervalMS: 100,
+      numItemsToTake: 5
     })
   }
 
@@ -203,8 +205,8 @@ class MainForm {
   }
 
 
-  ShowCombinedItems(combinedItems) {
-    this.combineItemTable.SetItems(combinedItems)
+  ShowCombinedItems(ratedItemGroups) {
+    this.combineItemTable.SetRatedItemGroups(ratedItemGroups)
   }
 
 

@@ -135,27 +135,38 @@ class MainFormHandler {
   }
 
 
-  TellCombineDone(level, hasSources, maxProgress, timeInMilliseconds) {
+  TellCombineDone(ratedItemGroups, maxProgress, timeInMilliseconds) {
     let timeInSeconds = Math.round(timeInMilliseconds / 1000)
+    let hasExactMatches = ratedItemGroups[g_exactMatch].ratedItems.length > 0
+    let hasBetterMatches = ratedItemGroups[g_betterMatch].ratedItems.length > 0
+    let hasLesserMatches = ratedItemGroups[g_lesserMatch].ratedItems.length > 0
+    let hasMixedMatches = ratedItemGroups[g_mixedMatch].ratedItems.length > 0
+    let hasSources = ratedItemGroups.some((ratedItemGroup) => {
+      return ratedItemGroup.hasSources
+    })
 
     let title = 'Divination is compete!'
     let message = `${this.GetProgressMessage(maxProgress, maxProgress, timeInMilliseconds)}<br><br>`
 
-    if (level === g_noCombines) {
+    if (!hasExactMatches && !hasBetterMatches && !hasLesserMatches && !hasMixedMatches) {
       title = 'Divination is unsuccessful'
       message += 'Sorry, I couldn\'t come up with your desired item at all.<br><br>Please look at your source items and desired item and make sure there is some sort of match.'
     }
-    else if (level === g_onlyImperfectCombines)
-      message += 'An exact match cannot be made.<br>I\'ll show you what can be made.'
-    else if (level === g_onlyPerfectWithExtrasCombines)
-      message += 'An exact match cannot be made, but I could create combinations with even more enchantments.<br>I\'ll show these instead.'
-    else if (level === g_perfectAndPerfectWithExtrasCombines)
-      message += 'I could also create combinations with even more enchantments.<br>I\'ll also show these combinations.'
-    else if (level === g_onlyPerfectCombines)
-      message += 'I listed how to get at your desired item.'
+    else if (hasExactMatches) {
+      if (hasBetterMatches)
+        message += 'I could also create combinations with even more enchantments.<br>I\'ll also show these combinations.'
+      else
+        message += 'I\'ll show how to get at your desired item.'
+    }
+    else {
+      if (hasBetterMatches)
+        message += 'An exact match cannot be made, but I could create combinations with even more enchantments.<br>I\'ll show these instead.'
+      else
+        message += 'An exact match cannot be made.<br>I\'ll show you what can be made.'
+    }
 
     if (hasSources)
-      message += '<br><br>Some of your source item(s) are however also nice matches for what you requested.<br>I\'ve also listed these and marked them for you.'
+      message += '<br><br>Some of your source item(s) are also nice matches for what you requested.<br>I\'ve also listed these and marked them for you.'
 
     $('#divineTitle').html(title)
     $('#divineProgress').html(message)
