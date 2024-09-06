@@ -2,6 +2,7 @@
   Wrapper for a single row in a combined item table.
 
   Prerequisites:
+  - settings.js
   - templateElement.js
   - enchantInfo.js
   - combinedEnchantRow.js
@@ -82,9 +83,9 @@ class CombinedItemRow extends RealElement {
   GetItemSuffix(item) {
     switch (item.set) {
       case g_source:
-        return ` (source nr. ${item.nr})`
+        return g_cirSettings.sourceItemSuffix.replace('#', item.nr)
       case g_extra:
-        return ' (extra)'
+        return g_cirSettings.extraItemSuffix
       case g_combined:
         return ''
     }

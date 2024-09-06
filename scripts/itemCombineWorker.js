@@ -24,6 +24,7 @@
 
 
 // scripts
+importScripts('settings.js')
 importScripts('dataSets.js')
 importScripts('enchantInfo.js')
 importScripts('enchantConflicts.js')

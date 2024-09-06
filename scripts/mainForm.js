@@ -3,6 +3,7 @@
   populates form element values/options.
 
   Prerequisites:
+  - settings.js
   - dataSets.js
   - enchantInfo.js
   - itemInfo.js
@@ -107,7 +108,7 @@ class MainForm {
     })
 
     // Note: the path should be relative to the html document loading us!
-    this.combineWorker = new Worker('scripts/itemCombineWorker.js')
+    this.combineWorker = new Worker(`scripts/itemCombineWorker.js?v=${g_mfSettings.webWorkerURLVersion}`)
 
     this.combineWorker.onmessage = (e) => {
       switch (e.data.type) {
@@ -134,8 +135,8 @@ class MainForm {
       type: 0,
       sourceItems: dataInContext.data.sourceItems,
       desiredItem: dataInContext.data.desiredItem,
-      feedbackIntervalMS: 100,
-      numItemsToTake: 5
+      feedbackIntervalMS: g_mfSettings.feedbackIntervalMS,
+      numItemsToTake: g_mfSettings.numItemsPerGroup
     })
   }
 
@@ -180,7 +181,7 @@ class MainForm {
     }
 
     let showHideOptions = {
-      'duration': 400
+      'duration': g_mfSettings.showHideSpeedMS
     }
     hideNotesElemJQ.click(() => {
       notesElemJQ.hide(showHideOptions)

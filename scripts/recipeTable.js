@@ -26,7 +26,7 @@ class RecipeTable {
   SetItem(item) {
     let maxItemDepth = this.GetItemDepth(item)
 
-    this.AddItemTree(item, maxItemDepth, 'f', 'Result', undefined)
+    this.AddItemTree(item, maxItemDepth, 'f', g_rtSettings.resultLabel, undefined)
     this.tableElemJQ.find('th:first').attr('colspan', maxItemDepth + 1)
   }
 
@@ -53,15 +53,15 @@ class RecipeTable {
     let description = ''
 
     switch (item.set) {
-      case g_combined: description = 'Combined '; break
-      case g_source:   description = 'Source '; break
-      case g_extra:    description = 'Extra '; break
-      case g_desired:  description = 'Desired '; break
+      case g_combined: description = g_rtSettings.combinedPrefix; break
+      case g_source:   description = g_rtSettings.sourcePrefix; break
+      case g_extra:    description = g_rtSettings.extraPrefix; break
+      case g_desired:  description = g_rtSettings.desiredPrefix; break
     }
 
     description += item.info.name
     if (item.set == g_source)
-      description += ` nr. ${item.nr}`
+      description += g_rtSettings.sourcePostfix.replace('#', item.nr)
     return description
   }
 
@@ -85,20 +85,20 @@ class RecipeTable {
   // returns string
   GetItemCost(item) {
     if (item.set !== g_combined)
-      return '-'
+      return g_rtSettings.noCost
     else if (item.cost == item.totalCost)
-      return `${item.cost}`
+      return g_rtSettings.singleCost.replace('#s', item.cost)
     else
-      return `${item.cost} (${item.totalCost} in total)`
+      return g_rtSettings.compoundCost.replace('#s', item.cost).replace('#t', item.totalCost)
   }
 
 
   SetChildHideState(rowInfo, hide) {
     rowInfo.numHides += (hide ? 1 : -1)
     if (rowInfo.numHides > 0)
-      rowInfo.rowElemJQ.hide(100)
+      rowInfo.rowElemJQ.hide(g_rtSettings.expandCollapseSpeedMS)
     else
-      rowInfo.rowElemJQ.show(100)
+      rowInfo.rowElemJQ.show(g_rtSettings.expandCollapseSpeedMS)
 
     rowInfo.childRowInfos.forEach((childRowInfo) => {
       this.SetChildHideState(childRowInfo, hide)
@@ -110,11 +110,11 @@ class RecipeTable {
     rowInfo.isUserCollapsed = !rowInfo.isUserCollapsed
 
     if (rowInfo.isUserCollapsed) {
-      rowInfo.mainTDElemJQ.html('&boxplus;')
+      rowInfo.mainTDElemJQ.html(g_rtSettings.expandGlyph)
       rowInfo.mainTDElemJQ.removeClass('treeLeft')
     }
     else {
-      rowInfo.mainTDElemJQ.html('&boxminus;')
+      rowInfo.mainTDElemJQ.html(g_rtSettings.collapseGlyph)
       rowInfo.mainTDElemJQ.addClass('treeLeft')
     }
 
@@ -172,7 +172,7 @@ class RecipeTable {
       if (isExpandableLeafNode) {
         isExpandableNode = true
         tdElemJQ.addClass('treeClick')
-        tdElemJQ.html('&boxminus;')
+        tdElemJQ.html(g_rtSettings.collapseGlyph)
         newRowInfo.mainTDElemJQ.click(() => {
           this.NodeClicked(newRowInfo)
         })
