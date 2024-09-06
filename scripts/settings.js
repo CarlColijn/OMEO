@@ -8,7 +8,7 @@
 
 // For mainForm.js
 const g_mfSettings = {
-  webWorkerURLVersion: '2',
+  webWorkerURLVersion: '3',
   feedbackIntervalMS: 100,
   numItemsPerGroup: 5,
   showHideSpeedMS: 400,
