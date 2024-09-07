@@ -38,7 +38,6 @@ class SourceItemTable {
   }
 
 
-  // note: for g_desired tables, only the 1st item is used.
   SetItems(items) {
     this.Clear()
 
@@ -49,7 +48,7 @@ class SourceItemTable {
 
 
   // returns ItemCollectionResult
-  GetItems(itemCollector) {
+  ExtractItems(itemCollector) {
     let itemRows = this.GetItemRows()
 
     itemRows.forEach((itemRow) => {
