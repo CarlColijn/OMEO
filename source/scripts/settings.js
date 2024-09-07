@@ -25,6 +25,8 @@ const g_riSettings = {
 // For recipeTable.js
 const g_rtSettings = {
   resultLabel: 'Result',
+  leftLabel: 'Left',
+  rightLabel: 'Right',
   sourcePrefix: 'Source ',
   sourcePostfix: ' nr. #',
   extraPrefix: 'Extra ',
