@@ -19,8 +19,7 @@
             <File name="source\scripts\combineResultFilter.js" />
             <File name="source\scripts\dataSets.js" />
             <File name="source\scripts\dataStream.js" />
-            <File name="source\scripts\desiredItemRow.js" />
-            <File name="source\scripts\desiredItemTable.js" />
+            <File name="source\scripts\desiredItemSection.js" />
             <File name="source\scripts\enchant.js" />
             <File name="source\scripts\enchantCombiner.js" />
             <File name="source\scripts\enchantConflicts.js" />
@@ -80,8 +79,7 @@
             <File name="testing\combineResultFilter.js" />
             <File name="testing\dataSets.js" />
             <File name="testing\dataStream.js" />
-            <File name="testing\desiredItemRow.js" />
-            <File name="testing\desiredItemTable.js" />
+            <File name="testing\desiredItemSection.js" />
             <File name="testing\enchant.js" />
             <File name="testing\enchantCombiner.js" />
             <File name="testing\enchantConflicts.js" />

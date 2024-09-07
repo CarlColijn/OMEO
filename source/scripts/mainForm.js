@@ -8,7 +8,7 @@
   - enchantInfo.js
   - itemInfo.js
   - sourceItemTable.js
-  - desiredItemTable.js
+  - desiredItemSection.js
   - combinedItemTable.js
   - itemRow.js
   - mainFormData.js
@@ -84,7 +84,7 @@ class MainForm {
 
   InitializeSubObjects() {
     this.sourceItemTable = new SourceItemTable($('#sources table'), $('#addSourceItem'))
-    this.desiredItemTable = new DesiredItemTable($('#desired table'))
+    this.desiredItemSection = new DesiredItemSection($('#desired .item'))
     this.renameTooElemJQ = $('#desired #renameToo')
 
     let ShowDetailsCallback = (item) => {
@@ -223,8 +223,8 @@ class MainForm {
   // - withEnchantDupes: bool
   // - mergedSourceItems: bool
   GetData(mergeSourceItems) {
-    let sourceItemsResult = this.sourceItemTable.GetItems(new ItemCollector(mergeSourceItems))
-    let desiredItemResult = this.desiredItemTable.GetItem(new ItemCollector(false))
+    let sourceItemsResult = this.sourceItemTable.ExtractItems(new ItemCollector(mergeSourceItems))
+    let desiredItemResult = this.desiredItemSection.ExtractItems(new ItemCollector(false))
     let renameToo = this.renameTooElemJQ.prop('checked')
 
     let data = new MainFormData()
@@ -275,7 +275,7 @@ class MainForm {
   SetData(data) {
     this.ClearResult()
     this.sourceItemTable.SetItems(data.sourceItems)
-    this.desiredItemTable.SetItem(data.desiredItem)
+    this.desiredItemSection.SetItem(data.desiredItem)
     this.renameTooElemJQ.prop('checked', data.renameToo)
   }
 

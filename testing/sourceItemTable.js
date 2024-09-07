@@ -74,7 +74,7 @@ jazil.AddTestSet(mainPage, 'SourceItemTable', {
     ]
 
     table.SetItems(testItems)
-    let collectedItemDetails = table.GetItems(new ItemCollector(false))
+    let collectedItemDetails = table.ExtractItems(new ItemCollector(false))
 
     jazil.ShouldBe(collectedItemDetails.withCountErrors, false, 'table says there were count errors!')
     jazil.ShouldBe(collectedItemDetails.countErrorElemJQs.length, 0, 'count error elements are reported!')
@@ -96,7 +96,7 @@ jazil.AddTestSet(mainPage, 'SourceItemTable', {
     ]
 
     table.SetItems(testItems)
-    let collectedItemDetails = table.GetItems(new ItemCollector(true))
+    let collectedItemDetails = table.ExtractItems(new ItemCollector(true))
 
     jazil.ShouldBe(collectedItemDetails.withCountErrors, false, 'table says there were count errors!')
     jazil.ShouldBe(collectedItemDetails.countErrorElemJQs.length, 0, 'count error elements are reported!')
@@ -127,7 +127,7 @@ jazil.AddTestSet(mainPage, 'SourceItemTable', {
     ]
 
     table.SetItems(testItems)
-    let collectedItemDetails = table.GetItems(new ItemCollector(false))
+    let collectedItemDetails = table.ExtractItems(new ItemCollector(false))
 
     jazil.ShouldBe(collectedItemDetails.withCountErrors, false, 'table says there were count errors!')
     jazil.ShouldBe(collectedItemDetails.countErrorElemJQs.length, 0, 'count error elements are reported!')
@@ -151,7 +151,7 @@ jazil.AddTestSet(mainPage, 'SourceItemTable', {
     // Just empty is the most cross-browser way to do so.
     // (note: index 0 is the template row)
     $(table.tableElemJQ.find('[name=count]')[2]).val('')
-    let collectedItemDetails = table.GetItems(new ItemCollector(false))
+    let collectedItemDetails = table.ExtractItems(new ItemCollector(false))
 
     jazil.ShouldBe(collectedItemDetails.withCountErrors, true, 'table says there were no count errors!')
     jazil.ShouldBe(collectedItemDetails.countErrorElemJQs.length, 1, 'incorrect count error elements are reported!')

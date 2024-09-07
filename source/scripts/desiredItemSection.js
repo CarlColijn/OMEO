@@ -2,7 +2,6 @@
   Wrapper for a single row in an item table.
 
   Prerequisites:
-  - templateElement.js
   - dataSets.js
   - enchantInfo.js
   - enchantRow.js
@@ -10,23 +9,23 @@
   - guiHelpers.js
 
   Defined classes:
-  - DesiredItemRow
+  - DesiredItemSection
 */
 
 
 // ======== PUBLIC ========
 
 
-class DesiredItemRow extends RealElement {
-  constructor(rowElemJQ) {
-    super(rowElemJQ)
-
+class DesiredItemSection {
+  constructor(sectionElemJQ) {
     // ==== PRIVATE ====
+    this.elemJQ = sectionElemJQ.first()
+
     let enchantTemplateRowElemJQ = this.elemJQ.find('.template').first()
     this.enchantTemplateRow = new EnchantRowTemplate(enchantTemplateRowElemJQ)
 
-    this.iconElemJQ = rowElemJQ.find('.icon')
-    this.idElemJQ = rowElemJQ.find('select[name="itemID"]')
+    this.iconElemJQ = this.elemJQ.find('.icon')
+    this.idElemJQ = this.elemJQ.find('select[name="itemID"]')
     this.SetupItemOptions()
 
     let item = this.GetAppropriateItemToUse()
@@ -80,6 +79,13 @@ class DesiredItemRow extends RealElement {
   }
 
 
+  // returns ItemCollectionResult
+  ExtractItems(itemCollector) {
+    itemCollector.ProcessRow(this)
+    return itemCollector.Finalize()
+  }
+
+
   // ======== PRIVATE ========
 
 
@@ -95,10 +101,9 @@ class DesiredItemRow extends RealElement {
 
 
   SetupItemOptions() {
-    let itemSelectElemJQs = this.elemJQ.find('select[name="itemID"]')
     for (let itemNr = 0; itemNr < g_numDifferentItems; ++itemNr) {
       let itemInfo = g_itemInfos[itemNr]
-      itemSelectElemJQs.append(`<option value="${itemInfo.id}">${itemInfo.name}</option>`)
+      this.idElemJQ.append(`<option value="${itemInfo.id}">${itemInfo.name}</option>`)
     }
   }
 

@@ -62,11 +62,10 @@
     <script src="enchantRow.js"></script>
     <script src="combinedEnchantRow.js"></script>
     <script src="sourceItemRow.js"></script>
-    <script src="desiredItemRow.js"></script>
     <script src="combinedItemRow.js"></script>
     <script src="combinedItemGroup.js"></script>
     <script src="sourceItemTable.js"></script>
-    <script src="desiredItemTable.js"></script>
+    <script src="desiredItemSection.js"></script>
     <script src="combinedItemTable.js"></script>
     <script src="itemCollector.js"></script>
     <script src="itemCostTreeFinalizer.js"></script>
@@ -127,27 +126,6 @@
               </table>
             </td>
             <td><select name="priorWork" class="priorWork"></select></td>
-          </tr>
-        </tbody>
-      </table>
-
-      <table id="desiredItemRow" class="desired table items">
-        <caption>Desired item rows</caption>
-        <tbody>
-          <tr class="item" data-real="1">
-            <td><span class="nr"></span></td>
-            <td><select name="itemID"></select></td>
-            <td>
-              <table class="enchants">
-                <tbody>
-                  <tr class="template enchant" data-real="0">
-                    <td><select name="enchantID" class="enchantInput"></select></td>
-                    <td><select name="level"></select></td>
-                    <td><button type="button" name="removeEnchant">Remove enchantment</button></td>
-                  </tr>
-                </tbody>
-              </table>
-            </td>
           </tr>
         </tbody>
       </table>
@@ -225,11 +203,10 @@
         </tbody>
       </table>
 
-      <table id="desiredItemTable" class="desired table items">
-        <caption>Desired item table</caption>
+      <table id="desiredItemSection" class="desired table items">
+        <caption>Desired item section</caption>
         <tbody>
-          <tr class="item" data-real="1" data-nr="1">
-            <td><span class="nr"></span></td>
+          <tr class="item">
             <td><select name="itemID"></select></td>
             <td>
               <table class="enchants">
