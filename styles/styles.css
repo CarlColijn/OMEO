@@ -85,15 +85,15 @@ th, td {
 }
 .treeTop {
   --treeLinesColor: #000000;
-  box-shadow: inset 0px 2px 0px 0px var(--treeLinesColor);
+  box-shadow: inset 0px 2px var(--treeLinesColor), inset 0px 3px #00000080, inset 0px 4px #00000040;
 }
 .treeLeft {
   --treeLinesColor: #000000;
-  box-shadow: inset 3px 0px 0px 0px var(--treeLinesColor);
+  box-shadow: inset 3px 0px var(--treeLinesColor), inset 4px 0px #00000080, inset 5px 0px #00000040;
 }
 .treeTop.treeLeft {
   --treeLinesColor: #000000;
-  box-shadow: inset 3px 2px 0px 0px var(--treeLinesColor);
+  box-shadow: inset 3px 2px var(--treeLinesColor), inset 4px 3px #00000080, inset 5px 4px #00000040;
 }
 .treeNode {
   width: 1em;
