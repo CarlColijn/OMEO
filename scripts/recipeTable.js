@@ -19,7 +19,6 @@ class RecipeTable {
     // ==== PRIVATE ====
     this.tableElemJQ = tableElemJQ
     this.templateRowElemJQ = tableElemJQ.find('.template').first()
-    this.allRowInfos = []
   }
 
 
@@ -147,7 +146,6 @@ class RecipeTable {
 
   AddItemTree(item, numUnusedColumns, collapseTrail, placement, parentRowInfo) {
     let newRowInfo = this.AddNewRow()
-    this.allRowInfos.push(newRowInfo)
     if (parentRowInfo !== undefined)
       parentRowInfo.childRowInfos.push(newRowInfo)
     let hasChildren = item.targetItem !== undefined
@@ -208,8 +206,8 @@ class RecipeTable {
     SetIcon(iconElemJQ, item.id, hasEnchants)
 
     if (hasChildren) {
-      this.AddItemTree(item.targetItem, numUnusedColumns - 1, 'l' + collapseTrail, 'Left', newRowInfo)
-      this.AddItemTree(item.sacrificeItem, numUnusedColumns - 1, 'r' + collapseTrail, 'Right', newRowInfo)
+      this.AddItemTree(item.targetItem, numUnusedColumns - 1, 'l' + collapseTrail, g_rtSettings.leftLabel, newRowInfo)
+      this.AddItemTree(item.sacrificeItem, numUnusedColumns - 1, 'r' + collapseTrail, g_rtSettings.rightLabel, newRowInfo)
     }
   }
 }
