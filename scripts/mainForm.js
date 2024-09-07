@@ -84,7 +84,7 @@ class MainForm {
 
   InitializeSubObjects() {
     this.sourceItemTable = new SourceItemTable($('#sources table'), $('#addSourceItem'))
-    this.desiredItemSection = new DesiredItemSection($('#desired table'))
+    this.desiredItemSection = new DesiredItemSection($('#desired .item'))
     this.renameTooElemJQ = $('#desired #renameToo')
 
     let ShowDetailsCallback = (item) => {
