@@ -47,34 +47,46 @@ h2 {
 /* Tables */
 table {
   border-collapse: collapse;
-  border: 0px solid #000000;
+  border-style: none;
 }
 th {
   text-align: left;
 }
 th, td {
-  padding: 0.2em 0.5em;
+  padding: 0.2em 0.4em;
   vertical-align: top;
 }
-.table {
-  border: 2px solid #000000;
+tr.spaceAfter td {
+  padding-bottom: 0.4em;
+}
+tr.noSpaceBefore > td {
+  padding-top: 0px;
 }
 .table th {
   color: #ffffff;
 }
+.table > thead > tr,
 .table > tbody > tr {
-  border-top: 1px solid #000000;
-  border-bottom: 1px solid #000000;
+  border: 1px solid #000000;
 }
-.enchants > tbody > tr > td {
-  padding-top: 0px;
-  padding-left: 0px;
+.table > thead > tr {
+  border-width: 2px 2px 1px 2px;
 }
-.table.items > tbody.group > tr.forcedSkip {
-  background-color: #00000000;
+.table > tbody > tr {
+  border-width: 1px 2px 1px 2px;
+}
+.table > tbody > tr.forcedHeader {
+  border-top-width: 2px;
+}
+.table > tbody > tr:last-child {
+  border-bottom-width: 2px;
+}
+.table > tbody.group > tr.forcedSkip {
+  background-color: #00000000 !important;
+  border-style: none;
   font-weight: bold;
 }
-.table.items > tbody.group > tr.forcedSkip td {
+.table > tbody.group > tr.forcedSkip td {
   padding-top: 1em;
 }
 
@@ -135,33 +147,32 @@ input[type=number] {
 #bookmark {
   display: none;
 }
-.enchantInput {
-  /* Note: needs to be adjusted if longer enchant names come along... */
-  width: 11em;
+.itemAndEnchantInput {
+  width: 100%;
 }
 .levelInput {
   width: 2.7em;
 }
+.itemDisplay {
+  font-weight: bold;
+}
+.enchantDisplay {
+  font-size: 0.9em;
+}
 
 
 /* Icons */
-.iconWrap {
-  display: inline;
-  white-space: nowrap;
-}
-.iconWrap img {
-  padding-right: 4px;
-}
-.iconWrap * {
-  vertical-align: top;
-}
-.iconWrap .icon {
+.icon {
   width: 24px;
   height: 24px;
   object-fit: none;
   object-position: 0px 0px;
 }
-.iconWrap .type {
+.iconTextWrapping * {
+  vertical-align: top;
+}
+.iconTextWrapping .iconText {
+  margin-right: 0.4em;
   white-space: normal;
 }
 
@@ -243,6 +254,9 @@ a:visited {
 /* Special content */
 .noWrap {
   white-space: nowrap;
+}
+.hidden {
+  display: none;
 }
 .indented {
   margin-left: 2em;

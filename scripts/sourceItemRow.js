@@ -138,7 +138,7 @@ class SourceItemRow extends RealElement {
 
 
   RemoveEnchants() {
-    this.elemJQ.find('.enchants .enchant').each((rowNr, enchantRowElem) => {
+    this.elemJQ.find('.enchant').each((rowNr, enchantRowElem) => {
       let enchantRow = new EnchantRow($(enchantRowElem))
       if (enchantRow.IsReal())
         enchantRow.Remove()
@@ -192,6 +192,8 @@ class SourceItemRow extends RealElement {
 
     let hasEnchants = item.enchantsByID.size > 0
     SetIcon(this.iconElemJQ, this.itemID, hasEnchants)
+
+    this.SyncEnchantOptions()
 
     this.SetEnchants(item.enchantsByID)
   }
@@ -287,7 +289,7 @@ class SourceItemRow extends RealElement {
       dupeElemJQ: undefined
     }
     let foundEnchants = []
-    this.elemJQ.find('.enchants .enchant').each((rowNr, enchantRowElem) => {
+    this.elemJQ.find('.enchant').each((rowNr, enchantRowElem) => {
       let enchantRowElemJQ = $(enchantRowElem)
       let enchantRow = new EnchantRow(enchantRowElemJQ)
       if (enchantRow.IsReal()) {
@@ -316,8 +318,6 @@ class SourceItemRow extends RealElement {
 
 
   SetEnchants(enchantsByID) {
-    this.RemoveEnchants()
-
     for (let enchantNr = 0; enchantNr < g_numDifferentEnchants; ++enchantNr) {
       let enchant = enchantsByID.get(g_enchantInfos[enchantNr].id)
       if (enchant !== undefined)

@@ -75,6 +75,8 @@ class DesiredItemSection {
     let hasEnchants = item.enchantsByID.size > 0
     SetIcon(this.iconElemJQ, this.itemID, hasEnchants)
 
+    this.SyncEnchantOptions()
+
     this.SetEnchants(item.enchantsByID)
   }
 
@@ -153,7 +155,7 @@ class DesiredItemSection {
       dupeElemJQ: undefined
     }
     let foundEnchants = []
-    this.elemJQ.find('.enchants .enchant').each((rowNr, enchantRowElem) => {
+    this.elemJQ.find('.enchant').each((rowNr, enchantRowElem) => {
       let enchantRowElemJQ = $(enchantRowElem)
       let enchantRow = new EnchantRow(enchantRowElemJQ)
       if (enchantRow.IsReal()) {
@@ -192,7 +194,7 @@ class DesiredItemSection {
 
 
   RemoveEnchants() {
-    this.elemJQ.find('.enchants .enchant').each((rowNr, enchantRowElem) => {
+    this.elemJQ.find('.enchant').each((rowNr, enchantRowElem) => {
       let enchantRow = new EnchantRow($(enchantRowElem))
       if (enchantRow.IsReal())
         enchantRow.Remove()
