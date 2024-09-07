@@ -18,6 +18,9 @@
 class EnchantRowTemplate extends TemplateElement {
   constructor(rowElemJQ) {
     super(rowElemJQ)
+
+    // ==== PRIVATE ====
+    this.idElemJQ = rowElemJQ.find('select[name="enchantID"]')
   }
 
 
@@ -38,6 +41,19 @@ class EnchantRowTemplate extends TemplateElement {
       newRow.idElemJQ[0].focus()
 
     return newRow
+  }
+
+
+  UpdateEnchantOptions(itemID) {
+    this.idElemJQ.find('option').remove()
+
+    let itemInfo = g_itemInfosByID.get(itemID)
+
+    for (let enchantNr = 0; enchantNr < g_numDifferentEnchants; ++enchantNr) {
+      let enchantInfo = g_enchantInfos[enchantNr]
+      if (itemInfo.CanHaveEnchant(enchantInfo.id))
+        this.idElemJQ.append(`<option value="${enchantInfo.id}">${enchantInfo.name}</option>`)
+    }
   }
 }
 
@@ -97,22 +113,7 @@ class EnchantRow extends RealElement {
   // ======== PRIVATE ========
 
 
-  UpdateEnchantOptions(itemID) {
-    this.idElemJQ.find('option').remove()
-
-    let itemInfo = g_itemInfosByID.get(itemID)
-
-    for (let enchantNr = 0; enchantNr < g_numDifferentEnchants; ++enchantNr) {
-      let enchantInfo = g_enchantInfos[enchantNr]
-      if (itemInfo.CanHaveEnchant(enchantInfo.id))
-        this.idElemJQ.append(`<option value="${enchantInfo.id}">${enchantInfo.name}</option>`)
-    }
-  }
-
-
   HookUpGUI(itemID, RemoveCallback) {
-    this.UpdateEnchantOptions(itemID)
-
     this.idElemJQ.change(() => {
       this.UpdateLevelOptions()
     })

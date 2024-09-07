@@ -19,6 +19,8 @@ class RecipeTable {
     // ==== PRIVATE ====
     this.tableElemJQ = tableElemJQ
     this.templateRowElemJQ = tableElemJQ.find('.template').first()
+
+    this.nextCheckboxID = 0
   }
 
 
@@ -49,8 +51,7 @@ class RecipeTable {
 
   // returns string
   GetItemDescription(item) {
-    let description = ''
-
+    let description
     switch (item.set) {
       case g_combined: description = g_rtSettings.combinedPrefix; break
       case g_source:   description = g_rtSettings.sourcePrefix; break
@@ -59,27 +60,24 @@ class RecipeTable {
     }
 
     description += item.info.name
-    if (item.set == g_source)
+    if (item.set === g_source)
       description += g_rtSettings.sourcePostfix.replace('#', item.nr)
-    if (item.renamePoint === true)
-      description += g_rtSettings.renamePostfix
     return description
   }
 
 
-  // returns string
-  GetItemEnchants(item) {
-    let enchants = ''
-    let isFirstEnchant = true
+  AddEnchants(enchantTemplateRowElemJQ, item) {
+    let templateRow = new TemplateElement(enchantTemplateRowElemJQ)
+
     for (let enchantNr = 0; enchantNr < g_numDifferentEnchants; ++enchantNr) {
       let enchant = item.enchantsByID.get(g_enchantInfos[enchantNr].id)
       if (enchant !== undefined) {
-        enchants += isFirstEnchant ? '' : '<br>'
-        isFirstEnchant = false
-        enchants += `${enchant.info.name} ${GetRomanNumeralForLevel(enchant.level)}`
+        let enchantRowElemJQ = templateRow.CreateExtraElement()
+
+        enchantRowElemJQ.find('.name').text(enchant.info.name)
+        enchantRowElemJQ.find('.level').text(GetRomanNumeralForLevel(enchant.level))
       }
     }
-    return enchants
   }
 
 
@@ -91,6 +89,15 @@ class RecipeTable {
       return g_rtSettings.singleCost.replace('#s', item.cost)
     else
       return g_rtSettings.compoundCost.replace('#s', item.cost).replace('#t', item.totalCost)
+  }
+
+
+  LinkLabelToCheckbox(labelElemJQ, checkboxElemJQ) {
+    let checkboxID = `check_${this.nextCheckboxID}`
+    checkboxElemJQ.attr('id', checkboxID)
+    labelElemJQ.attr('for', checkboxID)
+
+    ++this.nextCheckboxID
   }
 
 
@@ -150,11 +157,12 @@ class RecipeTable {
       parentRowInfo.childRowInfos.push(newRowInfo)
     let hasChildren = item.targetItem !== undefined
 
-    let placementTDElemJQ = newRowInfo.rowElemJQ.find('td:first')
+    let placementTDElemJQ = newRowInfo.rowElemJQ.find('.placementNode')
 
     let isExpandableNode = false
+    let treeNodeTemplateElem = new TemplateElement(newRowInfo.rowElemJQ.find('.template.treeNode'))
     for (let tdElemNr = 0; tdElemNr < collapseTrail.length; ++tdElemNr) {
-      let tdElemJQ = $('<td class="treeNode"></td>')
+      let tdElemJQ = treeNodeTemplateElem.CreateExtraElement()
 
       let isLeafNode = tdElemNr == 0
       let isNonLeafNode = tdElemNr > 0
@@ -196,14 +204,20 @@ class RecipeTable {
       })
     }
     placementElemJQ.html(placement)
-    newRowInfo.rowElemJQ.find('.description').html(this.GetItemDescription(item))
-    newRowInfo.rowElemJQ.find('.enchants').html(this.GetItemEnchants(item))
+    if (item.renamePoint)
+      newRowInfo.rowElemJQ.find('.renameInstructions').removeClass('hidden')
+    newRowInfo.rowElemJQ.find('.description').text(this.GetItemDescription(item))
+    this.AddEnchants(newRowInfo.rowElemJQ.find('.enchant'), item)
     newRowInfo.rowElemJQ.find('.priorWork').text(item.priorWork)
-    newRowInfo.rowElemJQ.find('.cost').text(this.GetItemCost(item))
+    newRowInfo.rowElemJQ.find('.cost').html(this.GetItemCost(item))
 
     let iconElemJQ = newRowInfo.rowElemJQ.find('.icon')
     let hasEnchants = item.enchantsByID.size > 0
     SetIcon(iconElemJQ, item.id, hasEnchants)
+
+    let labelElemJQ = newRowInfo.rowElemJQ.find('label')
+    let checkboxElemJQ = newRowInfo.rowElemJQ.find('input')
+    this.LinkLabelToCheckbox(labelElemJQ, checkboxElemJQ)
 
     if (hasChildren) {
       this.AddItemTree(item.targetItem, numUnusedColumns - 1, 'l' + collapseTrail, g_rtSettings.leftLabel, newRowInfo)

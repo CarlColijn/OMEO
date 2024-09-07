@@ -35,6 +35,7 @@
     <script src="scripts/bitSerializer.js"></script>
     <script src="scripts/dataStream.js"></script>
     <script src="scripts/guiHelpers.js"></script>
+    <script src="scripts/templateElement.js"></script>
     <script src="scripts/recipeTable.js"></script>
     <script src="scripts/recipeFormData.js"></script>
     <script src="scripts/recipeFormHandler.js"></script>
@@ -77,23 +78,37 @@
     <div id="recipe" class="content yellow">
       <h2>&#x25bd;&nbsp; Combining instructions &nbsp;&#x25bd;</h2>
 
-      <p>You can use the checkboxes to mark your building progress. But beware; their state will <em>not</em> be saved for you!</p>
+      <p>The target item is placed Left on the anvil, the sacrifice item Right.  You can use the checkboxes to mark your building progress. But beware; their state will <em>not</em> be saved for you!</p>
 
       <table class="table items">
         <thead>
           <tr>
             <th>Place</th>
-            <th>Item</th>
-            <th>Enchantments</th>
+            <th colspan="2">Item</th>
             <th>Prior work</th>
             <th>Cost</th>
           </tr>
         </thead>
         <tbody>
           <tr class="template item" data-real="0">
-            <td><span class="placement"></span></td>
-            <td><label class="noWrap"><input type="checkbox"><div class="iconWrap"><img class="icon" src="images/icons.png"><span class="type description"></span></div></label></td>
-            <td><span class="enchants"></span></td>
+            <td class="template treeNode"></td>
+            <td class="placementNode"><span class="placement"></span></td>
+            <td class="noSpaceRight"><input type="checkbox"></td>
+            <td class="noSpaceLeft">
+              <table>
+                <tbody>
+                  <tr class="noSpaceBefore">
+                    <td><div class="iconTextWrapping"><label><span class="description itemDisplay iconText"></span><img class="icon" src="images/icons.png"></label></div></td>
+                  </tr>
+                  <tr class="template enchant" data-real="0">
+                    <td class="noWrap enchantDisplay"><span class="name"></span> <span class="level"></span></td>
+                  </tr>
+                  <tr class="renameInstructions hidden spaceAfter">
+                    <td><em>Rename here!</em></td>
+                  </tr>
+                </tbody>
+              </table>
+            </td>
             <td><span class="priorWork"></span></td>
             <td><span class="cost"></span></td>
           </tr>

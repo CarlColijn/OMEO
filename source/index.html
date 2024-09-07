@@ -165,32 +165,40 @@
           <tr>
             <th>Nr</th>
             <th>Count</th>
-            <th>Type</th>
-            <th>Enchantments</th>
             <th>Prior work</th>
-            <th></th>
+            <th>Type</th>
           </tr>
         </thead>
         <tbody>
           <tr class="template item" data-real="0" data-nr="0">
             <td><span class="nr"></span></td>
             <td><input name="count" type="number" min="1" value="1"></td>
-            <td><div class="iconWrap"><img class="icon" src="images/icons.png"><select name="itemID" class="type"></select></div></td>
+            <td><select name="priorWork" class="priorWork"></select></td>
             <td>
-              <table class="enchants">
+              <table>
                 <tbody>
-                  <tr class="template enchant" data-real="0">
-                    <td><select name="enchantID" class="enchantInput"></select></td>
+                  <tr class="noSpaceBefore">
+                    <td><select name="itemID" class="type itemAndEnchantInput"></select></td>
+                    <td class="levelInput"><img class="icon" src="images/icons.png"></td>
+                    <td><button type="button" name="removeItem">Remove</button></td>
+                  </tr>
+                  <tr class="template enchant noSpaceBefore" data-real="0">
+                    <td><select name="enchantID" class="itemAndEnchantInput"></select></td>
                     <td><select name="level" class="levelInput"></select></td>
-                    <td><button type="button" name="removeEnchant">Remove enchantment</button></td>
+                    <td><button type="button" name="removeEnchant">Remove</button></td>
+                  </tr>
+                  <tr class="noSpaceBefore">
+                    <td>
+                      <button type="button" name="addEnchant">Add enchantment</button>
+                    </td>
+                    <td></td>
+                    <td></td>
                   </tr>
                 </tbody>
               </table>
-              <button type="button" name="addEnchant">Add enchantment</button>
             </td>
-            <td><select name="priorWork" class="priorWork"></select></td>
-            <td><button type="button" name="removeItem">Remove item</button></td>
           </tr>
+          <tr></tr> <!-- needed to have a last visible row for css -->
         </tbody>
       </table>
       <button type="button" id="addSourceItem">Add item</button>
@@ -205,31 +213,36 @@
         <thead>
           <tr>
             <th>Type</th>
-            <th>Enchantments</th>
           </tr>
         </thead>
         <tbody>
-          <tr class="item">
-            <td><div class="iconWrap"><img class="icon" src="images/icons.png"><select name="itemID"></select><div></td>
+          <tr>
             <td>
-              <table class="enchants">
+              <table class="item">
                 <tbody>
-                  <tr class="template enchant" data-real="0">
-                    <td><select name="enchantID" class="enchantInput"></select></td>
+                  <tr class="noSpaceBefore">
+                    <td><select name="itemID" class="itemAndEnchantInput"></select></td>
+                    <td><img class="icon" src="images/icons.png"></td>
+                    <td></td>
+                  </tr>
+                  <tr class="template enchant noSpaceBefore" data-real="0">
+                    <td><select name="enchantID" class="itemAndEnchantInput"></select></td>
                     <td><select name="level" class="levelInput"></select></td>
-                    <td><button type="button" name="removeEnchant">Remove enchantment</button></td>
+                    <td><button type="button" name="removeEnchant">Remove</button></td>
+                  </tr>
+                  <tr class="noSpaceBefore">
+                    <td><button type="button" name="addEnchant">Add enchantment</button></td>
+                    <td></td>
+                    <td></td>
                   </tr>
                 </tbody>
               </table>
-              <button type="button" name="addEnchant">Add enchantment</button>
             </td>
-          </tr>
-          <tr>
-            <td></td>
-            <td colspan="2"><label><input id="renameToo" name="renameToo" type="checkbox" value="1">Rename the item too</label> <span class="footnote">(costs 1 XP)</span></td>
           </tr>
         </tbody>
       </table>
+
+      <p><label><input id="renameToo" name="renameToo" type="checkbox" value="1">Rename the item too</label> <span class="footnote">(costs 1 XP)</span></p>
     </div>
 
     <div id="combined" class="content violet">
@@ -250,19 +263,20 @@
           <tr class="forcedHeader">
             <th>Count</th>
             <th>Type</th>
-            <th>Enchantments</th>
             <th>Prior work</th>
             <th>Cost</th>
             <th></th>
           </tr>
           <tr class="template item" data-real="0" data-nr="0">
             <td><span class="count"></span></td>
-            <td><div class="iconWrap"><img class="icon" src="images/icons.png"><span class="type"></span></div></td>
             <td>
-              <table class="enchants">
+              <table>
                 <tbody>
+                  <tr>
+                    <td><span class="iconTextWrapping"><span class="type itemDisplay iconText"></span><img class="icon" src="images/icons.png"></span></td>
+                  </tr>
                   <tr class="template enchant" data-real="0">
-                    <td><span class="name"></span> <span class="level"></span></td>
+                    <td class="noWrap enchantDisplay"><span class="name"></span> <span class="level"></span></td>
                   </tr>
                 </tbody>
               </table>
@@ -271,6 +285,7 @@
             <td><span class="cost"></span></td>
             <td><button type="button" name="show">Show</button></td>
           </tr>
+          <tr></tr> <!-- needed to have a last visible row for css -->
         </tbody>
       </table>
     </div>

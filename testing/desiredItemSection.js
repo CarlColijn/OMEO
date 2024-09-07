@@ -1,5 +1,5 @@
 function GetDesiredItemSection() {
-  return new DesiredItemSection($('#desiredItemSection .item'))
+  return new DesiredItemSection($('#desiredItemSection'))
 }
 
 

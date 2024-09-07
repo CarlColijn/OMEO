@@ -3,14 +3,14 @@
 class RecipeTableTester {
   constructor() {
     this.tableElemJQ = $('#recipeTable')
-    this.tableElemJQ.find('tr:not(.template)').remove()
-    this.numRowsBefore = this.tableElemJQ.find('tr').length
+    this.tableElemJQ.find('tr.item:not(.template)').remove()
+    this.numRowsBefore = this.tableElemJQ.find('.item').length
     this.table = new RecipeTable(this.tableElemJQ)
   }
 
 
   Finalize() {
-    this.numRowsAfter = this.tableElemJQ.find('tr').length
+    this.numRowsAfter = this.tableElemJQ.find('.item').length
     this.numRowsDiff = this.numRowsAfter - this.numRowsBefore
   }
 }
@@ -18,31 +18,35 @@ class RecipeTableTester {
 
 function CheckItemInTable(jazil, item, tester, neededPlacement) {
   let itemFound = false
-  tester.tableElemJQ.find('tr').each((rowNr, rowElem) => {
+  tester.tableElemJQ.find('tr.item').each((rowNr, rowElem) => {
     let rowElemJQ = $(rowElem)
     if (!rowElemJQ.hasClass('template')) {
       let listedPlacement = $(rowElemJQ.find('.placement')).text()
       let listedDescription = $(rowElemJQ.find('.description')).text()
-      let listedEnchants = $(rowElemJQ.find('.enchants')).text()
-      let listedCost = $(rowElemJQ.find('.cost')).text()
+      let listedEnchants = ''
+      $(rowElemJQ.find('.enchant:not(.template)')).each(function(rowNr, rowElem) {
+        let rowElemJQ = $(rowElem)
+        listedEnchants += rowElemJQ.find('.name').text() + ' ' + rowElemJQ.find('.level').text()
+      })
+      let listedRenameInstructions = $(rowElemJQ.find('.renameInstructions:not(.hidden)')).length > 0
+      let listedCost = $(rowElemJQ.find('.cost')).text().replace(/\s/, '')
       let listedPriorWork = $(rowElemJQ.find('.priorWork')).text()
 
       let neededDescription = `${GetSetName(item.set)} ${item.info.name}`
       if (item.set === g_source)
         neededDescription += ` nr. ${item.nr}`
-      if (item.renamePoint == true)
-        neededDescription += ` (rename here)`
       let neededEnchants = ''
       item.enchantsByID.forEach((enchant) => {
         neededEnchants += `${enchant.info.name} ${GetGUITextForEnchantLevel(enchant)}`
       })
+      let neededRenameInstructions = item.renamePoint === undefined ? false : item.renamePoint
       let neededCost
       if (item.set !== g_combined)
         neededCost = '-'
       else {
         neededCost = `${item.cost}`
         if (item.totalCost != item.cost)
-          neededCost += ` (${item.totalCost} in total)`
+          neededCost += `${item.totalCost}total`
       }
       let neededPriorWork = `${item.priorWork}`
 
@@ -50,6 +54,7 @@ function CheckItemInTable(jazil, item, tester, neededPlacement) {
         listedPlacement == neededPlacement &&
         listedDescription.includes(neededDescription) &&
         listedEnchants == neededEnchants &&
+        listedRenameInstructions == neededRenameInstructions &&
         listedCost == neededCost &&
         listedPriorWork == neededPriorWork
       )
@@ -117,7 +122,9 @@ function CreateTestSet(setDescription, setLetter) {
     'Simple item with renamePoint is shown OK': (jazil) => {
       let tester = new RecipeTableTester()
       let set = GetSet(setLetter)
-      let item = BuildItem({ set:g_combined, name:'Leggings', count:2, cost:4, totalCost:15, priorWork:2, renamePoint:true })
+      if (set !== g_combined)
+        jazil.SkipTest()
+      let item = BuildItem({ set:set, name:'Leggings', count:2, cost:4, totalCost:15, priorWork:2, rename:'r' })
       tester.table.SetItem(item)
       tester.Finalize()
 
@@ -160,7 +167,7 @@ jazil.AddTestSet(recipePage, 'RecipeTable - complex combined listings', {
     let tester = new RecipeTableTester()
     let item0_t_t = BuildItem({ set:g_source, name:'Book', nr:1, count:4, cost:0, totalCost:0, priorWork:0, enchants:[{ name:'Unbreaking', level:3 }] })
     let item0_t_s = BuildItem({ set:g_source, name:'Book', nr:2, count:2, cost:0, totalCost:0, priorWork:0, enchants:[{ name:'Mending' }] })
-    let item0_t = BuildItem({ set:g_combined, name:'Shovel', count:1, cost:3, totalCost:12, priorWork:0, renamePoint:true, enchants:[{ name:'Mending' }, { name:'Unbreaking', level:3 }] })
+    let item0_t = BuildItem({ set:g_combined, name:'Shovel', count:1, cost:3, totalCost:12, priorWork:0, rename:'r', enchants:[{ name:'Mending' }, { name:'Unbreaking', level:3 }] })
     item0_t.targetItem = item0_t_t
     item0_t.sacrificeItem = item0_t_s
     let item0_s = BuildItem({ set:g_extra, name:'Shovel', count:6, cost:0, totalCost:0, priorWork:3 })

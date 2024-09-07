@@ -37,7 +37,7 @@ class TemplateElement extends DOMElement {
   // returns jQuery-wrapped DOM object
   CreateExtraElement() {
     let newElemJQ = this.elemJQ.clone()
-    newElemJQ.appendTo(this.elemJQ.parent())
+    newElemJQ.insertBefore(this.elemJQ)
 
     newElemJQ.removeClass('template')
     newElemJQ.attr('data-real', 1)

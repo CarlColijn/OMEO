@@ -87,18 +87,18 @@
         </tbody>
       </table>
 
-      <table id="enchantRow" class="source table enchants">
+      <table id="enchantRow" class="source table">
         <caption>Enchant rows</caption>
         <tbody>
           <tr class="template enchant" data-real="0">
-            <td><select name="enchantID" class="enchantInput"></select></td>
+            <td><select name="enchantID"></select></td>
             <td><select name="level"></select></td>
             <td><button type="button" name="removeEnchant">Remove enchantment</button></td>
           </tr>
         </tbody>
       </table>
 
-      <table id="combinedEnchantRow" class="combines table enchants">
+      <table id="combinedEnchantRow" class="combines table">
         <caption>Combine enchant rows</caption>
         <tbody>
           <tr class="template enchant" data-real="0">
@@ -113,19 +113,30 @@
           <tr class="template item" data-real="0" data-nr="0">
             <td><span class="nr"></span></td>
             <td><input name="count" type="number" min="1" value="1"></td>
-            <td><select name="itemID"></select></td>
+            <td><select name="priorWork" class="priorWork"></select></td>
             <td>
-              <table class="enchants">
+              <table>
                 <tbody>
+                  <tr>
+                    <td><select name="itemID"></select></td>
+                    <td></td>
+                    <td><button type="button" name="removeItem">Remove</button></td>
+                  </tr>
                   <tr class="template enchant" data-real="0">
-                    <td><select name="enchantID" class="enchantInput"></select></td>
+                    <td><select name="enchantID"></select></td>
                     <td><select name="level"></select></td>
-                    <td><button type="button" name="removeEnchant">Remove enchantment</button></td>
+                    <td><button type="button" name="removeEnchant">Remove</button></td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <button type="button" name="addEnchant">Add enchantment</button>
+                    </td>
+                    <td></td>
+                    <td></td>
                   </tr>
                 </tbody>
               </table>
             </td>
-            <td><select name="priorWork" class="priorWork"></select></td>
           </tr>
         </tbody>
       </table>
@@ -135,10 +146,12 @@
         <tbody>
           <tr class="template item" data-real="0">
             <td><span class="count"></span></td>
-            <td><span class="type"></span></td>
             <td>
-              <table class="enchants">
+              <table>
                 <tbody>
+                  <tr>
+                    <td><span class="type"></span></td>
+                  </tr>
                   <tr class="template enchant" data-real="0">
                     <td><span class="name"></span> <span class="level"></span></td>
                   </tr>
@@ -164,10 +177,12 @@
           </tr>
           <tr class="template item" data-real="0">
             <td><span class="count"></span></td>
-            <td><span class="type"></span></td>
             <td>
-              <table class="enchants">
+              <table>
                 <tbody>
+                  <tr>
+                    <td><span class="type"></span></td>
+                  </tr>
                   <tr class="template enchant" data-real="0">
                     <td><span class="name"></span> <span class="level"></span></td>
                   </tr>
@@ -186,19 +201,30 @@
           <tr class="template item" data-real="0" data-nr="0">
             <td><span class="nr"></span></td>
             <td><input name="count" type="number" min="1" value="1"></td>
-            <td><select name="itemID"></select></td>
+            <td><select name="priorWork" class="priorWork"></select></td>
             <td>
-              <table class="enchants">
+              <table>
                 <tbody>
+                  <tr>
+                    <td><select name="itemID"></select></td>
+                    <td></td>
+                    <td><button type="button" name="removeItem">Remove</button></td>
+                  </tr>
                   <tr class="template enchant" data-real="0">
-                    <td><select name="enchantID" class="enchantInput"></select></td>
+                    <td><select name="enchantID"></select></td>
                     <td><select name="level"></select></td>
-                    <td><button type="button" name="removeEnchant">Remove enchantment</button></td>
+                    <td><button type="button" name="removeEnchant">Remove</button></td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <button type="button" name="addEnchant">Add enchantment</button>
+                    </td>
+                    <td></td>
+                    <td></td>
                   </tr>
                 </tbody>
               </table>
             </td>
-            <td><select name="priorWork" class="priorWork"></select></td>
           </tr>
         </tbody>
       </table>
@@ -208,17 +234,18 @@
         <tbody>
           <tr class="item">
             <td><select name="itemID"></select></td>
-            <td>
-              <table class="enchants">
-                <tbody>
-                  <tr class="template enchant" data-real="0">
-                    <td><select name="enchantID" class="enchantInput"></select></td>
-                    <td><select name="level"></select></td>
-                    <td><button type="button" name="removeEnchant">Remove enchantment</button></td>
-                  </tr>
-                </tbody>
-              </table>
-            </td>
+            <td></td>
+            <td></td>
+          </tr>
+          <tr class="template enchant" data-real="0">
+            <td><select name="enchantID"></select></td>
+            <td><select name="level"></select></td>
+            <td><button type="button" name="removeEnchant">Remove</button></td>
+          </tr>
+          <tr>
+            <td><button type="button" name="addEnchant">Add enchantment</button></td>
+            <td></td>
+            <td></td>
           </tr>
         </tbody>
       </table>
@@ -238,7 +265,7 @@
             <td><span class="count"></span></td>
             <td><span class="type"></span></td>
             <td>
-              <table class="enchants">
+              <table>
                 <tbody>
                   <tr class="template enchant" data-real="0">
                     <td><span class="name"></span> <span class="level"></span></td>
@@ -256,9 +283,24 @@
         <caption>Recipe table</caption>
         <tbody>
           <tr class="template item" data-real="0">
-            <td><span class="placement"></span></td>
-            <td><span class="description"></span></td>
-            <td><span class="enchants"></span></td>
+            <td class="template treeNode"></td>
+            <td class="placementNode"><span class="placement"></span></td>
+            <td><input type="checkbox"></td>
+            <td>
+              <table>
+                <tbody>
+                  <tr>
+                    <td><label><span class="description"></span></label></td>
+                  </tr>
+                  <tr class="template enchant" data-real="0">
+                    <td><span class="name"></span> <span class="level"></span></td>
+                  </tr>
+                  <tr class="renameInstructions hidden">
+                    <td><em>Rename here!</em></td>
+                  </tr>
+                </tbody>
+              </table>
+            </td>
             <td><span class="priorWork"></span></td>
             <td><span class="cost"></span></td>
           </tr>

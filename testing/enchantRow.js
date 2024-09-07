@@ -4,10 +4,13 @@ function GetEnchantTemplateRow() {
 
 
 function CreateEnchantRow(templateRow, enchantName, enchantLevel, itemName) {
+  let itemID = GetItemInfo(itemName).id
+  templateRow.UpdateEnchantOptions(itemID)
+
   return templateRow.CreateNew(
     BuildEnchant(enchantName, enchantLevel),
-    GetItemInfo(itemName).id,
-    false, undefined
+    itemID,
+    false, undefined, undefined
   )
 }
 
