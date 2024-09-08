@@ -112,7 +112,7 @@ class MainForm {
     })
 
     // Note: the path should be relative to the html document loading us!
-    this.combineWorker = new Worker(`scripts/itemCombineWorker.js?v=${g_mfSettings.webWorkerURLVersion}`)
+    this.combineWorker = new Worker('scripts/itemCombineWorker.js')
 
     this.combineWorker.onmessage = (e) => {
       switch (e.data.type) {

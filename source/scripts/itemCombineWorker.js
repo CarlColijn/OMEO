@@ -24,7 +24,6 @@
 */
 
 
-// scripts
 importScripts('settings.js')
 importScripts('dataSets.js')
 importScripts('enchantInfo.js')
@@ -39,7 +38,6 @@ importScripts('itemCombineTester.js')
 importScripts('itemCombiner.js')
 importScripts('ratedItem.js')
 importScripts('combineResultFilter.js')
-// /scripts
 
 
 // ======== PUBLIC ========

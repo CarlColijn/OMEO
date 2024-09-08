@@ -51,7 +51,6 @@
         <Folder name="other">
             <File name="source\browserconfig.xml" />
             <File name="source\CNAME" />
-            <File name="source\scripts\script.js" />
             <File name="source\site.webmanifest" />
             <File name="source\sitemap.xml" />
         </Folder>
