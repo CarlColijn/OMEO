@@ -214,6 +214,16 @@ input[type=number] {
 .enchantDisplay {
   font-size: 0.9em;
 }
+#contactForm {
+  text-align: right;
+}
+#contactForm textarea {
+  /* Just 100% makes it no align properly in FireFox; its 100% excl borders,
+  which FireFox adds to textareas... A few extra px in the left margin doesn't
+  really matter. */
+  width: calc(100% - 5px);
+  height: 10em;
+}
 
 
 /* Icons */
