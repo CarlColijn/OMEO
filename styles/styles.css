@@ -78,7 +78,19 @@ body {
 }
 #banner a {
   border-style: none;
+  text-decoration: none;
+  color: #ffffff;
 }
+#banner a:link {
+  color: #ffffff;
+}
+#banner a:hover {
+  color: #ffffff;
+}
+#banner a:visited {
+  color: #ffffff;
+}
+
 
 
 /* Tables */
