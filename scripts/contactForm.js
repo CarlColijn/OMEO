@@ -40,6 +40,7 @@ class ContactForm {
       })
       if (response.ok) {
         let spamCheck = await response.text()
+        alert(spamCheck)
         spamCheck = spamCheck.trim()
 
         let message = this.messageElemJQ.val()
