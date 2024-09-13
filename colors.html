@@ -54,7 +54,7 @@
         if (idSuffix == 'b')
           $('.newColor').css('background', colorText)
         else if (idSuffix == 'h')
-          $('.newColor h1, .newColor h2').css('background', colorText)
+          $('.newColor h1, .newColor #banner').css('background', colorText)
         else if (idSuffix == 't')
           $('.newColor em, .newColor thead tr').css('background', colorText)
         else if (idSuffix == 'o')
@@ -163,13 +163,10 @@
     </form>
 
     <div class="content firstContent newColor">
-      <h1>
-        <div class="letter"><img src="source/images/o1.png"></div>
-        <div class="letter"><img src="source/images/m.png"></div>
-        <div class="letter"><img src="source/images/e.png"></div>
-        <div class="letter"><img src="source/images/o2.png"></div><br>
-        <i>-- COLORIZED --</i>
-      </h1>
+      <div id="banner">
+        <a href="index.html"><div class="letter"><img src="source/images/o1.png"></div><div class="letter"><img src="source/images/m.png"></div><div class="letter"><img src="source/images/e.png"></div><div class="letter"><img src="source/images/o2.png"></div></a><br>
+        <span class="subtitle">Colorized</span>
+      </div>
 
       <p>Nunc arcu diam, tincidunt vel tincidunt eget, dapibus sed nisi. Fusce non libero semper, dapibus nisi varius, imperdiet neque. Nulla nibh urna, pellentesque eu faucibus id, dapibus vitae neque. Fusce auctor rutrum augue sit amet egestas. Etiam tempus aliquet laoreet. Etiam ultricies interdum velit, at lobortis magna luctus id. Quisque molestie aliquam ante a sagittis. Ut rhoncus elit vitae ante maximus laoreet. Vivamus ligula tellus, aliquam ut justo sit amet, lacinia suscipit sem. Aenean non nisl varius, facilisis eros in, hendrerit orci.</p>
 
@@ -177,7 +174,7 @@
     </div>
 
     <div class="content newColor">
-      <h2>Integer felis ex</h2>
+      <h1>Integer felis ex</h1>
 
       <p>Suspendisse vestibulum turpis magna, quis laoreet dui tempor tempus. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Integer venenatis imperdiet tempor.</p>
 
