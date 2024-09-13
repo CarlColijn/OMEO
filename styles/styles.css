@@ -558,27 +558,27 @@ em {
   background-color: #a895e7;
 }
 
-/* hue 200 */
+/* hue 225 */
 .fuchsia {
-  background-color: #f0cdff;
+  background-color: #f0cdf0;
 }
 .fuchsia h1,
 .fuchsia #banner {
-  background-color: #491d5b;
+  background-color: #5b1d49;
 }
 .fuchsia .treeTop,
 .fuchsia .treeLeft,
 .fuchsia .treeTop.treeLeft {
-  --treeLinesColor: #491d5b;
+  --treeLinesColor: #5b1d49;
 }
 .fuchsia em,
 .fuchsia .table > tbody.group > tr.forcedHeader,
 .fuchsia .table > thead > tr {
-  background-color: #5d316f;
+  background-color: #6f315d;
 }
 .fuchsia .table > tbody > tr:nth-child(odd) {
-  background-color: #deb6ee;
+  background-color: #eeb6de;
 }
 .fuchsia .table > tbody > tr:nth-child(even) {
-  background-color: #cf95e7;
+  background-color: #e795cf;
 }
