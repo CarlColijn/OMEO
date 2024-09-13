@@ -5,6 +5,7 @@
         </Folder>
         <Folder name="html">
             <File name="source\changeHistory.html" />
+            <File name="source\contact.html" />
             <File name="source\explained.html" />
             <File name="source\index.html" />
             <File name="source\recipe.html" />
@@ -17,6 +18,8 @@
             <File name="source\scripts\combinedItemRow.js" />
             <File name="source\scripts\combinedItemTable.js" />
             <File name="source\scripts\combineResultFilter.js" />
+            <File name="source\scripts\contactForm.js" />
+            <File name="source\scripts\contactFormHandler.js" />
             <File name="source\scripts\dataSets.js" />
             <File name="source\scripts\dataStream.js" />
             <File name="source\scripts\desiredItemSection.js" />
