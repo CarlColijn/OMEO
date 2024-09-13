@@ -3,7 +3,7 @@ body {
   color: #000000;
   background-color: #ffffff;
   margin: 0px;
-  padding: 1em;
+  padding: 0px;
   min-height: 100vh;
   font-family: Arial, Helvetica, sans-serif;
 }
@@ -12,12 +12,12 @@ body {
 /* Content blocks */
 .content {
   border-radius: 1em;
-  margin: 3em 0em 0em 0em;
-  padding: 0.5em;
+  margin: 2em 1em 1em 1em;
+  padding: 0.5em 0.5em 0.1em 0.5em;
   box-shadow: 0.05em 0.15em 0.2em #00000040;
 }
 .firstContent {
-  margin: 0em !important;
+  margin-top: 1em !important;
 }
 
 
