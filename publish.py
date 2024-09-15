@@ -1,10 +1,26 @@
 import os
 import shutil
+import stat
 import tkinter
 import tkinter.messagebox
+import tkinter.simpledialog
 import re
 import traceback
 import binascii
+import datetime
+# The environment variable needs to be set before we can import git.
+os.environ['GIT_PYTHON_GIT_EXECUTABLE'] = 'C:\\Program Files\\SmartGit\\git\\bin\\git.exe'
+import git
+
+
+def RemoveFolderSafe(folderPath):
+  def FixSHUtilError(func, path, exc):
+    os.chmod(path, stat.S_IRWXU | stat.S_IRWXG | stat.S_IRWXO)
+    func(path)
+
+  if os.path.isdir(folderPath):
+    shutil.rmtree(folderPath, ignore_errors=False, onerror=FixSHUtilError)
+
 
 
 class PseudoFileEntry:
@@ -22,9 +38,9 @@ class PseudoFileEntry:
 
 
 class FileInfo:
-  def __init__(self, file, fileUploadPath):
+  def __init__(self, file, repoFilePath):
     self.file = file
-    self.fileUploadPath = fileUploadPath
+    self.repoFilePath = repoFilePath
     self.content = ''
     self.contentSet = False
     self.hash = ''
@@ -63,15 +79,15 @@ class FileInfo:
     return len(self.hash) > 0
 
 
-  def CreateUploadVersion(self):
-    if not os.path.isdir(self.fileUploadPath):
-      os.makedirs(os.path.dirname(self.fileUploadPath), exist_ok=True)
+  def CreateRepoVersion(self):
+    if not os.path.isdir(self.repoFilePath):
+      os.makedirs(os.path.dirname(self.repoFilePath), exist_ok=True)
 
     if self.contentSet:
-      with open(self.fileUploadPath, 'w') as file:
+      with open(self.repoFilePath, 'w') as file:
         file.write(self.content)
     else:
-      shutil.copyfile(self.file.path, self.fileUploadPath)
+      shutil.copyfile(self.file.path, self.repoFilePath)
 
 
 
@@ -88,10 +104,13 @@ class FileProcessInstruction:
 
 class Publisher:
   def __init__(self):
+    self.repoFilePaths = set()
+
     self.htmlFileInfos = []
     self.jsFileInfos = []
     self.cssFileInfos = []
     self.otherFileInfos = []
+    self.allFilePaths = set()
 
     self.fileInfosByName = dict()
 
@@ -99,25 +118,76 @@ class Publisher:
     self.cssIncludeFileNames = []
 
 
-  def Publish(self, ourPath):
-    self.DeterminePathsToUse(ourPath)
-    self.CleanUploadFolder()
+  def Publish(self):
+    self.DeterminePathsToUse()
+    if not self.EnsureWeMayRun():
+      return False
+    if not self.GetAuthenticationTokens():
+      return False
+    self.CheckOutRepo()
+    self.IndexRepoFiles(self.repoPath)
     self.SetUpProcessInstructions()
-    self.ScanFolder(self.webRootPath, self.uploadRootPath)
+    self.ScanFolder(self.webRootPath, self.repoPath)
     self.ProcessIncludes()
     self.CombineIncludeFiles()
     self.ApplyFileHashes()
     self.FinalizeAllFileTypes()
+    self.KillRemovedFiles()
+    committed = self.MakeGitCommit()
+    if committed:
+      self.CheckInRepo()
+    self.RemoveRepo()
+    return committed
 
 
-  def DeterminePathsToUse(self, ourPath):
+  def DeterminePathsToUse(self):
+    ourPath = os.path.dirname(os.path.realpath(__file__))
+
     self.webRootPath = os.path.join(ourPath, 'source')
-    self.uploadRootPath = os.path.join(ourPath, 'upload')
+    self.repoPath = os.path.join(os.path.dirname(ourPath), 'GHPagesRepository')
 
 
-  def CleanUploadFolder(self):
-    if os.path.isdir(self.uploadRootPath):
-      shutil.rmtree(self.uploadRootPath)
+  def EnsureWeMayRun(self):
+    if not os.path.exists(self.repoPath):
+      return True
+
+    return tkinter.messagebox.askokcancel(
+      'Repository destination conflict',
+      f'There is already a file or folder located at the spot the OMEO repository needs to be checked out;\n{self.repoPath}\n\nRemove this folder and continue?',
+      default=tkinter.messagebox.CANCEL
+    )
+
+
+  def GetAuthenticationTokens(self):
+    def GetInformation(title, prompt):
+      information = tkinter.simpledialog.askstring(title, prompt, show='*')
+      if information is None:
+        return ''
+      else:
+        return information.strip()
+
+    self.userName = GetInformation('GitHub user name for OMEO', 'Enter your GitHub user name:')
+    if len(self.userName) == 0:
+      return False
+
+    self.accessToken = GetInformation('GitHub authentication token for OMEO', 'Enter your GitHub SSH authentication token:')
+    return len(self.accessToken) > 0
+
+
+  def CheckOutRepo(self):
+    RemoveFolderSafe(self.repoPath)
+    remoteURL = f'https://{self.userName}:{self.accessToken}@github.com/{self.userName}/OMEO.git'
+    self.repo = git.Repo.clone_from(remoteURL, self.repoPath)
+    self.repo.git.checkout('gh-pages')
+
+
+  def IndexRepoFiles(self, folderPath):
+    with os.scandir(folderPath) as folder:
+      for entry in folder:
+        if entry.is_file():
+          self.repoFilePaths.add(entry.path)
+        elif not entry.name == '.git':
+          self.IndexRepoFiles(entry.path)
 
 
   def SetUpProcessInstructions(self):
@@ -147,15 +217,16 @@ class Publisher:
     )
 
 
-  def ScanFolder(self, folderPath, uploadPath):
+  def ScanFolder(self, folderPath, repoPath):
     with os.scandir(folderPath) as folder:
       for entry in folder:
-        entryUploadPath = os.path.join(uploadPath, entry.name)
-        fileInfo = FileInfo(entry, entryUploadPath)
+        entryRepoPath = os.path.join(repoPath, entry.name)
+        fileInfo = FileInfo(entry, entryRepoPath)
 
         if entry.is_dir():
-          self.ScanFolder(entry.path, entryUploadPath)
+          self.ScanFolder(entry.path, entryRepoPath)
         else:
+          self.allFilePaths.add(entry.path)
           self.fileInfosByName[entry.name] = fileInfo
           if entry.name.endswith('.html'):
             self.htmlFileInfos.append(fileInfo)
@@ -221,11 +292,12 @@ class Publisher:
 
   def CreateSyntheticFileInfo(self, fileInfos, *pathComponents):
     sourceFilePath = os.path.join(self.webRootPath, *pathComponents)
-    uploadFilePath = os.path.join(self.uploadRootPath, *pathComponents)
+    repoFilePath = os.path.join(self.repoPath, *pathComponents)
     file = PseudoFileEntry(pathComponents[-1], sourceFilePath)
-    extraFileInfo = FileInfo(file, uploadFilePath)
+    extraFileInfo = FileInfo(file, repoFilePath)
 
     fileInfos.append(extraFileInfo)
+    self.allFilePaths.add(sourceFilePath)
     self.fileInfosByName[file.name] = extraFileInfo
 
     return extraFileInfo
@@ -265,7 +337,6 @@ class Publisher:
         for otherFileInfo in self.fileInfosByName.values():
           hashTag = f'[###{otherFileInfo.file.name}###]'
           if fileContent.find(hashTag) >= 0:
-            #print(f'{fileInfo.file.name} -> {otherFileInfo.file.name}')
             if fileInfo not in reffedFileInfosByFileInfo:
               reffedFileInfosByFileInfo[fileInfo] = []
             reffedFileInfosByFileInfo[fileInfo].append(otherFileInfo)
@@ -306,7 +377,7 @@ class Publisher:
   def FinalizeFileTypes(self, fileInfos, includedFileNames):
     for fileInfo in fileInfos:
       if fileInfo.file.name not in includedFileNames:
-        fileInfo.CreateUploadVersion()
+        fileInfo.CreateRepoVersion()
 
 
   def FinalizeAllFileTypes(self):
@@ -316,11 +387,52 @@ class Publisher:
     self.FinalizeFileTypes(self.otherFileInfos, [])
 
 
+  def KillRemovedFiles(self):
+    relRepoFilePaths = set([os.path.relpath(filePath, start=self.repoPath) for filePath in self.repoFilePaths])
+    relAllFilePaths = set([os.path.relpath(filePath, start=self.webRootPath) for filePath in self.allFilePaths])
+    relRemovedFilePaths = relRepoFilePaths - relAllFilePaths
+    for relFilePath in relRemovedFilePaths:
+      os.remove(os.path.join(self.repoPath, relFilePath))
 
 
-ourPath = os.path.dirname(os.path.realpath(__file__))
+  def MakeGitCommit(self):
+    filesToAdd = self.repo.untracked_files
+    filesToRemove = []
+    for diff in self.repo.index.diff(None):
+      if diff.change_type == 'D':
+        filesToRemove.append(diff.a_path)
+      else:
+        filesToAdd.append(diff.a_path)
+
+    hasFilesToRemove = len(filesToRemove) > 0
+    hasFilesToAdd = len(filesToAdd) > 0
+    if hasFilesToRemove:
+      self.repo.index.remove(filesToRemove, working_tree=True)
+    if hasFilesToAdd:
+      self.repo.index.add(filesToAdd)
+    somethingToDo = hasFilesToRemove or hasFilesToAdd
+
+    if somethingToDo:
+      dateTimeStamp = datetime.datetime.now().replace(microsecond=0).isoformat()
+      self.repo.index.commit(f'Auto-publish: {dateTimeStamp}')
+    else:
+      tkinter.messagebox.showinfo('Publishing not needed', 'There are no changes to commit to GitHub.')
+
+    return somethingToDo
+
+
+  def CheckInRepo(self):
+    self.repo.remotes.origin.push().raise_if_error()
+
+
+  def RemoveRepo(self):
+    RemoveFolderSafe(self.repoPath)
+
+
+
+
 try:
-  Publisher().Publish(ourPath)
-  tkinter.messagebox.showinfo('Publishing done', 'All files have been published and are now ready in the folder "upload".')
+  if Publisher().Publish():
+    tkinter.messagebox.showinfo('Publishing done', 'All files have been published and uploaded to GitHub.')
 except Exception as exception:
   tkinter.messagebox.showerror('Publishing error', f'Publishing failed;\n\n{exception}\n\n{traceback.format_exc()}')
