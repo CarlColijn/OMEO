@@ -24,20 +24,7 @@
 */
 
 
-importScripts('settings.js')
-importScripts('dataSets.js')
-importScripts('enchantInfo.js')
-importScripts('enchantConflicts.js')
-importScripts('enchant.js')
-importScripts('enchantCombiner.js')
-importScripts('itemInfo.js')
-importScripts('itemOrigins.js')
-importScripts('item.js')
-importScripts('itemCombineList.js')
-importScripts('itemCombineTester.js')
-importScripts('itemCombiner.js')
-importScripts('ratedItem.js')
-importScripts('combineResultFilter.js')
+importScripts('script.js?v=d7da996f')
 
 
 // ======== PUBLIC ========
