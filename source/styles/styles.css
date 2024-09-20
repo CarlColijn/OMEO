@@ -286,35 +286,37 @@ input[type=number] {
 .levelColumn {
   width: 8em;
 }
-.levelInput {
+.buttonStrip {
   white-space: nowrap;
 }
-.levelInput .levelBox {
+.buttonStrip .buttonBox {
   text-align: center;
   padding: 0px;
   margin: 0px;
-  border-radius: 0px;
 }
-.levelInput .levelBox.onlyOption {
+.buttonStrip .buttonBox.onlyButton {
   border-radius: 7px;
 }
-.levelInput .levelBox.firstOption {
+.buttonStrip .buttonBox.firstButton {
   border-radius: 7px 0px 0px 7px;
 }
-.levelInput .levelBox.lastOption {
+.buttonStrip .buttonBox.middleButton {
+  border-radius: 0px;
+}
+.buttonStrip .buttonBox.lastButton {
   border-radius: 0px 7px 7px 0px;
 }
-.levelInput .levelBox div {
+.buttonStrip .buttonBox div {
   width: 1.2em;
   padding: 1px 2px;
   margin: auto;
   text-align: center;
 }
-.levelInput .levelBox.selected {
+.buttonStrip .buttonBox.selectedButton {
   -webkit-filter: brightness(75%);
   filter: brightness(75%);
 }
-.levelInput .levelBox.selected div {
+.buttonStrip .buttonBox.selectedButton div {
   border-width: 2px 0px;
   border-style: solid;
   border-color: transparent;

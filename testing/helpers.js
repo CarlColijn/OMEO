@@ -36,6 +36,7 @@ let mainAccessObjectNames = [
   'EnchantIDsConflict',
   'BitRestorer',
   'BitStorer',
+  'ButtonStrip',
   'CombinedEnchantRow',
   'CombinedEnchantRowTemplate',
   'CombinedItemRow',

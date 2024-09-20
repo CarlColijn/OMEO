@@ -34,7 +34,13 @@ let g_numDifferentEnchants = 0
 
 // returns string
 function GetRomanNumeralForLevel(level) {
-  return ['-', 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X'][level]
+  return ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X'][level - 1]
+}
+
+
+// returns string[]
+function GetRomanNumeralsUpToLevel(level) {
+  return ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X'].slice(0, level)
 }
 
 

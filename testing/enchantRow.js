@@ -18,8 +18,8 @@ function CreateEnchantRow(templateRow, enchantName, enchantLevel, itemName) {
 function GetEnchantRowDetails(enchantRowElemJQ) {
   let enchantIDText = enchantRowElemJQ.find('[name=enchantID]').val()
   let enchantID = enchantIDText === null ? 0 : parseInt(enchantIDText)
-  let levelElemJQ = enchantRowElemJQ.find('button.selected')
-  let level = parseInt(levelElemJQ.val())
+  let levelElemJQ = enchantRowElemJQ.find('.levelInput .selectedButton')
+  let level = parseInt(levelElemJQ.val()) + 1
   return {
     'name': g_enchantInfosByID.get(enchantID).name,
     'level': level

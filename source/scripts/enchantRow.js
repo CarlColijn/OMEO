@@ -31,10 +31,9 @@ class EnchantRowTemplate extends TemplateElement {
 
     newRow.HookUpGUI(itemID, RemoveCallback)
 
-    if (enchant !== undefined)
-      newRow.SetEnchant(enchant) // performs an UpdateLevelOptions as well
-    else
-      newRow.UpdateLevelOptions()
+    if (enchant === undefined)
+      enchant = newRow.GetEnchant()
+    newRow.SetEnchant(enchant)
 
     newRow.focusElemJQWhenAllGone = focusElemJQWhenAllGone
     if (giveFocus)
@@ -66,7 +65,7 @@ class EnchantRow extends RealElement {
 
     // ==== PRIVATE ====
     this.idElemJQ = rowElemJQ.find('select[name="enchantID"]')
-    this.levelElemJQ = rowElemJQ.find('.levelInput')
+    this.levelElem = new ButtonStrip(rowElemJQ.find('.levelInput'))
   }
 
 
@@ -98,16 +97,14 @@ class EnchantRow extends RealElement {
   GetEnchant() {
     let enchantID = parseInt(this.idElemJQ.val())
     let enchantInfo = g_enchantInfosByID.get(enchantID)
-    let enchantLevel = this.GetNewEnchantLevel(enchantInfo)
+    let enchantLevel = this.GetEnchantLevel(enchantInfo)
     return new Enchant(enchantID, enchantLevel)
   }
 
 
   SetEnchant(enchant) {
     this.idElemJQ.val(enchant.id)
-    this.UpdateLevelOptions(this.idElemJQ, this.levelElemJQ)
-    this.levelElemJQ.find('button').removeClass('selected')
-    this.levelElemJQ.find(`button[value=${enchant.level}]`).addClass('selected')
+    this.UpdateLevelOptions(enchant)
   }
 
 
@@ -116,7 +113,7 @@ class EnchantRow extends RealElement {
 
   HookUpGUI(itemID, RemoveCallback) {
     this.idElemJQ.change(() => {
-      this.UpdateLevelOptions()
+      this.UpdateLevelOptions(undefined)
     })
 
     this.elemJQ.find('button[name="removeEnchant"]').click(() => {
@@ -128,44 +125,20 @@ class EnchantRow extends RealElement {
 
 
   // returns int
-  GetNewEnchantLevel(enchantInfo) {
-    let selectLevel = parseInt(this.levelElemJQ.find('.selected').val())
-    if (isNaN(selectLevel))
-      selectLevel = 1
-    return Math.max(1, Math.min(enchantInfo.maxLevel, selectLevel))
+  GetEnchantLevel(enchantInfo) {
+    let selectLevelNr = this.levelElem.GetSelectionNr()
+    if (selectLevelNr === undefined)
+      selectLevelNr = 0
+    return Math.max(1, Math.min(enchantInfo.maxLevel, selectLevelNr + 1))
   }
 
 
-  SetupNewLevelOptions(maxLevel, selectedLevel) {
-    this.levelElemJQ.empty()
+  UpdateLevelOptions(enchant) {
+    if (enchant === undefined)
+      enchant = this.GetEnchant()
 
-    for (let level = 1; level <= maxLevel; ++level) {
-      let orderClass =
-        level == 1 && level == maxLevel ?
-        ' onlyOption' :
-        level == 1 ?
-        ' firstOption' :
-        level == maxLevel ?
-        ' lastOption' :
-        ' middleOption'
-      let selectedClass =
-        level == selectedLevel ?
-        ' selected' :
-        ''
-      let levelButtonElemJQ = $(`<button type="button" class="levelBox${orderClass}${selectedClass}" value="${level}"><div>${GetRomanNumeralForLevel(level)}</div></button>`)
-      this.levelElemJQ.append(levelButtonElemJQ)
+    let levelTexts = GetRomanNumeralsUpToLevel(enchant.info.maxLevel)
 
-      let levelElemJQ = this.levelElemJQ
-      levelButtonElemJQ.on('click', function() {
-        levelElemJQ.find('button').removeClass('selected')
-        $(this).addClass('selected')
-      })
-    }
-  }
-
-
-  UpdateLevelOptions() {
-    let enchant = this.GetEnchant()
-    this.SetupNewLevelOptions(enchant.info.maxLevel, enchant.level)
+    this.levelElem.SetOptions(levelTexts, enchant.level - 1)
   }
 }

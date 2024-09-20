@@ -27,13 +27,13 @@ function GetDesiredItemSectionDetails(itemSectionElemJQ) {
   })
 
   let enchantLevels = ''
-  itemSectionElemJQ.find('button.selected').each((inputNr, inputElem) => {
+  itemSectionElemJQ.find('.levelInput .selectedButton').each((inputNr, inputElem) => {
     let inputElemJQ = $(inputElem)
     let rowElemJQ = inputElemJQ.parent().parent()
     if (rowElemJQ.attr('data-real') != 0) {
       if (enchantLevels != '')
         enchantLevels += '/'
-      enchantLevels += inputElemJQ.val()
+      enchantLevels += parseInt(inputElemJQ.val()) + 1
     }
   })
 

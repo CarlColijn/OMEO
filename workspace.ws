@@ -13,6 +13,7 @@
         </Folder>
         <Folder name="javascript">
             <File name="source\scripts\bitSerializer.js" />
+            <File name="source\scripts\buttonStrip.js" />
             <File name="source\scripts\combinedEnchantRow.js" />
             <File name="source\scripts\combinedItemGroup.js" />
             <File name="source\scripts\combinedItemRow.js" />
@@ -74,6 +75,7 @@
         </Folder>
         <Folder name="javascript">
             <File name="testing\bitSerializer.js" />
+            <File name="testing\buttonStrip.js" />
             <File name="testing\combinedEnchantRow.js" />
             <File name="testing\combinedItemGroup.js" />
             <File name="testing\combinedItemRow.js" />
