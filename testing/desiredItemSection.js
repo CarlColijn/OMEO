@@ -27,7 +27,7 @@ function GetDesiredItemSectionDetails(itemSectionElemJQ) {
   })
 
   let enchantLevels = ''
-  itemSectionElemJQ.find('[name=level]').each((inputNr, inputElem) => {
+  itemSectionElemJQ.find('button.selected').each((inputNr, inputElem) => {
     let inputElemJQ = $(inputElem)
     let rowElemJQ = inputElemJQ.parent().parent()
     if (rowElemJQ.attr('data-real') != 0) {

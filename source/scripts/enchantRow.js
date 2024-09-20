@@ -66,7 +66,7 @@ class EnchantRow extends RealElement {
 
     // ==== PRIVATE ====
     this.idElemJQ = rowElemJQ.find('select[name="enchantID"]')
-    this.levelElemJQ = rowElemJQ.find('select[name="level"]')
+    this.levelElemJQ = rowElemJQ.find('.levelInput')
   }
 
 
@@ -96,17 +96,18 @@ class EnchantRow extends RealElement {
 
   // returns Enchant
   GetEnchant() {
-    return new Enchant(
-      parseInt(this.idElemJQ.val()),
-      parseInt(this.levelElemJQ.val())
-    )
+    let enchantID = parseInt(this.idElemJQ.val())
+    let enchantInfo = g_enchantInfosByID.get(enchantID)
+    let enchantLevel = this.GetNewEnchantLevel(enchantInfo)
+    return new Enchant(enchantID, enchantLevel)
   }
 
 
   SetEnchant(enchant) {
     this.idElemJQ.val(enchant.id)
     this.UpdateLevelOptions(this.idElemJQ, this.levelElemJQ)
-    this.levelElemJQ.val(enchant.level)
+    this.levelElemJQ.find('button').removeClass('selected')
+    this.levelElemJQ.find(`button[value=${enchant.level}]`).addClass('selected')
   }
 
 
@@ -127,26 +128,44 @@ class EnchantRow extends RealElement {
 
 
   // returns int
-  GetNewEnchantLevel(newEnchant) {
-    let selectLevel = parseInt(this.levelElemJQ.val())
+  GetNewEnchantLevel(enchantInfo) {
+    let selectLevel = parseInt(this.levelElemJQ.find('.selected').val())
     if (isNaN(selectLevel))
       selectLevel = 1
-    return Math.max(1, Math.min(newEnchant.maxLevel, selectLevel))
+    return Math.max(1, Math.min(enchantInfo.maxLevel, selectLevel))
   }
 
 
   SetupNewLevelOptions(maxLevel, selectedLevel) {
-    this.levelElemJQ.find('option').remove()
+    this.levelElemJQ.empty()
 
-    for (let level = 1; level <= maxLevel; ++level)
-      this.levelElemJQ.append(`<option value="${level}"${level == selectedLevel ? ' selected' : ''}>${GetRomanNumeralForLevel(level)}</option>`)
+    for (let level = 1; level <= maxLevel; ++level) {
+      let orderClass =
+        level == 1 && level == maxLevel ?
+        ' onlyOption' :
+        level == 1 ?
+        ' firstOption' :
+        level == maxLevel ?
+        ' lastOption' :
+        ' middleOption'
+      let selectedClass =
+        level == selectedLevel ?
+        ' selected' :
+        ''
+      let levelButtonElemJQ = $(`<button type="button" class="levelBox${orderClass}${selectedClass}" value="${level}"><div>${GetRomanNumeralForLevel(level)}</div></button>`)
+      this.levelElemJQ.append(levelButtonElemJQ)
+
+      let levelElemJQ = this.levelElemJQ
+      levelButtonElemJQ.on('click', function() {
+        levelElemJQ.find('button').removeClass('selected')
+        $(this).addClass('selected')
+      })
+    }
   }
 
 
   UpdateLevelOptions() {
-    let enchantID = parseInt(this.idElemJQ.val())
-    let newEnchant = g_enchantInfosByID.get(enchantID)
-    let selectedLevel = this.GetNewEnchantLevel(newEnchant)
-    this.SetupNewLevelOptions(newEnchant.maxLevel, selectedLevel)
+    let enchant = this.GetEnchant()
+    this.SetupNewLevelOptions(enchant.info.maxLevel, enchant.level)
   }
 }
