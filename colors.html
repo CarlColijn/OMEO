@@ -54,9 +54,7 @@
         if (idSuffix == 'b')
           $('.newColor').css('background', colorText)
         else if (idSuffix == 'h')
-          $('.newColor h1, .newColor #banner').css('background', colorText)
-        else if (idSuffix == 't')
-          $('.newColor em, .newColor thead tr').css('background', colorText)
+          $('.newColor h1, .newColor #banner, .newColor em, .newColor thead tr').css('background', colorText)
         else if (idSuffix == 'o')
           $('.newColor tbody tr:nth-child(odd)').css('background', colorText)
         else if (idSuffix == 'e')
@@ -85,7 +83,6 @@
         if (hueChanged) {
           ChangeColorGroup('b')
           ChangeColorGroup('h')
-          ChangeColorGroup('t')
           ChangeColorGroup('o')
           ChangeColorGroup('e')
         }
@@ -136,28 +133,43 @@
     <form>
       <table>
         <tr>
-          <td>Hue:</td><td><input type="range" min="0" max="255" value="190" class="slider" id="hue"></td><td><span id="hue_val"></span></td>
+          <td>Hue:</td>
+          <td><input type="range" min="0" max="255" value="190" class="slider" id="hue"></td>
+          <td><span id="hue_val"></span></td>
         </tr>
         <tr>
-          <td>Sat:</td><td><input type="range" min="0" max="255" value="255" class="slider" id="sat_b"></td><td><span id="sat_b_val"></span></td>
-          <td>Sat:</td><td><input type="range" min="0" max="255" value="130" class="slider" id="sat_h"></td><td><span id="sat_h_val"></span></td>
-          <td>Sat:</td><td><input type="range" min="0" max="255" value="100" class="slider" id="sat_t"></td><td><span id="sat_t_val"></span></td>
-          <td>Sat:</td><td><input type="range" min="0" max="255" value="160" class="slider" id="sat_o"></td><td><span id="sat_o_val"></span></td>
-          <td>Sat:</td><td><input type="range" min="0" max="255" value="160" class="slider" id="sat_e"></td><td><span id="sat_e_val"></span></td>
+          <td>Sat:</td>
+          <td><input type="range" min="0" max="255" value="255" class="slider" id="sat_b"></td>
+          <td><span id="sat_b_val"></span></td>
+          <td>Sat:</td>
+          <td><input type="range" min="0" max="255" value="130" class="slider" id="sat_h"></td>
+          <td><span id="sat_h_val"></span></td>
+          <td>Sat:</td>
+          <td><input type="range" min="0" max="255" value="160" class="slider" id="sat_o"></td>
+          <td><span id="sat_o_val"></span></td>
+          <td>Sat:</td>
+          <td><input type="range" min="0" max="255" value="160" class="slider" id="sat_e"></td>
+          <td><span id="sat_e_val"></span></td>
         </tr>
         <tr>
-          <td>Lum:</td><td><input type="range" min="0" max="255" value="230" class="slider" id="lum_b"></td><td><span id="lum_b_val"></span></td>
-          <td>Lum:</td><td><input type="range" min="0" max="255" value="60" class="slider" id="lum_h"></td><td><span id="lum_h_val"></span></td>
-          <td>Lum:</td><td><input type="range" min="0" max="255" value="80" class="slider" id="lum_t"></td><td><span id="lum_t_val"></span></td>
-          <td>Lum:</td><td><input type="range" min="0" max="255" value="210" class="slider" id="lum_o"></td><td><span id="lum_o_val"></span></td>
-          <td>Lum:</td><td><input type="range" min="0" max="255" value="190" class="slider" id="lum_e"></td><td><span id="lum_e_val"></span></td>
+          <td>Lum:</td>
+          <td><input type="range" min="0" max="255" value="230" class="slider" id="lum_b"></td>
+          <td><span id="lum_b_val"></span></td>
+          <td>Lum:</td>
+          <td><input type="range" min="0" max="255" value="60" class="slider" id="lum_h"></td>
+          <td><span id="lum_h_val"></span></td>
+          <td>Lum:</td>
+          <td><input type="range" min="0" max="255" value="210" class="slider" id="lum_o"></td>
+          <td><span id="lum_o_val"></span></td>
+          <td>Lum:</td>
+          <td><input type="range" min="0" max="255" value="190" class="slider" id="lum_e"></td>
+          <td><span id="lum_e_val"></span></td>
         </tr>
         <tr>
-          <td colspan="3">Background: <span id="b_val"></span></td>
-          <td colspan="3">Headers: <span id="h_val"></span></td>
-          <td colspan="3">Table headers/em: <span id="t_val"></span></td>
-          <td colspan="3">Table odd: <span id="o_val"></span></td>
-          <td colspan="3">Table even: <span id="e_val"></span></td>
+          <td colspan="3">--contentColor: <span id="b_val"></span></td>
+          <td colspan="3">--headerColor: <span id="h_val"></span></td>
+          <td colspan="3">--tableOddColor: <span id="o_val"></span></td>
+          <td colspan="3">--tableEvenColor: <span id="e_val"></span></td>
         </tr>
       </table>
     </form>
