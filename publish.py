@@ -426,6 +426,7 @@ class Publisher:
 
 
   def RemoveRepo(self):
+    self.repo.close()
     RemoveFolderSafe(self.repoPath)
 
 
