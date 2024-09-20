@@ -165,26 +165,26 @@
           <tr>
             <th>Nr</th>
             <th>Count</th>
-            <th>Type</th>
-            <th></th>
-            <th colspan="2">Prior work / enchant level</th>
+            <th colspan="2">Type &amp; prior work<br>Enchantments &amp; levels</th>
           </tr>
         </thead>
         <tbody class="template item" data-real="0" data-nr="0">
           <tr>
             <td><span class="nr"></span></td>
             <td><input name="count" type="number" min="1" value="1"></td>
-            <td><select name="itemID" class="type itemAndEnchantInput"></select></td>
-            <td><img class="icon" src="images/icons.png"></td>
-            <td class="priorWorkInput buttonStrip"></td>
+            <td class="itemEnchantCell">
+              <div class="iconTextWrapping"><select name="itemID" class="type itemInput iconText"></select><img class="icon" src="images/icons.png"></div>
+              <div class="priorWorkInput buttonStrip"></div>
+            </td>
             <td><button type="button" name="removeItem">Remove</button></td>
           </tr>
           <tr class="template enchant noSpaceBefore" data-real="0">
             <td></td>
             <td></td>
-            <td><select name="enchantID" class="itemAndEnchantInput"></select></td>
-            <td></td>
-            <td class="levelInput buttonStrip"></td>
+            <td class="itemEnchantCell">
+              <div><select name="enchantID"></select></div>
+              <div class="levelInput buttonStrip"></div>
+            </td>
             <td><button type="button" name="removeEnchant">Remove</button></td>
           </tr>
           <tr class="noSpaceBefore">
@@ -193,8 +193,6 @@
             <td>
               <button type="button" name="addEnchant">Add enchantment</button>
             </td>
-            <td></td>
-            <td></td>
             <td></td>
           </tr>
         </tbody>
@@ -213,27 +211,23 @@
       <table class="table item groupedRows">
         <thead>
           <tr>
-            <th colspan="2">Type</th>
-            <th colspan="2">Enchant level</th>
+            <th colspan="2">Type<br>Enchantments &amp; levels</th>
           </tr>
         </thead>
         <tbody>
           <tr>
-            <td><select name="itemID" class="itemAndEnchantInput"></select></td>
-            <td><img class="icon" src="images/icons.png"></td>
-            <td></td>
+            <td class="itemEnchantCell iconTextWrapping"><select name="itemID" class="type itemInput iconText"></select><img class="icon" src="images/icons.png"></td>
             <td></td>
           </tr>
           <tr class="template enchant noSpaceBefore" data-real="0">
-            <td><select name="enchantID" class="itemAndEnchantInput"></select></td>
-            <td></td>
-            <td class="levelInput buttonStrip"></td>
+            <td class="itemEnchantCell">
+              <div><select name="enchantID"></select></div>
+              <div class="levelInput buttonStrip"></div>
+            </td>
             <td><button type="button" name="removeEnchant">Remove</button></td>
           </tr>
           <tr class="noSpaceBefore">
             <td><button type="button" name="addEnchant">Add enchantment</button></td>
-            <td></td>
-            <td></td>
             <td></td>
           </tr>
         </tbody>

@@ -304,11 +304,19 @@ input[type=number] {
 #bookmark {
   display: none;
 }
-.itemAndEnchantInput {
-  width: 100%;
+.itemEnchantCell {
+  vertical-align: top;
+}
+.itemEnchantCell > div {
+  display: inline-block;
+  margin-right: 0.3em;
+}
+.itemInput {
+  width: calc(100% - 32px);
 }
 .buttonStrip {
   white-space: nowrap;
+  margin-top: -2px;
 }
 .buttonStrip .buttonBox {
   text-align: center;
