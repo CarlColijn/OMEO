@@ -3,9 +3,10 @@ function GetStripElementJQ() {
 }
 
 
-function SetUpButtonStrip() {
+function SetUpButtonStrip(cleanFirst=true) {
   let stripElemJQ = GetStripElementJQ()
-  stripElemJQ.empty()
+  if (cleanFirst)
+    stripElemJQ.empty()
   return new ButtonStrip(stripElemJQ)
 }
 
@@ -83,11 +84,19 @@ jazil.AddTestSet(mainPage, 'ButtonStrip', {
     jazil.ShouldBe(strip.GetSelectionNr(), undefined, 'wrong result for overflow')
   },
 
+  'Re-attaching to previously set up options retun those options': (jazil) => {
+    let strip = SetUpButtonStrip()
+    strip.SetOptions(['s', 't', 'u'], 2)
+    jazil.ShouldBe(strip.GetSelectionNr(), 2, 'wrong initial result')
+    strip = SetUpButtonStrip(false)
+    jazil.ShouldBe(strip.GetSelectionNr(), 2, 'wrong re-attached result')
+  },
+
   'Set options get reflected in content': (jazil) => {
     let strip = SetUpButtonStrip()
-    strip.SetOptions(['stuvw', 13579, 1.2345, undefined], undefined)
+    strip.SetOptions(['vwxyz', 13579, 1.2345, undefined], undefined)
     let shownText = GetStripElementJQ().text()
-    jazil.ShouldBe(shownText.includes('stuvw'), true, 'text option not found')
+    jazil.ShouldBe(shownText.includes('vwxyz'), true, 'text option not found')
     jazil.ShouldBe(shownText.includes('13579'), true, 'integer option not found')
     jazil.ShouldBe(shownText.includes('1.2345'), true, 'float option not found')
     jazil.ShouldBe(shownText.includes('undefined'), true, 'undefined option not found')

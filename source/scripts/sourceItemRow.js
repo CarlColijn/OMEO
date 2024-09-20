@@ -24,7 +24,6 @@ class SourceItemRowTemplate extends TemplateElement {
     super(rowElemJQ)
 
     this.SetupItemOptions()
-    this.SetupPriorWorkOptions()
   }
 
 
@@ -58,13 +57,6 @@ class SourceItemRowTemplate extends TemplateElement {
       itemSelectElemJQs.append(`<option value="${itemInfo.id}">${itemInfo.name}</option>`)
     }
   }
-
-
-  SetupPriorWorkOptions() {
-    let priorWorkSelectElemJQs = this.elemJQ.find('select[name="priorWork"]')
-    for (let priorWork = 0; priorWork <= 6; ++priorWork)
-      priorWorkSelectElemJQs.append(`<option value="${priorWork}">${priorWork}</option>`)
-  }
 }
 
 
@@ -84,7 +76,7 @@ class SourceItemRow extends RealElement {
     this.countElemJQ = rowElemJQ.find('input[name="count"]')
     this.iconElemJQ = rowElemJQ.find('.icon')
     this.idElemJQ = rowElemJQ.find('select[name="itemID"]')
-    this.priorWorkElemJQ = rowElemJQ.find('select[name="priorWork"]')
+    this.priorWorkElem = new ButtonStrip(rowElemJQ.find('.priorWorkInput'))
 
     if (hookUpGUI) {
       let item = undefined
@@ -160,14 +152,12 @@ class SourceItemRow extends RealElement {
   // - enchantDupeElemJQ: JQuery-wrapped input element, if applicable
   GetItem() {
     let countResult = this.GetValidatedCount()
+    let itemID = parseInt(this.idElemJQ.val())
+    let priorWork = this.priorWorkElem.GetSelectionNr()
 
-    let item = new Item(
-      countResult.count,
-      g_source,
-      parseInt(this.idElemJQ.val()),
-      parseInt(this.priorWorkElemJQ.val())
-    )
+    let item = new Item(countResult.count, g_source, itemID, priorWork)
     let enchantResult = this.AddItemEnchants(item)
+
     item.nr = parseInt(this.elemJQ.attr('data-nr'))
 
     return {
@@ -188,7 +178,8 @@ class SourceItemRow extends RealElement {
 
     this.countElemJQ.val(item.count)
     this.idElemJQ.val(item.id)
-    this.priorWorkElemJQ.val(item.priorWork)
+    this.SetupPriorWorkOptions()
+    this.priorWorkElem.SetSelectionNr(item.priorWork)
 
     let hasEnchants = item.enchantsByID.size > 0
     SetIcon(this.iconElemJQ, this.itemID, hasEnchants)
@@ -200,6 +191,11 @@ class SourceItemRow extends RealElement {
 
 
   // ======== PRIVATE ========
+
+
+  SetupPriorWorkOptions() {
+    this.priorWorkElem.SetOptions([0,1,2,3,4,5,6], undefined)
+  }
 
 
   // returns Item

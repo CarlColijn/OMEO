@@ -24,7 +24,7 @@ function GetSourceItemRowDetails(itemRowElemJQ) {
   typeID = typeID === undefined ? undefined : parseInt(typeID)
   let type = g_itemInfosByID.get(typeID).name
 
-  let priorWorkElemJQ = itemRowElemJQ.find('[name=priorWork]')
+  let priorWorkElemJQ = itemRowElemJQ.find('.priorWorkInput .selectedButton')
   let priorWork = parseInt(priorWorkElemJQ.val())
 
   let enchantNames = ''
