@@ -1,3 +1,73 @@
+/* Content block customizations */
+
+/* Built using the Colors.html page, with the defaults set there,
+   except for the overrides stated above the blocks below. */
+
+/* hue 0, saturation 0 */
+.grey {
+  --contentColor: #e6e6e6;
+  --headerColor: #3c3c3c;
+  --tableOddColor: #d2d2d2;
+  --tableEvenColor: #bebebe;
+}
+
+/* hue 0 */
+.red {
+  --contentColor: #ffcdcd;
+  --headerColor: #5b1d1d;
+  --tableOddColor: #eeb6b6;
+  --tableEvenColor: #e79595;
+}
+
+/* hue 37, luminance 200 */
+.yellow {
+  --contentColor: #fff9cd;
+  --headerColor: #6b5f0d;
+  --tableOddColor: #eee7b6;
+  --tableEvenColor: #e7dc95;
+}
+
+/* hue 55 */
+.olive {
+  --contentColor: #f1ffcd;
+  --headerColor: #495b1d;
+  --tableOddColor: #dfeeb6;
+  --tableEvenColor: #d1e795;
+}
+
+/* hue 110 */
+.turquoise {
+  --contentColor: #cdffea;
+  --headerColor: #1d5b41;
+  --tableOddColor: #b6eed7;
+  --tableEvenColor: #95e7c5;
+}
+
+/* hue 155 */
+.azure {
+  --contentColor: #cddfff;
+  --headerColor: #1d335b;
+  --tableOddColor: #b6caee;
+  --tableEvenColor: #95b2e7;
+}
+
+/* hue 180 */
+.violet {
+  --contentColor: #d9cdff;
+  --headerColor: #2c1d5b;
+  --tableOddColor: #c3b6ee;
+  --tableEvenColor: #a895e7;
+}
+
+/* hue 225 */
+.fuchsia {
+  --contentColor: #f0cdf0;
+  --headerColor: #5b1d49;
+  --tableOddColor: #eeb6de;
+  --tableEvenColor: #e795cf;
+}
+
+
 /* Page */
 body {
   color: #000000;
@@ -11,6 +81,7 @@ body {
 
 /* Content blocks */
 .content {
+  background-color: var(--contentColor);
   border-radius: 15px;
   margin: 2em 1em 1em 1em;
   padding: 0.7em;
@@ -21,6 +92,7 @@ body {
 }
 .content h1 {
   color: #ffffff;
+  background-color: var(--headerColor);
   font-size: 1.2em;
   text-align: center;
   border-radius: 15px;
@@ -48,6 +120,7 @@ body {
 /* Banner */
 #banner {
   color: #ffffff;
+  background-color: var(--headerColor);
   text-align: center;
   border-radius: 15px;
   box-shadow: 0.1em 0.3em 0.2em #00000040;
@@ -125,13 +198,21 @@ td.noSpaceRight {
   border: 1px solid #000000;
 }
 .table > thead > tr {
+  background-color: var(--headerColor);
   border-width: 2px 2px 1px 2px;
 }
 .table > tbody > tr {
   border-width: 1px 2px 1px 2px;
 }
-.table > tbody > tr.forcedHeader {
+.table > tbody > tr:nth-child(odd) {
+  background-color: var(--tableOddColor);
+}
+.table > tbody > tr:nth-child(even) {
+  background-color: var(--tableEvenColor);
+}
+.table > tbody.group > tr.forcedHeader {
   border-top-width: 2px;
+  background-color: var(--headerColor);
 }
 .table > tbody > tr:last-child {
   border-bottom-width: 2px;
@@ -151,16 +232,13 @@ td.noSpaceRight {
   cursor: pointer;
 }
 .treeTop {
-  --treeLinesColor: #000000;
-  box-shadow: inset 0px 2px var(--treeLinesColor), inset 0px 3px #00000080, inset 0px 4px #00000040;
+  box-shadow: inset 0px 2px var(--headerColor), inset 0px 3px #00000080, inset 0px 4px #00000040;
 }
 .treeLeft {
-  --treeLinesColor: #000000;
-  box-shadow: inset 3px 0px var(--treeLinesColor), inset 4px 0px #00000080, inset 5px 0px #00000040;
+  box-shadow: inset 3px 0px var(--headerColor), inset 4px 0px #00000080, inset 5px 0px #00000040;
 }
 .treeTop.treeLeft {
-  --treeLinesColor: #000000;
-  box-shadow: inset 3px 2px var(--treeLinesColor), inset 4px 3px #00000080, inset 5px 4px #00000040;
+  box-shadow: inset 3px 2px var(--headerColor), inset 4px 3px #00000080, inset 5px 4px #00000040;
 }
 .treeNode {
   width: 1em;
@@ -341,6 +419,7 @@ a:visited {
 em {
   font-style: oblique;
   color: #ffffff;
+  background-color: var(--headerColor);
   border-radius: 0.3em;
   padding: 0em 0.2em;
 }
@@ -358,15 +437,16 @@ em {
   position: fixed;
   right: 0px;
   top: 0px;
+  font-size: 0.7em;
   text-align: center;
   background-color: #ffffffb0;
   border: 1px solid #00000050;
   border-radius: 15px;
-  margin: 1em;
-  padding: 1em;
+  margin: 0.5em;
+  padding: 0.5em;
 }
 .patreonIcon .firstLetter {
-  font-size: 1.3em;
+  font-size: 1em;
   font-weight: bold;
   color: #fc674d;
 }
@@ -385,210 +465,4 @@ em {
 .patreonIcon a:hover .firstLetter,
 .patreonIcon a:active .firstLetter {
   color: #fc9e8d;
-}
-
-
-/* Content block customizations */
-
-/* Built using the Colors.html page, with the defaults set there,
-   except for the overrides stated above the blocks below. */
-
-/* hue 0, saturation 0 */
-.grey {
-  background-color: #e6e6e6;
-}
-.grey h1,
-.grey #banner {
-  background-color: #3c3c3c;
-}
-.grey .treeTop,
-.grey .treeLeft,
-.grey .treeTop.treeLeft {
-  --treeLinesColor: #3c3c3c;
-}
-.grey em,
-.grey .table > tbody.group > tr.forcedHeader,
-.grey .table > thead > tr {
-  background-color: #505050;
-}
-.grey .table > tbody > tr:nth-child(odd) {
-  background-color: #d2d2d2;
-}
-.grey .table > tbody > tr:nth-child(even) {
-  background-color: #bebebe;
-}
-
-/* hue 0 */
-.red {
-  background-color: #ffcdcd;
-}
-.red h1,
-.red #banner {
-  background-color: #5b1d1d;
-}
-.red .treeTop,
-.red .treeLeft,
-.red .treeTop.treeLeft {
-  --treeLinesColor: #5b1d1d;
-}
-.red em,
-.red .table > tbody.group > tr.forcedHeader,
-.red .table > thead > tr {
-  background-color: #6f3131;
-}
-.red .table > tbody > tr:nth-child(odd) {
-  background-color: #eeb6b6;
-}
-.red .table > tbody > tr:nth-child(even) {
-  background-color: #e79595;
-}
-
-/* hue 37, luminance 200 */
-.yellow {
-  background-color: #fff9cd;
-}
-.yellow h1,
-.yellow #banner {
-  background-color: #6b5f0d;
-}
-.yellow .treeTop,
-.yellow .treeLeft,
-.yellow .treeTop.treeLeft {
-  --treeLinesColor: #6b5f0d;
-}
-.yellow em,
-.yellow .table > tbody.group > tr.forcedHeader,
-.yellow .table > thead > tr {
-  background-color: #6f6731;
-}
-.yellow .table > tbody > tr:nth-child(odd) {
-  background-color: #eee7b6;
-}
-.yellow .table > tbody > tr:nth-child(even) {
-  background-color: #e7dc95;
-}
-
-/* hue 55 */
-.olive {
-  background-color: #f1ffcd;
-}
-.olive h1,
-.olive #banner {
-  background-color: #495b1d;
-}
-.olive .treeTop,
-.olive .treeLeft,
-.olive .treeTop.treeLeft {
-  --treeLinesColor: #495b1d;
-}
-.olive em,
-.olive .table > tbody.group > tr.forcedHeader,
-.olive .table > thead > tr {
-  background-color: #5e6f31;
-}
-.olive .table > tbody > tr:nth-child(odd) {
-  background-color: #dfeeb6;
-}
-.olive .table > tbody > tr:nth-child(even) {
-  background-color: #d1e795;
-}
-
-/* hue 110 */
-.turquoise {
-  background-color: #cdffea;
-}
-.turquoise h1,
-.turquoise #banner {
-  background-color: #1d5b41;
-}
-.turquoise .treeTop,
-.turquoise .treeLeft,
-.turquoise .treeTop.treeLeft {
-  --treeLinesColor: #1d5b41;
-}
-.turquoise em,
-.turquoise .table > tbody.group > tr.forcedHeader,
-.turquoise .table > thead > tr {
-  background-color: #316f56;
-}
-.turquoise .table > tbody > tr:nth-child(odd) {
-  background-color: #b6eed7;
-}
-.turquoise .table > tbody > tr:nth-child(even) {
-  background-color: #95e7c5;
-}
-
-/* hue 155 */
-.azure {
-  background-color: #cddfff;
-}
-.azure h1,
-.azure #banner {
-  background-color: #1d335b;
-}
-.azure .treeTop,
-.azure .treeLeft,
-.azure .treeTop.treeLeft {
-  --treeLinesColor: #1d335b;
-}
-.azure em,
-.azure .table > tbody.group > tr.forcedHeader,
-.azure .table > thead > tr {
-  background-color: #31476f;
-}
-.azure .table > tbody > tr:nth-child(odd) {
-  background-color: #b6caee;
-}
-.azure .table > tbody > tr:nth-child(even) {
-  background-color: #95b2e7;
-}
-
-/* hue 180 */
-.violet {
-  background-color: #d9cdff;
-}
-.violet h1,
-.violet #banner {
-  background-color: #2c1d5b;
-}
-.violet .treeTop,
-.violet .treeLeft,
-.violet .treeTop.treeLeft {
-  --treeLinesColor: #2c1d5b;
-}
-.violet em,
-.violet .table > tbody.group > tr.forcedHeader,
-.violet .table > thead > tr {
-  background-color: #3f316f;
-}
-.violet .table > tbody > tr:nth-child(odd) {
-  background-color: #c3b6ee;
-}
-.violet .table > tbody > tr:nth-child(even) {
-  background-color: #a895e7;
-}
-
-/* hue 225 */
-.fuchsia {
-  background-color: #f0cdf0;
-}
-.fuchsia h1,
-.fuchsia #banner {
-  background-color: #5b1d49;
-}
-.fuchsia .treeTop,
-.fuchsia .treeLeft,
-.fuchsia .treeTop.treeLeft {
-  --treeLinesColor: #5b1d49;
-}
-.fuchsia em,
-.fuchsia .table > tbody.group > tr.forcedHeader,
-.fuchsia .table > thead > tr {
-  background-color: #6f315d;
-}
-.fuchsia .table > tbody > tr:nth-child(odd) {
-  background-color: #eeb6de;
-}
-.fuchsia .table > tbody > tr:nth-child(even) {
-  background-color: #e795cf;
 }
