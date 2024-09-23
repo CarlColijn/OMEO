@@ -223,7 +223,13 @@ let g_numDifferentEnchants = 0
 
 // returns string
 function GetRomanNumeralForLevel(level) {
-  return ['-', 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X'][level]
+  return ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X'][level - 1]
+}
+
+
+// returns string[]
+function GetRomanNumeralsUpToLevel(level) {
+  return ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X'].slice(0, level)
 }
 
 
@@ -1546,6 +1552,79 @@ class RealElement extends DOMElement {
 
 
 /*
+  Button strip GUI element management.
+
+  Prerequisites:
+  - none
+
+  Defined classes:
+  - ButtonStrip
+*/
+
+
+// ======== PUBLIC ========
+
+
+class ButtonStrip {
+  constructor(elemJQ) {
+    // ==== PRIVATE ====
+    this.elemJQ = elemJQ
+  }
+
+
+  // note: options should be an array of any
+  SetOptions(options, selectedOptionNr) {
+    this.elemJQ.empty()
+
+    let maxOptionNr = options.length - 1
+    for (let optionNr = 0; optionNr <= maxOptionNr; ++optionNr) {
+      let option = options[optionNr]
+      let orderClass =
+        optionNr == 0 && optionNr == maxOptionNr ?
+        ' onlyButton' :
+        optionNr == 0 ?
+        ' firstButton' :
+        optionNr == maxOptionNr ?
+        ' lastButton' :
+        ' middleButton'
+      let selectedClass =
+        optionNr === selectedOptionNr ?
+        ' selectedButton' :
+        ''
+
+      let buttonElemJQ = $(`<button type="button" class="buttonBox${orderClass}${selectedClass}" value="${optionNr}"><div>${option}</div></button>`)
+      this.elemJQ.append(buttonElemJQ)
+
+      let elemJQ = this.elemJQ
+      buttonElemJQ.on('click', function() {
+        elemJQ.find('button').removeClass('selectedButton')
+        $(this).addClass('selectedButton')
+      })
+    }
+  }
+
+
+  // returns int
+  // returns undefined when no selection is made
+  GetSelectionNr() {
+    let optionNr = parseInt(this.elemJQ.find('.selectedButton').val())
+    if (isNaN(optionNr))
+      return undefined
+    else
+      return optionNr
+  }
+
+
+  SetSelectionNr(optionNr) {
+    this.elemJQ.find('button').removeClass('selectedButton')
+    this.elemJQ.find(`button[value=${optionNr}]`).addClass('selectedButton')
+  }
+}
+
+
+
+
+/*
   Wrapper for a single row in an enchant table.
 
   Prerequisites:
@@ -1578,10 +1657,9 @@ class EnchantRowTemplate extends TemplateElement {
 
     newRow.HookUpGUI(itemID, RemoveCallback)
 
-    if (enchant !== undefined)
-      newRow.SetEnchant(enchant) // performs an UpdateLevelOptions as well
-    else
-      newRow.UpdateLevelOptions()
+    if (enchant === undefined)
+      enchant = newRow.GetEnchant()
+    newRow.SetEnchant(enchant)
 
     newRow.focusElemJQWhenAllGone = focusElemJQWhenAllGone
     if (giveFocus)
@@ -1613,7 +1691,7 @@ class EnchantRow extends RealElement {
 
     // ==== PRIVATE ====
     this.idElemJQ = rowElemJQ.find('select[name="enchantID"]')
-    this.levelElemJQ = rowElemJQ.find('select[name="level"]')
+    this.levelElem = new ButtonStrip(rowElemJQ.find('.levelInput'))
   }
 
 
@@ -1643,17 +1721,16 @@ class EnchantRow extends RealElement {
 
   // returns Enchant
   GetEnchant() {
-    return new Enchant(
-      parseInt(this.idElemJQ.val()),
-      parseInt(this.levelElemJQ.val())
-    )
+    let enchantID = parseInt(this.idElemJQ.val())
+    let enchantInfo = g_enchantInfosByID.get(enchantID)
+    let enchantLevel = this.GetEnchantLevel(enchantInfo)
+    return new Enchant(enchantID, enchantLevel)
   }
 
 
   SetEnchant(enchant) {
     this.idElemJQ.val(enchant.id)
-    this.UpdateLevelOptions(this.idElemJQ, this.levelElemJQ)
-    this.levelElemJQ.val(enchant.level)
+    this.UpdateLevelOptions(enchant)
   }
 
 
@@ -1662,7 +1739,7 @@ class EnchantRow extends RealElement {
 
   HookUpGUI(itemID, RemoveCallback) {
     this.idElemJQ.change(() => {
-      this.UpdateLevelOptions()
+      this.UpdateLevelOptions(undefined)
     })
 
     this.elemJQ.find('button[name="removeEnchant"]').click(() => {
@@ -1674,27 +1751,21 @@ class EnchantRow extends RealElement {
 
 
   // returns int
-  GetNewEnchantLevel(newEnchant) {
-    let selectLevel = parseInt(this.levelElemJQ.val())
-    if (isNaN(selectLevel))
-      selectLevel = 1
-    return Math.max(1, Math.min(newEnchant.maxLevel, selectLevel))
+  GetEnchantLevel(enchantInfo) {
+    let selectLevelNr = this.levelElem.GetSelectionNr()
+    if (selectLevelNr === undefined)
+      selectLevelNr = 0
+    return Math.max(1, Math.min(enchantInfo.maxLevel, selectLevelNr + 1))
   }
 
 
-  SetupNewLevelOptions(maxLevel, selectedLevel) {
-    this.levelElemJQ.find('option').remove()
+  UpdateLevelOptions(enchant) {
+    if (enchant === undefined)
+      enchant = this.GetEnchant()
 
-    for (let level = 1; level <= maxLevel; ++level)
-      this.levelElemJQ.append(`<option value="${level}"${level == selectedLevel ? ' selected' : ''}>${GetRomanNumeralForLevel(level)}</option>`)
-  }
+    let levelTexts = GetRomanNumeralsUpToLevel(enchant.info.maxLevel)
 
-
-  UpdateLevelOptions() {
-    let enchantID = parseInt(this.idElemJQ.val())
-    let newEnchant = g_enchantInfosByID.get(enchantID)
-    let selectedLevel = this.GetNewEnchantLevel(newEnchant)
-    this.SetupNewLevelOptions(newEnchant.maxLevel, selectedLevel)
+    this.levelElem.SetOptions(levelTexts, enchant.level - 1)
   }
 }
 
@@ -1771,7 +1842,6 @@ class SourceItemRowTemplate extends TemplateElement {
     super(rowElemJQ)
 
     this.SetupItemOptions()
-    this.SetupPriorWorkOptions()
   }
 
 
@@ -1805,13 +1875,6 @@ class SourceItemRowTemplate extends TemplateElement {
       itemSelectElemJQs.append(`<option value="${itemInfo.id}">${itemInfo.name}</option>`)
     }
   }
-
-
-  SetupPriorWorkOptions() {
-    let priorWorkSelectElemJQs = this.elemJQ.find('select[name="priorWork"]')
-    for (let priorWork = 0; priorWork <= 6; ++priorWork)
-      priorWorkSelectElemJQs.append(`<option value="${priorWork}">${priorWork}</option>`)
-  }
 }
 
 
@@ -1831,7 +1894,7 @@ class SourceItemRow extends RealElement {
     this.countElemJQ = rowElemJQ.find('input[name="count"]')
     this.iconElemJQ = rowElemJQ.find('.icon')
     this.idElemJQ = rowElemJQ.find('select[name="itemID"]')
-    this.priorWorkElemJQ = rowElemJQ.find('select[name="priorWork"]')
+    this.priorWorkElem = new ButtonStrip(rowElemJQ.find('.priorWorkInput'))
 
     if (hookUpGUI) {
       let item = undefined
@@ -1907,14 +1970,12 @@ class SourceItemRow extends RealElement {
   // - enchantDupeElemJQ: JQuery-wrapped input element, if applicable
   GetItem() {
     let countResult = this.GetValidatedCount()
+    let itemID = parseInt(this.idElemJQ.val())
+    let priorWork = this.priorWorkElem.GetSelectionNr()
 
-    let item = new Item(
-      countResult.count,
-      g_source,
-      parseInt(this.idElemJQ.val()),
-      parseInt(this.priorWorkElemJQ.val())
-    )
+    let item = new Item(countResult.count, g_source, itemID, priorWork)
     let enchantResult = this.AddItemEnchants(item)
+
     item.nr = parseInt(this.elemJQ.attr('data-nr'))
 
     return {
@@ -1935,7 +1996,8 @@ class SourceItemRow extends RealElement {
 
     this.countElemJQ.val(item.count)
     this.idElemJQ.val(item.id)
-    this.priorWorkElemJQ.val(item.priorWork)
+    this.SetupPriorWorkOptions()
+    this.priorWorkElem.SetSelectionNr(item.priorWork)
 
     let hasEnchants = item.enchantsByID.size > 0
     SetIcon(this.iconElemJQ, this.itemID, hasEnchants)
@@ -1947,6 +2009,11 @@ class SourceItemRow extends RealElement {
 
 
   // ======== PRIVATE ========
+
+
+  SetupPriorWorkOptions() {
+    this.priorWorkElem.SetOptions([0,1,2,3,4,5,6], undefined)
+  }
 
 
   // returns Item
@@ -4260,7 +4327,7 @@ class MainForm {
     })
 
     // Note: the path should be relative to the html document loading us!
-    this.combineWorker = new Worker('scripts/itemCombineWorker.js?v=6131e648')
+    this.combineWorker = new Worker('scripts/itemCombineWorker.js?v=3d11efd9')
 
     this.combineWorker.onmessage = (e) => {
       switch (e.data.type) {

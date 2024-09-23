@@ -197,6 +197,21 @@ td.noSpaceRight {
 .table > tbody > tr {
   border: 1px solid #000000;
 }
+.table.groupedRows > thead > tr,
+.table.groupedRows > tbody > tr {
+  border-style: none;
+}
+.table.groupedRows > thead {
+  border: 2px solid #000000;
+  border-bottom-width: 1px;
+}
+.table.groupedRows > tbody {
+  border: 2px solid #000000;
+  border-width: 1px 2px;
+}
+.table.groupedRows > tbody:last-child {
+  border-bottom-width: 2px;
+}
 .table > thead > tr {
   background-color: var(--headerColor);
   border-width: 2px 2px 1px 2px;
@@ -208,6 +223,15 @@ td.noSpaceRight {
   background-color: var(--tableOddColor);
 }
 .table > tbody > tr:nth-child(even) {
+  background-color: var(--tableEvenColor);
+}
+.table.groupedRows > tbody > tr {
+  background-color: transparent;
+}
+.table.groupedRows > tbody:nth-child(odd) {
+  background-color: var(--tableOddColor);
+}
+.table.groupedRows > tbody:nth-child(even) {
   background-color: var(--tableEvenColor);
 }
 .table > tbody.group > tr.forcedHeader {
@@ -280,11 +304,51 @@ input[type=number] {
 #bookmark {
   display: none;
 }
-.itemAndEnchantInput {
-  width: 100%;
+.itemEnchantCell {
+  vertical-align: top;
 }
-.levelInput {
-  width: 2.7em;
+.itemEnchantCell > div {
+  display: inline-block;
+  margin-right: 0.3em;
+}
+.itemInput {
+  width: calc(100% - 32px);
+}
+.buttonStrip {
+  white-space: nowrap;
+  margin-top: -2px;
+}
+.buttonStrip .buttonBox {
+  text-align: center;
+  padding: 0px;
+  margin: 0px;
+}
+.buttonStrip .buttonBox.onlyButton {
+  border-radius: 7px;
+}
+.buttonStrip .buttonBox.firstButton {
+  border-radius: 7px 0px 0px 7px;
+}
+.buttonStrip .buttonBox.middleButton {
+  border-radius: 0px;
+}
+.buttonStrip .buttonBox.lastButton {
+  border-radius: 0px 7px 7px 0px;
+}
+.buttonStrip .buttonBox div {
+  width: 1.2em;
+  padding: 1px 2px;
+  margin: auto;
+  text-align: center;
+}
+.buttonStrip .buttonBox.selectedButton {
+  -webkit-filter: brightness(75%);
+  filter: brightness(75%);
+}
+.buttonStrip .buttonBox.selectedButton div {
+  border-width: 2px 0px;
+  border-style: solid;
+  border-color: transparent;
 }
 .itemDisplay {
   font-weight: bold;
