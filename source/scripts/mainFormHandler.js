@@ -75,7 +75,7 @@ class MainFormHandler {
 
 
   TellItemsMerged(OnExit) {
-    new SimpleDialog('#itemsMerged').HookupButton('.exit')
+    new SimpleDialog('#itemsMerged', OnExit).HookupButton('.exit', OnExit)
   }
 
 
