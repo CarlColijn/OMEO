@@ -156,7 +156,40 @@
       <button id="showNotes" type="button">Oh, how did this all work again?</button>
     </div>
 
-    <div id="sources" class="content azure">
+    <div id="desired" class="content azure">
+      <h1>I want to have</h1>
+
+      <p>Tell me what you'd like to have, and I'll try to conjure it up.</p>
+
+      <table class="table item groupedRows">
+        <thead>
+          <tr>
+            <th colspan="2">Type<br>Enchantments &amp; levels</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="itemEnchantCell iconTextWrapping"><select name="itemID" class="type itemInput iconText"></select><img class="icon" src="images/icons.png"></td>
+            <td></td>
+          </tr>
+          <tr class="template enchant noSpaceBefore" data-real="0">
+            <td class="itemEnchantCell">
+              <div><select name="enchantID"></select></div>
+              <div class="levelInput buttonStrip"></div>
+            </td>
+            <td><button type="button" name="removeEnchant">Remove</button></td>
+          </tr>
+          <tr class="noSpaceBefore">
+            <td><button type="button" name="addEnchant">Add enchantment</button></td>
+            <td></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <p><label><input id="renameToo" name="renameToo" type="checkbox" value="1">Rename the item too</label> <span class="footnote">(costs 1 XP)</span></p>
+    </div>
+
+    <div id="sources" class="content red">
       <h1>My items</h1>
 
       <p>Just tell me below which items you want to use.</p>
@@ -202,39 +235,6 @@
         </tbody>
       </table>
       <button type="button" id="addSourceItem">Add item</button>
-    </div>
-
-    <div id="desired" class="content red">
-      <h1>I want to have</h1>
-
-      <p>Tell me what you'd like to have, and I'll try to conjure it up.</p>
-
-      <table class="table item groupedRows">
-        <thead>
-          <tr>
-            <th colspan="2">Type<br>Enchantments &amp; levels</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td class="itemEnchantCell iconTextWrapping"><select name="itemID" class="type itemInput iconText"></select><img class="icon" src="images/icons.png"></td>
-            <td></td>
-          </tr>
-          <tr class="template enchant noSpaceBefore" data-real="0">
-            <td class="itemEnchantCell">
-              <div><select name="enchantID"></select></div>
-              <div class="levelInput buttonStrip"></div>
-            </td>
-            <td><button type="button" name="removeEnchant">Remove</button></td>
-          </tr>
-          <tr class="noSpaceBefore">
-            <td><button type="button" name="addEnchant">Add enchantment</button></td>
-            <td></td>
-          </tr>
-        </tbody>
-      </table>
-
-      <p><label><input id="renameToo" name="renameToo" type="checkbox" value="1">Rename the item too</label> <span class="footnote">(costs 1 XP)</span></p>
     </div>
 
     <div id="combined" class="content violet">
