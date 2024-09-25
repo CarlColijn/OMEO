@@ -1,52 +1,15 @@
 /*
   Main page javascript module.
 
+  Prerequisites:
+  - simpleDialog.js
+
   Defined classes:
   - MainFormHandler
 */
 
 
 class MainFormHandler {
-  MakeDialogKeyboardCloseable(dialogElemJQ, exitButtonElemJQ, OnClose) {
-    let keyboardListener = (event) => {
-      if (
-        event.key === 'Escape' ||
-        event.key === ' ' ||
-        event.key === 'Enter'
-      ) {
-        event.preventDefault()
-        ExitDialog()
-      }
-    }
-
-    window.addEventListener('keydown', keyboardListener)
-
-    let ExitDialog = () => {
-      window.removeEventListener('keydown', keyboardListener)
-
-      dialogElemJQ.hide()
-
-      if (OnClose !== undefined)
-        OnClose()
-    }
-
-    exitButtonElemJQ.click(() => {
-      ExitDialog()
-    })
-  }
-
-
-  ShowSimpleDialog(dialogID, ContinueCallback) {
-    let dialogElemJQ = $(dialogID)
-    dialogElemJQ.css('display', 'flex')
-
-    let exitButtonJQ = dialogElemJQ.find('.exit')
-    exitButtonJQ[0].focus()
-
-    this.MakeDialogKeyboardCloseable(dialogElemJQ, exitButtonJQ, ContinueCallback)
-  }
-
-
   ClearErrors() {
     $('.error').remove()
   }
@@ -86,7 +49,7 @@ class MainFormHandler {
 
 
   FailedToLoad() {
-    this.ShowSimpleDialog('#dataInErrorForLoad', undefined)
+    new SimpleDialog('#dataInErrorForLoad').HookupButton('.exit')
   }
 
 
@@ -97,31 +60,26 @@ class MainFormHandler {
 
 
   TellFailedToSaveOnRequest() {
-    this.ShowSimpleDialog('#dataInErrorForSave', undefined)
+    new SimpleDialog('#dataInErrorForSave').HookupButton('.exit')
   }
 
 
   TellDataInError() {
-    this.ShowSimpleDialog('#dataInErrorForDivine', undefined)
+    new SimpleDialog('#dataInErrorForDivine').HookupButton('.exit')
   }
 
 
   TellItemsMerged(OnExit) {
-    this.ShowSimpleDialog('#itemsMerged', OnExit)
+    new SimpleDialog('#itemsMerged').HookupButton('.exit')
   }
 
 
   TellCombineStarting(OnCancel) {
-    let dialogElemJQ = $('#divining')
-    dialogElemJQ.css('display', 'flex')
-    let exitButtonElemJQ = $('#divining .exit')
-
     $('#divineTitle').html('Divination is in progress')
     $('#divineProgress').html('Starting up...')
-    exitButtonElemJQ.html('Stop')
+    $('#divining .exit').html('Stop')
 
-    exitButtonElemJQ[0].focus()
-    this.MakeDialogKeyboardCloseable(dialogElemJQ, exitButtonElemJQ, OnCancel)
+    new SimpleDialog('#divining', OnCancel).HookupButton('.exit', OnCancel)
   }
 
 

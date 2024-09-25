@@ -48,6 +48,7 @@
             <File name="source\scripts\recipeFormHandler.js" />
             <File name="source\scripts\recipeTable.js" />
             <File name="source\scripts\settings.js" />
+            <File name="source\scripts\simpleDialog.js" />
             <File name="source\scripts\sourceItemRow.js" />
             <File name="source\scripts\sourceItemTable.js" />
             <File name="source\scripts\templateElement.js" />
