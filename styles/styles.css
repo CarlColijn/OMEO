@@ -432,6 +432,7 @@ a:visited {
   display: none; /* to be changed by flex on demand */
   align-items: center;
   justify-content: center;
+  z-index: 1;
 }
 .dialogBody {
   margin: 10%;
@@ -469,6 +470,16 @@ a:visited {
 .footnote {
   font-style: oblique;
   font-size: 0.8em;
+}
+.credit {
+  font-size: 0.8em;
+  font-style: oblique;
+  font-weight: bold;
+}
+.credit::before {
+  content: '\025b7';
+  margin-right: 0.6em;
+  font-style: normal;
 }
 .keepTogether :first-child {
   margin-bottom: 0px;

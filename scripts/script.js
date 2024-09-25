@@ -1,5 +1,71 @@
 /*
+  Simple dialogs.
+
+  Defined classes:
+  - SimpleDialog
+*/
+
+
+// ======== PUBLIC ========
+
+
+class SimpleDialog {
+  constructor(dialogID, EscapeHandler) {
+    this.dialogElemJQ = $(dialogID)
+    this.dialogElemJQ.css('display', 'flex')
+
+    this.firstButtonAdded = false
+
+    this.keyboardListener = (event) => {
+      if (event.key === 'Escape') {
+        event.preventDefault()
+        this.ExitDialog(EscapeHandler)
+      }
+    }
+
+    window.addEventListener('keydown', this.keyboardListener)
+  }
+
+
+  // returns this for method chaining
+  HookupButton(buttonID, ClickHandler) {
+    let buttonElemJQ = this.dialogElemJQ.find(buttonID)
+
+    buttonElemJQ.unbind('click')
+    buttonElemJQ.click(() => {
+      this.ExitDialog(ClickHandler)
+    })
+
+    if (!this.firstButtonAdded) {
+      buttonElemJQ[0].focus()
+      this.firstButtonAdded = true
+    }
+
+    return this
+  }
+
+
+  // ======== PRIVATE ========
+
+
+  ExitDialog(Handler) {
+    window.removeEventListener('keydown', this.keyboardListener)
+
+    this.dialogElemJQ.hide()
+
+    if (Handler !== undefined)
+      Handler()
+  }
+}
+
+
+
+
+/*
   Contact page javascript module.
+
+  Prerequisites:
+  - simpleDialog.js
 
   Defined classes:
   - RecipeFormHandler
@@ -7,53 +73,13 @@
 
 
 class ContactFormHandler {
-  MakeDialogKeyboardCloseable(dialogElemJQ, exitButtonElemJQ, OnClose) {
-    let keyboardListener = (event) => {
-      if (
-        event.key === 'Escape' ||
-        event.key === ' ' ||
-        event.key === 'Enter'
-      ) {
-        event.preventDefault()
-        ExitDialog()
-      }
-    }
-
-    window.addEventListener('keydown', keyboardListener)
-
-    let ExitDialog = () => {
-      window.removeEventListener('keydown', keyboardListener)
-
-      dialogElemJQ.hide()
-
-      if (OnClose !== undefined)
-        OnClose()
-    }
-
-    exitButtonElemJQ.click(() => {
-      ExitDialog()
-    })
-  }
-
-
-  ShowSimpleDialog(dialogID) {
-    let dialogElemJQ = $(dialogID)
-    dialogElemJQ.css('display', 'flex')
-
-    let exitButtonJQ = dialogElemJQ.find('.exit')
-    exitButtonJQ[0].focus()
-
-    this.MakeDialogKeyboardCloseable(dialogElemJQ, exitButtonJQ)
-  }
-
-
   FeedbackSent() {
-    this.ShowSimpleDialog('#feedbackSent')
+    new SimpleDialog('#feedbackSent').HookupButton('.exit')
   }
 
 
   FeedbackFailure() {
-    this.ShowSimpleDialog('#feedbackFailure')
+    new SimpleDialog('#feedbackFailure').HookupButton('.exit')
   }
 }
 
@@ -378,6 +404,7 @@ RegisterConflictingEnchants(['Multishot', 'Piercing'])
 
   Defined globals:
   - g_itemInfosByID: Map(int -> ItemInfo)
+  - g_bookID: int
   - g_numDifferentItems: int
   - g_numItemIDBits: int
 */
@@ -405,6 +432,7 @@ class ItemInfo {
     this.enchantsAllowedByID = new Set()
 
     if (this.isBook) {
+      g_bookID = this.id
       g_enchantInfos.forEach((enchantInfo) => {
         this.enchantsAllowedByID.add(enchantInfo.id)
       })
@@ -432,6 +460,7 @@ let g_itemInfosByID = new Map()
 
 
 let g_numDifferentItems = 0
+let g_bookID = -1
 let g_itemInfos = [
   new ItemInfo(0, 'Book', 4,0, []),
   new ItemInfo(1, 'Axe', 2,2, ['Bane of Arthropods'/*, 'Chopping'*/, 'Curse of Vanishing','Efficiency', 'Fortune', 'Mending', 'Sharpness', 'Silk Touch', 'Smite', 'Unbreaking']),
@@ -792,6 +821,41 @@ class Item {
   }
 
 
+  DropUnusedEnchants() {
+    let enchantIDsToDrop = []
+
+    this.enchantsByID.forEach((enchant, id) => {
+      if (enchant.level == 0)
+        enchantIDsToDrop.push(id)
+    })
+
+    enchantIDsToDrop.forEach((enchantID) => {
+      this.enchantsByID.delete(enchantID)
+    })
+  }
+
+
+  DropAllEnchants() {
+    this.enchantsByID = new Map()
+  }
+
+
+  // returns Item[]
+  SplitIntoParts(itemSet) {
+    let parts = [new Item(1, itemSet, this.id, 0)]
+
+    this.enchantsByID.forEach((enchant, id) => {
+      if (enchant.level != 0) {
+        let book = new Item(1, itemSet, g_bookID, 0)
+        book.SetEnchant(enchant)
+        parts.push(book)
+      }
+    })
+
+    return parts
+  }
+
+
   // returns string
   HashType() {
     return this.Hash(false, false, false)
@@ -841,20 +905,6 @@ class Item {
       allData += `|${this.set.id}`
 
     return allData
-  }
-
-
-  DropUnusedEnchants() {
-    let enchantIDsToDrop = []
-
-    this.enchantsByID.forEach((enchant, id) => {
-      if (enchant.level == 0)
-        enchantIDsToDrop.push(id)
-    })
-
-    enchantIDsToDrop.forEach((enchantID) => {
-      this.enchantsByID.delete(enchantID)
-    })
   }
 }
 
@@ -2361,6 +2411,19 @@ class SourceItemTable {
     items.forEach((item, itemNr) => {
       this.templateRow.CreateNew(itemNr + 1, item, false, this.addItemElemJQ)
     })
+  }
+
+
+  // returns bool
+  HasItems() {
+    let hasItems = false
+    this.tableElemJQ.find('.item').each((rowNr, itemRowElem) => {
+      let itemRow = new SourceItemRow($(itemRowElem), false)
+      if (itemRow.IsReal())
+        hasItems = true
+      return !hasItems
+    })
+    return hasItems
   }
 
 
@@ -4002,52 +4065,15 @@ class ItemCostTreeFinalizer {
 /*
   Main page javascript module.
 
+  Prerequisites:
+  - simpleDialog.js
+
   Defined classes:
   - MainFormHandler
 */
 
 
 class MainFormHandler {
-  MakeDialogKeyboardCloseable(dialogElemJQ, exitButtonElemJQ, OnClose) {
-    let keyboardListener = (event) => {
-      if (
-        event.key === 'Escape' ||
-        event.key === ' ' ||
-        event.key === 'Enter'
-      ) {
-        event.preventDefault()
-        ExitDialog()
-      }
-    }
-
-    window.addEventListener('keydown', keyboardListener)
-
-    let ExitDialog = () => {
-      window.removeEventListener('keydown', keyboardListener)
-
-      dialogElemJQ.hide()
-
-      if (OnClose !== undefined)
-        OnClose()
-    }
-
-    exitButtonElemJQ.click(() => {
-      ExitDialog()
-    })
-  }
-
-
-  ShowSimpleDialog(dialogID, ContinueCallback) {
-    let dialogElemJQ = $(dialogID)
-    dialogElemJQ.css('display', 'flex')
-
-    let exitButtonJQ = dialogElemJQ.find('.exit')
-    exitButtonJQ[0].focus()
-
-    this.MakeDialogKeyboardCloseable(dialogElemJQ, exitButtonJQ, ContinueCallback)
-  }
-
-
   ClearErrors() {
     $('.error').remove()
   }
@@ -4087,7 +4113,7 @@ class MainFormHandler {
 
 
   FailedToLoad() {
-    this.ShowSimpleDialog('#dataInErrorForLoad', undefined)
+    new SimpleDialog('#dataInErrorForLoad').HookupButton('.exit')
   }
 
 
@@ -4098,31 +4124,36 @@ class MainFormHandler {
 
 
   TellFailedToSaveOnRequest() {
-    this.ShowSimpleDialog('#dataInErrorForSave', undefined)
+    new SimpleDialog('#dataInErrorForSave').HookupButton('.exit')
   }
 
 
-  TellDataInError() {
-    this.ShowSimpleDialog('#dataInErrorForDivine', undefined)
+  TellDataInErrorForDivine() {
+    new SimpleDialog('#dataInErrorForDivine').HookupButton('.exit')
+  }
+
+
+  TellDataInErrorForFillSources() {
+    new SimpleDialog('#dataInErrorForFillSources').HookupButton('.exit')
   }
 
 
   TellItemsMerged(OnExit) {
-    this.ShowSimpleDialog('#itemsMerged', OnExit)
+    new SimpleDialog('#itemsMerged').HookupButton('.exit')
+  }
+
+
+  AskMayOverwriteSources(OnYesClicked) {
+    new SimpleDialog('#mayOverwriteSources').HookupButton('.no').HookupButton('.yes', OnYesClicked)
   }
 
 
   TellCombineStarting(OnCancel) {
-    let dialogElemJQ = $('#divining')
-    dialogElemJQ.css('display', 'flex')
-    let exitButtonElemJQ = $('#divining .exit')
-
     $('#divineTitle').html('Divination is in progress')
     $('#divineProgress').html('Starting up...')
-    exitButtonElemJQ.html('Stop')
+    $('#divining .exit').html('Stop')
 
-    exitButtonElemJQ[0].focus()
-    this.MakeDialogKeyboardCloseable(dialogElemJQ, exitButtonElemJQ, OnCancel)
+    new SimpleDialog('#divining', OnCancel).HookupButton('.exit', OnCancel)
   }
 
 
@@ -4310,6 +4341,10 @@ class MainForm {
 
 
   HookUpGUI() {
+    $('#autoFillSources').click(() => {
+      this.AutoFillSources()
+    })
+
     $('#divine').click(() => {
       this.PerformDivine()
     })
@@ -4321,13 +4356,33 @@ class MainForm {
   }
 
 
+  ContinueFillSources() {
+    let dataInContext = this.GetData(true, false)
+    if (dataInContext.withCountErrors || dataInContext.withEnchantConflicts || dataInContext.withEnchantDupes)
+      this.formHandler.TellDataInErrorForFillSources()
+    else {
+      let desiredItem = dataInContext.data.desiredItem
+      let desiredParts = desiredItem.SplitIntoParts(g_source)
+      this.sourceItemTable.SetItems(desiredParts)
+    }
+  }
+
+
+  AutoFillSources() {
+    if (!this.sourceItemTable.HasItems())
+      this.ContinueFillSources()
+    else
+      this.formHandler.AskMayOverwriteSources(() => { this.ContinueFillSources() })
+  }
+
+
   ContinueDivine(dataInContext) {
     this.formHandler.TellCombineStarting(() => {
       this.ExitDivine()
     })
 
     // Note: the path should be relative to the html document loading us!
-    this.combineWorker = new Worker('scripts/itemCombineWorker.js?v=3d11efd9')
+    this.combineWorker = new Worker('scripts/itemCombineWorker.js?v=7a709b49')
 
     this.combineWorker.onmessage = (e) => {
       switch (e.data.type) {
@@ -4365,9 +4420,9 @@ class MainForm {
     this.ClearErrors()
     this.ClearResult()
 
-    let dataInContext = this.GetData(true)
+    let dataInContext = this.GetData(false, true)
     if (dataInContext.withCountErrors || dataInContext.withEnchantConflicts || dataInContext.withEnchantDupes)
-      this.formHandler.TellDataInError()
+      this.formHandler.TellDataInErrorForDivine()
     else {
       let ContinueCombine = () => {
         this.ContinueDivine(dataInContext)
@@ -4437,8 +4492,20 @@ class MainForm {
   // - withEnchantConflicts: bool
   // - withEnchantDupes: bool
   // - mergedSourceItems: bool
-  GetData(mergeSourceItems) {
-    let sourceItemsResult = this.sourceItemTable.ExtractItems(new ItemCollector(mergeSourceItems))
+  GetData(onlyDesiredItem, mergeSourceItems) {
+    let sourceItemsResult
+    if (onlyDesiredItem)
+      sourceItemsResult = {
+        items: [],
+        withCountErrors: false,
+        countErrorElemJQs: [],
+        withEnchantConflicts: false,
+        enchantConflictInfos: [],
+        withEnchantDupes: false,
+        enchantDupeElemJQs: []
+      }
+    else
+      sourceItemsResult = this.sourceItemTable.ExtractItems(new ItemCollector(mergeSourceItems))
     let desiredItemResult = this.desiredItemSection.ExtractItems(new ItemCollector(false))
     let renameToo = this.renameTooElemJQ.prop('checked')
 
@@ -4529,7 +4596,7 @@ class MainForm {
 
   // returns bool
   SaveToStream(stream) {
-    let dataInContext = this.GetData(false)
+    let dataInContext = this.GetData(false, false)
     if (dataInContext.withCountErrors || dataInContext.withEnchantDupes)
       return false
 
@@ -4792,54 +4859,17 @@ class RecipeTable {
 /*
   Recipe page javascript module.
 
+  Prerequisites:
+  - simpleDialog.js
+
   Defined classes:
   - RecipeFormHandler
 */
 
 
 class RecipeFormHandler {
-  MakeDialogKeyboardCloseable(dialogElemJQ, exitButtonElemJQ, OnClose) {
-    let keyboardListener = (event) => {
-      if (
-        event.key === 'Escape' ||
-        event.key === ' ' ||
-        event.key === 'Enter'
-      ) {
-        event.preventDefault()
-        ExitDialog()
-      }
-    }
-
-    window.addEventListener('keydown', keyboardListener)
-
-    let ExitDialog = () => {
-      window.removeEventListener('keydown', keyboardListener)
-
-      dialogElemJQ.hide()
-
-      if (OnClose !== undefined)
-        OnClose()
-    }
-
-    exitButtonElemJQ.click(() => {
-      ExitDialog()
-    })
-  }
-
-
-  ShowSimpleDialog(dialogID, ContinueCallback) {
-    let dialogElemJQ = $(dialogID)
-    dialogElemJQ.css('display', 'flex')
-
-    let exitButtonJQ = dialogElemJQ.find('.exit')
-    exitButtonJQ[0].focus()
-
-    this.MakeDialogKeyboardCloseable(dialogElemJQ, exitButtonJQ, ContinueCallback)
-  }
-
-
   FailedToLoad() {
-    this.ShowSimpleDialog('#dataInErrorForLoad', undefined)
+    new SimpleDialog('#dataInErrorForLoad').HookupButton('.exit')
   }
 }
 
