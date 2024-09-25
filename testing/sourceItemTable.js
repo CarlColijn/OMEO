@@ -13,6 +13,7 @@ jazil.AddTestSet(mainPage, 'SourceItemTable', {
   'Table is initialized correctly': (jazil) => {
     let table = GetSourceItemTable()
 
+    jazil.ShouldBe(table.HasItems(), false, 'table is not empty!')
     jazil.ShouldBe(table.tableElemJQ.find('tr.template.item').length, 1, 'no template row found!')
     jazil.ShouldBe(table.tableElemJQ.find('tr.item').length, 1, 'wrong number of rows by default!')
   },
@@ -24,6 +25,7 @@ jazil.AddTestSet(mainPage, 'SourceItemTable', {
     let newRow = table.AddRow()
     let numRowsPost = table.tableElemJQ.find('tr.item').length
     jazil.ShouldBe(numRowsPost - numRowsPre, 1, 'wrong number of rows added!')
+    jazil.ShouldBe(table.HasItems(), true, 'table is empty!')
 
     let newRowDetails = GetSourceItemRowDetails(newRow.elemJQ, g_source)
     jazil.ShouldBe(newRowDetails.nr, 1, 'wrong row nrs assigned!')
@@ -45,8 +47,9 @@ jazil.AddTestSet(mainPage, 'SourceItemTable', {
     table.SetItems(testItems)
     let numRowsPost = table.tableElemJQ.find('tr.item').length
 
-    // Note: for source tables, the previous test left a single unset row in there
-    jazil.ShouldBe(numRowsPost - numRowsPre, 2, 'wrong number of rows added!')
+    // Note: the previous test left 1 row in there
+    jazil.ShouldBe(numRowsPost - numRowsPre, 3 - 1, 'wrong number of rows added!')
+    jazil.ShouldBe(table.HasItems(), true, 'table is empty!')
 
     jazil.ShouldBe(SourceItemRowInTable('sourceItemTable', testItem1), true, 'New shield not in table!')
     jazil.ShouldBe(SourceItemRowInTable('sourceItemTable', testItem2), true, 'New helmet not in table!')
@@ -62,6 +65,29 @@ jazil.AddTestSet(mainPage, 'SourceItemTable', {
     })
 
     TestItemListsMatch(jazil, testItems, 'test', retrievedItems, 'retrieved')
+  },
+
+  'Clearing items works': (jazil) => {
+    let table = GetSourceItemTable()
+
+    let testItem1 = BuildItem({ set:g_source, name:'Shield', count:2, priorWork:3 })
+    let testItem2 = BuildItem({ set:g_source, name:'Helmet', count:3, priorWork:4, enchants:[{ name:'Aqua Affinity', level:1 }, { name:'Unbreaking', level:3 }] })
+    let testItems = [
+      testItem1,
+      testItem2
+    ]
+
+    let numRowsPre = table.tableElemJQ.find('tr.item').length
+    table.SetItems(testItems)
+    table.SetItems([])
+    let numRowsPost = table.tableElemJQ.find('tr.item').length
+
+    // Note: the previous test left 3 rows in there
+    jazil.ShouldBe(numRowsPost - numRowsPre, 0 - 3, 'rows are still present!')
+    jazil.ShouldBe(table.HasItems(), false, 'table is not empty!')
+
+    jazil.ShouldBe(SourceItemRowInTable('sourceItemTable', testItem1), false, 'New shield still in table!')
+    jazil.ShouldBe(SourceItemRowInTable('sourceItemTable', testItem2), false, 'New helmet still in table!')
   },
 
   'Getting items back works': (jazil) => {

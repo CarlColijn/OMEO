@@ -104,11 +104,28 @@
       </div>
     </div>
 
+    <div id="dataInErrorForFillSources" class="dialog">
+      <div class="dialogBody">
+        <h1>Errors detected</h1>
+        <p>I cannot automatically fill in the needed items to create this desired item; there are errors in your data.  Please fix these first.</p>
+        <p><button class="exit" type="button">OK</button></p>
+      </div>
+    </div>
+
     <div id="itemsMerged" class="dialog">
       <div class="dialogBody">
         <h1>Duplicate items detected</h1>
         <p>For performance reasons, I've taken the liberty to merge identical source items.</p>
         <p><button class="exit" type="button">OK</button></p>
+      </div>
+    </div>
+
+    <div id="mayOverwriteSources" class="dialog">
+      <div class="dialogBody">
+        <h1>Items already specified</h1>
+        <p>You have already specified items in the &quot;My items&quot; section. I'll need to remove these first.</p>
+        <p>Do you want to continue?</p>
+        <p><button class="yes" type="button">Yes</button><button class="no" type="button">No</button></p>
       </div>
     </div>
 
@@ -192,7 +209,7 @@
     <div id="sources" class="content red">
       <h1>My items</h1>
 
-      <p>Just tell me below which items you want to use.</p>
+      <p>Just tell me below which items you want to use.  I can also <button id="autoFillSources" type="button">automatically fill in</button> all needed items to create your desired item.</p>
 
       <table class="table items groupedRows">
         <thead>

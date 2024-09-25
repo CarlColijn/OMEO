@@ -95,6 +95,10 @@ class MainForm {
 
 
   HookUpGUI() {
+    $('#autoFillSources').click(() => {
+      this.AutoFillSources()
+    })
+
     $('#divine').click(() => {
       this.PerformDivine()
     })
@@ -103,6 +107,26 @@ class MainForm {
       if (!this.Save(true))
         this.formHandler.TellFailedToSaveOnRequest()
     })
+  }
+
+
+  ContinueFillSources() {
+    let dataInContext = this.GetData(true, false)
+    if (dataInContext.withCountErrors || dataInContext.withEnchantConflicts || dataInContext.withEnchantDupes)
+      this.formHandler.TellDataInErrorForFillSources()
+    else {
+      let desiredItem = dataInContext.data.desiredItem
+      let desiredParts = desiredItem.SplitIntoParts(g_source)
+      this.sourceItemTable.SetItems(desiredParts)
+    }
+  }
+
+
+  AutoFillSources() {
+    if (!this.sourceItemTable.HasItems())
+      this.ContinueFillSources()
+    else
+      this.formHandler.AskMayOverwriteSources(() => { this.ContinueFillSources() })
   }
 
 
@@ -150,9 +174,9 @@ class MainForm {
     this.ClearErrors()
     this.ClearResult()
 
-    let dataInContext = this.GetData(true)
+    let dataInContext = this.GetData(false, true)
     if (dataInContext.withCountErrors || dataInContext.withEnchantConflicts || dataInContext.withEnchantDupes)
-      this.formHandler.TellDataInError()
+      this.formHandler.TellDataInErrorForDivine()
     else {
       let ContinueCombine = () => {
         this.ContinueDivine(dataInContext)
@@ -222,8 +246,20 @@ class MainForm {
   // - withEnchantConflicts: bool
   // - withEnchantDupes: bool
   // - mergedSourceItems: bool
-  GetData(mergeSourceItems) {
-    let sourceItemsResult = this.sourceItemTable.ExtractItems(new ItemCollector(mergeSourceItems))
+  GetData(onlyDesiredItem, mergeSourceItems) {
+    let sourceItemsResult
+    if (onlyDesiredItem)
+      sourceItemsResult = {
+        items: [],
+        withCountErrors: false,
+        countErrorElemJQs: [],
+        withEnchantConflicts: false,
+        enchantConflictInfos: [],
+        withEnchantDupes: false,
+        enchantDupeElemJQs: []
+      }
+    else
+      sourceItemsResult = this.sourceItemTable.ExtractItems(new ItemCollector(mergeSourceItems))
     let desiredItemResult = this.desiredItemSection.ExtractItems(new ItemCollector(false))
     let renameToo = this.renameTooElemJQ.prop('checked')
 
@@ -314,7 +350,7 @@ class MainForm {
 
   // returns bool
   SaveToStream(stream) {
-    let dataInContext = this.GetData(false)
+    let dataInContext = this.GetData(false, false)
     if (dataInContext.withCountErrors || dataInContext.withEnchantDupes)
       return false
 

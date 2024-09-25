@@ -126,6 +126,41 @@ class Item {
   }
 
 
+  DropUnusedEnchants() {
+    let enchantIDsToDrop = []
+
+    this.enchantsByID.forEach((enchant, id) => {
+      if (enchant.level == 0)
+        enchantIDsToDrop.push(id)
+    })
+
+    enchantIDsToDrop.forEach((enchantID) => {
+      this.enchantsByID.delete(enchantID)
+    })
+  }
+
+
+  DropAllEnchants() {
+    this.enchantsByID = new Map()
+  }
+
+
+  // returns Item[]
+  SplitIntoParts(itemSet) {
+    let parts = [new Item(1, itemSet, this.id, 0)]
+
+    this.enchantsByID.forEach((enchant, id) => {
+      if (enchant.level != 0) {
+        let book = new Item(1, itemSet, g_bookID, 0)
+        book.SetEnchant(enchant)
+        parts.push(book)
+      }
+    })
+
+    return parts
+  }
+
+
   // returns string
   HashType() {
     return this.Hash(false, false, false)
@@ -175,19 +210,5 @@ class Item {
       allData += `|${this.set.id}`
 
     return allData
-  }
-
-
-  DropUnusedEnchants() {
-    let enchantIDsToDrop = []
-
-    this.enchantsByID.forEach((enchant, id) => {
-      if (enchant.level == 0)
-        enchantIDsToDrop.push(id)
-    })
-
-    enchantIDsToDrop.forEach((enchantID) => {
-      this.enchantsByID.delete(enchantID)
-    })
   }
 }

@@ -69,6 +69,7 @@ let mainAccessObjectNames = [
   'TemplateElement',
   'ZeroOrigin',
   'g_betterMatch',
+  'g_bookID',
   'g_combined',
   'g_dataSetsByID',
   'g_desired',

@@ -64,13 +64,23 @@ class MainFormHandler {
   }
 
 
-  TellDataInError() {
+  TellDataInErrorForDivine() {
     new SimpleDialog('#dataInErrorForDivine').HookupButton('.exit')
+  }
+
+
+  TellDataInErrorForFillSources() {
+    new SimpleDialog('#dataInErrorForFillSources').HookupButton('.exit')
   }
 
 
   TellItemsMerged(OnExit) {
     new SimpleDialog('#itemsMerged').HookupButton('.exit')
+  }
+
+
+  AskMayOverwriteSources(OnYesClicked) {
+    new SimpleDialog('#mayOverwriteSources').HookupButton('.no').HookupButton('.yes', OnYesClicked)
   }
 
 

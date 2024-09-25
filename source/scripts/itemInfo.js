@@ -15,6 +15,7 @@
 
   Defined globals:
   - g_itemInfosByID: Map(int -> ItemInfo)
+  - g_bookID: int
   - g_numDifferentItems: int
   - g_numItemIDBits: int
 */
@@ -42,6 +43,7 @@ class ItemInfo {
     this.enchantsAllowedByID = new Set()
 
     if (this.isBook) {
+      g_bookID = this.id
       g_enchantInfos.forEach((enchantInfo) => {
         this.enchantsAllowedByID.add(enchantInfo.id)
       })
@@ -69,6 +71,7 @@ let g_itemInfosByID = new Map()
 
 
 let g_numDifferentItems = 0
+let g_bookID = -1
 let g_itemInfos = [
   new ItemInfo(0, 'Book', 4,0, []),
   new ItemInfo(1, 'Axe', 2,2, ['Bane of Arthropods'/*, 'Chopping'*/, 'Curse of Vanishing','Efficiency', 'Fortune', 'Mending', 'Sharpness', 'Silk Touch', 'Smite', 'Unbreaking']),

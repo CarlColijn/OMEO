@@ -4,7 +4,11 @@ jazil.AddTestSet(mainPage, 'ItemInfo', {
   },
 
   'Item bit count is reasonable': (jazil) => {
-    jazil.ShouldBe(g_numItemIDBits(), 5, 'g_numItemIDBits')
+    jazil.ShouldBe(g_numItemIDBits(), 5)
+  },
+
+  'Book info ID is known': (jazil) => {
+    jazil.ShouldBe(g_bookID, 0, 'Book\'s ID is off!')
   },
 
   'Infos by ID line up': (jazil) => {

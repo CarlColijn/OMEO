@@ -72,11 +72,11 @@ jazil.AddTestSet(mainPage, 'Item', {
     pickaxe.enchantsByID.forEach((enchant) => {
       if (enchant.id === smiteInfo.id)
         foundSmite = true
-      if (enchant.id === sharpnessInfo.id)
+      else if (enchant.id === sharpnessInfo.id)
         foundSharpness = true
-      if (enchant.id === mendingInfo.id)
+      else if (enchant.id === mendingInfo.id)
         foundMending = true
-      if (enchant.id === flameInfo.id)
+      else if (enchant.id === flameInfo.id)
         foundFlame = true
     })
 
@@ -104,11 +104,11 @@ jazil.AddTestSet(mainPage, 'Item', {
     pickaxe.enchantsByID.forEach((enchant) => {
       if (enchant.id === smiteInfo.id)
         foundSmite = true
-      if (enchant.id === sharpnessInfo.id)
+      else if (enchant.id === sharpnessInfo.id)
         foundSharpness = true
-      if (enchant.id === mendingInfo.id)
+      else if (enchant.id === mendingInfo.id)
         foundMending = true
-      if (enchant.id === flameInfo.id)
+      else if (enchant.id === flameInfo.id)
         foundFlame = true
     })
 
@@ -117,6 +117,62 @@ jazil.AddTestSet(mainPage, 'Item', {
     jazil.Assert(foundMending, 'Mending disappeared!')
     jazil.Assert(!foundFlame, 'Flame is still here!')
     jazil.ShouldBe(numEnchantsLeft, 2, 'Wrong number of enchants left!')
+  },
+
+  'Dropping all enchants works': (jazil) => {
+    let book = BuildItem({ set:g_extra, name:'Book', enchants:[{ name:'Flame', level:10 }, { name:'Unbreaking', level:4 }, { name:'Protection', level:20 }, { name:'Sweeping Edge', level:0 }] })
+
+    book.DropAllEnchants()
+
+    jazil.ShouldBe(book.enchantsByID.size, 0, 'Some enchants got left behind!')
+  },
+
+  'Breaking up an item into parts works': (jazil) => {
+    let shield = BuildItem({ set:g_source, name:'Shield', enchants:[{ name:'Luck of the Sea', level:6 }, { name:'Unbreaking', level:0 }, { name:'Thorns', level:11 }, { name:'Mending', level:2 }] })
+
+    let allParts = shield.SplitIntoParts(g_extra)
+
+    let shieldFound = false
+    let shieldAtNr0 = false
+    let luckInfo = g_enchantInfosByID.get(g_enchantIDsByName.get('Luck of the Sea'))
+    let foundLuck = false
+    let unbreakingInfo = g_enchantInfosByID.get(g_enchantIDsByName.get('Unbreaking'))
+    let foundUnbreaking = false
+    let thornsInfo = g_enchantInfosByID.get(g_enchantIDsByName.get('Thorns'))
+    let foundThorns = false
+    let mendingInfo = g_enchantInfosByID.get(g_enchantIDsByName.get('Mending'))
+    let foundMending = false
+
+    allParts.forEach((item, itemNr) => {
+      jazil.ShouldBe(item.set, g_extra, `Wrong set ${item.set.desc} returned on part ${itemNr}!`)
+      if (item.id === shield.id) {
+        jazil.ShouldBe(shieldFound, false, 'Shield found twice!')
+        jazil.ShouldBe(item.enchantsByID.size, 0, `Wrong number of enchants on shield!`)
+        shieldFound = true
+        shieldAtNr0 = itemNr == 0
+      }
+      else if (item.id == g_bookID) {
+        jazil.ShouldBe(item.enchantsByID.size, 1, `Wrong number of enchants on book ${itemNr}!`)
+        item.enchantsByID.forEach((enchant) => {
+          if (enchant.id === luckInfo.id)
+            foundLuck = true
+          else if (enchant.id === unbreakingInfo.id)
+            foundUnbreaking = true
+          else if (enchant.id === thornsInfo.id)
+            foundThorns = true
+          else if (enchant.id === mendingInfo.id)
+            foundMending = true
+        })
+      }
+      else
+        jazil.Fail(`Inappropriate item ${item.id} (${item.info.name}) found at ${itemNr}!`)
+    })
+
+    jazil.Assert(shieldFound, 'Shield not found!')
+    jazil.Assert(foundLuck, 'Luck not found!')
+    jazil.Assert(!foundUnbreaking, 'Unbreaking is found!')
+    jazil.Assert(foundThorns, 'Thorns not found!')
+    jazil.Assert(foundMending, 'Mending not found!')
   },
 
   'CollapseTree returns all items': (jazil) => {

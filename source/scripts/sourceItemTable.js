@@ -47,6 +47,19 @@ class SourceItemTable {
   }
 
 
+  // returns bool
+  HasItems() {
+    let hasItems = false
+    this.tableElemJQ.find('.item').each((rowNr, itemRowElem) => {
+      let itemRow = new SourceItemRow($(itemRowElem), false)
+      if (itemRow.IsReal())
+        hasItems = true
+      return !hasItems
+    })
+    return hasItems
+  }
+
+
   // returns ItemCollectionResult
   ExtractItems(itemCollector) {
     let itemRows = this.GetItemRows()
