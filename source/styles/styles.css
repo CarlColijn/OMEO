@@ -432,6 +432,7 @@ a:visited {
   display: none; /* to be changed by flex on demand */
   align-items: center;
   justify-content: center;
+  z-index: 1;
 }
 .dialogBody {
   margin: 10%;
