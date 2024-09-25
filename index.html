@@ -27,7 +27,7 @@
 
     <!-- own content -->
     <link href="styles/styles.css?v=2407c040" rel="stylesheet">
-    <script src="scripts/script.js?v=ac43a483"></script>
+    <script src="scripts/script.js?v=853a87d9"></script>
     <script>
       let g_form = new MainForm(new MainFormHandler())
     </script>
@@ -83,6 +83,14 @@
       <div class="dialogBody">
         <h1>Duplicate items detected</h1>
         <p>For performance reasons, I've taken the liberty to merge identical source items.</p>
+        <p><button class="exit" type="button">OK</button></p>
+      </div>
+    </div>
+
+    <div id="extraItemAdded" class="dialog">
+      <div class="dialogBody">
+        <h1>Extra items added</h1>
+        <p>You only listed <span class="itemType">item</span> which already had a prior work penalty and/or already had enchantments on them. Sometimes just starting with a clean item gives better results. I've therefore also added a clean <span class="itemType">item</span> for you.</p>
         <p><button class="exit" type="button">OK</button></p>
       </div>
     </div>

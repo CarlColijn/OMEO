@@ -4139,7 +4139,13 @@ class MainFormHandler {
 
 
   TellItemsMerged(OnExit) {
-    new SimpleDialog('#itemsMerged').HookupButton('.exit')
+    new SimpleDialog('#itemsMerged', OnExit).HookupButton('.exit', OnExit)
+  }
+
+
+  TellExtraItemAdded(itemName, OnExit) {
+    $('#extraItemAdded .itemType').text(itemName)
+    new SimpleDialog('#extraItemAdded', OnExit).HookupButton('.exit', OnExit)
   }
 
 
@@ -4382,7 +4388,7 @@ class MainForm {
     })
 
     // Note: the path should be relative to the html document loading us!
-    this.combineWorker = new Worker('scripts/itemCombineWorker.js?v=7a709b49')
+    this.combineWorker = new Worker('scripts/itemCombineWorker.js?v=91c41acb')
 
     this.combineWorker.onmessage = (e) => {
       switch (e.data.type) {
