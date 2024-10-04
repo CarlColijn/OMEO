@@ -26,8 +26,8 @@
     <meta name="theme-color" content="#202a0e">
 
     <!-- own content -->
-    <link href="styles/styles.css?v=2407c040" rel="stylesheet">
-    <script src="scripts/script.js?v=853a87d9"></script>
+    <link href="styles/styles.css?v=360b3e4f" rel="stylesheet">
+    <script src="scripts/script.js?v=b0b8f27b"></script>
     <script>
       let g_form = new MainForm(new MainFormHandler())
     </script>
@@ -83,14 +83,6 @@
       <div class="dialogBody">
         <h1>Duplicate items detected</h1>
         <p>For performance reasons, I've taken the liberty to merge identical source items.</p>
-        <p><button class="exit" type="button">OK</button></p>
-      </div>
-    </div>
-
-    <div id="extraItemAdded" class="dialog">
-      <div class="dialogBody">
-        <h1>Extra items added</h1>
-        <p>You only listed <span class="itemType">item</span> which already had a prior work penalty and/or already had enchantments on them. Sometimes just starting with a clean item gives better results. I've therefore also added a clean <span class="itemType">item</span> for you.</p>
         <p><button class="exit" type="button">OK</button></p>
       </div>
     </div>
@@ -161,7 +153,7 @@
         </thead>
         <tbody>
           <tr>
-            <td class="itemEnchantCell iconTextWrapping"><select name="itemID" class="type itemInput iconText"></select><img class="icon" src="images/icons.png"></td>
+            <td class="itemEnchantCell"><div class="iconTextWrapping"><select name="itemID" class="type itemInput iconText"></select><div class="icon"><img class="type" src="images/icons.png"><div class="glint"></div></div></div></td>
             <td></td>
           </tr>
           <tr class="template enchant noSpaceBefore" data-real="0">
@@ -199,7 +191,7 @@
             <td><span class="nr"></span></td>
             <td><input name="count" type="number" min="1" value="1"></td>
             <td class="itemEnchantCell">
-              <div class="iconTextWrapping"><select name="itemID" class="type itemInput iconText"></select><img class="icon" src="images/icons.png"></div>
+              <div class="iconTextWrapping"><select name="itemID" class="type itemInput iconText"></select><div class="icon"><img class="type" src="images/icons.png"><div class="glint"></div></div></div>
               <div class="priorWorkInput buttonStrip"></div>
             </td>
             <td><button type="button" name="removeItem">Remove</button></td>
@@ -257,7 +249,7 @@
               <table>
                 <tbody>
                   <tr>
-                    <td><span class="iconTextWrapping"><span class="type itemDisplay iconText"></span><img class="icon" src="images/icons.png"></span></td>
+                    <td><span class="iconTextWrapping"><span class="type itemDisplay iconText"></span><div class="icon"><img class="type" src="images/icons.png"><div class="glint"></div></div></span></td>
                   </tr>
                   <tr class="template enchant" data-real="0">
                     <td class="noWrap enchantDisplay"><span class="name"></span> <span class="level"></span></td>
