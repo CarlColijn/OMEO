@@ -1,9 +1,7 @@
 function SetIcon(iconElemJQ, itemID, hasEnchants) {
   let itemInfo = g_itemInfosByID.get(itemID)
+  let iconIndex = hasEnchants ? itemInfo.iconIndexEnchanted : itemInfo.iconIndexNormal
+  iconElemJQ.attr('style', `--iconIndex:${iconIndex};`)
 
-  let iconX = -24 * (itemInfo.iconXPos)
-  let iconY = -24 * (itemInfo.iconYPos + (hasEnchants ? 3 : 0))
-  let iconCSSPosition = `${iconX}px ${iconY}px`
-
-  iconElemJQ.css('object-position', iconCSSPosition)
+  iconElemJQ.find('.glint').css('display', hasEnchants ? 'inline-block' : 'none')
 }

@@ -1,0 +1,13 @@
+Icon source:
+- screenshot from Minecraft inventory
+- use the unenchanted versions (except for enchanted Book)
+
+Icon processing:
+- remove the border from the screenshot to keep the 64x64 internal image
+- remove the gray background (watch out with Shield)
+- add to grid
+
+Icon exporting:
+- make the grid layer invisible
+- scale the image to be 24px high
+- export to png

@@ -370,10 +370,36 @@ input[type=number] {
 
 /* Icons */
 .icon {
+  position: relative;
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  overflow: hidden;
+}
+.icon .type {
   width: 24px;
   height: 24px;
   object-fit: none;
-  object-position: 0px 0px;
+  object-position: calc(-24px * var(--iconIndex, 0)) 0px;
+  position: absolute;
+  top: 0px;
+  left: 0px;
+}
+.icon .glint {
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  mix-blend-mode: lighten;
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  background-image: url(../images/glint.webp);
+  -webkit-mask-image: url(../images/icons.png);
+  mask-image: url(../images/icons.png);
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: calc(-24px * var(--iconIndex, 0)) 0px;
+  mask-position: calc(-24px * var(--iconIndex, 0)) 0px;
 }
 .iconTextWrapping * {
   vertical-align: top;
