@@ -173,6 +173,7 @@ table {
 }
 th {
   text-align: left;
+  font-size: 0.9em;
 }
 th, td {
   padding: 0.2em 0.4em;
