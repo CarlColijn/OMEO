@@ -28,9 +28,9 @@ class SourceItemRowTemplate extends TemplateElement {
 
 
   // returns SourceItemRow
-  CreateNew(nr, item, giveFocus, focusElemJQWhenAllGone) {
+  CreateNew(nr, item, allRows, giveFocus, focusElemJQWhenAllGone) {
     let newRowElemJQ = super.CreateExtraElement()
-    let newItemRow = new SourceItemRow(newRowElemJQ, false)
+    let newItemRow = new SourceItemRow(newRowElemJQ, allRows)
 
     newItemRow.SetNumber(nr)
 
@@ -63,28 +63,23 @@ class SourceItemRowTemplate extends TemplateElement {
 
 
 class SourceItemRow extends RealElement {
-  constructor(rowElemJQ, hookUpGUI) {
+  constructor(rowElemJQ, allRows) {
     super(rowElemJQ)
 
     // ==== PUBLIC ====
     this.nr = -1 // to be filled in later
 
     // ==== PRIVATE ====
-    this.enchantTemplateRow = new EnchantRowTemplate(this.elemJQ, 'enchant')
+    this.enchantRowTemplate = new EnchantRowTemplate(this.elemJQ, 'enchant')
+    this.enchantRows = []
 
+    this.nrElemJQ = rowElemJQ.find('.nr')
     this.countElemJQ = rowElemJQ.find('input[name="count"]')
     this.iconElemJQ = rowElemJQ.find('.icon')
     this.idElemJQ = rowElemJQ.find('select[name="itemID"]')
     this.priorWorkElem = new ButtonStrip(rowElemJQ.find('.priorWorkInput'))
 
-    if (hookUpGUI) {
-      let item = undefined
-      if (this.IsReal()) {
-        item = this.EnsureAppropriateItemUsed(item)
-        this.SetItem(item)
-      }
-      this.HookUpGUI(item)
-    }
+    this.allRows = allRows
   }
 
 
@@ -103,13 +98,19 @@ class SourceItemRow extends RealElement {
       focusElemJQ[0].focus()
 
     super.Remove()
+
+    let nextRowNr = this.nr
+    this.allRows.splice(nextRowNr - 1, 1)
+
+    for (; nextRowNr < this.allRows.length; ++nextRowNr)
+      this.allRows[nextRowNr - 1].SetNumber(nextRowNr)
   }
 
 
   SetNumber(nr) {
     this.nr = nr
     this.elemJQ.attr('data-nr', nr)
-    this.elemJQ.find('.nr').text(nr)
+    this.nrElemJQ.text(nr)
   }
 
 
@@ -120,21 +121,18 @@ class SourceItemRow extends RealElement {
 
   AddEnchant(enchant) {
     let RemoveEnchantCallback = () => {
-      let hasEnchants = this.enchantTemplateRow.ElementsPresent()
+      let hasEnchants = this.enchantRowTemplate.ElementsPresent()
       SetIcon(this.iconElemJQ, this.itemID, hasEnchants)
     }
 
-    this.enchantTemplateRow.CreateNew(enchant, this.itemID, true, this.addEnchantElemJQ, RemoveEnchantCallback)
+    let enchantRow = this.enchantRowTemplate.CreateNew(enchant, this.itemID, true, this.addEnchantElemJQ, RemoveEnchantCallback)
+    this.enchantRows.push(enchantRow)
   }
 
 
   RemoveEnchants() {
-    this.elemJQ.find('.enchant').each((rowNr, enchantRowElem) => {
-      let enchantRow = new EnchantRow($(enchantRowElem))
-      if (enchantRow.IsReal())
-        enchantRow.Remove()
-      return true
-    })
+    this.enchantRowTemplate.RemoveCreatedElements()
+    this.enchantRows.splice(0, Infinity)
   }
 
 
@@ -212,27 +210,16 @@ class SourceItemRow extends RealElement {
   }
 
 
-  RenumberAllRows(tbodyElemJQ) {
-    tbodyElemJQ.find('.item').each((rowNr, rowElem) => {
-      new SourceItemRow($(rowElem), false).SetNumber(rowNr)
-    })
-  }
-
-
   SyncEnchantOptions() {
     this.RemoveEnchants()
 
-    this.enchantTemplateRow.UpdateEnchantOptions(this.itemID)
+    this.enchantRowTemplate.UpdateEnchantOptions(this.itemID)
   }
 
 
   HookUpGUI(item) {
     this.elemJQ.find('button[name="removeItem"]').click(() => {
-      let tbodyElemJQ = this.elemJQ.parent()
-
       this.Remove()
-
-      this.RenumberAllRows(tbodyElemJQ)
     })
 
     this.idElemJQ.change(() => {
@@ -283,29 +270,26 @@ class SourceItemRow extends RealElement {
       withDupe: false,
       dupeElemJQ: undefined
     }
+
     let foundEnchants = []
-    this.elemJQ.find('.enchant').each((rowNr, enchantRowElem) => {
-      let enchantRowElemJQ = $(enchantRowElem)
-      let enchantRow = new EnchantRow(enchantRowElemJQ)
-      if (enchantRow.IsReal()) {
-        let enchant = enchantRow.GetEnchant()
-        foundEnchants.forEach((previousEnchant) => {
-          if (EnchantIDsConflict(previousEnchant.info.id, enchant.info.id)) {
-            result.withConflict = true
-            result.conflictInfo.conflictingEnchantName = previousEnchant.info.name
-            result.conflictInfo.inputElemJQ = enchantRow.GetIDElemJQ()
-          }
-          if (previousEnchant.info.id == enchant.info.id) {
-            result.withDupe = true
-            result.dupeElemJQ = enchantRow.GetIDElemJQ()
-          }
-        })
+    this.enchantRows.forEach((enchantRow) => {
+      let enchant = enchantRow.GetEnchant()
 
-        foundEnchants.push(enchant)
+      foundEnchants.forEach((previousEnchant) => {
+        if (EnchantIDsConflict(previousEnchant.info.id, enchant.info.id)) {
+          result.withConflict = true
+          result.conflictInfo.conflictingEnchantName = previousEnchant.info.name
+          result.conflictInfo.inputElemJQ = enchantRow.GetIDElemJQ()
+        }
+        if (previousEnchant.info.id == enchant.info.id) {
+          result.withDupe = true
+          result.dupeElemJQ = enchantRow.GetIDElemJQ()
+        }
+      })
 
-        item.SetEnchant(enchant)
-      }
-      return !result.withConflict
+      foundEnchants.push(enchant)
+
+      item.SetEnchant(enchant)
     })
 
     return result

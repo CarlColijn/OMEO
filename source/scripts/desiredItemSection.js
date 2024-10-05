@@ -21,7 +21,8 @@ class DesiredItemSection {
     // ==== PRIVATE ====
     this.elemJQ = sectionElemJQ.first()
 
-    this.enchantTemplateRow = new EnchantRowTemplate(this.elemJQ, 'enchant')
+    this.enchantRowTemplate = new EnchantRowTemplate(this.elemJQ, 'enchant')
+    this.enchantRows = []
 
     this.iconElemJQ = this.elemJQ.find('.icon')
     this.idElemJQ = this.elemJQ.find('select[name="itemID"]')
@@ -119,7 +120,7 @@ class DesiredItemSection {
   SyncEnchantOptions() {
     this.RemoveEnchants()
 
-    this.enchantTemplateRow.UpdateEnchantOptions(this.itemID)
+    this.enchantRowTemplate.UpdateEnchantOptions(this.itemID)
   }
 
 
@@ -153,29 +154,26 @@ class DesiredItemSection {
       withDupe: false,
       dupeElemJQ: undefined
     }
+
     let foundEnchants = []
-    this.elemJQ.find('.enchant').each((rowNr, enchantRowElem) => {
-      let enchantRowElemJQ = $(enchantRowElem)
-      let enchantRow = new EnchantRow(enchantRowElemJQ)
-      if (enchantRow.IsReal()) {
-        let enchant = enchantRow.GetEnchant()
-        foundEnchants.forEach((previousEnchant) => {
-          if (EnchantIDsConflict(previousEnchant.info.id, enchant.info.id)) {
-            result.withConflict = true
-            result.conflictInfo.conflictingEnchantName = previousEnchant.info.name
-            result.conflictInfo.inputElemJQ = enchantRow.GetIDElemJQ()
-          }
-          if (previousEnchant.info.id == enchant.info.id) {
-            result.withDupe = true
-            result.dupeElemJQ = enchantRow.GetIDElemJQ()
-          }
-        })
+    this.enchantRows.forEach((enchantRow) => {
+      let enchant = enchantRow.GetEnchant()
 
-        foundEnchants.push(enchant)
+      foundEnchants.forEach((previousEnchant) => {
+        if (EnchantIDsConflict(previousEnchant.info.id, enchant.info.id)) {
+          result.withConflict = true
+          result.conflictInfo.conflictingEnchantName = previousEnchant.info.name
+          result.conflictInfo.inputElemJQ = enchantRow.GetIDElemJQ()
+        }
+        if (previousEnchant.info.id == enchant.info.id) {
+          result.withDupe = true
+          result.dupeElemJQ = enchantRow.GetIDElemJQ()
+        }
+      })
 
-        item.SetEnchant(enchant)
-      }
-      return !result.withConflict
+      foundEnchants.push(enchant)
+
+      item.SetEnchant(enchant)
     })
 
     return result
@@ -184,21 +182,18 @@ class DesiredItemSection {
 
   AddEnchant(enchant) {
     let RemoveEnchantCallback = () => {
-      let hasEnchants = this.enchantTemplateRow.ElementsPresent()
+      let hasEnchants = this.enchantRowTemplate.ElementsPresent()
       SetIcon(this.iconElemJQ, this.itemID, hasEnchants)
     }
 
-    this.enchantTemplateRow.CreateNew(enchant, this.itemID, true, this.addEnchantElemJQ, RemoveEnchantCallback)
+    let enchantRow = this.enchantRowTemplate.CreateNew(enchant, this.itemID, true, this.addEnchantElemJQ, RemoveEnchantCallback)
+    this.enchantRows.push(enchantRow)
   }
 
 
   RemoveEnchants() {
-    this.elemJQ.find('.enchant').each((rowNr, enchantRowElem) => {
-      let enchantRow = new EnchantRow($(enchantRowElem))
-      if (enchantRow.IsReal())
-        enchantRow.Remove()
-      return true
-    })
+    this.enchantRowTemplate.RemoveCreatedElements()
+    this.enchantRows.splice(0, Infinity)
   }
 
 

@@ -3,9 +3,13 @@ function GetSourceItemTemplateRow() {
 }
 
 
-function CreateSourceItemRow(templateRow, item, nr) {
-  return templateRow.CreateNew(nr ?? 1, item, false, undefined)
-}
+CreateSourceItemRow = function() {
+  let testSourceItemRows = []
+
+  return (templateRow, item, nr) => {
+    return templateRow.CreateNew(nr ?? 1, item, testSourceItemRows, false, undefined)
+  }
+}()
 
 
 function GetSourceItemRowDetails(itemRowElemJQ) {

@@ -1,15 +1,24 @@
-function GetSourceItemTable() {
-  let CallbackHandlerMock = {
-    click: () => {}
+let GetSourceItemTable
+function MakeGetSourceItemTableAvailable() {
+  let addItemElemJQMock = {
+    click: () => {},
+    focus: () => {}
   }
+  table = new SourceItemTable($('#sourceItemTable'), addItemElemJQMock)
 
-  return new SourceItemTable($('#sourceItemTable'), CallbackHandlerMock)
+  GetSourceItemTable = () => {
+    return table
+  }
 }
 
 
 
 
 jazil.AddTestSet(mainPage, 'SourceItemTable', {
+  'Function definition initialization for further tests': (jazil) => {
+    MakeGetSourceItemTableAvailable()
+  },
+
   'Table is initialized correctly': (jazil) => {
     let table = GetSourceItemTable()
 
@@ -55,14 +64,7 @@ jazil.AddTestSet(mainPage, 'SourceItemTable', {
     jazil.ShouldBe(SourceItemRowInTable('sourceItemTable', testItem2), true, 'New helmet not in table!')
     jazil.ShouldBe(SourceItemRowInTable('sourceItemTable', testItem3), true, 'New boots not in table!')
 
-    retrievedItems = []
-    table.tableElemJQ.find('tr.item').each((rowNr, rowElem) => {
-      let rowElemJQ = $(rowElem)
-      if (!rowElemJQ.hasClass('template')) {
-        let itemRow = new SourceItemRow(rowElemJQ, false)
-        retrievedItems.push(itemRow.GetItem().item)
-      }
-    })
+    retrievedItems = table.GetItems()
 
     TestItemListsMatch(jazil, testItems, 'test', retrievedItems, 'retrieved')
   },

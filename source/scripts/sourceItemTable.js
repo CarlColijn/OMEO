@@ -27,13 +27,16 @@ class SourceItemTable {
     })
 
     this.templateRow = new SourceItemRowTemplate(this.tableElemJQ, 'item')
+    this.rows = []
   }
 
 
   // returns ItemRow
   AddRow() {
-    let newNr = this.tableElemJQ.find('.item').length
-    return this.templateRow.CreateNew(newNr, undefined, true, this.addItemElemJQ)
+    let newNr = this.rows.length + 1
+    let newRow = this.templateRow.CreateNew(newNr, undefined, this.rows, true, this.addItemElemJQ)
+    this.rows.push(newRow)
+    return newRow
   }
 
 
@@ -41,38 +44,37 @@ class SourceItemTable {
     this.Clear()
 
     items.forEach((item, itemNr) => {
-      this.templateRow.CreateNew(itemNr + 1, item, false, this.addItemElemJQ)
+      let newRow = this.templateRow.CreateNew(itemNr + 1, item, this.rows, false, this.addItemElemJQ)
+      this.rows.push(newRow)
     })
   }
 
 
   // returns bool
   HasItems() {
-    let hasItems = false
-    this.tableElemJQ.find('.item').each((rowNr, itemRowElem) => {
-      let itemRow = new SourceItemRow($(itemRowElem), false)
-      if (itemRow.IsReal())
-        hasItems = true
-      return !hasItems
+    return this.rows.length > 0
+  }
+
+
+  // returns Item[]
+  GetItems() {
+    return this.rows.map((row) => {
+      return row.GetItem().item
     })
-    return hasItems
   }
 
 
   // returns ItemCollectionResult
   ExtractItems(itemCollector) {
-    let itemRows = this.GetItemRows()
-
-    itemRows.forEach((itemRow) => {
-      itemCollector.ProcessRow(itemRow)
+    this.rows.forEach((row) => {
+      itemCollector.ProcessRow(row)
     })
 
     let result = itemCollector.Finalize()
 
     if (result.mergedItems) {
-      this.UpdateRowNrs(itemRows, result)
-      this.UpdateRowCounts(itemRows, result)
-      this.RemoveMergedRows(itemRows, result)
+      this.RemoveMergedRows(result)
+      this.UpdateRowCounts(result)
     }
 
     return result
@@ -83,48 +85,24 @@ class SourceItemTable {
 
 
   Clear() {
-    this.tableElemJQ.find('.item').each((rowNr, rowElem) => {
-      let itemRow = new SourceItemRow($(rowElem), false)
-      if (itemRow.IsReal())
-        itemRow.Remove()
-      return true
-    })
+    this.templateRow.RemoveCreatedElements()
+    this.rows.splice(0, Infinity)
+
+    this.addItemElemJQ.focus()
   }
 
 
-  UpdateRowNrs(itemRows, mergeResult) {
-    mergeResult.rowsToUpdateNr.forEach((itemRow) => {
-      itemRow.SetNumber(itemRow.nr)
-    })
-  }
-
-
-  UpdateRowCounts(itemRows, mergeResult) {
-    mergeResult.rowsToUpdateCount.forEach((itemRow) => {
-      let item = mergeResult.itemsByRow.get(itemRow)
-      itemRow.SetCount(item.count)
-    })
-  }
-
-
-  RemoveMergedRows(itemRows, mergeResult) {
+  RemoveMergedRows(mergeResult) {
     mergeResult.rowsToRemove.forEach((row) => {
       row.Remove()
     })
   }
 
 
-  // returns SourceItemRow[]
-  GetItemRows() {
-    let realItemRows = []
-    this.tableElemJQ.find('.item').each((rowNr, itemRowElem) => {
-      let itemRow = new SourceItemRow($(itemRowElem), false)
-      if (itemRow.IsReal()) {
-        itemRow.nr = realItemRows.length
-        realItemRows.push(itemRow)
-      }
-      return true
+  UpdateRowCounts(mergeResult) {
+    mergeResult.rowsToUpdateCount.forEach((row) => {
+      let item = mergeResult.itemsByRow.get(row)
+      row.SetCount(item.count)
     })
-    return realItemRows
   }
 }
