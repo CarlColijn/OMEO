@@ -251,8 +251,8 @@ jazil.AddTestSet(mainPage, 'SourceItemRow', {
     let item = BuildItem({ set:g_source, name:'Pumpkin', count:23, priorWork:5, cost:3, enchants:[] })
     let itemRow = CreateSourceItemRow(templateRow, item, 46)
     let enchant = new Enchant(g_enchantIDsByName.get('Curse of Vanishing'), 1)
-    itemRow.AddEnchant(enchant)
-    itemRow.AddEnchant(enchant)
+    itemRow.AddEnchant(enchant, false)
+    itemRow.AddEnchant(enchant, false)
 
     let itemDetails = itemRow.GetItem()
     let retrievedItem = itemDetails.item
@@ -348,8 +348,8 @@ jazil.AddTestSet(mainPage, 'SourceItemRow', {
     let item = BuildItem({ set:g_source, name:'Flint & Steel', count:1, priorWork:0, cost:8 })
     let itemRow = CreateSourceItemRow(templateRow, item, 28)
     // Note: enchantments are ordered in addition order
-    itemRow.AddEnchant(BuildEnchant('Unbreaking', 2))
-    itemRow.AddEnchant(BuildEnchant('Mending', 1))
+    itemRow.AddEnchant(BuildEnchant('Unbreaking', 2), false)
+    itemRow.AddEnchant(BuildEnchant('Mending', 1), false)
 
     let details = GetSourceItemRowDetails(itemRow.elemJQ)
 
@@ -367,8 +367,8 @@ jazil.AddTestSet(mainPage, 'SourceItemRow', {
     let item = BuildItem({ set:g_source, name:'Fishing Rod', count:3, priorWork:2, cost:1 })
     let itemRow = CreateSourceItemRow(templateRow, item, 26)
     // Note: enchantments are ordered in addition order
-    itemRow.AddEnchant(BuildEnchant('Unbreaking', 2))
-    itemRow.AddEnchant(BuildEnchant('Lure', 3))
+    itemRow.AddEnchant(BuildEnchant('Unbreaking', 2), false)
+    itemRow.AddEnchant(BuildEnchant('Lure', 3), false)
     itemRow.RemoveEnchants()
 
     let details = GetSourceItemRowDetails(itemRow.elemJQ)

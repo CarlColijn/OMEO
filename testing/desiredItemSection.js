@@ -152,8 +152,8 @@ jazil.AddTestSet(mainPage, 'DesiredItemSection', {
     let item = BuildItem({ set:g_desired, name:'Pumpkin', count:23, priorWork:5, cost:3, enchants:[] })
     itemSection.SetItem(item)
     let enchant = new Enchant(g_enchantIDsByName.get('Curse of Vanishing'), 1)
-    itemSection.AddEnchant(enchant)
-    itemSection.AddEnchant(enchant)
+    itemSection.AddEnchant(enchant, false)
+    itemSection.AddEnchant(enchant, false)
 
     let itemDetails = itemSection.GetItem()
     let retrievedItem = itemDetails.item
@@ -179,8 +179,8 @@ jazil.AddTestSet(mainPage, 'DesiredItemSection', {
     let item = BuildItem({ set:g_desired, name:'Flint & Steel', count:1, priorWork:0, cost:8 })
     itemSection.SetItem(item)
     // Note: enchantments are ordered in addition order
-    itemSection.AddEnchant(BuildEnchant('Unbreaking', 2))
-    itemSection.AddEnchant(BuildEnchant('Mending', 1))
+    itemSection.AddEnchant(BuildEnchant('Unbreaking', 2), false)
+    itemSection.AddEnchant(BuildEnchant('Mending', 1), false)
 
     let details = GetDesiredItemSectionDetails(itemSection.elemJQ)
 
@@ -195,8 +195,8 @@ jazil.AddTestSet(mainPage, 'DesiredItemSection', {
     let item = BuildItem({ set:g_desired, name:'Fishing Rod', count:3, priorWork:2, cost:1 })
     itemSection.SetItem(item)
     // Note: enchantments are ordered in addition order
-    itemSection.AddEnchant(BuildEnchant('Unbreaking', 2))
-    itemSection.AddEnchant(BuildEnchant('Lure', 3))
+    itemSection.AddEnchant(BuildEnchant('Unbreaking', 2), false)
+    itemSection.AddEnchant(BuildEnchant('Lure', 3), false)
     itemSection.RemoveEnchants()
 
     let details = GetDesiredItemSectionDetails(itemSection.elemJQ)

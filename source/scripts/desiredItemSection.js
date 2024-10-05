@@ -134,7 +134,7 @@ class DesiredItemSection {
     this.addEnchantElemJQ = this.elemJQ.find('button[name="addEnchant"]')
     this.addEnchantElemJQ.click(() => {
       SetIcon(this.iconElemJQ, this.itemID, true)
-      this.AddEnchant(undefined)
+      this.AddEnchant(undefined, true)
     })
   }
 
@@ -180,13 +180,13 @@ class DesiredItemSection {
   }
 
 
-  AddEnchant(enchant) {
+  AddEnchant(enchant, giveFocus) {
     let RemoveEnchantCallback = () => {
       let hasEnchants = this.enchantRowTemplate.ElementsPresent()
       SetIcon(this.iconElemJQ, this.itemID, hasEnchants)
     }
 
-    let enchantRow = this.enchantRowTemplate.CreateNew(enchant, this.itemID, true, this.addEnchantElemJQ, RemoveEnchantCallback)
+    let enchantRow = this.enchantRowTemplate.CreateNew(enchant, this.itemID, giveFocus, this.addEnchantElemJQ, RemoveEnchantCallback)
     this.enchantRows.push(enchantRow)
   }
 
@@ -203,7 +203,7 @@ class DesiredItemSection {
     for (let enchantNr = 0; enchantNr < g_numDifferentEnchants; ++enchantNr) {
       let enchant = enchantsByID.get(g_enchantInfos[enchantNr].id)
       if (enchant !== undefined)
-        this.AddEnchant(enchant)
+        this.AddEnchant(enchant, false)
     }
   }
 }
