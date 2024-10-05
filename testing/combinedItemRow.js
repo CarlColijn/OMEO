@@ -26,8 +26,8 @@ function GetCombinedItemRowDetails(itemRowElemJQ) {
   enchantNames = ''
   itemRowElemJQ.find('.enchant .name').each((enchantNr, nameElem) => {
     let nameElemJQ = $(nameElem)
-    let rowElemJQ = nameElemJQ.parent().parent()
-    if (rowElemJQ.attr('data-real') != 0) {
+    let rowElem = new DOMElement(nameElemJQ.parent().parent())
+    if (rowElem.IsReal()) {
       if (enchantNames != '')
         enchantNames += '/'
       enchantNames += nameElemJQ.text()
@@ -36,8 +36,8 @@ function GetCombinedItemRowDetails(itemRowElemJQ) {
   enchantLevels = ''
   itemRowElemJQ.find('.enchant .level').each((enchantNr, levelElem) => {
     let levelElemJQ = $(levelElem)
-    let rowElemJQ = levelElemJQ.parent().parent()
-    if (rowElemJQ.attr('data-real') != 0) {
+    let rowElem = new DOMElement(levelElemJQ.parent().parent())
+    if (rowElem.IsReal()) {
       if (enchantLevels != '')
         enchantLevels += '/'
       enchantLevels += GetEnchantLevelFromGUIText(levelElemJQ.text())

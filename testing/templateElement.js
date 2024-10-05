@@ -70,6 +70,7 @@ jazil.AddTestSet(mainPage, 'TemplateElement', {
     let templateElement = new TestTemplateElement()
     let element = templateElement.CreateNew('test 1')
     jazil.ShouldBe(element.IsReal(), true)
+    jazil.ShouldBe(templateElement.ElementsPresent(), true, 'added element not reported!')
   },
 
   'Create new element from template': (jazil) => {
@@ -90,7 +91,7 @@ jazil.AddTestSet(mainPage, 'TemplateElement', {
     jazil.ShouldBe(numElementsPost - numElementsPre, 3, 'amount of elements added is off!')
   },
 
-  'Elements can be removed': (jazil) => {
+  'Individual elements can be removed': (jazil) => {
     let templateElement = new TestTemplateElement()
     let element1 = templateElement.CreateNew('test 6')
     let element2 = templateElement.CreateNew('test 7')
@@ -100,6 +101,17 @@ jazil.AddTestSet(mainPage, 'TemplateElement', {
     let numElementsPost = $('#templateElement tr').length
     jazil.ShouldBe(numElementsPost - numElementsPre, -1, 'amount of elements removed is off!')
     jazil.ShouldBe(ElementPresent('test 7'), false, 'removed element is still present!')
+  },
+
+  'All elements can be removed': (jazil) => {
+    let templateElement = new TestTemplateElement()
+    let element8 = templateElement.CreateNew('test 8')
+    let numElementsPre = $('#templateElement tr').length
+    templateElement.RemoveCreatedElements()
+    let numElementsPost = $('#templateElement tr').length
+    jazil.ShouldBe(numElementsPost, 1, 'amount of elements removed is off!')
+    jazil.ShouldBe(ElementPresent('test 8'), false, 'removed element is still present!')
+    jazil.ShouldBe(templateElement.ElementsPresent(), false, 'element presence still reported!')
   },
 
 })

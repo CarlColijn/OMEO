@@ -30,8 +30,8 @@ function GetSourceItemRowDetails(itemRowElemJQ) {
   let enchantNames = ''
   itemRowElemJQ.find('[name=enchantID]').each((inputNr, inputElem) => {
     let inputElemJQ = $(inputElem)
-    let rowElemJQ = inputElemJQ.parent().parent()
-    if (rowElemJQ.attr('data-real') != 0) {
+    let rowElem = new DOMElement(inputElemJQ.parent().parent())
+    if (rowElem.IsReal()) {
       let enchantID = parseInt(inputElemJQ.val())
       if (enchantNames != '')
         enchantNames += '/'
@@ -42,8 +42,8 @@ function GetSourceItemRowDetails(itemRowElemJQ) {
   let enchantLevels = ''
   itemRowElemJQ.find('.levelInput .selectedButton').each((inputNr, inputElem) => {
     let inputElemJQ = $(inputElem)
-    let rowElemJQ = inputElemJQ.parent().parent()
-    if (rowElemJQ.attr('data-real') != 0) {
+    let rowElem = new DOMElement(inputElemJQ.parent().parent())
+    if (rowElem.IsReal()) {
       if (enchantLevels != '')
         enchantLevels += '/'
       enchantLevels += parseInt(inputElemJQ.val()) + 1
@@ -65,10 +65,13 @@ function SourceItemRowInTable(testContainerID, item) {
   let foundRow = false
   $(`#${testContainerID} tr.item`).each((rowNr, itemRowElem) => {
     let itemRowElemJQ = $(itemRowElem)
-    let details = GetSourceItemRowDetails(itemRowElemJQ)
-    if (details.type == item.info.name) {
-      foundRow = true
-      return false
+    let itemRow = new DOMElement(itemRowElemJQ)
+    if (itemRow.IsReal()) {
+      let details = GetSourceItemRowDetails(itemRowElemJQ)
+      if (details.type == item.info.name) {
+        foundRow = true
+        return false
+      }
     }
     return true
   })

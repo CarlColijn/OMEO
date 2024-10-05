@@ -81,7 +81,7 @@ class EnchantRow extends RealElement {
       focusRowElemJQ = this.elemJQ.prev()
 
     let focusElemJQ
-    if (focusRowElemJQ.length > 0 && focusRowElemJQ.attr('data-real') != 0)
+    if (focusRowElemJQ.length > 0 && new DOMElement(focusRowElemJQ).IsReal())
       focusElemJQ = focusRowElemJQ.find('button[name="removeEnchant"]')
     else
       focusElemJQ = this.focusElemJQWhenAllGone

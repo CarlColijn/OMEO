@@ -15,12 +15,11 @@ class DOMElement {
   constructor(elemJQ) {
     // ==== PUBLIC ====
     this.elemJQ = elemJQ
-    this.isReal = elemJQ.attr('data-real') != 0
   }
 
 
   IsReal() {
-    return this.isReal
+    return this.elemJQ.attr('data-real') != 0
   }
 }
 
@@ -31,6 +30,11 @@ class DOMElement {
 class TemplateElement extends DOMElement {
   constructor(parentElemJQ, elementClass) {
     super(parentElemJQ.find(`.template.${elementClass}`))
+
+    this.elemJQ.attr('data-real', 0)
+
+    this.parentElemJQ = parentElemJQ
+    this.elementClass = elementClass
   }
 
 
@@ -43,6 +47,17 @@ class TemplateElement extends DOMElement {
     newElemJQ.attr('data-real', 1)
 
     return newElemJQ
+  }
+
+
+  // returns bool
+  ElementsPresent() {
+    return this.parentElemJQ.find(`.${this.elementClass}[data-real="1"]`).length > 0
+  }
+
+
+  RemoveCreatedElements() {
+    this.parentElemJQ.find(`.${this.elementClass}[data-real="1"]`).remove()
   }
 }
 

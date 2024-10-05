@@ -44,7 +44,7 @@ function CombinedItemGroupInTable(testContainerID, description) {
 
 
 function ClearPreviousItemGroups() {
-  $('#combinedItemGroup tbody[data-real="1"]').remove()
+  new GetCombinedItemGroupTemplate().RemoveCreatedElements()
 }
 
 

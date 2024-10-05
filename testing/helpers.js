@@ -48,6 +48,7 @@ let mainAccessObjectNames = [
   'DataStream',
   'DataStreamLoadingOptions',
   'DesiredItemSection',
+  'DOMElement',
   'Enchant',
   'EnchantCombiner',
   'EnchantRow',

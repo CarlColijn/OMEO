@@ -94,7 +94,7 @@ class SourceItemRow extends RealElement {
       focusRowElemJQ = this.elemJQ.prev()
 
     let focusElemJQ
-    if (focusRowElemJQ.length > 0 && focusRowElemJQ.attr('data-real') != 0)
+    if (focusRowElemJQ.length > 0 && new DOMElement(focusRowElemJQ).IsReal())
       focusElemJQ = focusRowElemJQ.find('button[name="removeItem"]')
     else
       focusElemJQ = this.focusElemJQWhenAllGone
@@ -120,7 +120,7 @@ class SourceItemRow extends RealElement {
 
   AddEnchant(enchant) {
     let RemoveEnchantCallback = () => {
-      let hasEnchants = this.elemJQ.find('.enchant[data-real="1"]').length > 0
+      let hasEnchants = this.enchantTemplateRow.ElementsPresent()
       SetIcon(this.iconElemJQ, this.itemID, hasEnchants)
     }
 

@@ -17,8 +17,8 @@ function GetDesiredItemSectionDetails(itemSectionElemJQ) {
   let enchantNames = ''
   itemSectionElemJQ.find('[name=enchantID]').each((inputNr, inputElem) => {
     let inputElemJQ = $(inputElem)
-    let rowElemJQ = inputElemJQ.parent().parent()
-    if (rowElemJQ.attr('data-real') != 0) {
+    let rowElem = new DOMElement(inputElemJQ.parent().parent())
+    if (rowElem.IsReal()) {
       let enchantID = parseInt(inputElemJQ.val())
       if (enchantNames != '')
         enchantNames += '/'
@@ -29,8 +29,8 @@ function GetDesiredItemSectionDetails(itemSectionElemJQ) {
   let enchantLevels = ''
   itemSectionElemJQ.find('.levelInput .selectedButton').each((inputNr, inputElem) => {
     let inputElemJQ = $(inputElem)
-    let rowElemJQ = inputElemJQ.parent().parent()
-    if (rowElemJQ.attr('data-real') != 0) {
+    let rowElem = new DOMElement(inputElemJQ.parent().parent())
+    if (rowElem.IsReal()) {
       if (enchantLevels != '')
         enchantLevels += '/'
       enchantLevels += parseInt(inputElemJQ.val()) + 1

@@ -26,12 +26,7 @@ class CombinedItemTable {
 
 
   Clear() {
-    this.tableElemJQ.find('.group').each((groupNr, groupElem) => {
-      let groupElemJQ = $(groupElem)
-      if (groupElemJQ.attr('data-real') != 0)
-        groupElemJQ.remove()
-      return true
-    })
+    this.itemTemplateGroup.RemoveCreatedElements()
   }
 
 

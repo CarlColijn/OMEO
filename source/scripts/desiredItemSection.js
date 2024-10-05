@@ -184,7 +184,7 @@ class DesiredItemSection {
 
   AddEnchant(enchant) {
     let RemoveEnchantCallback = () => {
-      let hasEnchants = this.elemJQ.find('.enchant[data-real="1"]').length > 0
+      let hasEnchants = this.enchantTemplateRow.ElementsPresent()
       SetIcon(this.iconElemJQ, this.itemID, hasEnchants)
     }
 
