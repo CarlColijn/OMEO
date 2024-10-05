@@ -18,7 +18,7 @@ class RecipeTable {
   constructor(tableElemJQ) {
     // ==== PRIVATE ====
     this.tableElemJQ = tableElemJQ
-    this.templateRowElemJQ = tableElemJQ.find('.template').first()
+    this.itemTemplateRow = new TemplateElement(tableElemJQ, 'item')
 
     this.nextCheckboxID = 0
   }
@@ -66,13 +66,11 @@ class RecipeTable {
   }
 
 
-  AddEnchants(enchantTemplateRowElemJQ, item) {
-    let templateRow = new TemplateElement(enchantTemplateRowElemJQ)
-
+  AddEnchants(enchantTemplateElem, item) {
     for (let enchantNr = 0; enchantNr < g_numDifferentEnchants; ++enchantNr) {
       let enchant = item.enchantsByID.get(g_enchantInfos[enchantNr].id)
       if (enchant !== undefined) {
-        let enchantRowElemJQ = templateRow.CreateExtraElement()
+        let enchantRowElemJQ = enchantTemplateElem.CreateExtraElement()
 
         enchantRowElemJQ.find('.name').text(enchant.info.name)
         enchantRowElemJQ.find('.level').text(GetRomanNumeralForLevel(enchant.level))
@@ -134,16 +132,12 @@ class RecipeTable {
 
   // returns RowInfo
   AddNewRow() {
-    let newRowElemJQ = this.templateRowElemJQ.clone()
-
-    let rowParentElemJQ = this.templateRowElemJQ.parent()
-    newRowElemJQ.appendTo(rowParentElemJQ)
-
-    newRowElemJQ.removeClass('template')
-    newRowElemJQ.attr('data-real', 1)
+    let newRowElemJQ = this.itemTemplateRow.CreateExtraElement()
 
     return {
       rowElemJQ: newRowElemJQ,
+      treeNodeTemplateElem: new TemplateElement(newRowElemJQ, 'treeNode'),
+      enchantTemplateElem: new TemplateElement(newRowElemJQ, 'enchant'),
       isUserCollapsed: false,
       numHides: 0,
       childRowInfos: []
@@ -160,9 +154,8 @@ class RecipeTable {
     let placementTDElemJQ = newRowInfo.rowElemJQ.find('.placementNode')
 
     let isExpandableNode = false
-    let treeNodeTemplateElem = new TemplateElement(newRowInfo.rowElemJQ.find('.template.treeNode'))
     for (let tdElemNr = 0; tdElemNr < collapseTrail.length; ++tdElemNr) {
-      let tdElemJQ = treeNodeTemplateElem.CreateExtraElement()
+      let tdElemJQ = newRowInfo.treeNodeTemplateElem.CreateExtraElement()
 
       let isLeafNode = tdElemNr == 0
       let isNonLeafNode = tdElemNr > 0
@@ -207,7 +200,7 @@ class RecipeTable {
     if (item.renamePoint)
       newRowInfo.rowElemJQ.find('.renameInstructions').removeClass('hidden')
     newRowInfo.rowElemJQ.find('.description').text(this.GetItemDescription(item))
-    this.AddEnchants(newRowInfo.rowElemJQ.find('.enchant'), item)
+    this.AddEnchants(newRowInfo.enchantTemplateElem, item)
     newRowInfo.rowElemJQ.find('.priorWork').text(item.priorWork)
     newRowInfo.rowElemJQ.find('.cost').html(this.GetItemCost(item))
 

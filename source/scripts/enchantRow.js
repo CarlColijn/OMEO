@@ -16,11 +16,11 @@
 
 
 class EnchantRowTemplate extends TemplateElement {
-  constructor(rowElemJQ) {
-    super(rowElemJQ)
+  constructor(parentElemJQ, elementClass) {
+    super(parentElemJQ, elementClass)
 
     // ==== PRIVATE ====
-    this.idElemJQ = rowElemJQ.find('select[name="enchantID"]')
+    this.idElemJQ = this.elemJQ.find('select[name="enchantID"]')
   }
 
 

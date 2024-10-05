@@ -1,5 +1,5 @@
 function GetEnchantTemplateRow() {
-  return new EnchantRowTemplate($('#enchantRow .template'))
+  return new EnchantRowTemplate($('#enchantRow'), 'enchant')
 }
 
 

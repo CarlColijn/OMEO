@@ -3,8 +3,7 @@ function GetCombinedItemGroupTemplate() {
     click: () => {}
   }
 
-  let templateGroupElemJQ = $('#combinedItemGroup .template.group')
-  return new CombinedItemGroupTemplate(templateGroupElemJQ, CallbackHandlerMock)
+  return new CombinedItemGroupTemplate($('#combinedItemGroup'), 'group', CallbackHandlerMock)
 }
 
 

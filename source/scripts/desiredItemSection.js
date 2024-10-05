@@ -21,8 +21,7 @@ class DesiredItemSection {
     // ==== PRIVATE ====
     this.elemJQ = sectionElemJQ.first()
 
-    let enchantTemplateRowElemJQ = this.elemJQ.find('.template').first()
-    this.enchantTemplateRow = new EnchantRowTemplate(enchantTemplateRowElemJQ)
+    this.enchantTemplateRow = new EnchantRowTemplate(this.elemJQ, 'enchant')
 
     this.iconElemJQ = this.elemJQ.find('.icon')
     this.idElemJQ = this.elemJQ.find('select[name="itemID"]')

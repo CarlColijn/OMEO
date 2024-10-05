@@ -10,7 +10,7 @@ let TestTemplateElement
 function MakeTestTemplateElementAvailable() {
   TestTemplateElement = class extends TemplateElement {
     constructor() {
-      super($('#templateElement .template'))
+      super($('#templateElement'), 'test')
     }
 
 

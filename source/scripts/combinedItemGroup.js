@@ -15,8 +15,8 @@
 
 
 class CombinedItemGroupTemplate extends TemplateElement {
-  constructor(tbodyElemJQ, ShowDetails) {
-    super(tbodyElemJQ)
+  constructor(parentElemJQ, elementClass, ShowDetails) {
+    super(parentElemJQ, elementClass)
 
     this.ShowDetails = ShowDetails
   }
@@ -40,8 +40,7 @@ class CombinedItemGroup extends RealElement {
 
     this.SetHeading(match)
 
-    let templateRowElemJQ = this.elemJQ.find('.template.item').first()
-    this.itemTemplateRow = new CombinedItemRowTemplate(templateRowElemJQ, ShowDetails)
+    this.itemTemplateRow = new CombinedItemRowTemplate(this.elemJQ, 'item', ShowDetails)
   }
 
 

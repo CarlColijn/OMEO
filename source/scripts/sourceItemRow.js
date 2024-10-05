@@ -20,8 +20,8 @@
 
 
 class SourceItemRowTemplate extends TemplateElement {
-  constructor(rowElemJQ, hookUpGUI) {
-    super(rowElemJQ)
+  constructor(parentElemJQ, elementClass) {
+    super(parentElemJQ, elementClass)
 
     this.SetupItemOptions()
   }
@@ -70,8 +70,7 @@ class SourceItemRow extends RealElement {
     this.nr = -1 // to be filled in later
 
     // ==== PRIVATE ====
-    let enchantTemplateRowElemJQ = this.elemJQ.find('.template').first()
-    this.enchantTemplateRow = new EnchantRowTemplate(enchantTemplateRowElemJQ)
+    this.enchantTemplateRow = new EnchantRowTemplate(this.elemJQ, 'enchant')
 
     this.countElemJQ = rowElemJQ.find('input[name="count"]')
     this.iconElemJQ = rowElemJQ.find('.icon')

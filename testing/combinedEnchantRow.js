@@ -1,6 +1,5 @@
 function GetCombinedEnchantTemplateRow() {
-  let templateRowElemJQ = $('#combinedEnchantRow .template')
-  return new CombinedEnchantRowTemplate(templateRowElemJQ)
+  return new CombinedEnchantRowTemplate($('#combinedEnchantRow'), 'enchant')
 }
 
 

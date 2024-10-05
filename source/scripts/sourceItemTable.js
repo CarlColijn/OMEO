@@ -26,8 +26,7 @@ class SourceItemTable {
       this.AddRow()
     })
 
-    let templateRowElemJQ = this.tableElemJQ.find('.template.item').first()
-    this.templateRow = new SourceItemRowTemplate(templateRowElemJQ, false)
+    this.templateRow = new SourceItemRowTemplate(this.tableElemJQ, 'item')
   }
 
 

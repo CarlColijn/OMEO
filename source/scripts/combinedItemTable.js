@@ -21,8 +21,7 @@ class CombinedItemTable {
     // ==== PRIVATE ====
     this.ShowDetails = ShowDetails
 
-    let templateGroupElemJQ = this.tableElemJQ.find('.template').first()
-    this.itemTemplateGroup = new CombinedItemGroupTemplate(templateGroupElemJQ, ShowDetails)
+    this.itemTemplateGroup = new CombinedItemGroupTemplate(this.tableElemJQ, 'group', ShowDetails)
   }
 
 

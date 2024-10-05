@@ -16,8 +16,8 @@
 
 
 class CombinedEnchantRowTemplate extends TemplateElement {
-  constructor(rowElemJQ) {
-    super(rowElemJQ)
+  constructor(parentElemJQ, elementClass) {
+    super(parentElemJQ, elementClass)
   }
 
 
@@ -30,9 +30,9 @@ class CombinedEnchantRowTemplate extends TemplateElement {
 }
 
 
-class CombinedEnchantRow extends TemplateElement {
+class CombinedEnchantRow extends RealElement {
   constructor(rowElemJQ, enchant) {
-    super(rowElemJQ, enchant)
+    super(rowElemJQ)
 
     this.elemJQ.find('.name').text(enchant.info.name)
     this.elemJQ.find('.level').text(GetRomanNumeralForLevel(enchant.level))

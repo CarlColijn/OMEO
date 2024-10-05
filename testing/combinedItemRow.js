@@ -3,8 +3,7 @@ function GetCombinedItemRowTemplate() {
     click: () => {}
   }
 
-  let templateRowElemJQ = $('#combinedItemRow .template.item')
-  return new CombinedItemRowTemplate(templateRowElemJQ, CallbackHandlerMock)
+  return new CombinedItemRowTemplate($('#combinedItemRow'), 'item', CallbackHandlerMock)
 }
 
 

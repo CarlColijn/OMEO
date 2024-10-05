@@ -1,5 +1,5 @@
 function GetSourceItemTemplateRow() {
-  return new SourceItemRowTemplate($('#sourceItemRow .template.item'), false)
+  return new SourceItemRowTemplate($('#sourceItemRow'), 'item')
 }
 
 

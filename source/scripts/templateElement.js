@@ -29,8 +29,8 @@ class DOMElement {
 
 
 class TemplateElement extends DOMElement {
-  constructor(elemJQ) {
-    super(elemJQ)
+  constructor(parentElemJQ, elementClass) {
+    super(parentElemJQ.find(`.template.${elementClass}`))
   }
 
 

@@ -19,8 +19,8 @@
 
 
 class CombinedItemRowTemplate extends TemplateElement {
-  constructor(rowElemJQ, ShowDetails) {
-    super(rowElemJQ)
+  constructor(parentElemJQ, elementClass, ShowDetails) {
+    super(parentElemJQ, elementClass)
 
     // ==== PRIVATE ====
     this.ShowDetails = ShowDetails
@@ -55,8 +55,7 @@ class CombinedItemRow extends RealElement {
     // ==== PRIVATE ====
     this.ShowDetails = ShowDetails
 
-    let enchantTemplateRowElemJQ = this.elemJQ.find('.template').first()
-    this.enchantTemplateRow = new CombinedEnchantRowTemplate(enchantTemplateRowElemJQ)
+    this.enchantTemplateRow = new CombinedEnchantRowTemplate(this.elemJQ, 'enchant')
   }
 
 
