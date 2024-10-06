@@ -28,4 +28,23 @@ jazil.AddTestSet(mainPage, 'EnchantConflicts', {
     jazil.Assert(!EnchantIDsConflict(mendingID, piercingID), 'Mending conflicts with Piercing!')
   },
 
+  'Querying conflicting ids return correct list': (jazil) => {
+    let ids = [
+      g_enchantIDsByName.get('Protection'),
+      g_enchantIDsByName.get('Fire Protection'),
+      g_enchantIDsByName.get('Blast Protection'),
+      g_enchantIDsByName.get('Projectile Protection')
+    ]
+
+    ids.forEach((id) => {
+      let conflictingIDs = GetConflictingEnchantIDs(id)
+      jazil.ShouldBe(conflictingIDs.size, ids.length - 1, `Incorrect number of conflicts returned for ${id}!`)
+
+      ids.forEach((otherID) => {
+        if (otherID != id)
+          jazil.ShouldBe(conflictingIDs.has(otherID), true, `Incorrect id ${otherID} marked as conflicting for ${id}!`)
+      })
+    })
+  },
+
 })

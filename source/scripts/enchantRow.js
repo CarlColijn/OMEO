@@ -18,41 +18,18 @@
 class EnchantRowTemplate extends TemplateElement {
   constructor(parentElemJQ, elementClass) {
     super(parentElemJQ, elementClass)
-
-    // ==== PRIVATE ====
-    this.idElemJQ = this.elemJQ.find('select[name="enchantID"]')
   }
 
 
   // returns EnchantRow
-  CreateNew(enchant, itemID, giveFocus, focusElemJQWhenAllGone, RemoveCallback) {
+  CreateNew(itemID, enchant, allRows, giveFocus, focusElemJQWhenAllGone, ChangeEnchantCallback) {
     let newRowElemJQ = super.CreateExtraElement()
-    let newRow = new EnchantRow(newRowElemJQ)
+    let newRow = new EnchantRow(newRowElemJQ, itemID, enchant, allRows, focusElemJQWhenAllGone, ChangeEnchantCallback)
 
-    newRow.HookUpGUI(itemID, RemoveCallback)
-
-    if (enchant === undefined)
-      enchant = newRow.GetEnchant()
-    newRow.SetEnchant(enchant)
-
-    newRow.focusElemJQWhenAllGone = focusElemJQWhenAllGone
     if (giveFocus)
       newRow.idElemJQ[0].focus()
 
     return newRow
-  }
-
-
-  UpdateEnchantOptions(itemID) {
-    this.idElemJQ.find('option').remove()
-
-    let itemInfo = g_itemInfosByID.get(itemID)
-
-    for (let enchantNr = 0; enchantNr < g_numDifferentEnchants; ++enchantNr) {
-      let enchantInfo = g_enchantInfos[enchantNr]
-      if (itemInfo.CanHaveEnchant(enchantInfo.id))
-        this.idElemJQ.append(`<option value="${enchantInfo.id}">${enchantInfo.name}</option>`)
-    }
   }
 }
 
@@ -60,18 +37,35 @@ class EnchantRowTemplate extends TemplateElement {
 
 
 class EnchantRow extends RealElement {
-  constructor(rowElemJQ) {
+  constructor(rowElemJQ, itemID, enchant, allRows, focusElemJQWhenAllGone, ChangeEnchantCallback) {
     super(rowElemJQ)
 
     // ==== PRIVATE ====
+    this.allRows = allRows
+    this.allRows.push(this)
+
     this.idElemJQ = rowElemJQ.find('select[name="enchantID"]')
     this.levelElem = new ButtonStrip(rowElemJQ.find('.levelInput'))
+    this.UpdateEnchantOptions(itemID)
+
+    this.focusElemJQWhenAllGone = focusElemJQWhenAllGone
+    this.HookUpGUI(itemID, ChangeEnchantCallback)
+
+    this.SetEnchant(enchant)
   }
 
 
-  // returns jQuery-wrapped input element
-  GetIDElemJQ() {
-    return this.idElemJQ
+  // returns int
+  GetEnchantID() {
+    return this.enchantID
+  }
+
+
+  // returns Enchant
+  GetEnchant() {
+    let enchantInfo = g_enchantInfosByID.get(this.enchantID)
+    let enchantLevel = this.GetEnchantLevel(enchantInfo)
+    return new Enchant(this.enchantID, enchantLevel)
   }
 
 
@@ -89,38 +83,111 @@ class EnchantRow extends RealElement {
     if (focusElemJQ?.length > 0)
       focusElemJQ[0].focus()
 
+    let ourRowNr = this.allRows.indexOf(this)
+    if (ourRowNr != -1)
+      this.allRows.splice(ourRowNr, 1)
+
+    this.SendIDChange()
+
     super.Remove()
-  }
-
-
-  // returns Enchant
-  GetEnchant() {
-    let enchantID = parseInt(this.idElemJQ.val())
-    let enchantInfo = g_enchantInfosByID.get(enchantID)
-    let enchantLevel = this.GetEnchantLevel(enchantInfo)
-    return new Enchant(enchantID, enchantLevel)
-  }
-
-
-  SetEnchant(enchant) {
-    this.idElemJQ.val(enchant.id)
-    this.UpdateLevelOptions(enchant)
   }
 
 
   // ======== PRIVATE ========
 
 
-  HookUpGUI(itemID, RemoveCallback) {
+  SetEnchant(enchant) {
+    if (enchant === undefined) {
+      this.enchantID = parseInt(this.idElemJQ.val())
+      enchant = this.GetEnchant()
+    }
+    else {
+      this.enchantID = enchant.id
+      this.idElemJQ.val(enchant.id)
+    }
+
+    this.UpdateLevelOptions(enchant)
+
+    this.SendIDChange()
+  }
+
+
+  SendIDChange() {
+    this.allRows.forEach((otherRow) => {
+      if (otherRow !== this)
+        otherRow.EnchantChoicesChanged()
+    })
+  }
+
+
+  HookUpGUI(itemID, ChangeEnchantCallback) {
     this.idElemJQ.change(() => {
-      this.UpdateLevelOptions(undefined)
+      this.enchantID = parseInt(this.idElemJQ.val())
+      let enchant = this.GetEnchant()
+
+      this.UpdateLevelOptions(enchant)
+
+      this.SendIDChange()
+
+      ChangeEnchantCallback()
     })
 
     this.elemJQ.find('button[name="removeEnchant"]').click(() => {
       this.Remove()
-      if (RemoveCallback !== undefined)
-        RemoveCallback()
+
+      ChangeEnchantCallback()
     })
+  }
+
+
+  // returns Set(int)
+  GetUnusableEnchantIDs() {
+    let unusableEnchantIDs = new Set()
+
+    this.allRows.forEach((otherRow) => {
+      if (this !== otherRow) {
+        unusableEnchantIDs.add(otherRow.enchantID)
+        GetConflictingEnchantIDs(otherRow.enchantID).forEach((conflictingID) => {
+          unusableEnchantIDs.add(conflictingID)
+        })
+      }
+    })
+
+    return unusableEnchantIDs
+  }
+
+
+  EnchantChoicesChanged() {
+    let unusableEnchantIDs = this.GetUnusableEnchantIDs()
+
+    this.idElemJQ.find('option').each(function() {
+      let optionElemJQ = $(this)
+      let enchantID = parseInt(optionElemJQ.val())
+
+      if (enchantID != this.enchantID) {
+        if (unusableEnchantIDs.has(enchantID))
+          optionElemJQ.attr('disabled', 'disabled')
+        else
+          optionElemJQ.removeAttr('disabled')
+      }
+    })
+  }
+
+
+  UpdateEnchantOptions(itemID) {
+    this.idElemJQ.find('option').remove()
+
+    let itemInfo = g_itemInfosByID.get(itemID)
+
+    let unusableEnchantIDs = this.GetUnusableEnchantIDs()
+
+    for (let enchantNr = 0; enchantNr < g_numDifferentEnchants; ++enchantNr) {
+      let enchantInfo = g_enchantInfos[enchantNr]
+      if (itemInfo.CanHaveEnchant(enchantInfo.id)) {
+        let enchantUnusable = unusableEnchantIDs.has(enchantInfo.id)
+        this.idElemJQ.append(`<option value="${enchantInfo.id}"${enchantUnusable ? ' disabled="disabled"' : ''}>${enchantInfo.name}</option>`)
+      }
+    }
   }
 
 
@@ -134,9 +201,6 @@ class EnchantRow extends RealElement {
 
 
   UpdateLevelOptions(enchant) {
-    if (enchant === undefined)
-      enchant = this.GetEnchant()
-
     let levelTexts = GetRomanNumeralsUpToLevel(enchant.info.maxLevel)
 
     this.levelElem.SetOptions(levelTexts, enchant.level - 1)

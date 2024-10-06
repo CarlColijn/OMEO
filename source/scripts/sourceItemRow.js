@@ -4,8 +4,7 @@
   Prerequisites:
   - templateElement.js
   - dataSets.js
-  - enchantInfo.js
-  - enchantRow.js
+  - enchantSection.js
   - item.js
   - guiHelpers.js
 
@@ -70,9 +69,6 @@ class SourceItemRow extends RealElement {
     this.nr = -1 // to be filled in later
 
     // ==== PRIVATE ====
-    this.enchantRowTemplate = new EnchantRowTemplate(this.elemJQ, 'enchant')
-    this.enchantRows = []
-
     this.nrElemJQ = rowElemJQ.find('.nr')
     this.countElemJQ = rowElemJQ.find('input[name="count"]')
     this.iconElemJQ = rowElemJQ.find('.icon')
@@ -80,6 +76,14 @@ class SourceItemRow extends RealElement {
     this.priorWorkElem = new ButtonStrip(rowElemJQ.find('.priorWorkInput'))
 
     this.allRows = allRows
+
+    let item = this.SyncCurrentItemWithoutEnchants()
+
+    let addEnchantElemJQ = this.elemJQ.find('button[name="addEnchant"]')
+    let EnchantStateChangedHandler = (hasEnchants) => {
+      this.EnchantStateChanged(hasEnchants)
+    }
+    this.enchantSection = new EnchantSection(item, addEnchantElemJQ, this.elemJQ, EnchantStateChangedHandler)
   }
 
 
@@ -97,6 +101,7 @@ class SourceItemRow extends RealElement {
     if (focusElemJQ?.length > 0)
       focusElemJQ[0].focus()
 
+    this.enchantSection.RemoveEnchants()
     super.Remove()
 
     let nextRowNr = this.nr
@@ -119,75 +124,53 @@ class SourceItemRow extends RealElement {
   }
 
 
-  AddEnchant(enchant, giveFocus) {
-    let RemoveEnchantCallback = () => {
-      let hasEnchants = this.enchantRowTemplate.ElementsPresent()
-      SetIcon(this.iconElemJQ, this.itemID, hasEnchants)
-    }
-
-    let enchantRow = this.enchantRowTemplate.CreateNew(enchant, this.itemID, giveFocus, this.addEnchantElemJQ, RemoveEnchantCallback)
-    this.enchantRows.push(enchantRow)
-  }
-
-
-  RemoveEnchants() {
-    this.enchantRowTemplate.RemoveCreatedElements()
-    this.enchantRows.splice(0, Infinity)
-  }
-
-
   // returns object:
   // - item: Item
   // - withCountError: bool
   // - countErrorElemJQ: JQuery-wrapped input element, if applicable
-  // - withEnchantConflict: bool
-  // - enchantConflictInfo: {
-  //     conflictingEnchantName: string,
-  //     inputElemJQ: JQuery-wrapped input element
-  //   }
-  // - withEnchantDupe: bool
-  // - enchantDupeElemJQ: JQuery-wrapped input element, if applicable
   GetItem() {
     let countResult = this.GetValidatedCount()
     let itemID = parseInt(this.idElemJQ.val())
     let priorWork = this.priorWorkElem.GetSelectionNr()
 
     let item = new Item(countResult.count, g_source, itemID, priorWork)
-    let enchantResult = this.AddItemEnchants(item)
+    this.enchantSection.AddEnchantsToItem(item)
 
     item.nr = parseInt(this.elemJQ.attr('data-nr'))
 
     return {
       item: item,
       withCountError: countResult.inError,
-      countErrorElemJQ: countResult.errorElemJQ,
-      withEnchantConflict: enchantResult.withConflict,
-      enchantConflictInfo: enchantResult.conflictInfo,
-      withEnchantDupe: enchantResult.withDupe,
-      enchantDupeElemJQ: enchantResult.dupeElemJQ
+      countErrorElemJQ: countResult.errorElemJQ
     }
   }
 
 
   SetItem(item) {
-    if (item !== undefined)
-      this.itemID = item.id
+    this.itemID = item.id
 
     this.countElemJQ.val(item.count)
     this.idElemJQ.val(item.id)
     this.SetupPriorWorkOptions()
     this.priorWorkElem.SetSelectionNr(item.priorWork)
 
-    let hasEnchants = item.enchantsByID.size > 0
-    SetIcon(this.iconElemJQ, this.itemID, hasEnchants)
-
-    this.SyncEnchantOptions()
-
-    this.SetEnchants(item.enchantsByID)
+    this.enchantSection.ChangeItem(item)
   }
 
 
   // ======== PRIVATE ========
+
+
+  // returns Item
+  SyncCurrentItemWithoutEnchants() {
+    this.itemID = parseInt(this.idElemJQ.val())
+    return new Item(
+      1,
+      g_source,
+      parseInt(this.itemID),
+      0
+    )
+  }
 
 
   SetupPriorWorkOptions() {
@@ -210,29 +193,20 @@ class SourceItemRow extends RealElement {
   }
 
 
-  SyncEnchantOptions() {
-    this.RemoveEnchants()
-
-    this.enchantRowTemplate.UpdateEnchantOptions(this.itemID)
-  }
-
-
   HookUpGUI(item) {
     this.elemJQ.find('button[name="removeItem"]').click(() => {
       this.Remove()
     })
 
     this.idElemJQ.change(() => {
-      this.itemID = parseInt(this.idElemJQ.val())
-      SetIcon(this.iconElemJQ, this.itemID, false)
-      this.SyncEnchantOptions()
+      let item = this.SyncCurrentItemWithoutEnchants()
+      this.enchantSection.ChangeItem(item)
     })
+  }
 
-    this.addEnchantElemJQ = this.elemJQ.find('button[name="addEnchant"]')
-    this.addEnchantElemJQ.click(() => {
-      SetIcon(this.iconElemJQ, this.itemID, true)
-      this.AddEnchant(undefined, true)
-    })
+
+  EnchantStateChanged(hasEnchants) {
+    SetIcon(this.iconElemJQ, this.itemID, hasEnchants)
   }
 
 
@@ -251,56 +225,6 @@ class SourceItemRow extends RealElement {
         inError ?
         this.countElemJQ :
         undefined
-    }
-  }
-
-
-  // returns object:
-  // - withConflict: bool
-  // - conflictInfo: {
-  //     conflictingEnchantName: string
-  //     inputElemJQ: JQuery-wrapped input element, if applicable
-  //   }
-  // - withDupe: bool
-  // - dupeElemJQ: JQuery-wrapped input element, if applicable
-  AddItemEnchants(item) {
-    let result = {
-      withConflict: false,
-      conflictInfo: {},
-      withDupe: false,
-      dupeElemJQ: undefined
-    }
-
-    let foundEnchants = []
-    this.enchantRows.forEach((enchantRow) => {
-      let enchant = enchantRow.GetEnchant()
-
-      foundEnchants.forEach((previousEnchant) => {
-        if (EnchantIDsConflict(previousEnchant.info.id, enchant.info.id)) {
-          result.withConflict = true
-          result.conflictInfo.conflictingEnchantName = previousEnchant.info.name
-          result.conflictInfo.inputElemJQ = enchantRow.GetIDElemJQ()
-        }
-        if (previousEnchant.info.id == enchant.info.id) {
-          result.withDupe = true
-          result.dupeElemJQ = enchantRow.GetIDElemJQ()
-        }
-      })
-
-      foundEnchants.push(enchant)
-
-      item.SetEnchant(enchant)
-    })
-
-    return result
-  }
-
-
-  SetEnchants(enchantsByID) {
-    for (let enchantNr = 0; enchantNr < g_numDifferentEnchants; ++enchantNr) {
-      let enchant = enchantsByID.get(g_enchantInfos[enchantNr].id)
-      if (enchant !== undefined)
-        this.AddEnchant(enchant, false)
     }
   }
 }

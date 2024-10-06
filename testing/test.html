@@ -62,6 +62,7 @@
     <script src="buttonStrip.js"></script>
     <script src="enchantRow.js"></script>
     <script src="combinedEnchantRow.js"></script>
+    <script src="enchantSection.js"></script>
     <script src="sourceItemRow.js"></script>
     <script src="combinedItemRow.js"></script>
     <script src="combinedItemGroup.js"></script>
@@ -107,6 +108,20 @@
         <tbody>
           <tr class="template enchant">
             <td><span class="name"></span> <span class="level"></span></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <table id="enchantSection" class="source table">
+        <caption>Enchant section</caption>
+        <tbody>
+          <tr class="template enchant">
+            <td><select name="enchantID"></select></td>
+            <td class="levelInput buttonStrip"></td>
+            <td><button type="button" name="removeEnchant">Remove enchantment</button></td>
+          </tr>
+          <tr>
+            <td><button type="button" name="addEnchant">Add enchantment</button></td>
           </tr>
         </tbody>
       </table>

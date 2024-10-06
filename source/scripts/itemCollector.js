@@ -9,13 +9,6 @@
   - ItemCollectionResult
     - withCountErrors: bool
     - countErrorElemJQs: [] of JQuery wrapped DOM input elements
-    - withEnchantConflicts: bool
-    - enchantConflictInfos: [] of {
-        conflictEnchantName: string,
-        inputElemJQ: JQuery wrapped DOM input element
-      }
-    - withEnchantDupes: bool
-    - enchantDupeElemJQs: [] of JQuery wrapped DOM input elements
     - items: Item[]
     - mergedItems: bool
     - rowsToUpdateNr: ItemRow[]
@@ -37,10 +30,6 @@ class ItemCollectionResult {
     // ==== PUBLIC ====
     this.withCountErrors = false
     this.countErrorElemJQs = []
-    this.withEnchantConflicts = false
-    this.enchantConflictInfos = []
-    this.withEnchantDupes = false
-    this.enchantDupeElemJQs = []
     this.items = []
     this.mergedItems = false
     this.rowsToUpdateNr = []
@@ -71,14 +60,6 @@ class ItemCollector {
       this.result.withCountErrors = true
       this.result.countErrorElemJQs.push(itemResult.countErrorElemJQ)
     }
-    if (itemResult.withEnchantConflict) {
-      this.result.withEnchantConflicts = true
-      this.result.enchantConflictInfos.push(itemResult.enchantConflictInfo)
-    }
-    if (itemResult.withEnchantDupe) {
-      this.result.withEnchantDupes = true
-      this.result.enchantDupeElemJQs.push(itemResult.enchantDupeElemJQ)
-    }
 
     let item = itemResult.item
     let itemHash = item.HashTypeAndPriorWork()
@@ -93,8 +74,7 @@ class ItemCollector {
 
     let mayMergeRow =
       this.mergeItems &&
-      !this.result.withCountErrors &&
-      !this.result.withEnchantDupes
+      !this.result.withCountErrors
 
     let rowMerged = false
     if (mayMergeRow) {

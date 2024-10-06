@@ -20,16 +20,6 @@ class MainFormHandler {
   }
 
 
-  NoteEnchantConflict(conflictInfo) {
-    conflictInfo.inputElemJQ.after(`<div class="error">This enchantment conflicts<br>with ${conflictInfo.conflictingEnchantName}</div>`)
-  }
-
-
-  NoteEnchantDupe(inputElemJQ) {
-    inputElemJQ.after('<div class="error">Duplicate enchantment</div>')
-  }
-
-
   AskLoadFromURLOrLocalStorage(OnLocalStorage, OnURL) {
     let dialogElemJQ = $('#urlVsLocalStorageConflict')
     dialogElemJQ.css('display', 'flex')

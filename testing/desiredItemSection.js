@@ -114,97 +114,11 @@ jazil.AddTestSet(mainPage, 'DesiredItemSection', {
     })
 
     jazil.ShouldBe(itemDetails.withCountError, false, 'row says there were count errors!')
-    jazil.ShouldBe(itemDetails.withEnchantConflict, false, 'row says there were enchant conflicts!')
-    jazil.ShouldBe(itemDetails.withEnchantDupe, false, 'row says there were enchant dupes!')
     jazil.ShouldBe(itemDetails.countErrorElemJQ, undefined, 'row reports a DOM element in error!')
     jazil.ShouldBe(retrievedItem.info.name, item.info.name, 'name is off!')
     jazil.ShouldBe(enchantNames, 'Efficiency/Unbreaking', 'enchant names are off!')
     jazil.ShouldBe(enchantLevels, '2/1', 'enchant levels are off!')
     jazil.ShouldBe(DesiredItemInSection(item), true, 'added row is not present!')
-  },
-
-  'Enchant conflicts get registered': (jazil) => {
-    let itemSection = GetDesiredItemSection()
-    let item = BuildItem({ set:g_desired, name:'Leggings', count:23, priorWork:5, cost:3, enchants:[{ name:'Fire Protection', level:1 }, { name:'Blast Protection', level:1 }] })
-    itemSection.SetItem(item)
-
-    let itemDetails = itemSection.GetItem()
-    let retrievedItem = itemDetails.item
-    let enchantNames = ''
-    let enchantLevels = ''
-    retrievedItem.enchantsByID.forEach((enchant) => {
-      if (enchant !== undefined) {
-        enchantNames += enchant.info.name
-        enchantLevels += enchant.level
-      }
-    })
-
-    jazil.ShouldBe(itemDetails.withEnchantConflict, true, 'row says there were no enchant conflicts!')
-    jazil.ShouldNotBe(itemDetails.enchantConflictInfo?.inputElemJQ, undefined, 'row reports no DOM element in error!')
-    jazil.ShouldBe(retrievedItem.info.name, item.info.name, 'name is off!')
-    jazil.ShouldBe(enchantNames, 'Blast ProtectionFire Protection', 'enchant names are off!')
-    jazil.ShouldBe(enchantLevels, '11', 'enchant levels are off!')
-    jazil.ShouldBe(DesiredItemInSection(item), true, 'added row is not present!')
-  },
-
-  'Enchant dupes get registered': (jazil) => {
-    let itemSection = GetDesiredItemSection()
-    let item = BuildItem({ set:g_desired, name:'Pumpkin', count:23, priorWork:5, cost:3, enchants:[] })
-    itemSection.SetItem(item)
-    let enchant = new Enchant(g_enchantIDsByName.get('Curse of Vanishing'), 1)
-    itemSection.AddEnchant(enchant, false)
-    itemSection.AddEnchant(enchant, false)
-
-    let itemDetails = itemSection.GetItem()
-    let retrievedItem = itemDetails.item
-    let enchantNames = ''
-    let enchantLevels = ''
-    retrievedItem.enchantsByID.forEach((enchant) => {
-      if (enchant !== undefined) {
-        enchantNames += enchant.info.name
-        enchantLevels += enchant.level
-      }
-    })
-
-    jazil.ShouldBe(itemDetails.withEnchantDupe, true, 'row says there were no enchant dupes!')
-    jazil.ShouldNotBe(itemDetails.enchantDupeElemJQ, undefined, 'row reports no DOM element in error!')
-    jazil.ShouldBe(retrievedItem.info.name, item.info.name, 'name is off!')
-    jazil.ShouldBe(enchantNames, 'Curse of Vanishing', 'enchant names are off!')
-    jazil.ShouldBe(enchantLevels, '1', 'enchant levels are off!')
-    jazil.ShouldBe(DesiredItemInSection(item), true, 'added row is not present!')
-  },
-
-  'Item can get extra enchants': (jazil) => {
-    let itemSection = GetDesiredItemSection()
-    let item = BuildItem({ set:g_desired, name:'Flint & Steel', count:1, priorWork:0, cost:8 })
-    itemSection.SetItem(item)
-    // Note: enchantments are ordered in addition order
-    itemSection.AddEnchant(BuildEnchant('Unbreaking', 2), false)
-    itemSection.AddEnchant(BuildEnchant('Mending', 1), false)
-
-    let details = GetDesiredItemSectionDetails(itemSection.elemJQ)
-
-    jazil.ShouldBe(details.type, item.info.name, 'type is off!')
-    jazil.ShouldBe(details.enchantNames, 'Unbreaking/Mending', 'enchant names are off!')
-    jazil.ShouldBe(details.enchantLevels, '2/1', 'enchant levels are off!')
-    jazil.ShouldBe(DesiredItemInSection(item), true, 'changed row is not present anymore!')
-  },
-
-  'Item enchants can be removed': (jazil) => {
-    let itemSection = GetDesiredItemSection()
-    let item = BuildItem({ set:g_desired, name:'Fishing Rod', count:3, priorWork:2, cost:1 })
-    itemSection.SetItem(item)
-    // Note: enchantments are ordered in addition order
-    itemSection.AddEnchant(BuildEnchant('Unbreaking', 2), false)
-    itemSection.AddEnchant(BuildEnchant('Lure', 3), false)
-    itemSection.RemoveEnchants()
-
-    let details = GetDesiredItemSectionDetails(itemSection.elemJQ)
-
-    jazil.ShouldBe(details.type, item.info.name, 'type is off!')
-    jazil.ShouldBe(details.enchantNames, '', 'enchant names are off!')
-    jazil.ShouldBe(details.enchantLevels, '', 'enchant levels are off!')
-    jazil.ShouldBe(DesiredItemInSection(item), true, 'changed row is not present anymore!')
   },
 
   'Item can be changed': (jazil) => {

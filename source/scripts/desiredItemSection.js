@@ -4,7 +4,7 @@
   Prerequisites:
   - dataSets.js
   - enchantInfo.js
-  - enchantRow.js
+  - enchantSection.js
   - item.js
   - guiHelpers.js
 
@@ -20,18 +20,20 @@ class DesiredItemSection {
   constructor(sectionElemJQ) {
     // ==== PRIVATE ====
     this.elemJQ = sectionElemJQ.first()
-
-    this.enchantRowTemplate = new EnchantRowTemplate(this.elemJQ, 'enchant')
-    this.enchantRows = []
-
     this.iconElemJQ = this.elemJQ.find('.icon')
     this.idElemJQ = this.elemJQ.find('select[name="itemID"]')
     this.SetupItemOptions()
+    this.HookUpGUI()
 
-    let item = this.GetAppropriateItemToUse()
+    let item = this.SyncCurrentItemWithoutEnchants()
+
+    let addEnchantElemJQ = this.elemJQ.find('button[name="addEnchant"]')
+    let EnchantStateChangedHandler = (hasEnchants) => {
+      this.EnchantStateChanged(hasEnchants)
+    }
+    this.enchantSection = new EnchantSection(item, addEnchantElemJQ, this.elemJQ, EnchantStateChangedHandler)
+
     this.SetItem(item)
-
-    this.HookUpGUI(item)
   }
 
 
@@ -39,45 +41,23 @@ class DesiredItemSection {
   // - item: Item
   // - withCountError: false
   // - countErrorElemJQ: undefined
-  // - withEnchantConflict: bool
-  // - enchantConflictInfo: {
-  //     conflictingEnchantName: string,
-  //     inputElemJQ: JQuery-wrapped input element
-  //   }
-  // - withEnchantDupe: bool
-  // - enchantDupeElemJQ: JQuery-wrapped input element, if applicable
   GetItem() {
-    let item = new Item(
-      1,
-      g_desired,
-      parseInt(this.idElemJQ.val()),
-      0
-    )
-    let enchantResult = this.AddItemEnchants(item)
+    let item = this.SyncCurrentItemWithoutEnchants()
+    this.enchantSection.AddEnchantsToItem(item)
 
     return {
       item: item,
       withCountError: false,
-      countErrorElemJQ: undefined,
-      withEnchantConflict: enchantResult.withConflict,
-      enchantConflictInfo: enchantResult.conflictInfo,
-      withEnchantDupe: enchantResult.withDupe,
-      enchantDupeElemJQ: enchantResult.dupeElemJQ
+      countErrorElemJQ: undefined
     }
   }
 
 
   SetItem(item) {
     this.itemID = item.id
-
     this.idElemJQ.val(item.id)
 
-    let hasEnchants = item.enchantsByID.size > 0
-    SetIcon(this.iconElemJQ, this.itemID, hasEnchants)
-
-    this.SyncEnchantOptions()
-
-    this.SetEnchants(item.enchantsByID)
+    this.enchantSection.ChangeItem(item)
   }
 
 
@@ -92,7 +72,8 @@ class DesiredItemSection {
 
 
   // returns Item
-  GetAppropriateItemToUse() {
+  SyncCurrentItemWithoutEnchants() {
+    this.itemID = parseInt(this.idElemJQ.val())
     return new Item(
       1,
       g_desired,
@@ -117,93 +98,15 @@ class DesiredItemSection {
   }
 
 
-  SyncEnchantOptions() {
-    this.RemoveEnchants()
-
-    this.enchantRowTemplate.UpdateEnchantOptions(this.itemID)
-  }
-
-
-  HookUpGUI(item) {
+  HookUpGUI() {
     this.idElemJQ.change(() => {
-      this.itemID = parseInt(this.idElemJQ.val())
-      SetIcon(this.iconElemJQ, this.itemID, false)
-      this.SyncEnchantOptions()
-    })
-
-    this.addEnchantElemJQ = this.elemJQ.find('button[name="addEnchant"]')
-    this.addEnchantElemJQ.click(() => {
-      SetIcon(this.iconElemJQ, this.itemID, true)
-      this.AddEnchant(undefined, true)
+      let item = this.SyncCurrentItemWithoutEnchants()
+      this.enchantSection.ChangeItem(item)
     })
   }
 
 
-  // returns object:
-  // - withConflict: bool
-  // - conflictInfo: {
-  //     conflictingEnchantName: string
-  //     inputElemJQ: JQuery-wrapped input element, if applicable
-  //   }
-  // - withDupe: bool
-  // - dupeElemJQ: JQuery-wrapped input element, if applicable
-  AddItemEnchants(item) {
-    let result = {
-      withConflict: false,
-      conflictInfo: {},
-      withDupe: false,
-      dupeElemJQ: undefined
-    }
-
-    let foundEnchants = []
-    this.enchantRows.forEach((enchantRow) => {
-      let enchant = enchantRow.GetEnchant()
-
-      foundEnchants.forEach((previousEnchant) => {
-        if (EnchantIDsConflict(previousEnchant.info.id, enchant.info.id)) {
-          result.withConflict = true
-          result.conflictInfo.conflictingEnchantName = previousEnchant.info.name
-          result.conflictInfo.inputElemJQ = enchantRow.GetIDElemJQ()
-        }
-        if (previousEnchant.info.id == enchant.info.id) {
-          result.withDupe = true
-          result.dupeElemJQ = enchantRow.GetIDElemJQ()
-        }
-      })
-
-      foundEnchants.push(enchant)
-
-      item.SetEnchant(enchant)
-    })
-
-    return result
-  }
-
-
-  AddEnchant(enchant, giveFocus) {
-    let RemoveEnchantCallback = () => {
-      let hasEnchants = this.enchantRowTemplate.ElementsPresent()
-      SetIcon(this.iconElemJQ, this.itemID, hasEnchants)
-    }
-
-    let enchantRow = this.enchantRowTemplate.CreateNew(enchant, this.itemID, giveFocus, this.addEnchantElemJQ, RemoveEnchantCallback)
-    this.enchantRows.push(enchantRow)
-  }
-
-
-  RemoveEnchants() {
-    this.enchantRowTemplate.RemoveCreatedElements()
-    this.enchantRows.splice(0, Infinity)
-  }
-
-
-  SetEnchants(enchantsByID) {
-    this.RemoveEnchants()
-
-    for (let enchantNr = 0; enchantNr < g_numDifferentEnchants; ++enchantNr) {
-      let enchant = enchantsByID.get(g_enchantInfos[enchantNr].id)
-      if (enchant !== undefined)
-        this.AddEnchant(enchant, false)
-    }
+  EnchantStateChanged(hasEnchants) {
+    SetIcon(this.iconElemJQ, this.itemID, hasEnchants)
   }
 }

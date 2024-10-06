@@ -170,8 +170,6 @@ jazil.AddTestSet(mainPage, 'SourceItemRow', {
     })
 
     jazil.ShouldBe(itemDetails.withCountError, false, 'row says there were count errors!')
-    jazil.ShouldBe(itemDetails.withEnchantConflict, false, 'row says there were enchant conflicts!')
-    jazil.ShouldBe(itemDetails.withEnchantDupe, false, 'row says there were enchant dupes!')
     jazil.ShouldBe(itemDetails.countErrorElemJQ, undefined, 'row reports a DOM element in error!')
     jazil.ShouldBe(retrievedItem.set, g_source, 'set is off!')
     jazil.ShouldBe(retrievedItem.nr, 31, 'nr is off!')
@@ -213,67 +211,6 @@ jazil.AddTestSet(mainPage, 'SourceItemRow', {
     jazil.ShouldBe(retrievedItem.info.name, item.info.name, 'name is off!')
     jazil.ShouldBe(retrievedItem.priorWork, item.priorWork, 'priorWork is off!')
     jazil.ShouldBe(enchantNames, 'Projectile Protection', 'enchant names are off!')
-    jazil.ShouldBe(enchantLevels, '1', 'enchant levels are off!')
-    jazil.ShouldBe(SourceItemRowInTable('sourceItemRow', item), true, 'added row is not present!')
-  },
-
-  'Enchant conflicts get registered': (jazil) => {
-    let templateRow = GetSourceItemTemplateRow()
-    let item = BuildItem({ set:g_source, name:'Leggings', count:23, priorWork:5, cost:3, enchants:[{ name:'Fire Protection', level:1 }, { name:'Blast Protection', level:1 }] })
-    let itemRow = CreateSourceItemRow(templateRow, item, 63)
-
-    let itemDetails = itemRow.GetItem()
-    let retrievedItem = itemDetails.item
-    let enchantNames = ''
-    let enchantLevels = ''
-    retrievedItem.enchantsByID.forEach((enchant) => {
-      if (enchant !== undefined) {
-        enchantNames += enchant.info.name
-        enchantLevels += enchant.level
-      }
-    })
-
-    jazil.ShouldBe(itemDetails.withEnchantConflict, true, 'row says there were no enchant conflicts!')
-    jazil.ShouldNotBe(itemDetails.enchantConflictInfo?.inputElemJQ, undefined, 'row reports no DOM element in error!')
-    jazil.ShouldBe(retrievedItem.set, g_source, 'set is off!')
-    jazil.ShouldBe(retrievedItem.nr, 63, 'nr is off!')
-    jazil.ShouldBe(retrievedItem.cost, 0, 'cost is set!')
-    jazil.ShouldBe(retrievedItem.count, item.count, 'count is off!')
-    jazil.ShouldBe(retrievedItem.info.name, item.info.name, 'name is off!')
-    jazil.ShouldBe(retrievedItem.priorWork, item.priorWork, 'priorWork is off!')
-    jazil.ShouldBe(enchantNames, 'Blast ProtectionFire Protection', 'enchant names are off!')
-    jazil.ShouldBe(enchantLevels, '11', 'enchant levels are off!')
-    jazil.ShouldBe(SourceItemRowInTable('sourceItemRow', item), true, 'added row is not present!')
-  },
-
-  'Enchant dupes get registered': (jazil) => {
-    let templateRow = GetSourceItemTemplateRow()
-    let item = BuildItem({ set:g_source, name:'Pumpkin', count:23, priorWork:5, cost:3, enchants:[] })
-    let itemRow = CreateSourceItemRow(templateRow, item, 46)
-    let enchant = new Enchant(g_enchantIDsByName.get('Curse of Vanishing'), 1)
-    itemRow.AddEnchant(enchant, false)
-    itemRow.AddEnchant(enchant, false)
-
-    let itemDetails = itemRow.GetItem()
-    let retrievedItem = itemDetails.item
-    let enchantNames = ''
-    let enchantLevels = ''
-    retrievedItem.enchantsByID.forEach((enchant) => {
-      if (enchant !== undefined) {
-        enchantNames += enchant.info.name
-        enchantLevels += enchant.level
-      }
-    })
-
-    jazil.ShouldBe(itemDetails.withEnchantDupe, true, 'row says there were no enchant dupes!')
-    jazil.ShouldNotBe(itemDetails.enchantDupeElemJQ, undefined, 'row reports no DOM element in error!')
-    jazil.ShouldBe(retrievedItem.set, g_source, 'set is off!')
-    jazil.ShouldBe(retrievedItem.nr, 46, 'nr is off!')
-    jazil.ShouldBe(retrievedItem.cost, 0, 'cost is set!')
-    jazil.ShouldBe(retrievedItem.count, item.count, 'count is off!')
-    jazil.ShouldBe(retrievedItem.info.name, item.info.name, 'name is off!')
-    jazil.ShouldBe(retrievedItem.priorWork, item.priorWork, 'priorWork is off!')
-    jazil.ShouldBe(enchantNames, 'Curse of Vanishing', 'enchant names are off!')
     jazil.ShouldBe(enchantLevels, '1', 'enchant levels are off!')
     jazil.ShouldBe(SourceItemRowInTable('sourceItemRow', item), true, 'added row is not present!')
   },
@@ -338,45 +275,6 @@ jazil.AddTestSet(mainPage, 'SourceItemRow', {
     jazil.ShouldBe(details.count, 5, 'count is off!')
     jazil.ShouldBe(details.type, item.info.name, 'type is off!')
     jazil.ShouldBe(details.priorWork, 3, 'priorWork is off!')
-    jazil.ShouldBe(details.enchantNames, '', 'enchant names are off!')
-    jazil.ShouldBe(details.enchantLevels, '', 'enchant levels are off!')
-    jazil.ShouldBe(SourceItemRowInTable('sourceItemRow', item), true, 'changed row is not present anymore!')
-  },
-
-  'Item can get extra enchants': (jazil) => {
-    let templateRow = GetSourceItemTemplateRow()
-    let item = BuildItem({ set:g_source, name:'Flint & Steel', count:1, priorWork:0, cost:8 })
-    let itemRow = CreateSourceItemRow(templateRow, item, 28)
-    // Note: enchantments are ordered in addition order
-    itemRow.AddEnchant(BuildEnchant('Unbreaking', 2), false)
-    itemRow.AddEnchant(BuildEnchant('Mending', 1), false)
-
-    let details = GetSourceItemRowDetails(itemRow.elemJQ)
-
-    jazil.ShouldBe(details.nr, 28, 'nr is off!')
-    jazil.ShouldBe(details.count, 1, 'count is off!')
-    jazil.ShouldBe(details.type, item.info.name, 'type is off!')
-    jazil.ShouldBe(details.priorWork, 0, 'priorWork is off!')
-    jazil.ShouldBe(details.enchantNames, 'Unbreaking/Mending', 'enchant names are off!')
-    jazil.ShouldBe(details.enchantLevels, '2/1', 'enchant levels are off!')
-    jazil.ShouldBe(SourceItemRowInTable('sourceItemRow', item), true, 'changed row is not present anymore!')
-  },
-
-  'Item enchants can be removed': (jazil) => {
-    let templateRow = GetSourceItemTemplateRow()
-    let item = BuildItem({ set:g_source, name:'Fishing Rod', count:3, priorWork:2, cost:1 })
-    let itemRow = CreateSourceItemRow(templateRow, item, 26)
-    // Note: enchantments are ordered in addition order
-    itemRow.AddEnchant(BuildEnchant('Unbreaking', 2), false)
-    itemRow.AddEnchant(BuildEnchant('Lure', 3), false)
-    itemRow.RemoveEnchants()
-
-    let details = GetSourceItemRowDetails(itemRow.elemJQ)
-
-    jazil.ShouldBe(details.nr, 26, 'nr is off!')
-    jazil.ShouldBe(details.count, 3, 'count is off!')
-    jazil.ShouldBe(details.type, item.info.name, 'type is off!')
-    jazil.ShouldBe(details.priorWork, 2, 'priorWork is off!')
     jazil.ShouldBe(details.enchantNames, '', 'enchant names are off!')
     jazil.ShouldBe(details.enchantLevels, '', 'enchant levels are off!')
     jazil.ShouldBe(SourceItemRowInTable('sourceItemRow', item), true, 'changed row is not present anymore!')

@@ -53,6 +53,8 @@ let mainAccessObjectNames = [
   'EnchantCombiner',
   'EnchantRow',
   'EnchantRowTemplate',
+  'EnchantSection',
+  'GetConflictingEnchantIDs',
   'Item',
   'ItemCollector',
   'ItemCombineList',

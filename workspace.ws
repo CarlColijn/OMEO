@@ -29,6 +29,7 @@
             <File name="source\scripts\enchantConflicts.js" />
             <File name="source\scripts\enchantInfo.js" />
             <File name="source\scripts\enchantRow.js" />
+            <File name="source\scripts\enchantSection.js" />
             <File name="source\scripts\guiHelpers.js" />
             <File name="source\scripts\item.js" />
             <File name="source\scripts\itemCollector.js" />
@@ -90,6 +91,7 @@
             <File name="testing\enchantConflicts.js" />
             <File name="testing\enchantInfo.js" />
             <File name="testing\enchantRow.js" />
+            <File name="testing\enchantSection.js" />
             <File name="testing\helpers.js" />
             <File name="testing\item.js" />
             <File name="testing\itemCollector.js" />
