@@ -102,7 +102,7 @@ class SourceItemRow extends RealElement {
     let nextRowNr = this.nr
     this.allRows.splice(nextRowNr - 1, 1)
 
-    for (; nextRowNr < this.allRows.length; ++nextRowNr)
+    for (; nextRowNr <= this.allRows.length; ++nextRowNr)
       this.allRows[nextRowNr - 1].SetNumber(nextRowNr)
   }
 
