@@ -32,7 +32,6 @@
             <File name="source\scripts\enchantSection.js" />
             <File name="source\scripts\guiHelpers.js" />
             <File name="source\scripts\item.js" />
-            <File name="source\scripts\itemCollector.js" />
             <File name="source\scripts\itemCombineList.js" />
             <File name="source\scripts\itemCombiner.js" />
             <File name="source\scripts\itemCombineTester.js" />
@@ -50,6 +49,7 @@
             <File name="source\scripts\recipeTable.js" />
             <File name="source\scripts\settings.js" />
             <File name="source\scripts\simpleDialog.js" />
+            <File name="source\scripts\sourceItemCollector.js" />
             <File name="source\scripts\sourceItemRow.js" />
             <File name="source\scripts\sourceItemTable.js" />
             <File name="source\scripts\templateElement.js" />
@@ -94,7 +94,6 @@
             <File name="testing\enchantSection.js" />
             <File name="testing\helpers.js" />
             <File name="testing\item.js" />
-            <File name="testing\itemCollector.js" />
             <File name="testing\itemCombineList.js" />
             <File name="testing\itemCombiner.js" />
             <File name="testing\itemCombineTester.js" />
@@ -106,6 +105,7 @@
             <File name="testing\ratedItem.js" />
             <File name="testing\recipeFormData.js" />
             <File name="testing\recipeTable.js" />
+            <File name="testing\sourceItemCollector.js" />
             <File name="testing\sourceItemRow.js" />
             <File name="testing\sourceItemTable.js" />
             <File name="testing\templateElement.js" />

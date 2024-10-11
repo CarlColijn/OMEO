@@ -37,19 +37,11 @@ class DesiredItemSection {
   }
 
 
-  // returns object:
-  // - item: Item
-  // - withCountError: false
-  // - countErrorElemJQ: undefined
+  // returns Item
   GetItem() {
     let item = this.SyncCurrentItemWithoutEnchants()
     this.enchantSection.AddEnchantsToItem(item)
-
-    return {
-      item: item,
-      withCountError: false,
-      countErrorElemJQ: undefined
-    }
+    return item
   }
 
 
@@ -58,13 +50,6 @@ class DesiredItemSection {
     this.idElemJQ.val(item.id)
 
     this.enchantSection.ChangeItem(item)
-  }
-
-
-  // returns ItemCollectionResult
-  ExtractItems(itemCollector) {
-    itemCollector.ProcessRow(this)
-    return itemCollector.Finalize()
   }
 
 

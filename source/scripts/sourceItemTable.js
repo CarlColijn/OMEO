@@ -4,7 +4,7 @@
   Prerequisites:
   - dataSets.js
   - sourceItemRow.js
-  - itemCollector.js
+  - sourceItemCollector.js
 
   Defined classes:
   - SourceItemTable
@@ -64,7 +64,7 @@ class SourceItemTable {
   }
 
 
-  // returns ItemCollectionResult
+  // returns SourceItemCollectionResult
   ExtractItems(itemCollector) {
     this.rows.forEach((row) => {
       itemCollector.ProcessRow(row)

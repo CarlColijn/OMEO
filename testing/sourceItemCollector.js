@@ -7,9 +7,9 @@ function CreateSourceItemRows(templateRow, items, jumpNrs) {
 }
 
 
-// returns ItemCollectorResult
+// returns SourceItemCollectorResult
 function ProcessItemRows(itemRows, mergeRows) {
-  let collector = new ItemCollector(mergeRows)
+  let collector = new SourceItemCollector(mergeRows)
   itemRows.forEach((itemRow) => {
     collector.ProcessRow(itemRow)
   })
@@ -17,7 +17,7 @@ function ProcessItemRows(itemRows, mergeRows) {
 }
 
 
-jazil.AddTestSet(mainPage, 'ItemCollector', {
+jazil.AddTestSet(mainPage, 'SourceItemCollector', {
   'Processing rows without issues goes OK': (jazil) => {
     let templateRow = GetSourceItemTemplateRow()
 

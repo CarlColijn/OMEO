@@ -253,13 +253,13 @@ class MainForm {
         countErrorElemJQs: []
       }
     else
-      sourceItemsResult = this.sourceItemTable.ExtractItems(new ItemCollector(mergeSourceItems))
-    let desiredItemResult = this.desiredItemSection.ExtractItems(new ItemCollector(false))
+      sourceItemsResult = this.sourceItemTable.ExtractItems(new SourceItemCollector(mergeSourceItems))
+    let desiredItem = this.desiredItemSection.GetItem()
     let renameToo = this.renameTooElemJQ.prop('checked')
 
     let data = new MainFormData()
     data.AddSourceItems(sourceItemsResult.items)
-    data.SetDesiredItem(desiredItemResult.items[0])
+    data.SetDesiredItem(desiredItem)
     data.SetRenameToo(renameToo)
 
     let withCountErrors = sourceItemsResult.withCountErrors

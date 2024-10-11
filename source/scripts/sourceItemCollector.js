@@ -1,12 +1,12 @@
 /*
-  Collects Item-s from ItemRow-s, merging mergeable items/rows in the process if needed.
+  Collects Item-s from SourceItemRow-s, merging mergeable items/rows in the process if needed.
 
   Prerequisites:
   - item.js
-  - itemRow.js
+  - sourceItemRow.js
 
   Defined classes:
-  - ItemCollectionResult
+  - SourceItemCollectionResult
     - withCountErrors: bool
     - countErrorElemJQs: [] of JQuery wrapped DOM input elements
     - items: Item[]
@@ -18,14 +18,14 @@
       if mergedItems, maps the ItemRow-s returned in rowsToUpdateCount,
       rowsToUpdateNr and rowsToRemove to their corresponding Item-s
       returned in items.
-  - ItemCollector
+  - SourceItemCollector
 */
 
 
 // ======== PUBLIC ========
 
 
-class ItemCollectionResult {
+class SourceItemCollectionResult {
   constructor() {
     // ==== PUBLIC ====
     this.withCountErrors = false
@@ -42,7 +42,7 @@ class ItemCollectionResult {
 
 
 
-class ItemCollector {
+class SourceItemCollector {
   constructor(mergeItems) {
     // ==== PRIVATE ====
     this.mergeItems = mergeItems
@@ -50,7 +50,7 @@ class ItemCollector {
     this.rowItemsMappedForUpdateCount = new Set()
     this.nextRowNr = 1
 
-    this.result = new ItemCollectionResult()
+    this.result = new SourceItemCollectionResult()
   }
 
 
@@ -112,7 +112,7 @@ class ItemCollector {
   }
 
 
-  // return ItemCollectionResult
+  // return SourceItemCollectionResult
   Finalize() {
     return this.result
   }

@@ -102,7 +102,7 @@ jazil.AddTestSet(mainPage, 'SourceItemTable', {
     ]
 
     table.SetItems(testItems)
-    let collectedItemDetails = table.ExtractItems(new ItemCollector(false))
+    let collectedItemDetails = table.ExtractItems(new SourceItemCollector(false))
 
     jazil.ShouldBe(collectedItemDetails.withCountErrors, false, 'table says there were count errors!')
     jazil.ShouldBe(collectedItemDetails.countErrorElemJQs.length, 0, 'count error elements are reported!')
@@ -124,7 +124,7 @@ jazil.AddTestSet(mainPage, 'SourceItemTable', {
     ]
 
     table.SetItems(testItems)
-    let collectedItemDetails = table.ExtractItems(new ItemCollector(true))
+    let collectedItemDetails = table.ExtractItems(new SourceItemCollector(true))
 
     jazil.ShouldBe(collectedItemDetails.withCountErrors, false, 'table says there were count errors!')
     jazil.ShouldBe(collectedItemDetails.countErrorElemJQs.length, 0, 'count error elements are reported!')
@@ -155,7 +155,7 @@ jazil.AddTestSet(mainPage, 'SourceItemTable', {
     ]
 
     table.SetItems(testItems)
-    let collectedItemDetails = table.ExtractItems(new ItemCollector(false))
+    let collectedItemDetails = table.ExtractItems(new SourceItemCollector(false))
 
     jazil.ShouldBe(collectedItemDetails.withCountErrors, false, 'table says there were count errors!')
     jazil.ShouldBe(collectedItemDetails.countErrorElemJQs.length, 0, 'count error elements are reported!')
@@ -179,7 +179,7 @@ jazil.AddTestSet(mainPage, 'SourceItemTable', {
     // Just empty is the most cross-browser way to do so.
     // (note: the template row comes only after the real rows, so index is ok)
     $(table.tableElemJQ.find('[name=count]')[1]).val('')
-    let collectedItemDetails = table.ExtractItems(new ItemCollector(false))
+    let collectedItemDetails = table.ExtractItems(new SourceItemCollector(false))
 
     jazil.ShouldBe(collectedItemDetails.withCountErrors, true, 'table says there were no count errors!')
     jazil.ShouldBe(collectedItemDetails.countErrorElemJQs.length, 1, 'incorrect count error elements are reported!')

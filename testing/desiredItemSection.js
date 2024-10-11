@@ -98,8 +98,7 @@ jazil.AddTestSet(mainPage, 'DesiredItemSection', {
     let item = BuildItem({ set:g_desired, name:'Shears', count:2, priorWork:5, cost:3, enchants:[{ name:'Unbreaking', level:1 }, { name:'Efficiency', level:2 }] })
     itemSection.SetItem(item)
 
-    let itemDetails = itemSection.GetItem()
-    let retrievedItem = itemDetails.item
+    let retrievedItem = itemSection.GetItem()
     let enchantNames = ''
     let enchantLevels = ''
     retrievedItem.enchantsByID.forEach((enchant) => {
@@ -113,8 +112,6 @@ jazil.AddTestSet(mainPage, 'DesiredItemSection', {
       }
     })
 
-    jazil.ShouldBe(itemDetails.withCountError, false, 'row says there were count errors!')
-    jazil.ShouldBe(itemDetails.countErrorElemJQ, undefined, 'row reports a DOM element in error!')
     jazil.ShouldBe(retrievedItem.info.name, item.info.name, 'name is off!')
     jazil.ShouldBe(enchantNames, 'Efficiency/Unbreaking', 'enchant names are off!')
     jazil.ShouldBe(enchantLevels, '2/1', 'enchant levels are off!')
