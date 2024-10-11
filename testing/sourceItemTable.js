@@ -105,7 +105,6 @@ jazil.AddTestSet(mainPage, 'SourceItemTable', {
     let collectedItemDetails = table.ExtractItems(new SourceItemCollector(false))
 
     jazil.ShouldBe(collectedItemDetails.withCountErrors, false, 'table says there were count errors!')
-    jazil.ShouldBe(collectedItemDetails.countErrorElemJQs.length, 0, 'count error elements are reported!')
     jazil.ShouldBe(collectedItemDetails.mergedItems, false, 'Items marked as merged!')
     TestItemListsMatch(jazil, testItems, 'test', collectedItemDetails.items, 'retrieved')
   },
@@ -127,7 +126,6 @@ jazil.AddTestSet(mainPage, 'SourceItemTable', {
     let collectedItemDetails = table.ExtractItems(new SourceItemCollector(true))
 
     jazil.ShouldBe(collectedItemDetails.withCountErrors, false, 'table says there were count errors!')
-    jazil.ShouldBe(collectedItemDetails.countErrorElemJQs.length, 0, 'count error elements are reported!')
     jazil.ShouldBe(collectedItemDetails.mergedItems, true, 'Items not marked as merged!')
 
     // merge the mergeable items ourselves first to compare them properly
@@ -158,7 +156,6 @@ jazil.AddTestSet(mainPage, 'SourceItemTable', {
     let collectedItemDetails = table.ExtractItems(new SourceItemCollector(false))
 
     jazil.ShouldBe(collectedItemDetails.withCountErrors, false, 'table says there were count errors!')
-    jazil.ShouldBe(collectedItemDetails.countErrorElemJQs.length, 0, 'count error elements are reported!')
     jazil.ShouldBe(collectedItemDetails.mergedItems, false, 'Items marked as merged!')
 
     TestItemListsMatch(jazil, testItems, 'test', collectedItemDetails.items, 'retrieved')
@@ -168,7 +165,7 @@ jazil.AddTestSet(mainPage, 'SourceItemTable', {
     let table = GetSourceItemTable()
 
     let testItems = [
-      BuildItem({ set:g_source, name:'Boots', count:1, priorWork:1 }),
+      BuildItem({ set:g_source, name:'Boots', count:4, priorWork:1 }),
       BuildItem({ set:g_source, name:'Boots', count:2, priorWork:1, enchants:[{ name:'Protection', level:3 }, { name:'Feather Falling', level:1 }] }),
       BuildItem({ set:g_source, name:'Boots', count:5, priorWork:1 }),
     ]
@@ -182,11 +179,10 @@ jazil.AddTestSet(mainPage, 'SourceItemTable', {
     let collectedItemDetails = table.ExtractItems(new SourceItemCollector(false))
 
     jazil.ShouldBe(collectedItemDetails.withCountErrors, true, 'table says there were no count errors!')
-    jazil.ShouldBe(collectedItemDetails.countErrorElemJQs.length, 1, 'incorrect count error elements are reported!')
     jazil.ShouldBe(collectedItemDetails.mergedItems, false, 'Items marked as merged!')
 
-    // Update the test item to reflect the NaN state.
-    testItems[1].count = NaN
+    // Update the test item to reflect the error state.
+    testItems[1].count = 1
 
     TestItemListsMatch(jazil, testItems, 'test', collectedItemDetails.items, 'retrieved')
   },

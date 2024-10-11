@@ -31,7 +31,6 @@ jazil.AddTestSet(mainPage, 'SourceItemCollector', {
     let result = ProcessItemRows(itemRows, false)
 
     jazil.ShouldBe(result.withCountErrors, false, 'collector says there were count errors!')
-    jazil.ShouldBe(result.countErrorElemJQs.length, 0, 'count error elements are reported!')
     jazil.ShouldBe(result.mergedItems, false, 'Items marked as merged!')
     jazil.ShouldBe(result.rowsToUpdateNr.length, 0, 'Wrong number of rows marked to update nr!')
     jazil.ShouldBe(result.rowsToUpdateCount.length, 0, 'Wrong number of rows marked to update count!')
@@ -52,7 +51,6 @@ jazil.AddTestSet(mainPage, 'SourceItemCollector', {
     let result = ProcessItemRows(itemRows, false)
 
     jazil.ShouldBe(result.withCountErrors, false, 'collector says there were count errors!')
-    jazil.ShouldBe(result.countErrorElemJQs.length, 0, 'count error elements are reported!')
     jazil.ShouldBe(result.mergedItems, false, 'Items marked as merged!')
     jazil.ShouldBe(result.rowsToUpdateNr.length, 2, 'Wrong number of rows marked to update nr!')
     jazil.ShouldBe(result.rowsToUpdateCount.length, 0, 'Wrong number of rows marked to update count!')
@@ -97,7 +95,6 @@ jazil.AddTestSet(mainPage, 'SourceItemCollector', {
     let result = ProcessItemRows(itemRows, true)
 
     jazil.ShouldBe(result.withCountErrors, false, 'collector says there were count errors!')
-    jazil.ShouldBe(result.countErrorElemJQs.length, 0, 'count error elements are reported!')
     jazil.ShouldBe(result.mergedItems, true, 'Items not marked as merged!')
     jazil.ShouldBe(result.rowsToUpdateNr.length, 1, 'Wrong number of rows marked to update nr!')
     jazil.ShouldBe(result.rowsToUpdateCount.length, 2, 'Wrong number of rows marked to update count!')
@@ -141,7 +138,6 @@ jazil.AddTestSet(mainPage, 'SourceItemCollector', {
     let result = ProcessItemRows(itemRows, false)
 
     jazil.ShouldBe(result.withCountErrors, false, 'collector says there were count errors!')
-    jazil.ShouldBe(result.countErrorElemJQs.length, 0, 'count error elements are reported!')
     jazil.ShouldBe(result.mergedItems, false, 'Items marked as merged!')
     jazil.ShouldBe(result.rowsToUpdateNr.length, 0, 'Wrong number of rows marked to update nr!')
     jazil.ShouldBe(result.rowsToUpdateCount.length, 0, 'Wrong number of rows marked to update!')
@@ -158,7 +154,7 @@ jazil.AddTestSet(mainPage, 'SourceItemCollector', {
     let templateRow = GetSourceItemTemplateRow()
 
     let testItems = [
-      BuildItem({ set:g_source, name:'Boots', tag:1, count:1, priorWork:1 }),
+      BuildItem({ set:g_source, name:'Boots', tag:1, count:4, priorWork:1 }),
       BuildItem({ set:g_source, name:'Boots', tag:2, count:2, priorWork:1, enchants:[{ name:'Protection', level:3 }, { name:'Feather Falling', level:1 }] }),
       BuildItem({ set:g_source, name:'Boots', tag:3, count:5, priorWork:1 }),
     ]
@@ -171,12 +167,11 @@ jazil.AddTestSet(mainPage, 'SourceItemCollector', {
     $(itemRows[1].elemJQ.find('[name=count]')).val('')
 
     // Update the test item to reflect the expected value for count.
-    testItems[1].count = NaN
+    testItems[1].count = 1
 
     let result = ProcessItemRows(itemRows, false)
 
     jazil.ShouldBe(result.withCountErrors, true, 'collector says there were no count errors!')
-    jazil.ShouldBe(result.countErrorElemJQs.length, 1, 'incorrect count error elements are reported!')
     jazil.ShouldBe(result.mergedItems, false, 'Items marked as merged!')
     jazil.ShouldBe(result.rowsToUpdateNr.length, 0, 'Wrong number of rows marked to update nr!')
     jazil.ShouldBe(result.rowsToUpdateCount.length, 0, 'Wrong number of rows marked to update!')

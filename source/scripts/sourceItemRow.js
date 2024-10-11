@@ -71,6 +71,7 @@ class SourceItemRow extends RealElement {
     // ==== PRIVATE ====
     this.nrElemJQ = rowElemJQ.find('.nr')
     this.countElemJQ = rowElemJQ.find('input[name="count"]')
+    this.countErrorElemJQ = rowElemJQ.find('.error')
     this.iconElemJQ = rowElemJQ.find('.icon')
     this.idElemJQ = rowElemJQ.find('select[name="itemID"]')
     this.priorWorkElem = new ButtonStrip(rowElemJQ.find('.priorWorkInput'))
@@ -121,27 +122,27 @@ class SourceItemRow extends RealElement {
 
   SetCount(newCount) {
     this.countElemJQ.val(newCount)
+    this.countErrorElemJQ.hide()
   }
 
 
   // returns object:
   // - item: Item
   // - withCountError: bool
-  // - countErrorElemJQ: JQuery-wrapped input element, if applicable
   GetItem() {
-    let countResult = this.GetValidatedCount()
+    let count = parseInt(this.countElemJQ.val())
+    let withCountError = isNaN(count)
     let itemID = parseInt(this.idElemJQ.val())
     let priorWork = this.priorWorkElem.GetSelectionNr()
 
-    let item = new Item(countResult.count, g_source, itemID, priorWork)
+    let item = new Item(withCountError ? 1 : count, g_source, itemID, priorWork)
     this.enchantSection.AddEnchantsToItem(item)
 
     item.nr = parseInt(this.elemJQ.attr('data-nr'))
 
     return {
       item: item,
-      withCountError: countResult.inError,
-      countErrorElemJQ: countResult.errorElemJQ
+      withCountError: withCountError
     }
   }
 
@@ -149,7 +150,7 @@ class SourceItemRow extends RealElement {
   SetItem(item) {
     this.itemID = item.id
 
-    this.countElemJQ.val(item.count)
+    this.SetCount(item.count)
     this.idElemJQ.val(item.id)
     this.SetupPriorWorkOptions()
     this.priorWorkElem.SetSelectionNr(item.priorWork)
@@ -198,6 +199,14 @@ class SourceItemRow extends RealElement {
       this.Remove()
     })
 
+    this.countElemJQ.on('focusout', () => {
+      let count = parseInt(this.countElemJQ.val())
+      if (isNaN(count))
+        this.countErrorElemJQ.show()
+      else
+        this.countErrorElemJQ.hide()
+    })
+
     this.idElemJQ.change(() => {
       let item = this.SyncCurrentItemWithoutEnchants()
       this.enchantSection.ChangeItem(item)
@@ -207,24 +216,5 @@ class SourceItemRow extends RealElement {
 
   EnchantStateChanged(hasEnchants) {
     SetIcon(this.iconElemJQ, this.itemID, hasEnchants)
-  }
-
-
-  // returns object:
-  // - count: int / NaN
-  // - inError: bool
-  // - errorElemJQ: JQuery-wrapped input element, if applicable
-  GetValidatedCount() {
-    let count = parseInt(this.countElemJQ.val())
-    let inError = isNaN(count)
-
-    return {
-      count: count,
-      inError: inError,
-      errorElemJQ:
-        inError ?
-        this.countElemJQ :
-        undefined
-    }
   }
 }

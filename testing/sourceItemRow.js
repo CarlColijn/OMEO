@@ -170,7 +170,6 @@ jazil.AddTestSet(mainPage, 'SourceItemRow', {
     })
 
     jazil.ShouldBe(itemDetails.withCountError, false, 'row says there were count errors!')
-    jazil.ShouldBe(itemDetails.countErrorElemJQ, undefined, 'row reports a DOM element in error!')
     jazil.ShouldBe(retrievedItem.set, g_source, 'set is off!')
     jazil.ShouldBe(retrievedItem.nr, 31, 'nr is off!')
     jazil.ShouldBe(retrievedItem.cost, 0, 'cost is set!')
@@ -203,11 +202,10 @@ jazil.AddTestSet(mainPage, 'SourceItemRow', {
     })
 
     jazil.ShouldBe(itemDetails.withCountError, true, 'row says there were no count errors!')
-    jazil.ShouldNotBe(itemDetails.countErrorElemJQ, undefined, 'row reports no DOM element in error!')
     jazil.ShouldBe(retrievedItem.set, g_source, 'set is off!')
     jazil.ShouldBe(retrievedItem.nr, 25, 'nr is off!')
     jazil.ShouldBe(retrievedItem.cost, 0, 'cost is set!')
-    jazil.ShouldBe(retrievedItem.count, NaN, 'count is off!')
+    jazil.ShouldBe(retrievedItem.count, 1, 'count is off!')
     jazil.ShouldBe(retrievedItem.info.name, item.info.name, 'name is off!')
     jazil.ShouldBe(retrievedItem.priorWork, item.priorWork, 'priorWork is off!')
     jazil.ShouldBe(enchantNames, 'Projectile Protection', 'enchant names are off!')

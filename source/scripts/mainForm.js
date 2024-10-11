@@ -56,8 +56,7 @@ class MainForm {
 
 
   ShutDown(event) {
-    if (!this.Save(false))
-      this.formHandler.FailedToSaveOnUnload(event)
+    this.Save(false)
   }
 
 
@@ -72,7 +71,7 @@ class MainForm {
 
     let ourStream = new DataStream(true)
     let extraData =
-      this.SaveToStream(ourStream) ?
+      this.SaveToStream(ourStream, false) ?
       '&data=' + ourStream.GetData() :
       ''
 
@@ -171,7 +170,6 @@ class MainForm {
 
 
   PerformDivine() {
-    this.ClearErrors()
     this.ClearResult()
 
     let dataInContext = this.GetData(false, true)
@@ -225,11 +223,6 @@ class MainForm {
   }
 
 
-  ClearErrors() {
-    this.formHandler.ClearErrors()
-  }
-
-
   ClearResult() {
     this.combineItemTable.Clear()
   }
@@ -249,8 +242,7 @@ class MainForm {
     if (onlyDesiredItem)
       sourceItemsResult = {
         items: [],
-        withCountErrors: false,
-        countErrorElemJQs: []
+        withCountErrors: false
       }
     else
       sourceItemsResult = this.sourceItemTable.ExtractItems(new SourceItemCollector(mergeSourceItems))
@@ -262,16 +254,9 @@ class MainForm {
     data.SetDesiredItem(desiredItem)
     data.SetRenameToo(renameToo)
 
-    let withCountErrors = sourceItemsResult.withCountErrors
-    if (withCountErrors) {
-      sourceItemsResult.countErrorElemJQs.forEach((countErrorElemJQ) => {
-        this.formHandler.NoteCountError(countErrorElemJQ)
-      })
-    }
-
     return {
       data: data,
-      withCountErrors: withCountErrors,
+      withCountErrors: sourceItemsResult.withCountErrors,
       mergedSourceItems: sourceItemsResult.mergedItems
     }
   }
@@ -318,9 +303,9 @@ class MainForm {
 
 
   // returns bool
-  SaveToStream(stream) {
+  SaveToStream(stream, ignoreCountErrors) {
     let dataInContext = this.GetData(false, false)
-    if (dataInContext.withCountErrors)
+    if (dataInContext.withCountErrors && !ignoreCountErrors)
       return false
 
     dataInContext.data.Serialize(stream)
@@ -330,10 +315,8 @@ class MainForm {
 
   // returns bool (if saving was successful)
   Save(toURL) {
-    this.ClearErrors()
-
     let stream = new DataStream(true)
-    if (!this.SaveToStream(stream))
+    if (!this.SaveToStream(stream, !toURL))
       return false
 
     if (toURL)

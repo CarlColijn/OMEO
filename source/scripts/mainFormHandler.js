@@ -10,16 +10,6 @@
 
 
 class MainFormHandler {
-  ClearErrors() {
-    $('.error').remove()
-  }
-
-
-  NoteCountError(inputElemJQ) {
-    inputElemJQ.after('<div class="error">This is not a number</div>')
-  }
-
-
   AskLoadFromURLOrLocalStorage(OnLocalStorage, OnURL) {
     let dialogElemJQ = $('#urlVsLocalStorageConflict')
     dialogElemJQ.css('display', 'flex')
@@ -40,12 +30,6 @@ class MainFormHandler {
 
   FailedToLoad() {
     new SimpleDialog('#dataInErrorForLoad').HookupButton('.exit')
-  }
-
-
-  FailedToSaveOnUnload(unloadEvent) {
-    unloadEvent.preventDefault()
-    unloadEvent.returnValue = 'Your data has issues and could not be saved.\n\nAre you sure you want to leave now?  Any unsaved changes will be lost!'
   }
 
 
