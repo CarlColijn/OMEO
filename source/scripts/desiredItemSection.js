@@ -76,13 +76,6 @@ class DesiredItemSection {
   }
 
 
-  SetupPriorWorkOptions() {
-    let priorWorkSelectElemJQs = this.elemJQ.find('select[name="priorWork"]')
-    for (let priorWork = 0; priorWork <= 6; ++priorWork)
-      priorWorkSelectElemJQs.append(`<option value="${priorWork}">${priorWork}</option>`)
-  }
-
-
   HookUpGUI() {
     this.idElemJQ.change(() => {
       let item = this.SyncCurrentItemWithoutEnchants()
