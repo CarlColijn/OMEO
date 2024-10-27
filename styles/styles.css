@@ -294,7 +294,7 @@ dt {
 
 /* Templates */
 .template {
-  display: none;
+  display: none !important;
 }
 
 
@@ -353,6 +353,10 @@ input[type=number] {
 }
 .itemDisplay {
   font-weight: bold;
+}
+.conflictEnchants {
+  margin: 4px 6px;
+  display: inline-block;
 }
 .enchantDisplay {
   font-size: 0.9em;
@@ -453,13 +457,17 @@ a:visited {
   background-color: #00000050;
   position: fixed;
   left: 0px;
+  right: 0px;
   top: 0px;
+  bottom: 0px;
   width: 100%;
   height: 100%;
+  margin: auto;
   display: none; /* to be changed by flex on demand */
   align-items: center;
   justify-content: center;
   z-index: 1;
+  overflow: auto;
 }
 .dialogBody {
   margin: 10%;

@@ -30,15 +30,16 @@ class SimpleDialog {
   // returns this for method chaining
   HookupButton(buttonID, ClickHandler) {
     let buttonElemJQ = this.dialogElemJQ.find(buttonID)
+    if (buttonElemJQ.length > 0) {
+      buttonElemJQ.unbind('click')
+      buttonElemJQ.click(() => {
+        this.ExitDialog(ClickHandler)
+      })
 
-    buttonElemJQ.unbind('click')
-    buttonElemJQ.click(() => {
-      this.ExitDialog(ClickHandler)
-    })
-
-    if (!this.firstButtonAdded) {
-      buttonElemJQ[0].focus()
-      this.firstButtonAdded = true
+      if (!this.firstButtonAdded) {
+        buttonElemJQ[0].focus()
+        this.firstButtonAdded = true
+      }
     }
 
     return this
@@ -344,6 +345,8 @@ let g_numEnchantIDBits = g_numDifferentEnchants.toString(2).length
 
   Defined globals:
   - EnchantIDsConflict: whether 2 given enchants conflict
+  - GetConflictingEnchantIDs: gets the IDs that conflict with a given ID
+  - GetConflictingEnchantIDSetsListForIDs: gets the enchant conflict sets filtered for a given ID set
 */
 
 
@@ -366,43 +369,89 @@ function GetConflictingEnchantIDs(id) {
 }
 
 
+// returns Array(Array(Set(int)))
+function GetConflictingEnchantIDSetsListForIDs(relevantIDs) {
+  let filteredIDSetsList = []
+  g_conflictingEnchantIDSetsList.forEach((conflictingIDSets) => {
+    let filteredIDSets = []
+    conflictingIDSets.forEach((conflictingIDSet) => {
+      // Note: prime candidate for conflictingIDSet.union when it's
+      // matured enough...
+      let filteredIDSet = new Set()
+      relevantIDs.forEach((relevantID) => {
+        if (conflictingIDSet.has(relevantID))
+          filteredIDSet.add(relevantID)
+      })
+
+      if (filteredIDSet.size > 0)
+        filteredIDSets.push(filteredIDSet)
+    })
+
+    if (filteredIDSets.length > 1)
+      filteredIDSetsList.push(filteredIDSets)
+  })
+
+  return filteredIDSetsList
+}
+
+
 // ======== PRIVATE ========
 
 
 let g_conflictingEnchantIDsByID = new Map()
+let g_conflictingEnchantIDSetsList = new Array()
 
 
-function RegisterConflictingEnchants(enchantNames) {
-  let RegisterConflict = (id1, id2) => {
-    let ids = g_conflictingEnchantIDsByID.get(id1)
-    if (ids === undefined) {
-      ids = new Set()
-      g_conflictingEnchantIDsByID.set(id1, ids)
-    }
-    ids.add(id2)
+function RegisterConflictingEnchantIDs(id1, id2) {
+  let ids = g_conflictingEnchantIDsByID.get(id1)
+  if (ids === undefined) {
+    ids = new Set()
+    g_conflictingEnchantIDsByID.set(id1, ids)
   }
-
-  for (let enchant1Nr = 0; enchant1Nr < enchantNames.length - 1; ++enchant1Nr) {
-    let enchant1ID = g_enchantIDsByName.get(enchantNames[enchant1Nr])
-    for (let enchant2Nr = enchant1Nr + 1; enchant2Nr < enchantNames.length; ++enchant2Nr) {
-      let enchant2ID = g_enchantIDsByName.get(enchantNames[enchant2Nr])
-
-      RegisterConflict(enchant1ID, enchant2ID)
-      RegisterConflict(enchant2ID, enchant1ID)
-    }
-  }
+  ids.add(id2)
 }
 
 
-RegisterConflictingEnchants(['Protection', 'Blast Protection', 'Fire Protection', 'Projectile Protection'])
-RegisterConflictingEnchants(['Depth Strider', 'Frost Walker'])
-RegisterConflictingEnchants(['Sharpness', 'Smite', 'Bane of Arthropods', 'Density', 'Breach'])
-// Silk Touch & Fortune can be combined with commands
-RegisterConflictingEnchants(['Silk Touch', 'Fortune'])
-RegisterConflictingEnchants(['Infinity', 'Mending'])
-RegisterConflictingEnchants(['Riptide', 'Loyalty'])
-RegisterConflictingEnchants(['Riptide', 'Channeling'])
-RegisterConflictingEnchants(['Multishot', 'Piercing'])
+function RegisterConflictingEnchants(nameSetsList) {
+  // Phase 1: name to ID
+  g_conflictingEnchantIDSetsList = nameSetsList.map((nameSets) => {
+    return nameSets.map((nameSet) => {
+      return new Set(
+        nameSet.map((name) => {
+          return g_enchantIDsByName.get(name)
+        })
+      )
+    })
+  })
+
+  // Phase 2: register the mutual id conflicts embedded within
+  g_conflictingEnchantIDSetsList.forEach((idSets) => {
+    idSets.forEach((idSet1) => {
+      idSets.forEach((idSet2) => {
+        if (idSet1 !== idSet2) {
+          idSet1.forEach((id1) => {
+            idSet2.forEach((id2) => {
+              if (id1 != id2)
+                RegisterConflictingEnchantIDs(id1, id2)
+            })
+          })
+        }
+      })
+    })
+  })
+}
+
+
+RegisterConflictingEnchants([
+  [['Protection'], ['Blast Protection'], ['Fire Protection'], ['Projectile Protection']],
+  [['Depth Strider'], ['Frost Walker']],
+  [['Sharpness'], ['Smite'], ['Bane of Arthropods'], ['Density'], ['Breach']],
+  // Silk Touch & Fortune can be combined with commands
+  [['Silk Touch'], ['Fortune']],
+  [['Infinity'], ['Mending']],
+  [['Riptide'], ['Loyalty', 'Channeling']],
+  [['Multishot'], ['Piercing']]
+])
 
 
 
@@ -412,6 +461,7 @@ RegisterConflictingEnchants(['Multishot', 'Piercing'])
 
   Prerequisites:
   - enchantInfo.js
+  - enchantConflicts.js
 
   Defined classes:
   - ItemInfo
@@ -420,6 +470,9 @@ RegisterConflictingEnchants(['Multishot', 'Piercing'])
     - iconIndexNormal: int
     - iconIndexEnchanted: int
     - isBook: bool
+    - allowedEnchantIDs: Set(int)
+    - conflictingEnchantIDSetsList: Array(Array(Set(int)))
+    - nonConflictingEnchantIDs: Set(int)
     - CanHaveEnchant(enchantID: int) -> bool
 
   Defined globals:
@@ -447,23 +500,13 @@ class ItemInfo {
     this.iconIndexEnchanted = iconIndexEnchanted
     this.isBook = name == 'Book'
     this.name = name
+    this.allowedEnchantIDs = this.GetAllowedEnchantIDs(enchantNames)
+    this.conflictingEnchantIDSetsList = GetConflictingEnchantIDSetsListForIDs(this.allowedEnchantIDs)
+    this.nonConflictingEnchantIDs = this.GetNonConflictingEnchantIDs(this.allowedEnchantIDs, this.conflictingEnchantIDSetsList)
 
     // ==== PRIVATE ====
-    this.enchantsAllowedByID = new Set()
-
-    if (this.isBook) {
+    if (this.isBook)
       g_bookID = this.id
-      g_enchantInfos.forEach((enchantInfo) => {
-        this.enchantsAllowedByID.add(enchantInfo.id)
-      })
-    }
-    else {
-      enchantNames.forEach((enchantName) => {
-        let enchantID = g_enchantIDsByName.get(enchantName)
-        this.enchantsAllowedByID.add(enchantID)
-      })
-    }
-
     g_itemInfosByID.set(id, this)
     ++g_numDifferentItems
   }
@@ -471,7 +514,32 @@ class ItemInfo {
 
   // returns bool
   CanHaveEnchant(enchantID) {
-    return this.enchantsAllowedByID.has(enchantID)
+    return this.allowedEnchantIDs.has(enchantID)
+  }
+
+
+  // ==== PRIVATE ====
+
+
+  // returns Set(int)
+  GetAllowedEnchantIDs(enchantNames) {
+    return new Set(
+      this.isBook ?
+      g_enchantInfos.map((enchantInfo) => { return enchantInfo.id }) :
+      enchantNames.map((enchantName) => { return g_enchantIDsByName.get(enchantName) })
+    )
+  }
+
+
+  // returns Set(int)
+  GetNonConflictingEnchantIDs(allowedEnchantIDs, conflictingEnchantIDSetsList) {
+    return new Set([...allowedEnchantIDs].filter((id) => {
+      return conflictingEnchantIDSetsList.every((idSets) => {
+        return idSets.every((idSet) => {
+          return !idSet.has(id)
+        })
+      })
+    }))
   }
 }
 
@@ -1992,11 +2060,28 @@ class EnchantSection {
   }
 
 
+  HasEnchants() {
+    return this.enchantRows.length > 0
+  }
+
+
   RemoveEnchants() {
     this.enchantRowTemplate.RemoveCreatedElements()
     this.enchantRows.splice(0, Infinity)
 
     this.UpdateGUIState(false, true)
+  }
+
+
+  SetEnchants(enchants) {
+    this.enchantRowTemplate.RemoveCreatedElements()
+    this.enchantRows.splice(0, Infinity)
+
+    enchants.forEach((enchant) => {
+      this.AddEnchant(enchant, false)
+    })
+
+    this.UpdateGUIState(enchants.length > 0, false)
   }
 
 
@@ -2620,13 +2705,13 @@ class SourceItemTable {
 
 
 class DesiredItemSection {
-  constructor(sectionElemJQ) {
+  constructor(sectionElemJQ, AskMaySetMaxedDesiredEnchants) {
     // ==== PRIVATE ====
     this.elemJQ = sectionElemJQ.first()
     this.iconElemJQ = this.elemJQ.find('.icon')
     this.idElemJQ = this.elemJQ.find('select[name="itemID"]')
     this.SetupItemOptions()
-    this.HookUpGUI()
+    this.HookUpGUI(AskMaySetMaxedDesiredEnchants)
 
     let item = this.SyncCurrentItemWithoutEnchants()
 
@@ -2679,17 +2764,57 @@ class DesiredItemSection {
   }
 
 
-  SetupPriorWorkOptions() {
-    let priorWorkSelectElemJQs = this.elemJQ.find('select[name="priorWork"]')
-    for (let priorWork = 0; priorWork <= 6; ++priorWork)
-      priorWorkSelectElemJQs.append(`<option value="${priorWork}">${priorWork}</option>`)
+  SetMaxEnchants(nonConflictingIDs, chosenConflictingIDs) {
+    let ids = [...nonConflictingIDs, ...chosenConflictingIDs]
+    let idInfos = ids.map((id) => {
+      return {
+        id: id,
+        info: g_enchantInfosByID.get(id)
+      }
+    })
+    idInfos.sort((idInfo1, idInfo2) => {
+      return (
+        idInfo1.info.name < idInfo2.info.name ?
+        -1 :
+        idInfo1.info.name > idInfo2.info.name ?
+        +1 :
+        0
+      )
+    })
+    let maxLevelEnchants = idInfos.map((idInfo) => {
+      return new Enchant(idInfo.id, idInfo.info.maxLevel)
+    })
+    this.enchantSection.SetEnchants(maxLevelEnchants)
   }
 
 
-  HookUpGUI() {
+  AddMaxEnchants(AskMaySetMaxedDesiredEnchants) {
+    let item = this.SyncCurrentItemWithoutEnchants()
+
+    let maxEnchantsCallbackInfo = {
+      enchantsAlreadyPresent: this.enchantSection.HasEnchants(),
+      hasConflictingEnchants: item.info.conflictingEnchantIDSetsList.length > 0,
+      info: item.info,
+      OnContinue: (maxEnchantsCallbackInfo, chosenConflictingIDs) => {
+        this.SetMaxEnchants(maxEnchantsCallbackInfo.info.nonConflictingEnchantIDs, chosenConflictingIDs)
+      }
+    }
+
+    if (!maxEnchantsCallbackInfo.enchantsAlreadyPresent && !maxEnchantsCallbackInfo.hasConflictingEnchants)
+      maxEnchantsCallbackInfo.OnContinue(maxEnchantsCallbackInfo, [])
+    else
+      AskMaySetMaxedDesiredEnchants(maxEnchantsCallbackInfo)
+  }
+
+
+  HookUpGUI(AskMaySetMaxedDesiredEnchants) {
     this.idElemJQ.change(() => {
       let item = this.SyncCurrentItemWithoutEnchants()
       this.enchantSection.ChangeItem(item)
+    })
+
+    this.elemJQ.find('button[name="addMaxEnchants"]').click(() => {
+      this.AddMaxEnchants(AskMaySetMaxedDesiredEnchants)
     })
   }
 
@@ -4016,10 +4141,101 @@ class ItemCostTreeFinalizer {
 
 
 /*
+  Enchant conflict picker.
+
+  Prerequisites:
+  - itemInfo.js
+  - templateElement.js
+
+  Defined classes:
+  - EnchantConflictPicker
+*/
+
+
+// ======== PUBLIC ========
+
+
+class EnchantConflictPicker {
+  constructor(dialogElemJQ, itemInfo) {
+    let ids = [...itemInfo.nonConflictingEnchantIDs]
+    let names = ids.reduce((names, id) => {
+      return names + (names.length == 0 ? '' : ' &#x2022; ') + g_enchantInfosByID.get(id).name
+    }, '')
+    dialogElemJQ.find('.nonConflictEnchants').html(names)
+
+    let conflictTemplateElem = new TemplateElement(dialogElemJQ, 'conflictEnchants')
+
+    conflictTemplateElem.RemoveCreatedElements()
+    this.selectElemJQs = []
+
+    itemInfo.conflictingEnchantIDSetsList.forEach((idSets) => {
+      let conflictElemJQ = conflictTemplateElem.CreateExtraElement()
+      let selectElemJQ = conflictElemJQ.find('select')
+      this.selectElemJQs.push(selectElemJQ)
+
+      let optionOptions = idSets.map((idSet) => {
+        let ids = [...idSet]
+        let idWithNames = ids.map((id) => {
+          return {
+            id: id,
+            name: g_enchantInfosByID.get(id).name
+          }
+        }).sort((idWithName1, idWithName2) => {
+          return (
+            idWithName1.name < idWithName2.name ?
+            -1 :
+            idWithName1.name > idWithName2.name ?
+            +1 :
+            0
+          )
+        })
+        return {
+          idsText: idWithNames.reduce((idsText, idWithName, idNr) => {
+            return idsText + (idNr == 0 ? '' : ',') + idWithName.id
+          }, ''),
+          names: idWithNames.reduce((names, idWithName, idNr) => {
+            return names + (idNr == 0 ? '' : ', ') + idWithName.name
+          }, '')
+        }
+      })
+
+      optionOptions.sort((optionOption1, optionOption2) => {
+        return (
+          optionOption1.names < optionOption2.names ?
+          -1 :
+          optionOption1.names > optionOption2.names ?
+          +1 :
+          0
+        )
+      })
+
+      optionOptions.forEach((optionOption) => {
+        $(`<option value="${optionOption.idsText}">${optionOption.names}</option>`).appendTo(selectElemJQ)
+      })
+    })
+  }
+
+
+  GetChosenIDs() {
+    let chosenIDsText = this.selectElemJQs.reduce((idsText, selectElemJQ, selectElemNr) => {
+        return idsText + (selectElemNr == 0 ? '' : ',') + selectElemJQ.val()
+    }, '')
+
+    return chosenIDsText.split(',').map((idText) => {
+      return parseInt(idText)
+    })
+  }
+}
+
+
+
+
+/*
   Main page javascript module.
 
   Prerequisites:
   - simpleDialog.js
+  - enchantConflictPicker.js
 
   Defined classes:
   - MainFormHandler
@@ -4067,6 +4283,31 @@ class MainFormHandler {
 
   TellItemsMerged(OnExit) {
     new SimpleDialog('#itemsMerged', OnExit).HookupButton('.exit', OnExit)
+  }
+
+
+  AskMaySetMaxedDesiredEnchants(maxEnchantsCallbackInfo) {
+    let dialogID =
+      maxEnchantsCallbackInfo.hasConflictingEnchants && maxEnchantsCallbackInfo.enchantsAlreadyPresent ?
+      '#maySetMaxedDesiredEnchants_askConflictAndReplace' :
+      maxEnchantsCallbackInfo.hasConflictingEnchants ?
+      '#maySetMaxedDesiredEnchants_askConflictOnly' :
+      '#maySetMaxedDesiredEnchants_askReplaceOnly'
+
+    let withEnchantConflictPicker = maxEnchantsCallbackInfo.hasConflictingEnchants
+    let enchantConflictPicker =
+      withEnchantConflictPicker ?
+      new EnchantConflictPicker($(dialogID), maxEnchantsCallbackInfo.info) :
+      undefined
+    let OnYesClicked = () => {
+      maxEnchantsCallbackInfo.OnContinue(
+        maxEnchantsCallbackInfo,
+        withEnchantConflictPicker ?
+        enchantConflictPicker.GetChosenIDs() :
+        []
+      )
+    }
+    new SimpleDialog(dialogID).HookupButton('.no').HookupButton('.yes', OnYesClicked)
   }
 
 
@@ -4256,7 +4497,7 @@ class MainForm {
 
   InitializeSubObjects() {
     this.sourceItemTable = new SourceItemTable($('#sources table'), $('#addSourceItem'))
-    this.desiredItemSection = new DesiredItemSection($('#desired .item'))
+    this.desiredItemSection = new DesiredItemSection($('#desired .item'), (maxEnchantsCallbackInfo) => { return this.AskMaySetMaxedDesiredEnchants(maxEnchantsCallbackInfo) })
     this.renameTooElemJQ = $('#desired #renameToo')
 
     let ShowDetailsCallback = (item) => {
@@ -4279,6 +4520,11 @@ class MainForm {
       if (!this.Save(true))
         this.formHandler.TellFailedToSaveOnRequest()
     })
+  }
+
+
+  AskMaySetMaxedDesiredEnchants(maxEnchantsCallbackInfo) {
+    this.formHandler.AskMaySetMaxedDesiredEnchants(maxEnchantsCallbackInfo)
   }
 
 
@@ -4308,7 +4554,7 @@ class MainForm {
     })
 
     // Note: the path should be relative to the html document loading us!
-    this.combineWorker = new Worker('scripts/itemCombineWorker.js?v=2fcf6ac0')
+    this.combineWorker = new Worker('scripts/itemCombineWorker.js?v=935aee5e')
 
     this.combineWorker.onmessage = (e) => {
       switch (e.data.type) {
