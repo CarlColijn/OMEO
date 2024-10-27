@@ -71,6 +71,7 @@
     <script src="combinedItemTable.js"></script>
     <script src="sourceItemCollector.js"></script>
     <script src="itemCostTreeFinalizer.js"></script>
+    <script src="enchantConflictPicker.js"></script>
     <script src="recipeFormData.js"></script>
     <script src="recipeTable.js"></script>
   </head>
@@ -254,7 +255,7 @@
           <tr class="item">
             <td><select name="itemID"></select></td>
             <td></td>
-            <td></td>
+            <td><button type="button" name="addMaxEnchants">Max out</button></td>
           </tr>
           <tr class="template enchant">
             <td><select name="enchantID"></select></td>
@@ -268,6 +269,13 @@
           </tr>
         </tbody>
       </table>
+
+      <div id="enchantConflictPicker">
+        <p>Non-conflicting:<br>
+        <span class="nonConflictEnchants"></span></p>
+        <p>Conflicting:<br>
+        <span class="template conflictEnchants"><select></select></span></p>
+      </div>
 
       <table id="combinedItemTable" class="combines table items">
         <caption>Combined item table</caption>

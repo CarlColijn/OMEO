@@ -294,7 +294,7 @@ dt {
 
 /* Templates */
 .template {
-  display: none;
+  display: none !important;
 }
 
 
@@ -353,6 +353,10 @@ input[type=number] {
 }
 .itemDisplay {
   font-weight: bold;
+}
+.conflictEnchants {
+  margin: 4px 6px;
+  display: inline-block;
 }
 .enchantDisplay {
   font-size: 0.9em;

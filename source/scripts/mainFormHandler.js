@@ -3,6 +3,7 @@
 
   Prerequisites:
   - simpleDialog.js
+  - enchantConflictPicker.js
 
   Defined classes:
   - MainFormHandler
@@ -50,6 +51,31 @@ class MainFormHandler {
 
   TellItemsMerged(OnExit) {
     new SimpleDialog('#itemsMerged', OnExit).HookupButton('.exit', OnExit)
+  }
+
+
+  AskMaySetMaxedDesiredEnchants(maxEnchantsCallbackInfo) {
+    let dialogID =
+      maxEnchantsCallbackInfo.hasConflictingEnchants && maxEnchantsCallbackInfo.enchantsAlreadyPresent ?
+      '#maySetMaxedDesiredEnchants_askConflictAndReplace' :
+      maxEnchantsCallbackInfo.hasConflictingEnchants ?
+      '#maySetMaxedDesiredEnchants_askConflictOnly' :
+      '#maySetMaxedDesiredEnchants_askReplaceOnly'
+
+    let withEnchantConflictPicker = maxEnchantsCallbackInfo.hasConflictingEnchants
+    let enchantConflictPicker =
+      withEnchantConflictPicker ?
+      new EnchantConflictPicker($(dialogID), maxEnchantsCallbackInfo.info) :
+      undefined
+    let OnYesClicked = () => {
+      maxEnchantsCallbackInfo.OnContinue(
+        maxEnchantsCallbackInfo,
+        withEnchantConflictPicker ?
+        enchantConflictPicker.GetChosenIDs() :
+        []
+      )
+    }
+    new SimpleDialog(dialogID).HookupButton('.no').HookupButton('.yes', OnYesClicked)
   }
 
 

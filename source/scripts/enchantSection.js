@@ -27,11 +27,28 @@ class EnchantSection {
   }
 
 
+  HasEnchants() {
+    return this.enchantRows.length > 0
+  }
+
+
   RemoveEnchants() {
     this.enchantRowTemplate.RemoveCreatedElements()
     this.enchantRows.splice(0, Infinity)
 
     this.UpdateGUIState(false, true)
+  }
+
+
+  SetEnchants(enchants) {
+    this.enchantRowTemplate.RemoveCreatedElements()
+    this.enchantRows.splice(0, Infinity)
+
+    enchants.forEach((enchant) => {
+      this.AddEnchant(enchant, false)
+    })
+
+    this.UpdateGUIState(enchants.length > 0, false)
   }
 
 

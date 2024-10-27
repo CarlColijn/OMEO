@@ -1,3 +1,14 @@
+function EnchantNameSetsListToIDSetsList(nameSetsList) {
+  return nameSetsList.map((nameSets) => {
+    return nameSets.map((nameSet) => {
+      return new Set(nameSet.map((name) => {
+        return g_enchantIDsByName.get(name)
+      }))
+    })
+  })
+}
+
+
 jazil.AddTestSet(mainPage, 'ItemInfo', {
   'All item types are counted': (jazil) => {
     jazil.ShouldBe(g_numDifferentItems(), g_itemInfos.length)
@@ -31,10 +42,6 @@ jazil.AddTestSet(mainPage, 'ItemInfo', {
     jazil.ShouldBe(info, undefined, 'got an info for XYZ!')
   },
 
-  // We're not creating actual infos, since that would add them to all
-  // system lists.  We're using 'Pickaxe' and 'Book' here since those
-  // have enough interesting properties.
-
   'Pickaxe has correct details': (jazil) => {
     let pickaxeInfo = GetItemInfo('Pickaxe')
 
@@ -46,10 +53,17 @@ jazil.AddTestSet(mainPage, 'ItemInfo', {
   'Pickaxe has correct enchants': (jazil) => {
     let pickaxeInfo = GetItemInfo('Pickaxe')
 
-    jazil.Assert(pickaxeInfo.CanHaveEnchant(g_enchantIDsByName.get('Fortune')), 'doesn\'t have Fortune enchant!')
-    jazil.Assert(pickaxeInfo.CanHaveEnchant(g_enchantIDsByName.get('Silk Touch')), 'doesn\'t have Silk Touch enchant!')
-    jazil.Assert(!pickaxeInfo.CanHaveEnchant(g_enchantIDsByName.get('Smite')), 'has Smite enchant!')
-    jazil.Assert(!pickaxeInfo.CanHaveEnchant(g_enchantIDsByName.get('Channeling')), 'has Channeling enchant!')
+    let allowedEnchantNames = new Set(['Curse of Vanishing','Efficiency','Fortune','Mending','Silk Touch','Unbreaking'])
+    let enchantDetails = g_enchantInfos.map((info) => {
+      return {
+        info: info,
+        allowed: allowedEnchantNames.has(info.name)
+      }
+    })
+
+    enchantDetails.forEach((detail) => {
+      jazil.ShouldBe(pickaxeInfo.CanHaveEnchant(detail.info.id), detail.allowed, `${detail.info.name}'s allowed state is off!`)
+    })
   },
 
   'Book has correct details': (jazil) => {
@@ -66,6 +80,83 @@ jazil.AddTestSet(mainPage, 'ItemInfo', {
     g_enchantInfosByID.forEach((info, id) => {
       jazil.Assert(bookInfo.CanHaveEnchant(id), `doesn't have ${info.name} enchant!`)
     })
+  },
+
+  'Book has all conflict enchant ID sets': (jazil) => {
+    let bookInfo = GetItemInfo('Book')
+
+    TestConflictingSetsListsMatch(jazil, bookInfo.conflictingEnchantIDSetsList, g_conflictingEnchantIDSetsList)
+  },
+
+  'Book\'s non-conflicting enchant IDs match up': (jazil) => {
+    let bookInfo = GetItemInfo('Book')
+
+    let conflictingIDs = new Set()
+    bookInfo.conflictingEnchantIDSetsList.forEach((idSets) => {
+      idSets.forEach((idSet) => {
+        idSet.forEach((id) => {
+          conflictingIDs.add(id)
+        })
+      })
+    })
+
+    jazil.ShouldBe(bookInfo.nonConflictingEnchantIDs.size, g_enchantInfosByID.size - conflictingIDs.size, 'number of non-conflicting enchants is off!')
+    g_enchantInfosByID.forEach((info, id) => {
+      if (!conflictingIDs.has(id))
+        jazil.Assert(bookInfo.nonConflictingEnchantIDs.has(id), `${info.name} not marked as non-conflicting!`)
+    })
+  },
+
+  'Pickaxe\'s non-conflicting enchant IDs match up': (jazil) => {
+    let pickaxeInfo = GetItemInfo('Pickaxe')
+
+    let conflictingIDs = new Set()
+    pickaxeInfo.conflictingEnchantIDSetsList.forEach((idSets) => {
+      idSets.forEach((idSet) => {
+        idSet.forEach((id) => {
+          conflictingIDs.add(id)
+        })
+      })
+    })
+
+    jazil.ShouldBe(pickaxeInfo.nonConflictingEnchantIDs.size, pickaxeInfo.allowedEnchantIDs.size - conflictingIDs.size, 'number of non-conflicting enchants is off!')
+    pickaxeInfo.allowedEnchantIDs.forEach((id) => {
+      if (!conflictingIDs.has(id)) {
+        let info = g_enchantInfosByID.get(id)
+        jazil.Assert(pickaxeInfo.nonConflictingEnchantIDs.has(id), `${info.name} not marked as non-conflicting!`)
+      }
+    })
+  },
+
+  'Trident has the correct conflict enchant ID sets': (jazil) => {
+    let tridentInfo = GetItemInfo('Trident')
+    let expectedIDSetsList = EnchantNameSetsListToIDSetsList([
+      //[['Infinity'], ['Mending']] => skipped because only Mending is allowed
+      [['Riptide'], ['Loyalty', 'Channeling']]
+    ])
+
+    TestConflictingSetsListsMatch(jazil, tridentInfo.conflictingEnchantIDSetsList, expectedIDSetsList)
+  },
+
+  'Sword has the correct conflict enchant ID sets': (jazil) => {
+    let swordInfo = GetItemInfo('Sword')
+    let expectedIDSetsList = EnchantNameSetsListToIDSetsList([
+      [['Sharpness'], ['Smite'], ['Bane of Arthropods']]
+      //[['Infinity'], ['Mending']] => skipped because only Mending is allowed
+    ])
+
+    TestConflictingSetsListsMatch(jazil, swordInfo.conflictingEnchantIDSetsList, expectedIDSetsList)
+  },
+
+  'Boots has the correct conflict enchant ID sets': (jazil) => {
+    let bootsInfo = GetItemInfo('Boots')
+    let expectedIDSetsList = EnchantNameSetsListToIDSetsList([
+      [['Protection'], ['Blast Protection'], ['Fire Protection'], ['Projectile Protection']],
+      [['Depth Strider'], ['Frost Walker']]
+      //[['Infinity'], ['Mending']] => skipped because only Mending is allowed
+    ])
+
+    TestConflictingSetsListsMatch(jazil, bootsInfo.conflictingEnchantIDSetsList, expectedIDSetsList)
   },
 
 })

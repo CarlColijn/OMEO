@@ -33,7 +33,6 @@ let recipePage = jazil.AddPageToTest('Recipe', recipeURL, recipeAccessObjectName
 
 let mainURL = '../source/index.html'
 let mainAccessObjectNames = [
-  'EnchantIDsConflict',
   'BitRestorer',
   'BitStorer',
   'ButtonStrip',
@@ -51,10 +50,13 @@ let mainAccessObjectNames = [
   'DOMElement',
   'Enchant',
   'EnchantCombiner',
+  'EnchantConflictPicker',
+  'EnchantIDsConflict',
   'EnchantRow',
   'EnchantRowTemplate',
   'EnchantSection',
   'GetConflictingEnchantIDs',
+  'GetConflictingEnchantIDSetsListForIDs',
   'Item',
   'ItemCombineList',
   'ItemCombiner',
@@ -74,6 +76,7 @@ let mainAccessObjectNames = [
   'g_betterMatch',
   'g_bookID',
   'g_combined',
+  'g_conflictingEnchantIDSetsList',
   'g_dataSetsByID',
   'g_desired',
   'g_enchantIDsByName',

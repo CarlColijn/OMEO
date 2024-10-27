@@ -3,6 +3,7 @@
 
   Prerequisites:
   - enchantInfo.js
+  - enchantConflicts.js
 
   Defined classes:
   - ItemInfo
@@ -11,6 +12,9 @@
     - iconIndexNormal: int
     - iconIndexEnchanted: int
     - isBook: bool
+    - allowedEnchantIDs: Set(int)
+    - conflictingEnchantIDSetsList: Array(Array(Set(int)))
+    - nonConflictingEnchantIDs: Set(int)
     - CanHaveEnchant(enchantID: int) -> bool
 
   Defined globals:
@@ -38,23 +42,13 @@ class ItemInfo {
     this.iconIndexEnchanted = iconIndexEnchanted
     this.isBook = name == 'Book'
     this.name = name
+    this.allowedEnchantIDs = this.GetAllowedEnchantIDs(enchantNames)
+    this.conflictingEnchantIDSetsList = GetConflictingEnchantIDSetsListForIDs(this.allowedEnchantIDs)
+    this.nonConflictingEnchantIDs = this.GetNonConflictingEnchantIDs(this.allowedEnchantIDs, this.conflictingEnchantIDSetsList)
 
     // ==== PRIVATE ====
-    this.enchantsAllowedByID = new Set()
-
-    if (this.isBook) {
+    if (this.isBook)
       g_bookID = this.id
-      g_enchantInfos.forEach((enchantInfo) => {
-        this.enchantsAllowedByID.add(enchantInfo.id)
-      })
-    }
-    else {
-      enchantNames.forEach((enchantName) => {
-        let enchantID = g_enchantIDsByName.get(enchantName)
-        this.enchantsAllowedByID.add(enchantID)
-      })
-    }
-
     g_itemInfosByID.set(id, this)
     ++g_numDifferentItems
   }
@@ -62,7 +56,32 @@ class ItemInfo {
 
   // returns bool
   CanHaveEnchant(enchantID) {
-    return this.enchantsAllowedByID.has(enchantID)
+    return this.allowedEnchantIDs.has(enchantID)
+  }
+
+
+  // ==== PRIVATE ====
+
+
+  // returns Set(int)
+  GetAllowedEnchantIDs(enchantNames) {
+    return new Set(
+      this.isBook ?
+      g_enchantInfos.map((enchantInfo) => { return enchantInfo.id }) :
+      enchantNames.map((enchantName) => { return g_enchantIDsByName.get(enchantName) })
+    )
+  }
+
+
+  // returns Set(int)
+  GetNonConflictingEnchantIDs(allowedEnchantIDs, conflictingEnchantIDSetsList) {
+    return new Set([...allowedEnchantIDs].filter((id) => {
+      return conflictingEnchantIDSetsList.every((idSets) => {
+        return idSets.every((idSet) => {
+          return !idSet.has(id)
+        })
+      })
+    }))
   }
 }
 

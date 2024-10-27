@@ -60,6 +60,7 @@
     <script src="scripts/ratedItem.js"></script>
     <script src="scripts/combineResultFilter.js"></script>
     <script src="scripts/itemCostTreeFinalizer.js"></script>
+    <script src="scripts/enchantConflictPicker.js"></script>
     <script src="scripts/mainFormHandler.js"></script>
     <script src="scripts/mainForm.js"></script>
     <script>
@@ -118,6 +119,34 @@
         <h1>Duplicate items detected</h1>
         <p>For performance reasons, I've taken the liberty to merge identical source items.</p>
         <p><button class="exit" type="button">OK</button></p>
+      </div>
+    </div>
+
+    <div id="maySetMaxedDesiredEnchants_askReplaceOnly" class="dialog">
+      <div class="dialogBody">
+        <h1>Max out your desired item</h1>
+        <p>You have already set up enchantments on your desired item. I'll replace these with a maxed out set.</p>
+        <p><button class="yes" type="button">OK</button><button class="no" type="button">Cancel</button></p>
+      </div>
+    </div>
+
+    <div id="maySetMaxedDesiredEnchants_askConflictOnly" class="dialog">
+      <div class="dialogBody">
+        <h1>Max out your desired item</h1>
+        <p>Some enchantments conflict with each other. Pick the one(s) you want to have.</p>
+        <p>Conflicting enchantments:<br><span class="template conflictEnchants"><select></select></span></p>
+        <p>Non-conflicting enchantments:<br><span class="nonConflictEnchants"></span></p>
+        <p><button class="yes" type="button">Done</button><button class="no" type="button">Cancel</button></p>
+      </div>
+    </div>
+
+    <div id="maySetMaxedDesiredEnchants_askConflictAndReplace" class="dialog">
+      <div class="dialogBody">
+        <h1>Max out your desired item</h1>
+        <p>Some enchantments conflict with each other. Pick the one(s) you want to have. I'll then replace your previous enchantments with the ones you choose below.</p>
+        <p>Conflicting enchantments:<br><span class="template conflictEnchants"><select></select></span></p>
+        <p>Non-conflicting enchantments:<br><span class="nonConflictEnchants"></span></p>
+        <p><button class="yes" type="button">Done</button><button class="no" type="button">Cancel</button></p>
       </div>
     </div>
 
@@ -188,7 +217,7 @@
         <tbody>
           <tr>
             <td class="itemEnchantCell"><div class="iconTextWrapping"><select name="itemID" class="type itemInput iconText"></select><div class="icon"><img class="type" src="images/icons.png"><div class="glint"></div></div></div></td>
-            <td></td>
+            <td><button type="button" name="addMaxEnchants">Max out</button></td>
           </tr>
           <tr class="template enchant noSpaceBefore">
             <td class="itemEnchantCell">

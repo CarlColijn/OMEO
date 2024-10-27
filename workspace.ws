@@ -26,6 +26,7 @@
             <File name="source\scripts\desiredItemSection.js" />
             <File name="source\scripts\enchant.js" />
             <File name="source\scripts\enchantCombiner.js" />
+            <File name="source\scripts\enchantConflictPicker.js" />
             <File name="source\scripts\enchantConflicts.js" />
             <File name="source\scripts\enchantInfo.js" />
             <File name="source\scripts\enchantRow.js" />
@@ -88,6 +89,7 @@
             <File name="testing\desiredItemSection.js" />
             <File name="testing\enchant.js" />
             <File name="testing\enchantCombiner.js" />
+            <File name="testing\enchantConflictPicker.js" />
             <File name="testing\enchantConflicts.js" />
             <File name="testing\enchantInfo.js" />
             <File name="testing\enchantRow.js" />

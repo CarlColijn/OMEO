@@ -1,10 +1,25 @@
 function GetDesiredItemSection() {
-  return new DesiredItemSection($('#desiredItemSection'))
+  return new DesiredItemSection($('#desiredItemSection'), undefined)
 }
 
 
 function SetDesiredItem(itemSection, item) {
   itemSection.SetItem(item)
+}
+
+
+function GetItemEnchantDetails(item) {
+  let enchants = []
+  item.enchantsByID.forEach((enchant) => {
+    if (enchant !== undefined)
+      enchants.push(enchant)
+  })
+  enchants.sort((item1, item2) => {
+    return item1.info.id - item2.info.id
+  })
+  return enchants.reduce((serialized, enchant) => {
+    return `${serialized}, ${enchant.info.name}/${enchant.level}`
+  }, '')
 }
 
 
@@ -132,6 +147,99 @@ jazil.AddTestSet(mainPage, 'DesiredItemSection', {
     jazil.ShouldBe(details.enchantNames, 'Aqua Affinity/Blast Protection', 'enchant names are off!')
     jazil.ShouldBe(details.enchantLevels, '1/4', 'enchant levels are off!')
     jazil.ShouldBe(DesiredItemInSection(updatedItem), true, 'changed row is not present anymore!')
+  },
+
+  'Setting maxed enchants with no enchants and no conflicts doesn\'t call callback': (jazil) => {
+    let itemSection = GetDesiredItemSection()
+    let item = BuildItem({ set:g_desired, name:'Brush', count:3, priorWork:2, cost:2 })
+    itemSection.SetItem(item)
+
+    let callbackCalled = false
+    let AskMaySetMaxedDesiredEnchantsMock = (maxEnchantsCallbackInfo) => {
+      callbackCalled = true
+    }
+    itemSection.AddMaxEnchants(AskMaySetMaxedDesiredEnchantsMock)
+    jazil.ShouldBe(callbackCalled, false, 'callback called!')
+  },
+
+  'Setting maxed enchants with no enchants and conflicts does call callback': (jazil) => {
+    let itemSection = GetDesiredItemSection()
+    let item = BuildItem({ set:g_desired, name:'Axe', count:3, priorWork:2, cost:2 })
+    itemSection.SetItem(item)
+
+    let callbackCalled = false
+    let AskMaySetMaxedDesiredEnchantsMock = (maxEnchantsCallbackInfo) => {
+      callbackCalled = true
+      jazil.ShouldBe(maxEnchantsCallbackInfo.enchantsAlreadyPresent, false, 'reporting that enchants already present!')
+      jazil.ShouldBe(maxEnchantsCallbackInfo.hasConflictingEnchants, true, 'reporting that enchants don\'t conflict!')
+      jazil.ShouldBe(maxEnchantsCallbackInfo.info, item.info, 'info is off!')
+    }
+    itemSection.AddMaxEnchants(AskMaySetMaxedDesiredEnchantsMock)
+    jazil.ShouldBe(callbackCalled, true, 'callback not called!')
+  },
+
+  'Setting maxed enchants with enchants and no conflicts does call callback': (jazil) => {
+    let itemSection = GetDesiredItemSection()
+    let item = BuildItem({ set:g_desired, name:'Brush', count:3, priorWork:2, cost:2, enchants:[{ name:'Curse of Vanishing', level:1 }] })
+    itemSection.SetItem(item)
+
+    let callbackCalled = false
+    let AskMaySetMaxedDesiredEnchantsMock = (maxEnchantsCallbackInfo) => {
+      callbackCalled = true
+      jazil.ShouldBe(maxEnchantsCallbackInfo.enchantsAlreadyPresent, true, 'reporting that enchants not already present!')
+      jazil.ShouldBe(maxEnchantsCallbackInfo.hasConflictingEnchants, false, 'reporting that enchants conflict!')
+    }
+    itemSection.AddMaxEnchants(AskMaySetMaxedDesiredEnchantsMock)
+    jazil.ShouldBe(callbackCalled, true, 'callback not called!')
+  },
+
+  'Setting maxed enchants with enchants and conflicts does call callback': (jazil) => {
+    let itemSection = GetDesiredItemSection()
+    let item = BuildItem({ set:g_desired, name:'Pickaxe', count:3, priorWork:2, cost:2, enchants:[{ name:'Curse of Vanishing', level:1 }] })
+    itemSection.SetItem(item)
+
+    let callbackCalled = false
+    let AskMaySetMaxedDesiredEnchantsMock = (maxEnchantsCallbackInfo) => {
+      callbackCalled = true
+      jazil.ShouldBe(maxEnchantsCallbackInfo.enchantsAlreadyPresent, true, 'reporting that enchants not already present!')
+      jazil.ShouldBe(maxEnchantsCallbackInfo.hasConflictingEnchants, true, 'reporting that enchants don\'t conflict!')
+      jazil.ShouldBe(maxEnchantsCallbackInfo.info, item.info, 'info is off!')
+    }
+    itemSection.AddMaxEnchants(AskMaySetMaxedDesiredEnchantsMock)
+    jazil.ShouldBe(callbackCalled, true, 'callback not called!')
+  },
+
+  'Continuing from callback sets maxed enchants': (jazil) => {
+    let itemSection = GetDesiredItemSection()
+    let item = BuildItem({ set:g_desired, name:'Boots', count:3, priorWork:2, cost:2, enchants:[{ name:'Curse of Binding', level:1 }] })
+    itemSection.SetItem(item)
+
+    let chosenEnchantIDs = ['Protection', 'Frost Walker'].map((name) => {
+      return g_enchantIDsByName.get(name)
+    })
+
+    let callbackCalled = false
+    let AskMaySetMaxedDesiredEnchantsMock = (maxEnchantsCallbackInfo) => {
+      callbackCalled = true
+      maxEnchantsCallbackInfo.OnContinue(maxEnchantsCallbackInfo, chosenEnchantIDs)
+    }
+    itemSection.AddMaxEnchants(AskMaySetMaxedDesiredEnchantsMock)
+
+    let allEnchantIDs = [...item.info.nonConflictingEnchantIDs, ...chosenEnchantIDs]
+    item.DropAllEnchants()
+    allEnchantIDs.forEach((id) => {
+      let info = g_enchantInfosByID.get(id)
+      let maxEnchant = new Enchant(id, info.maxLevel)
+      item.SetEnchant(maxEnchant)
+    })
+    let itemEnchantDetails = GetItemEnchantDetails(item)
+
+    let retrievedItem = itemSection.GetItem()
+    let retrievedEnchantDetails = GetItemEnchantDetails(retrievedItem)
+
+    jazil.ShouldBe(callbackCalled, true, 'callback not called!')
+    jazil.ShouldBe(retrievedEnchantDetails, itemEnchantDetails, 'enchant details are off!')
+    jazil.ShouldBe(DesiredItemInSection(item), true, 'added row is not present!')
   },
 
 })

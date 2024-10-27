@@ -83,7 +83,7 @@ class MainForm {
 
   InitializeSubObjects() {
     this.sourceItemTable = new SourceItemTable($('#sources table'), $('#addSourceItem'))
-    this.desiredItemSection = new DesiredItemSection($('#desired .item'))
+    this.desiredItemSection = new DesiredItemSection($('#desired .item'), (maxEnchantsCallbackInfo) => { return this.AskMaySetMaxedDesiredEnchants(maxEnchantsCallbackInfo) })
     this.renameTooElemJQ = $('#desired #renameToo')
 
     let ShowDetailsCallback = (item) => {
@@ -106,6 +106,11 @@ class MainForm {
       if (!this.Save(true))
         this.formHandler.TellFailedToSaveOnRequest()
     })
+  }
+
+
+  AskMaySetMaxedDesiredEnchants(maxEnchantsCallbackInfo) {
+    this.formHandler.AskMaySetMaxedDesiredEnchants(maxEnchantsCallbackInfo)
   }
 
 

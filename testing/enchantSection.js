@@ -33,7 +33,8 @@ jazil.AddTestSet(mainPage, 'EnchantSection', {
   'New section has no enchants': (jazil) => {
     let originalItem = BuildItem({ set:g_source, name:'Book', count:1, priorWork:0, cost:0 })
     let sectionInfo = CreateEnchantSection(originalItem)
-    jazil.ShouldBe(sectionInfo.hasEnchants, false, 'initial hasEnchants is off!')
+    jazil.ShouldBe(sectionInfo.section.HasEnchants(), false, 'initial self-reported HasEnchants is off!')
+    jazil.ShouldBe(sectionInfo.hasEnchants, false, 'initial deduced hasEnchants is off!')
     jazil.ShouldBe(sectionInfo.addEnchantElemJQ.prop('disabled'), false, 'initial disabled state is off!')
 
     let testItem = new Item(1, g_source, 0, 0)
@@ -44,7 +45,8 @@ jazil.AddTestSet(mainPage, 'EnchantSection', {
   'Enchants get retrieved from initially set item': (jazil) => {
     let originalItem = BuildItem({ set:g_source, name:'Book', count:1, priorWork:0, cost:0, enchants:[{ name:'Smite', level:2 }, { name:'Unbreaking', level:3 }] })
     let sectionInfo = CreateEnchantSection(originalItem)
-    jazil.ShouldBe(sectionInfo.hasEnchants, true, 'initial hasEnchants is off!')
+    jazil.ShouldBe(sectionInfo.section.HasEnchants(), true, 'initial self-reported HasEnchants is off!')
+    jazil.ShouldBe(sectionInfo.hasEnchants, true, 'initial deduced hasEnchants is off!')
     jazil.ShouldBe(sectionInfo.addEnchantElemJQ.prop('disabled'), false, 'initial disabled state is off!')
 
     let testItem = new Item(1, g_source, 0, 0)
@@ -55,12 +57,14 @@ jazil.AddTestSet(mainPage, 'EnchantSection', {
   'Remove enchants results in no enchants': (jazil) => {
     let originalItem = BuildItem({ set:g_source, name:'Book', count:1, priorWork:0, cost:0, enchants:[{ name:'Smite', level:2 }, { name:'Unbreaking', level:3 }] })
     let sectionInfo = CreateEnchantSection(originalItem)
-    jazil.ShouldBe(sectionInfo.hasEnchants, true, 'initial hasEnchants is off!')
+    jazil.ShouldBe(sectionInfo.section.HasEnchants(), true, 'initial self-reported HasEnchants is off!')
+    jazil.ShouldBe(sectionInfo.hasEnchants, true, 'initial deduced hasEnchants is off!')
     jazil.ShouldBe(sectionInfo.addEnchantElemJQ.prop('disabled'), false, 'initial disabled state is off!')
 
     let emptyItem = new Item(1, g_source, 0, 0)
     sectionInfo.section.RemoveEnchants()
-    jazil.ShouldBe(sectionInfo.hasEnchants, false, 'updated hasEnchants is off!')
+    jazil.ShouldBe(sectionInfo.section.HasEnchants(), false, 'updated self-reported HasEnchants is off!')
+    jazil.ShouldBe(sectionInfo.hasEnchants, false, 'updated deduced hasEnchants is off!')
     jazil.ShouldBe(sectionInfo.addEnchantElemJQ.prop('disabled'), false, 'updated disabled state is off!')
 
     let testItem = new Item(1, g_source, 0, 0)
@@ -71,12 +75,33 @@ jazil.AddTestSet(mainPage, 'EnchantSection', {
   'Changed item\'s enchants get returned': (jazil) => {
     let originalItem = BuildItem({ set:g_source, name:'Book', count:1, priorWork:0, cost:0, enchants:[{ name:'Smite', level:2 }, { name:'Unbreaking', level:3 }] })
     let sectionInfo = CreateEnchantSection(originalItem)
-    jazil.ShouldBe(sectionInfo.hasEnchants, true, 'initial hasEnchants is off!')
+    jazil.ShouldBe(sectionInfo.section.HasEnchants(), true, 'initial self-reported HasEnchants is off!')
+    jazil.ShouldBe(sectionInfo.hasEnchants, true, 'initial deduced hasEnchants is off!')
     jazil.ShouldBe(sectionInfo.addEnchantElemJQ.prop('disabled'), false, 'initial disabled state is off!')
 
     let changedItem = BuildItem({ set:g_source, name:'Book', count:1, priorWork:0, cost:0, enchants:[{ name:'Mending', level:1 }, { name:'Protection', level:4 }] })
     sectionInfo.section.ChangeItem(changedItem)
-    jazil.ShouldBe(sectionInfo.hasEnchants, true, 'updated hasEnchants is off!')
+    jazil.ShouldBe(sectionInfo.section.HasEnchants(), true, 'updated self-reported HasEnchants is off!')
+    jazil.ShouldBe(sectionInfo.hasEnchants, true, 'updated deduced hasEnchants is off!')
+    jazil.ShouldBe(sectionInfo.addEnchantElemJQ.prop('disabled'), false, 'updated disabled state is off!')
+
+    let testItem = new Item(1, g_source, 0, 0)
+    sectionInfo.section.AddEnchantsToItem(testItem)
+    ItemHasSameEnchants(jazil, changedItem, testItem)
+  },
+
+  'Newly set enchants get returned': (jazil) => {
+    let originalItem = BuildItem({ set:g_source, name:'Book', count:1, priorWork:0, cost:0, enchants:[{ name:'Smite', level:2 }, { name:'Unbreaking', level:3 }] })
+    let sectionInfo = CreateEnchantSection(originalItem)
+
+    let changedItem = BuildItem({ set:g_source, name:'Book', count:1, priorWork:0, cost:0, enchants:[{ name:'Smite', level:3 }, { name:'Luck of the Sea', level:1 }, { name:'Lure', level:1 }] })
+    let changedEnchants = []
+    changedItem.enchantsByID.forEach((enchant, id) => {
+      changedEnchants.push(enchant)
+    })
+    sectionInfo.section.SetEnchants(changedEnchants)
+    jazil.ShouldBe(sectionInfo.section.HasEnchants(), true, 'updated self-reported HasEnchants is off!')
+    jazil.ShouldBe(sectionInfo.hasEnchants, true, 'updated deduced hasEnchants is off!')
     jazil.ShouldBe(sectionInfo.addEnchantElemJQ.prop('disabled'), false, 'updated disabled state is off!')
 
     let testItem = new Item(1, g_source, 0, 0)
@@ -88,12 +113,14 @@ jazil.AddTestSet(mainPage, 'EnchantSection', {
     let originalItem = BuildItem({ set:g_source, name:'Shears', count:1, priorWork:0, cost:0, enchants:[{ name:'Efficiency', level:2 }, { name:'Mending', level:1 }] })
 
     let sectionInfo = CreateEnchantSection(originalItem)
-    jazil.ShouldBe(sectionInfo.hasEnchants, true, 'initial hasEnchants is off!')
+    jazil.ShouldBe(sectionInfo.section.HasEnchants(), true, 'initial self-reported HasEnchants is off!')
+    jazil.ShouldBe(sectionInfo.hasEnchants, true, 'initial deduced hasEnchants is off!')
     jazil.ShouldBe(sectionInfo.addEnchantElemJQ.prop('disabled'), false, 'initial disabled state is off!')
 
     let changedItem = BuildItem({ set:g_source, name:'Shears', count:1, priorWork:0, cost:0, enchants:[{ name:'Curse of Vanishing', level:1 }, { name:'Efficiency', level:2 }, { name:'Mending', level:1 }, { name:'Unbreaking', level:1 }] })
     sectionInfo.section.ChangeItem(changedItem)
-    jazil.ShouldBe(sectionInfo.hasEnchants, true, 'updated hasEnchants is off!')
+    jazil.ShouldBe(sectionInfo.section.HasEnchants(), true, 'updated self-reported HasEnchants is off!')
+    jazil.ShouldBe(sectionInfo.hasEnchants, true, 'updated deduced hasEnchants is off!')
     jazil.ShouldBe(sectionInfo.addEnchantElemJQ.prop('disabled'), true, 'updated disabled state is off!')
 
     let testItem = new Item(1, g_source, 0, 0)
@@ -105,12 +132,14 @@ jazil.AddTestSet(mainPage, 'EnchantSection', {
     let originalItem = BuildItem({ set:g_source, name:'Shears', count:1, priorWork:0, cost:0, enchants:[{ name:'Curse of Vanishing', level:1 }, { name:'Efficiency', level:2 }, { name:'Mending', level:1 }, { name:'Unbreaking', level:1 }] })
 
     let sectionInfo = CreateEnchantSection(originalItem)
-    jazil.ShouldBe(sectionInfo.hasEnchants, true, 'initial hasEnchants is off!')
+    jazil.ShouldBe(sectionInfo.section.HasEnchants(), true, 'initial self-reported HasEnchants is off!')
+    jazil.ShouldBe(sectionInfo.hasEnchants, true, 'initial deduced hasEnchants is off!')
     jazil.ShouldBe(sectionInfo.addEnchantElemJQ.prop('disabled'), true, 'initial disabled state is off!')
 
     let emptyItem = new Item(1, g_source, 0, 0)
     sectionInfo.section.RemoveEnchants()
-    jazil.ShouldBe(sectionInfo.hasEnchants, false, 'updated hasEnchants is off!')
+    jazil.ShouldBe(sectionInfo.section.HasEnchants(), false, 'updated self-reported HasEnchants is off!')
+    jazil.ShouldBe(sectionInfo.hasEnchants, false, 'updated deduced hasEnchants is off!')
     jazil.ShouldBe(sectionInfo.addEnchantElemJQ.prop('disabled'), false, 'updated disabled state is off!')
 
     let testItem = new Item(1, g_source, 0, 0)
@@ -122,12 +151,14 @@ jazil.AddTestSet(mainPage, 'EnchantSection', {
     let originalItem = BuildItem({ set:g_source, name:'Shears', count:1, priorWork:0, cost:0, enchants:[{ name:'Curse of Vanishing', level:1 }, { name:'Efficiency', level:2 }, { name:'Mending', level:1 }, { name:'Unbreaking', level:1 }] })
 
     let sectionInfo = CreateEnchantSection(originalItem)
-    jazil.ShouldBe(sectionInfo.hasEnchants, true, 'initial hasEnchants is off!')
+    jazil.ShouldBe(sectionInfo.section.HasEnchants(), true, 'initial self-reported HasEnchants is off!')
+    jazil.ShouldBe(sectionInfo.hasEnchants, true, 'initial deduced hasEnchants is off!')
     jazil.ShouldBe(sectionInfo.addEnchantElemJQ.prop('disabled'), true, 'initial disabled state is off!')
 
     let changedItem = BuildItem({ set:g_source, name:'Shears', count:1, priorWork:0, cost:0, enchants:[{ name:'Efficiency', level:2 }, { name:'Mending', level:1 }] })
     sectionInfo.section.ChangeItem(changedItem)
-    jazil.ShouldBe(sectionInfo.hasEnchants, true, 'updated hasEnchants is off!')
+    jazil.ShouldBe(sectionInfo.section.HasEnchants(), true, 'updated self-reported HasEnchants is off!')
+    jazil.ShouldBe(sectionInfo.hasEnchants, true, 'updated deduced hasEnchants is off!')
     jazil.ShouldBe(sectionInfo.addEnchantElemJQ.prop('disabled'), false, 'updated disabled state is off!')
 
     let testItem = new Item(1, g_source, 0, 0)

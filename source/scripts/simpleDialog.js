@@ -30,15 +30,16 @@ class SimpleDialog {
   // returns this for method chaining
   HookupButton(buttonID, ClickHandler) {
     let buttonElemJQ = this.dialogElemJQ.find(buttonID)
+    if (buttonElemJQ.length > 0) {
+      buttonElemJQ.unbind('click')
+      buttonElemJQ.click(() => {
+        this.ExitDialog(ClickHandler)
+      })
 
-    buttonElemJQ.unbind('click')
-    buttonElemJQ.click(() => {
-      this.ExitDialog(ClickHandler)
-    })
-
-    if (!this.firstButtonAdded) {
-      buttonElemJQ[0].focus()
-      this.firstButtonAdded = true
+      if (!this.firstButtonAdded) {
+        buttonElemJQ[0].focus()
+        this.firstButtonAdded = true
+      }
     }
 
     return this
