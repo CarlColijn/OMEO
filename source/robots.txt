@@ -1,0 +1,3 @@
+Sitemap: https://omeo.one/sitemap.xml
+User-agent: *
+Disallow:
