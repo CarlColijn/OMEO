@@ -16,8 +16,7 @@ class ContactForm {
   constructor(formHandler) {
     this.formHandler = formHandler
 
-    $(() => {
-      // only execute once the DOM is fully loaded
+    window.addEventListener('load', () => {
       this.HookUpGUI()
     })
   }
@@ -42,7 +41,7 @@ class ContactForm {
         let spamCheck = await response.text()
         spamCheck = spamCheck.trim()
 
-        let message = this.messageElemJQ.val()
+        let message = this.messageElem.value
 
         response = await fetch(contactURL, {
           method: "POST",
@@ -69,10 +68,10 @@ class ContactForm {
 
 
   HookUpGUI() {
-    this.formElemJQ = $('#contactForm')
-    this.messageElemJQ = this.formElemJQ.find('textarea')
+    this.formElem = document.getElementById('contactForm')
+    this.messageElem = this.formElem.querySelector('textarea')
 
-    this.formElemJQ.on('submit', (event) => {
+    this.formElem.addEventListener('submit', (event) => {
       this.OnSubmit(event)
     })
   }

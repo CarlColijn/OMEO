@@ -16,25 +16,25 @@
 
 
 class CombinedEnchantRowTemplate extends TemplateElement {
-  constructor(parentElemJQ, elementClass) {
-    super(parentElemJQ, elementClass)
+  constructor(parentElem, elementClass) {
+    super(parentElem, elementClass)
   }
 
 
   // returns CombinedEnchantRow
   CreateNew(enchant) {
-    let newRowElemJQ = super.CreateExtraElement()
+    let newRowElem = super.CreateExtraElement()
 
-    return new CombinedEnchantRow(newRowElemJQ, enchant)
+    return new CombinedEnchantRow(newRowElem, enchant)
   }
 }
 
 
 class CombinedEnchantRow extends RealElement {
-  constructor(rowElemJQ, enchant) {
-    super(rowElemJQ)
+  constructor(rowElem, enchant) {
+    super(rowElem)
 
-    this.elemJQ.find('.name').text(enchant.info.name)
-    this.elemJQ.find('.level').text(GetRomanNumeralForLevel(enchant.level))
+    this.elem.querySelector('.name').textContent = enchant.info.name
+    this.elem.querySelector('.level').textContent = GetRomanNumeralForLevel(enchant.level)
   }
 }

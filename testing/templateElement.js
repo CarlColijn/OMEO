@@ -10,7 +10,7 @@ let TestTemplateElement
 function MakeTestTemplateElementAvailable() {
   TestTemplateElement = class extends TemplateElement {
     constructor() {
-      super($('#templateElement'), 'test')
+      super(document.getElementById('templateElement'), 'test')
     }
 
 
@@ -24,15 +24,15 @@ function MakeTestTemplateElementAvailable() {
 let TestRealElement
 function MakeTestRealElementAvailable() {
   TestRealElement = class extends RealElement {
-    constructor(elemJQ, description) {
-      super(elemJQ)
+    constructor(elem, description) {
+      super(elem)
 
-      this.elemJQ.find('.description').text(description)
+      this.elem.querySelector('.description').textContent = description
     }
 
 
     GetDescription() {
-      return this.elemJQ.find('.description').text()
+      return this.elem.querySelector('.description').textContent
     }
   }
 }
@@ -40,9 +40,8 @@ function MakeTestRealElementAvailable() {
 
 function ElementPresent(description) {
   let foundElement = false
-  $('#templateElement tr').each((elemNr, elementDOM) => {
-    let elementJQ = $(elementDOM)
-    if (description == elementJQ.find('.description').text()) {
+  document.querySelectorAll('#templateElement tr').forEach((rowElem) => {
+    if (description == rowElem.querySelector('.description').textContent) {
       foundElement = true
       return false
     }
@@ -83,11 +82,11 @@ jazil.AddTestSet(mainPage, 'TemplateElement', {
 
   'Added element count is OK': (jazil) => {
     let templateElement = new TestTemplateElement()
-    let numElementsPre = $('#templateElement tr').length
+    let numElementsPre = document.querySelectorAll('#templateElement tr').length
     let element1 = templateElement.CreateNew('test 3')
     let element2 = templateElement.CreateNew('test 4')
     let element3 = templateElement.CreateNew('test 5')
-    let numElementsPost = $('#templateElement tr').length
+    let numElementsPost = document.querySelectorAll('#templateElement tr').length
     jazil.ShouldBe(numElementsPost - numElementsPre, 3, 'amount of elements added is off!')
   },
 
@@ -96,9 +95,9 @@ jazil.AddTestSet(mainPage, 'TemplateElement', {
     let element1 = templateElement.CreateNew('test 6')
     let element2 = templateElement.CreateNew('test 7')
     let element3 = templateElement.CreateNew('test 8')
-    let numElementsPre = $('#templateElement tr').length
+    let numElementsPre = document.querySelectorAll('#templateElement tr').length
     element2.Remove()
-    let numElementsPost = $('#templateElement tr').length
+    let numElementsPost = document.querySelectorAll('#templateElement tr').length
     jazil.ShouldBe(numElementsPost - numElementsPre, -1, 'amount of elements removed is off!')
     jazil.ShouldBe(ElementPresent('test 7'), false, 'removed element is still present!')
   },
@@ -106,9 +105,9 @@ jazil.AddTestSet(mainPage, 'TemplateElement', {
   'All elements can be removed': (jazil) => {
     let templateElement = new TestTemplateElement()
     let element8 = templateElement.CreateNew('test 8')
-    let numElementsPre = $('#templateElement tr').length
+    let numElementsPre = document.querySelectorAll('#templateElement tr').length
     templateElement.RemoveCreatedElements()
-    let numElementsPost = $('#templateElement tr').length
+    let numElementsPost = document.querySelectorAll('#templateElement tr').length
     jazil.ShouldBe(numElementsPost, 1, 'amount of elements removed is off!')
     jazil.ShouldBe(ElementPresent('test 8'), false, 'removed element is still present!')
     jazil.ShouldBe(templateElement.ElementsPresent(), false, 'element presence still reported!')

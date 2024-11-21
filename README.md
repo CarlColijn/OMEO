@@ -4,7 +4,7 @@ Online Minecraft Enchantment Oracle, or: how to get that sweet OP gear in Minecr
 ## How to contribute?
 
 ### Prerequisites
-OMEO is built to be ran as a stand-alone static HTML web app, which can be served from anywhere. It makes use of plain jQuery only, without any further external dependencies.
+OMEO is built to be ran as a stand-alone static HTML web app, which can be served from anywhere. It doesn't have any external dependencies.
 
 ### Used tools
 For now I'm just using Notepad++ for coding, FireFox and a local Python web server for testing, and Inkscape for the artwork.

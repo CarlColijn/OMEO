@@ -1,5 +1,5 @@
 function GetDesiredItemSection() {
-  return new DesiredItemSection($('#desiredItemSection'), undefined)
+  return new DesiredItemSection(document.getElementById('desiredItemSection'), undefined)
 }
 
 
@@ -23,18 +23,17 @@ function GetItemEnchantDetails(item) {
 }
 
 
-function GetDesiredItemSectionDetails(itemSectionElemJQ) {
-  let typeElemJQ = itemSectionElemJQ.find('[name=itemID]')
-  let typeID = typeElemJQ.val()
+function GetDesiredItemSectionDetails(itemSectionElem) {
+  let typeElem = itemSectionElem.querySelector('[name=itemID]')
+  let typeID = typeElem.value
   typeID = typeID === undefined ? undefined : parseInt(typeID)
   let type = g_itemInfosByID.get(typeID).name
 
   let enchantNames = ''
-  itemSectionElemJQ.find('[name=enchantID]').each((inputNr, inputElem) => {
-    let inputElemJQ = $(inputElem)
-    let rowElem = new DOMElement(inputElemJQ.parent().parent())
+  itemSectionElem.querySelectorAll('[name=enchantID]').forEach((inputElem, inputNr) => {
+    let rowElem = new DOMElement(inputElem.parentElement.parentElement)
     if (rowElem.IsReal()) {
-      let enchantID = parseInt(inputElemJQ.val())
+      let enchantID = parseInt(inputElem.value)
       if (enchantNames != '')
         enchantNames += '/'
       enchantNames += g_enchantInfosByID.get(enchantID).name
@@ -42,13 +41,12 @@ function GetDesiredItemSectionDetails(itemSectionElemJQ) {
   })
 
   let enchantLevels = ''
-  itemSectionElemJQ.find('.levelInput .selectedButton').each((inputNr, inputElem) => {
-    let inputElemJQ = $(inputElem)
-    let rowElem = new DOMElement(inputElemJQ.parent().parent())
+  itemSectionElem.querySelectorAll('.levelInput .selectedButton').forEach((inputElem, inputNr) => {
+    let rowElem = new DOMElement(inputElem.parentElement.parentElement)
     if (rowElem.IsReal()) {
       if (enchantLevels != '')
         enchantLevels += '/'
-      enchantLevels += parseInt(inputElemJQ.val()) + 1
+      enchantLevels += parseInt(inputElem.value) + 1
     }
   })
 
@@ -61,8 +59,8 @@ function GetDesiredItemSectionDetails(itemSectionElemJQ) {
 
 
 function DesiredItemInSection(item) {
-  let itemSectionElemJQ = $('#desiredItemSection')
-  let details = GetDesiredItemSectionDetails(itemSectionElemJQ)
+  let itemSectionElem = document.getElementById('desiredItemSection')
+  let details = GetDesiredItemSectionDetails(itemSectionElem)
   return details.type == item.info.name
 }
 
@@ -73,7 +71,7 @@ jazil.AddTestSet(mainPage, 'DesiredItemSection', {
   'Initial content is correct': (jazil) => {
     let itemSection = GetDesiredItemSection()
 
-    let details = GetDesiredItemSectionDetails(itemSection.elemJQ)
+    let details = GetDesiredItemSectionDetails(itemSection.elem)
 
     jazil.ShouldBe(details.type, 'Axe', 'name is off!')
     jazil.ShouldBe(details.enchantNames, '', 'enchant names are off!')
@@ -85,7 +83,7 @@ jazil.AddTestSet(mainPage, 'DesiredItemSection', {
     let item = BuildItem({ set:g_desired, name:'Pickaxe', count:9, priorWork:2, cost:15 })
     itemSection.SetItem(item)
 
-    let details = GetDesiredItemSectionDetails(itemSection.elemJQ)
+    let details = GetDesiredItemSectionDetails(itemSection.elem)
 
     jazil.ShouldBe(details.type, item.info.name, 'type is off!')
     jazil.ShouldBe(details.enchantNames, '', 'enchant names are off!')
@@ -99,7 +97,7 @@ jazil.AddTestSet(mainPage, 'DesiredItemSection', {
     let item = BuildItem({ set:g_desired, name:'Turtle Shell', count:1, priorWork:4, cost:9, enchants:[{ name:'Unbreaking', level:3 }, { name:'Mending', level:1 }] })
     itemSection.SetItem(item)
 
-    let details = GetDesiredItemSectionDetails(itemSection.elemJQ)
+    let details = GetDesiredItemSectionDetails(itemSection.elem)
 
     jazil.ShouldBe(details.type, item.info.name, 'type is off!')
     jazil.ShouldBe(details.enchantNames, 'Mending/Unbreaking', 'enchant names are off!')
@@ -141,7 +139,7 @@ jazil.AddTestSet(mainPage, 'DesiredItemSection', {
     let updatedItem = BuildItem({ set:g_desired, name:'Helmet', count:6, priorWork:4, cost:5, enchants:[{ name:'Blast Protection', level:4 }, { name:'Aqua Affinity', level:1 }] })
     itemSection.SetItem(updatedItem)
 
-    let details = GetDesiredItemSectionDetails(itemSection.elemJQ)
+    let details = GetDesiredItemSectionDetails(itemSection.elem)
 
     jazil.ShouldBe(details.type, updatedItem.info.name, 'type is off!')
     jazil.ShouldBe(details.enchantNames, 'Aqua Affinity/Blast Protection', 'enchant names are off!')

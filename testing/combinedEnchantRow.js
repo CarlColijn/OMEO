@@ -1,5 +1,5 @@
 function GetCombinedEnchantTemplateRow() {
-  return new CombinedEnchantRowTemplate($('#combinedEnchantRow'), 'enchant')
+  return new CombinedEnchantRowTemplate(document.getElementById('combinedEnchantRow'), 'enchant')
 }
 
 
@@ -10,19 +10,18 @@ function CreateCombinedEnchantRow(templateRow, enchantName, enchantLevel) {
 }
 
 
-function GetCombinedEnchantRowDetails(enchantRowElemJQ) {
+function GetCombinedEnchantRowDetails(enchantRowElem) {
   return {
-    'name': enchantRowElemJQ.find('.name').text(),
-    'level': GetEnchantLevelFromGUIText(enchantRowElemJQ.find('.level').text())
+    'name': enchantRowElem.querySelector('.name').textContent,
+    'level': GetEnchantLevelFromGUIText(enchantRowElem.querySelector('.level').textContent)
   }
 }
 
 
 function CombinedEnchantRowInTable(enchantName) {
   let foundRow = false
-  $('#combinedEnchantRow tr').each((rowNr, enchantRowElem) => {
-    let enchantRowElemJQ = $(enchantRowElem)
-    let details = GetCombinedEnchantRowDetails(enchantRowElemJQ)
+  document.querySelectorAll('#combinedEnchantRow tr').forEach((enchantRowElem) => {
+    let details = GetCombinedEnchantRowDetails(enchantRowElem)
     if (details.name == enchantName) {
       foundRow = true
       return false
@@ -51,7 +50,7 @@ jazil.AddTestSet(mainPage, 'CombinedEnchantRow', {
   'Create new row from template': (jazil) => {
     let templateRow = GetCombinedEnchantTemplateRow()
     let enchantRow = CreateCombinedEnchantRow(templateRow, 'Unbreaking', 3)
-    let details = GetCombinedEnchantRowDetails(enchantRow.elemJQ)
+    let details = GetCombinedEnchantRowDetails(enchantRow.elem)
     jazil.ShouldBe(details.name, 'Unbreaking', 'name is off!')
     jazil.ShouldBe(details.level, 3, 'level is off!')
     jazil.ShouldBe(CombinedEnchantRowInTable('Unbreaking'), true, 'added row is not present!')
@@ -59,11 +58,11 @@ jazil.AddTestSet(mainPage, 'CombinedEnchantRow', {
 
   'Added row count is OK': (jazil) => {
     let templateRow = GetCombinedEnchantTemplateRow()
-    let numRowsPre = $('#combinedEnchantRow tr').length
+    let numRowsPre = document.querySelectorAll('#combinedEnchantRow tr').length
     let enchantRow1 = CreateCombinedEnchantRow(templateRow, 'Smite', 1)
     let enchantRow2 = CreateCombinedEnchantRow(templateRow, 'Aqua Affinity', 1)
     let enchantRow3 = CreateCombinedEnchantRow(templateRow, 'Blast Protection', 2)
-    let numRowsPost = $('#combinedEnchantRow tr').length
+    let numRowsPost = document.querySelectorAll('#combinedEnchantRow tr').length
     jazil.ShouldBe(numRowsPost - numRowsPre, 3, 'amount of rows added is off!')
   },
 

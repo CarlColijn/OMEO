@@ -1,13 +1,13 @@
-function GetStripElementJQ() {
-  return $('#buttonStrip')
+function GetStripElement() {
+  return document.getElementById('buttonStrip')
 }
 
 
 function SetUpButtonStrip(cleanFirst=true) {
-  let stripElemJQ = GetStripElementJQ()
+  let stripElem = GetStripElement()
   if (cleanFirst)
-    stripElemJQ.empty()
-  return new ButtonStrip(stripElemJQ)
+    stripElem.replaceChildren()
+  return new ButtonStrip(stripElem)
 }
 
 
@@ -16,7 +16,7 @@ function SetUpButtonStrip(cleanFirst=true) {
 jazil.AddTestSet(mainPage, 'ButtonStrip', {
   'Uninitialized strip has no physical content': (jazil) => {
     let strip = SetUpButtonStrip()
-    jazil.ShouldBe(GetStripElementJQ().children().length, 0)
+    jazil.ShouldBe(GetStripElement().childElementCount, 0)
   },
 
   'Uninitialized strip has no selection': (jazil) => {
@@ -33,13 +33,13 @@ jazil.AddTestSet(mainPage, 'ButtonStrip', {
   'Uninitialized strip with selection still has no content': (jazil) => {
     let strip = SetUpButtonStrip()
     strip.SetSelectionNr(3)
-    jazil.ShouldBe(GetStripElementJQ().children().length, 0)
+    jazil.ShouldBe(GetStripElement().childElementCount, 0)
   },
 
   'Initialized strip has physical content': (jazil) => {
     let strip = SetUpButtonStrip()
     strip.SetOptions(['a', 'b', 'c'], 1)
-    jazil.ShouldNotBe(GetStripElementJQ().children().length, 0)
+    jazil.ShouldNotBe(GetStripElement().childElementCount, 0)
   },
 
   'Initialized strip without preselected selection has no selection': (jazil) => {
@@ -95,7 +95,7 @@ jazil.AddTestSet(mainPage, 'ButtonStrip', {
   'Set options get reflected in content': (jazil) => {
     let strip = SetUpButtonStrip()
     strip.SetOptions(['vwxyz', 13579, 1.2345, undefined], undefined)
-    let shownText = GetStripElementJQ().text()
+    let shownText = GetStripElement().textContent
     jazil.ShouldBe(shownText.includes('vwxyz'), true, 'text option not found')
     jazil.ShouldBe(shownText.includes('13579'), true, 'integer option not found')
     jazil.ShouldBe(shownText.includes('1.2345'), true, 'float option not found')

@@ -6,9 +6,6 @@
     <!-- https://developer.mozilla.org/en-US/docs/Web/HTML/Element/meta -->
     <meta charset="utf-8">
 
-    <!-- http://jquery.com/ -->
-    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-
     <!-- testing framework -->
     <script src="jazillionth/jazillionth.js"></script>
 
@@ -81,6 +78,9 @@
     </div>
 
     <div id="testObjects">
+      <p>Helper objects</p>
+      <input type="button" id="dummyButton">
+
       <table id="templateElement" class="table">
         <caption>Template elements</caption>
         <tbody>
@@ -138,7 +138,7 @@
               <table>
                 <tbody>
                   <tr>
-                    <td><select name="itemID"></select></td>
+                    <td><select name="itemID"></select><div class="icon"><img class="type" src="images/icons.png" alt=""><div class="glint"></div></div></td>
                     <td></td>
                     <td><button type="button" name="removeItem">Remove</button></td>
                   </tr>
@@ -170,10 +170,10 @@
               <table>
                 <tbody>
                   <tr>
-                    <td><span class="type"></span></td>
+                    <td><span class="type"></span><div class="icon"><img class="type" src="images/icons.png" alt=""><div class="glint"></div></div></td>
                   </tr>
                   <tr class="template enchant">
-                    <td><span class="name"></span> <span class="level"></span></td>
+                    <td><span class="name"></span> <span class="level"></span> <button type="button" name="show">Show</button></td>
                   </tr>
                 </tbody>
               </table>
@@ -201,10 +201,10 @@
               <table>
                 <tbody>
                   <tr>
-                    <td><span class="type"></span></td>
+                    <td><span class="type"></span><div class="icon"><img class="type" src="images/icons.png" alt=""><div class="glint"></div></div></td>
                   </tr>
                   <tr class="template enchant">
-                    <td><span class="name"></span> <span class="level"></span></td>
+                    <td><span class="name"></span> <span class="level"></span> <button type="button" name="show">Show</button></td>
                   </tr>
                 </tbody>
               </table>
@@ -226,7 +226,7 @@
               <table>
                 <tbody>
                   <tr>
-                    <td><select name="itemID"></select></td>
+                    <td><select name="itemID"></select><div class="icon"><img class="type" src="images/icons.png" alt=""><div class="glint"></div></div></td>
                     <td></td>
                     <td><button type="button" name="removeItem">Remove</button></td>
                   </tr>
@@ -253,7 +253,7 @@
         <caption>Desired item section</caption>
         <tbody>
           <tr class="item">
-            <td><select name="itemID"></select></td>
+            <td><select name="itemID"></select><div class="icon"><img class="type" src="images/icons.png" alt=""><div class="glint"></div></div></td>
             <td></td>
             <td><button type="button" name="addMaxEnchants">Max out</button></td>
           </tr>
@@ -290,7 +290,7 @@
           </tr>
           <tr class="template item">
             <td><span class="count"></span></td>
-            <td><span class="type"></span></td>
+            <td><span class="type"></span><div class="icon"><img class="type" src="images/icons.png" alt=""><div class="glint"></div></div></td>
             <td>
               <table>
                 <tbody>
@@ -302,12 +302,21 @@
             </td>
             <td><span class="priorWork"></span></td>
             <td><span class="cost"></span></td>
+            <td><button type="button" name="show">Show</button></td>
           </tr>
         </tbody>
       </table>
 
       <table id="recipeTable" class="table items">
         <caption>Recipe table</caption>
+        <thead>
+          <tr>
+            <th>Place</th>
+            <th colspan="2">Item</th>
+            <th>Prior work</th>
+            <th>Cost</th>
+          </tr>
+        </thead>
         <tbody>
           <tr class="template item">
             <td class="template treeNode"></td>
@@ -317,7 +326,7 @@
               <table>
                 <tbody>
                   <tr>
-                    <td><label><span class="description"></span></label></td>
+                    <td><label><span class="description"></span><div class="icon"><img class="type" src="images/icons.png" alt=""><div class="glint"></div></div></label></td>
                   </tr>
                   <tr class="template enchant">
                     <td><span class="name"></span> <span class="level"></span></td>

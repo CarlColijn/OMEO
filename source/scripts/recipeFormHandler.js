@@ -11,6 +11,6 @@
 
 class RecipeFormHandler {
   FailedToLoad() {
-    new SimpleDialog('#dataInErrorForLoad').HookupButton('.exit')
+    new SimpleDialog('dataInErrorForLoad').HookupButton('.exit')
   }
 }

@@ -15,10 +15,10 @@
 
 
 class RecipeTable {
-  constructor(tableElemJQ) {
+  constructor(tableElem) {
     // ==== PRIVATE ====
-    this.tableElemJQ = tableElemJQ
-    this.itemTemplateRow = new TemplateElement(tableElemJQ, 'item')
+    this.tableElem = tableElem
+    this.itemTemplateRow = new TemplateElement(tableElem, 'item')
 
     this.nextCheckboxID = 0
   }
@@ -28,7 +28,8 @@ class RecipeTable {
     let maxItemDepth = this.GetItemDepth(item)
 
     this.AddItemTree(item, maxItemDepth, 'f', g_rtSettings.resultLabel, undefined)
-    this.tableElemJQ.find('th:first').attr('colspan', maxItemDepth + 1)
+    // Note: only the 1st th needs the colspan, and querySelector only returns the 1st
+    this.tableElem.querySelector('th').setAttribute('colspan', maxItemDepth + 1)
   }
 
 
@@ -70,10 +71,10 @@ class RecipeTable {
     for (let enchantNr = 0; enchantNr < g_numDifferentEnchants; ++enchantNr) {
       let enchant = item.enchantsByID.get(g_enchantInfos[enchantNr].id)
       if (enchant !== undefined) {
-        let enchantRowElemJQ = enchantTemplateElem.CreateExtraElement()
+        let enchantRowElem = enchantTemplateElem.CreateExtraElement()
 
-        enchantRowElemJQ.find('.name').text(enchant.info.name)
-        enchantRowElemJQ.find('.level').text(GetRomanNumeralForLevel(enchant.level))
+        enchantRowElem.querySelector('.name').textContent = enchant.info.name
+        enchantRowElem.querySelector('.level').textContent = GetRomanNumeralForLevel(enchant.level)
       }
     }
   }
@@ -90,10 +91,10 @@ class RecipeTable {
   }
 
 
-  LinkLabelToCheckbox(labelElemJQ, checkboxElemJQ) {
+  LinkLabelToCheckbox(labelElem, checkboxElem) {
     let checkboxID = `check_${this.nextCheckboxID}`
-    checkboxElemJQ.attr('id', checkboxID)
-    labelElemJQ.attr('for', checkboxID)
+    checkboxElem.setAttribute('id', checkboxID)
+    labelElem.setAttribute('for', checkboxID)
 
     ++this.nextCheckboxID
   }
@@ -102,9 +103,9 @@ class RecipeTable {
   SetChildHideState(rowInfo, hide) {
     rowInfo.numHides += (hide ? 1 : -1)
     if (rowInfo.numHides > 0)
-      rowInfo.rowElemJQ.hide(g_rtSettings.expandCollapseSpeedMS)
+      HideElemAnimated(rowInfo.rowElem, g_rtSettings.expandCollapseSpeedMS)
     else
-      rowInfo.rowElemJQ.show(g_rtSettings.expandCollapseSpeedMS)
+      ShowElemAnimated(rowInfo.rowElem, '', g_rtSettings.expandCollapseSpeedMS)
 
     rowInfo.childRowInfos.forEach((childRowInfo) => {
       this.SetChildHideState(childRowInfo, hide)
@@ -116,12 +117,12 @@ class RecipeTable {
     rowInfo.isUserCollapsed = !rowInfo.isUserCollapsed
 
     if (rowInfo.isUserCollapsed) {
-      rowInfo.mainTDElemJQ.html(g_rtSettings.expandGlyph)
-      rowInfo.mainTDElemJQ.removeClass('treeLeft')
+      rowInfo.mainTDElem.innerHTML = g_rtSettings.expandGlyph
+      rowInfo.mainTDElem.classList.remove('treeLeft')
     }
     else {
-      rowInfo.mainTDElemJQ.html(g_rtSettings.collapseGlyph)
-      rowInfo.mainTDElemJQ.addClass('treeLeft')
+      rowInfo.mainTDElem.innerHTML = g_rtSettings.collapseGlyph
+      rowInfo.mainTDElem.classList.add('treeLeft')
     }
 
     rowInfo.childRowInfos.forEach((childRowInfo) => {
@@ -132,12 +133,12 @@ class RecipeTable {
 
   // returns RowInfo
   AddNewRow() {
-    let newRowElemJQ = this.itemTemplateRow.CreateExtraElement()
+    let newRowElem = this.itemTemplateRow.CreateExtraElement()
 
     return {
-      rowElemJQ: newRowElemJQ,
-      treeNodeTemplateElem: new TemplateElement(newRowElemJQ, 'treeNode'),
-      enchantTemplateElem: new TemplateElement(newRowElemJQ, 'enchant'),
+      rowElem: newRowElem,
+      treeNodeTemplateElem: new TemplateElement(newRowElem, 'treeNode'),
+      enchantTemplateElem: new TemplateElement(newRowElem, 'enchant'),
       isUserCollapsed: false,
       numHides: 0,
       childRowInfos: []
@@ -151,11 +152,11 @@ class RecipeTable {
       parentRowInfo.childRowInfos.push(newRowInfo)
     let hasChildren = item.targetItem !== undefined
 
-    let placementTDElemJQ = newRowInfo.rowElemJQ.find('.placementNode')
+    let placementTDElem = newRowInfo.rowElem.querySelector('.placementNode')
 
     let isExpandableNode = false
     for (let tdElemNr = 0; tdElemNr < collapseTrail.length; ++tdElemNr) {
-      let tdElemJQ = newRowInfo.treeNodeTemplateElem.CreateExtraElement()
+      let tdElem = newRowInfo.treeNodeTemplateElem.CreateExtraElement()
 
       let isLeafNode = tdElemNr == 0
       let isNonLeafNode = tdElemNr > 0
@@ -168,49 +169,49 @@ class RecipeTable {
         collapseTrail[tdElemNr - 1] == 'l'
 
       if (isLeafNode)
-        newRowInfo.mainTDElemJQ = tdElemJQ
+        newRowInfo.mainTDElem = tdElem
 
       if (isExpandableLeafNode) {
         isExpandableNode = true
-        tdElemJQ.addClass('treeClick')
-        tdElemJQ.html(g_rtSettings.collapseGlyph)
-        newRowInfo.mainTDElemJQ.click(() => {
+        tdElem.classList.add('treeClick')
+        tdElem.innerHTML = g_rtSettings.collapseGlyph
+        newRowInfo.mainTDElem.addEventListener('click', () => {
           this.NodeClicked(newRowInfo)
         })
       }
 
       if (isUnexpandableLeafNode || isOneBeforeLeafNode)
-        tdElemJQ.addClass('treeTop')
+        tdElem.classList.add('treeTop')
 
       if (isExpandableLeafNode || isPassthroughFromLeftNode)
-        tdElemJQ.addClass('treeLeft')
+        tdElem.classList.add('treeLeft')
 
-      tdElemJQ.prependTo(newRowInfo.rowElemJQ)
+      newRowInfo.rowElem.prepend(tdElem)
     }
 
-    placementTDElemJQ.attr('colspan', numUnusedColumns)
-    let placementElemJQ = newRowInfo.rowElemJQ.find('.placement')
+    placementTDElem.setAttribute('colspan', numUnusedColumns)
+    let placementElem = newRowInfo.rowElem.querySelector('.placement')
     if (isExpandableNode) {
-      placementElemJQ.addClass('treeClick')
-      placementElemJQ.click(() => {
+      placementElem.classList.add('treeClick')
+      placementElem.addEventListener('click', () => {
         this.NodeClicked(newRowInfo)
       })
     }
-    placementElemJQ.html(placement)
+    placementElem.innerHTML = placement
     if (item.renamePoint)
-      newRowInfo.rowElemJQ.find('.renameInstructions').removeClass('hidden')
-    newRowInfo.rowElemJQ.find('.description').text(this.GetItemDescription(item))
+      newRowInfo.rowElem.querySelector('.renameInstructions').classList.remove('hidden')
+    newRowInfo.rowElem.querySelector('.description').textContent = this.GetItemDescription(item)
     this.AddEnchants(newRowInfo.enchantTemplateElem, item)
-    newRowInfo.rowElemJQ.find('.priorWork').text(item.priorWork)
-    newRowInfo.rowElemJQ.find('.cost').html(this.GetItemCost(item))
+    newRowInfo.rowElem.querySelector('.priorWork').textContent = item.priorWork
+    newRowInfo.rowElem.querySelector('.cost').innerHTML = this.GetItemCost(item)
 
-    let iconElemJQ = newRowInfo.rowElemJQ.find('.icon')
+    let iconElem = newRowInfo.rowElem.querySelector('.icon')
     let hasEnchants = item.enchantsByID.size > 0
-    SetIcon(iconElemJQ, item.id, hasEnchants)
+    SetIcon(iconElem, item.id, hasEnchants)
 
-    let labelElemJQ = newRowInfo.rowElemJQ.find('label')
-    let checkboxElemJQ = newRowInfo.rowElemJQ.find('input')
-    this.LinkLabelToCheckbox(labelElemJQ, checkboxElemJQ)
+    let labelElem = newRowInfo.rowElem.querySelector('label')
+    let checkboxElem = newRowInfo.rowElem.querySelector('input')
+    this.LinkLabelToCheckbox(labelElem, checkboxElem)
 
     if (hasChildren) {
       this.AddItemTree(item.targetItem, numUnusedColumns - 1, 'l' + collapseTrail, g_rtSettings.leftLabel, newRowInfo)

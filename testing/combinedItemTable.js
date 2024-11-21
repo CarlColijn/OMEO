@@ -1,6 +1,6 @@
 // returns CombinedItemTable
 function GetCombinedItemTable() {
-  return new CombinedItemTable($('#combinedItemTable'), undefined)
+  return new CombinedItemTable(document.getElementById('combinedItemTable'), undefined)
 }
 
 
@@ -10,8 +10,8 @@ jazil.AddTestSet(mainPage, 'CombinedItemTable', {
   'Table is initialized correctly': (jazil) => {
     let table = GetCombinedItemTable()
 
-    jazil.ShouldBe(table.tableElemJQ.find('tr.template.item').length, 1, 'no template row found!')
-    jazil.ShouldBe(table.tableElemJQ.find('tr.item').length, 1, 'wrong number of rows by default!')
+    jazil.ShouldBe(table.tableElem.querySelectorAll('tr.template.item').length, 1, 'no template row found!')
+    jazil.ShouldBe(table.tableElem.querySelectorAll('tr.item').length, 1, 'wrong number of rows by default!')
   },
 
   'Setting rated item groups works': (jazil) => {
@@ -42,11 +42,11 @@ jazil.AddTestSet(mainPage, 'CombinedItemTable', {
       })
     }
 
-    let numGroupsPre = table.tableElemJQ.find('tbody.group').length
-    let numRowsPre = table.tableElemJQ.find('tr.item').length
+    let numGroupsPre = table.tableElem.querySelectorAll('tbody.group').length
+    let numRowsPre = table.tableElem.querySelectorAll('tr.item').length
     table.SetCombinedItems(filteredCombinedItems)
-    let numGroupsPost = table.tableElemJQ.find('tbody.group').length
-    let numRowsPost = table.tableElemJQ.find('tr.item').length
+    let numGroupsPost = table.tableElem.querySelectorAll('tbody.group').length
+    let numRowsPost = table.tableElem.querySelectorAll('tr.item').length
 
     // 3 groups, plus 1 for the template
     jazil.ShouldBe(numGroupsPost - numGroupsPre, 4, 'wrong number of groups added!')

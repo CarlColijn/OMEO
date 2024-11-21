@@ -22,8 +22,7 @@ class RecipeForm {
   constructor(formHandler) {
     this.formHandler = formHandler
 
-    $(() => {
-      // only execute once the DOM is fully loaded
+    window.addEventListener('load', () => {
       this.SetBacklink()
 
       this.Load()
@@ -41,10 +40,10 @@ class RecipeForm {
       // hmmm... no backlink; leave it like it is
       return
 
-    this.backlinkElemJQ = $('#backlink')
-    let dataLink = this.backlinkElemJQ.attr('href')
+    let backlinkElem = document.getElementById('backlink')
+    let dataLink = backlinkElem.getAttribute('href')
     dataLink += `?form=${data}`
-    this.backlinkElemJQ.attr('href', dataLink)
+    backlinkElem.setAttribute('href', dataLink)
   }
 
 
@@ -58,7 +57,7 @@ class RecipeForm {
       let data = new RecipeFormData()
       allOK = data.Deserialize(stream)
       if (allOK) {
-        let recipeTable = new RecipeTable($('#recipe table'))
+        let recipeTable = new RecipeTable(document.querySelector('#recipe table'))
         recipeTable.SetItem(data.item)
       }
     }

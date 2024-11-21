@@ -386,7 +386,7 @@ function GetEnchantLevelFromGUIText(guiText) {
 class DataStateController {
   constructor(jazil) {
     this.jazil = jazil
-    this.bookmarkElement = $(this.jazil.testDocument).find('#bookmark a')
+    this.bookmarkElement = this.jazil.testDocument.querySelector('#bookmark a')
   }
 
 
@@ -396,7 +396,10 @@ class DataStateController {
 
 
   GetBookmark() {
-    return this.ExtractFromURL(this.bookmarkElement.attr('href'))
+    if (this.bookmarkElement === null)
+      return 'null'
+    else
+      return this.ExtractFromURL(this.bookmarkElement.getAttribute('href'))
   }
 
 
@@ -431,10 +434,12 @@ class DataStateController {
     else
       this.jazil.testWindow.localStorage.setItem('form', localStorageData)
 
-    if (bookmarkData === undefined)
-      this.bookmarkElement.attr('href', '')
-    else
-      this.bookmarkElement.attr('href', this.GetURL(bookmarkData))
+    if (this.bookmarkElement !== null) {
+      if (bookmarkData === undefined)
+        this.bookmarkElement.setAttribute('href', '')
+      else
+        this.bookmarkElement.setAttribute('href', this.GetURL(bookmarkData))
+    }
 
     if (addressData === undefined)
       this.jazil.testWindow.history.replaceState(null, '', this.GetURL())

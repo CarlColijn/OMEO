@@ -164,7 +164,7 @@ jazil.AddTestSet(mainPage, 'SourceItemCollector', {
     // Update the middle item row's count to something non-numeric.
     // Just empty is the most cross-browser way to do so.
     // (note: index 0 is the template row)
-    $(itemRows[1].elemJQ.find('[name=count]')).val('')
+    itemRows[1].elem.querySelector('[name=count]').value = ''
 
     // Update the test item to reflect the expected value for count.
     testItems[1].count = 1

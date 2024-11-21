@@ -1,7 +1,7 @@
 function GetPicker(itemName) {
-  let dialogElemJQ = $('#enchantConflictPicker')
+  let dialogElem = document.getElementById('enchantConflictPicker')
   let itemInfo = GetItemInfo(itemName)
-  return new EnchantConflictPicker(dialogElemJQ, itemInfo)
+  return new EnchantConflictPicker(dialogElem, itemInfo)
 }
 
 
@@ -13,21 +13,19 @@ function GetCanonicalReducedStringList(seperator, stringList) {
 
 
 function GetShownEnchantNames() {
-  let dialogElemJQ = $('#enchantConflictPicker')
+  let dialogElem = document.getElementById('enchantConflictPicker')
   let nonConflictingNames = GetCanonicalReducedStringList(
     ',',
-    dialogElemJQ.find('.nonConflictEnchants').text().split('\u2022').map((name) => {
+    dialogElem.querySelector('.nonConflictEnchants').textContent.split('\u2022').map((name) => {
       return name.trim()
     }).toSorted()
   )
 
   let conflictingNameSets = []
-  dialogElemJQ.find('.conflictEnchants:not(.template) select').each(function() {
+  dialogElem.querySelectorAll('.conflictEnchants:not(.template) select').forEach((selectElem) => {
     let names = []
-    let selectElemJQ = $(this)
-    selectElemJQ.find('option').each(function() {
-      let optionElemJQ = $(this)
-      let name = optionElemJQ.text().replace(', ', '+')
+    selectElem.querySelectorAll('option').forEach((optionElem) => {
+      let name = optionElem.textContent.replace(', ', '+')
       names.push(name)
     })
     conflictingNameSets.push(GetCanonicalReducedStringList(',', names))
@@ -109,11 +107,10 @@ jazil.AddTestSet(mainPage, 'EnchantConflictPicker', {
   'Returns correct ID selection': (jazil) => {
     let picker = GetPicker('Book')
 
-    let selectElemJQs = $('#enchantConflictPicker select:not(.template)')
-    selectElemJQs.each(function() {
-      let selectElemJQ = $(this)
-      let optionElemJQs = selectElemJQ.find('option')
-      selectElemJQ.val($(optionElemJQs[optionElemJQs.length - 2]).val())
+    let selectElems = document.querySelectorAll('#enchantConflictPicker .conflictEnchants:not(.template) select')
+    selectElems.forEach((selectElem) => {
+      let optionElems = selectElem.querySelectorAll('option')
+      selectElem.value = optionElems[optionElems.length - 2].value
     })
 
     let chosenIDs = picker.GetChosenIDs()

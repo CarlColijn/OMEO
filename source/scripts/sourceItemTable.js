@@ -8,7 +8,7 @@
 
   Defined classes:
   - SourceItemTable
-    - tableElemJQ: the main table's jQuery element
+    - tableElem: the main table's element
 */
 
 
@@ -16,17 +16,17 @@
 
 
 class SourceItemTable {
-  constructor(tableElemJQ, addItemElemJQ) {
+  constructor(tableElem, addItemElem) {
     // ==== PUBLIC ====
-    this.tableElemJQ = tableElemJQ
+    this.tableElem = tableElem
 
     // ==== PRIVATE ====
-    this.addItemElemJQ = addItemElemJQ
-    addItemElemJQ.click(() => {
+    this.addItemElem = addItemElem
+    addItemElem.addEventListener('click', () => {
       this.AddRow()
     })
 
-    this.templateRow = new SourceItemRowTemplate(this.tableElemJQ, 'item')
+    this.templateRow = new SourceItemRowTemplate(this.tableElem, 'item')
     this.rows = []
   }
 
@@ -34,7 +34,7 @@ class SourceItemTable {
   // returns ItemRow
   AddRow() {
     let newNr = this.rows.length + 1
-    let newRow = this.templateRow.CreateNew(newNr, undefined, this.rows, true, this.addItemElemJQ)
+    let newRow = this.templateRow.CreateNew(newNr, undefined, this.rows, true, this.addItemElem)
     this.rows.push(newRow)
     return newRow
   }
@@ -44,7 +44,7 @@ class SourceItemTable {
     this.Clear()
 
     items.forEach((item, itemNr) => {
-      let newRow = this.templateRow.CreateNew(itemNr + 1, item, this.rows, false, this.addItemElemJQ)
+      let newRow = this.templateRow.CreateNew(itemNr + 1, item, this.rows, false, this.addItemElem)
       this.rows.push(newRow)
     })
   }
@@ -88,7 +88,7 @@ class SourceItemTable {
     this.templateRow.RemoveCreatedElements()
     this.rows.splice(0, Infinity)
 
-    this.addItemElemJQ.focus()
+    this.addItemElem.focus()
   }
 
 

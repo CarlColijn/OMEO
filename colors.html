@@ -6,9 +6,6 @@
     <meta charset="utf-8">
     <meta content="initial-scale=1, width=device-width" name="viewport">
 
-    <!-- http://jquery.com/ -->
-    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-
     <!-- own content -->
     <link href="source/styles/styles.css" rel="stylesheet">
 
@@ -51,29 +48,35 @@
       }
 
       function UpdateCSS(idSuffix, colorText) {
+        let SetElemsBackgroundColor = (selector) => {
+          document.querySelectorAll(selector).forEach((elem) => {
+            elem.style.background = colorText
+          })
+        }
+
         if (idSuffix == 'b')
-          $('.newColor').css('background', colorText)
+          SetElemsBackgroundColor('.newColor')
         else if (idSuffix == 'h')
-          $('.newColor h1, .newColor #banner, .newColor em, .newColor thead tr').css('background', colorText)
+          SetElemsBackgroundColor('.newColor h1, .newColor #banner, .newColor em, .newColor thead tr')
         else if (idSuffix == 'o')
-          $('.newColor tbody tr:nth-child(odd)').css('background', colorText)
+          SetElemsBackgroundColor('.newColor tbody tr:nth-child(odd)')
         else if (idSuffix == 'e')
-          $('.newColor tbody tr:nth-child(even)').css('background', colorText)
+          SetElemsBackgroundColor('.newColor tbody tr:nth-child(even)')
       }
 
       function ChangeColorGroup(idSuffix) {
-        let hue = $('#hue')[0].value
-        let sat = $(`#sat_${idSuffix}`)[0].value
-        let lum = $(`#lum_${idSuffix}`)[0].value
+        let hue = document.getElementById('hue').value
+        let sat = document.getElementById(`sat_${idSuffix}`).value
+        let lum = document.getElementById(`lum_${idSuffix}`).value
         let colorText = HslToRgbText(hue / 255.0, sat / 255.0, lum / 255.0)
 
-        $(`#${idSuffix}_val`).text(colorText)
+        document.getElementById(`${idSuffix}_val`).textContent = colorText
 
         UpdateCSS(idSuffix, colorText)
       }
 
       function ShowSliderValue(sliderElem) {
-        $(`#${sliderElem.id}_val`).text(sliderElem.value)
+        document.getElementById(`${sliderElem.id}_val`).textContent = sliderElem.value
       }
 
       function ChangeColor(elem) {
@@ -92,12 +95,12 @@
         }
       }
 
-      $('document').ready(() => {
-        $('.slider').each(function() {
-          this.oninput = () => {
-            ChangeColor(this)
-          }
-          ChangeColor(this)
+      window.addEventListener('load', () => {
+        document.querySelectorAll('.slider').forEach((sliderElem) => {
+          sliderElem.addEventListener('input', () => {
+            ChangeColor(sliderElem)
+          })
+          ChangeColor(sliderElem)
         })
       })
     </script>

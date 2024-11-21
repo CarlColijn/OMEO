@@ -16,18 +16,18 @@
 
 
 class EnchantRowTemplate extends TemplateElement {
-  constructor(parentElemJQ, elementClass) {
-    super(parentElemJQ, elementClass)
+  constructor(parentElem, elementClass) {
+    super(parentElem, elementClass)
   }
 
 
   // returns EnchantRow
-  CreateNew(itemID, enchant, allRows, giveFocus, focusElemJQWhenAllGone, ChangeEnchantCallback) {
-    let newRowElemJQ = super.CreateExtraElement()
-    let newRow = new EnchantRow(newRowElemJQ, itemID, enchant, allRows, focusElemJQWhenAllGone, ChangeEnchantCallback)
+  CreateNew(itemID, enchant, allRows, giveFocus, focusElemWhenAllGone, ChangeEnchantCallback) {
+    let newRowElem = super.CreateExtraElement()
+    let newRow = new EnchantRow(newRowElem, itemID, enchant, allRows, focusElemWhenAllGone, ChangeEnchantCallback)
 
     if (giveFocus)
-      newRow.idElemJQ[0].focus()
+      newRow.idElem.focus()
 
     return newRow
   }
@@ -37,18 +37,18 @@ class EnchantRowTemplate extends TemplateElement {
 
 
 class EnchantRow extends RealElement {
-  constructor(rowElemJQ, itemID, enchant, allRows, focusElemJQWhenAllGone, ChangeEnchantCallback) {
-    super(rowElemJQ)
+  constructor(rowElem, itemID, enchant, allRows, focusElemWhenAllGone, ChangeEnchantCallback) {
+    super(rowElem)
 
     // ==== PRIVATE ====
     this.allRows = allRows
     this.allRows.push(this)
 
-    this.idElemJQ = rowElemJQ.find('select[name="enchantID"]')
-    this.levelElem = new ButtonStrip(rowElemJQ.find('.levelInput'))
+    this.idElem = rowElem.querySelector('select[name="enchantID"]')
+    this.levelElem = new ButtonStrip(rowElem.querySelector('.levelInput'))
     this.UpdateEnchantOptions(itemID)
 
-    this.focusElemJQWhenAllGone = focusElemJQWhenAllGone
+    this.focusElemWhenAllGone = focusElemWhenAllGone
     this.HookUpGUI(itemID, ChangeEnchantCallback)
 
     this.SetEnchant(enchant)
@@ -70,18 +70,18 @@ class EnchantRow extends RealElement {
 
 
   Remove() {
-    let focusRowElemJQ = this.elemJQ.next()
-    if (focusRowElemJQ.length == 0)
-      focusRowElemJQ = this.elemJQ.prev()
+    let focusRowElem = this.elem.nextElementSibling
+    if (focusRowElem === null || !new DOMElement(focusRowElem).IsReal())
+      focusRowElem = this.elem.previousElementSibling
 
-    let focusElemJQ
-    if (focusRowElemJQ.length > 0 && new DOMElement(focusRowElemJQ).IsReal())
-      focusElemJQ = focusRowElemJQ.find('button[name="removeEnchant"]')
+    let focusElem
+    if (focusRowElem !== null && new DOMElement(focusRowElem).IsReal())
+      focusElem = focusRowElem.querySelector('button[name="removeEnchant"]')
     else
-      focusElemJQ = this.focusElemJQWhenAllGone
+      focusElem = this.focusElemWhenAllGone
 
-    if (focusElemJQ?.length > 0)
-      focusElemJQ[0].focus()
+    if (focusElem)
+      focusElem.focus()
 
     let ourRowNr = this.allRows.indexOf(this)
     if (ourRowNr != -1)
@@ -98,12 +98,12 @@ class EnchantRow extends RealElement {
 
   SetEnchant(enchant) {
     if (enchant === undefined) {
-      this.enchantID = parseInt(this.idElemJQ.val())
+      this.enchantID = parseInt(this.idElem.value)
       enchant = this.GetEnchant()
     }
     else {
       this.enchantID = enchant.id
-      this.idElemJQ.val(enchant.id)
+      this.idElem.value = enchant.id
     }
 
     this.UpdateLevelOptions(enchant)
@@ -121,8 +121,8 @@ class EnchantRow extends RealElement {
 
 
   HookUpGUI(itemID, ChangeEnchantCallback) {
-    this.idElemJQ.change(() => {
-      this.enchantID = parseInt(this.idElemJQ.val())
+    this.idElem.addEventListener('change', () => {
+      this.enchantID = parseInt(this.idElem.value)
       let enchant = this.GetEnchant()
 
       this.UpdateLevelOptions(enchant)
@@ -132,7 +132,7 @@ class EnchantRow extends RealElement {
       ChangeEnchantCallback()
     })
 
-    this.elemJQ.find('button[name="removeEnchant"]').click(() => {
+    this.elem.querySelector('button[name="removeEnchant"]').addEventListener('click', () => {
       this.Remove()
 
       ChangeEnchantCallback()
@@ -160,22 +160,23 @@ class EnchantRow extends RealElement {
   EnchantChoicesChanged() {
     let unusableEnchantIDs = this.GetUnusableEnchantIDs()
 
-    this.idElemJQ.find('option').each(function() {
-      let optionElemJQ = $(this)
-      let enchantID = parseInt(optionElemJQ.val())
+    this.idElem.querySelectorAll('option').forEach((optionElem) => {
+      let enchantID = parseInt(optionElem.value)
 
       if (enchantID != this.enchantID) {
         if (unusableEnchantIDs.has(enchantID))
-          optionElemJQ.attr('disabled', 'disabled')
+          optionElem.setAttribute('disabled', 'disabled')
         else
-          optionElemJQ.removeAttr('disabled')
+          optionElem.removeAttribute('disabled')
       }
     })
   }
 
 
   UpdateEnchantOptions(itemID) {
-    this.idElemJQ.find('option').remove()
+    this.idElem.querySelectorAll('option').forEach((optionElem) => {
+      optionElem.remove()
+    })
 
     let itemInfo = g_itemInfosByID.get(itemID)
 
@@ -185,7 +186,12 @@ class EnchantRow extends RealElement {
       let enchantInfo = g_enchantInfos[enchantNr]
       if (itemInfo.CanHaveEnchant(enchantInfo.id)) {
         let enchantUnusable = unusableEnchantIDs.has(enchantInfo.id)
-        this.idElemJQ.append(`<option value="${enchantInfo.id}"${enchantUnusable ? ' disabled="disabled"' : ''}>${enchantInfo.name}</option>`)
+        let optionElem = document.createElement('option')
+        optionElem.value = enchantInfo.id
+        optionElem.textContent = enchantInfo.name
+        if (enchantUnusable)
+          optionElem.setAttribute('disabled', 'disabled')
+        this.idElem.appendChild(optionElem)
       }
     }
   }

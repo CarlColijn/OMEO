@@ -17,21 +17,21 @@
 
 
 class DesiredItemSection {
-  constructor(sectionElemJQ, AskMaySetMaxedDesiredEnchants) {
+  constructor(sectionElem, AskMaySetMaxedDesiredEnchants) {
     // ==== PRIVATE ====
-    this.elemJQ = sectionElemJQ.first()
-    this.iconElemJQ = this.elemJQ.find('.icon')
-    this.idElemJQ = this.elemJQ.find('select[name="itemID"]')
+    this.elem = sectionElem
+    this.iconElem = this.elem.querySelector('.icon')
+    this.idElem = this.elem.querySelector('select[name="itemID"]')
     this.SetupItemOptions()
     this.HookUpGUI(AskMaySetMaxedDesiredEnchants)
 
     let item = this.SyncCurrentItemWithoutEnchants()
 
-    let addEnchantElemJQ = this.elemJQ.find('button[name="addEnchant"]')
+    let addEnchantElem = this.elem.querySelector('button[name="addEnchant"]')
     let EnchantStateChangedHandler = (hasEnchants) => {
       this.EnchantStateChanged(hasEnchants)
     }
-    this.enchantSection = new EnchantSection(item, addEnchantElemJQ, this.elemJQ, EnchantStateChangedHandler)
+    this.enchantSection = new EnchantSection(item, addEnchantElem, this.elem, EnchantStateChangedHandler)
 
     this.SetItem(item)
   }
@@ -47,7 +47,7 @@ class DesiredItemSection {
 
   SetItem(item) {
     this.itemID = item.id
-    this.idElemJQ.val(item.id)
+    this.idElem.value = item.id
 
     this.enchantSection.ChangeItem(item)
   }
@@ -58,11 +58,12 @@ class DesiredItemSection {
 
   // returns Item
   SyncCurrentItemWithoutEnchants() {
-    this.itemID = parseInt(this.idElemJQ.val())
+    let id = parseInt(this.idElem.value)
+    this.itemID = id
     return new Item(
       1,
       g_desired,
-      parseInt(this.idElemJQ.val()),
+      id,
       0
     )
   }
@@ -71,7 +72,10 @@ class DesiredItemSection {
   SetupItemOptions() {
     for (let itemNr = 0; itemNr < g_numDifferentItems; ++itemNr) {
       let itemInfo = g_itemInfos[itemNr]
-      this.idElemJQ.append(`<option value="${itemInfo.id}">${itemInfo.name}</option>`)
+      let optionElem = document.createElement('option')
+      optionElem.setAttribute('value', itemInfo.id)
+      optionElem.textContent = itemInfo.name
+      this.idElem.appendChild(optionElem)
     }
   }
 
@@ -120,18 +124,18 @@ class DesiredItemSection {
 
 
   HookUpGUI(AskMaySetMaxedDesiredEnchants) {
-    this.idElemJQ.change(() => {
+    this.idElem.addEventListener('change', () => {
       let item = this.SyncCurrentItemWithoutEnchants()
       this.enchantSection.ChangeItem(item)
     })
 
-    this.elemJQ.find('button[name="addMaxEnchants"]').click(() => {
+    this.elem.querySelector('button[name="addMaxEnchants"]').addEventListener('click', () => {
       this.AddMaxEnchants(AskMaySetMaxedDesiredEnchants)
     })
   }
 
 
   EnchantStateChanged(hasEnchants) {
-    SetIcon(this.iconElemJQ, this.itemID, hasEnchants)
+    SetIcon(this.iconElem, this.itemID, hasEnchants)
   }
 }

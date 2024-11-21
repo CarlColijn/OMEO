@@ -30,13 +30,12 @@ class MainForm {
   constructor(formHandler) {
     this.formHandler = formHandler
 
-    $(() => {
-      // only execute once the DOM is fully loaded
+    window.addEventListener('load', () => {
       this.StartUp()
     })
 
-    $(window).on('beforeunload', (event) => {
-      this.ShutDown(event)
+    window.addEventListener('unload', () => {
+      this.ShutDown()
     })
   }
 
@@ -55,7 +54,7 @@ class MainForm {
   }
 
 
-  ShutDown(event) {
+  ShutDown() {
     this.Save(false)
   }
 
@@ -82,27 +81,27 @@ class MainForm {
 
 
   InitializeSubObjects() {
-    this.sourceItemTable = new SourceItemTable($('#sources table'), $('#addSourceItem'))
-    this.desiredItemSection = new DesiredItemSection($('#desired .item'), (maxEnchantsCallbackInfo) => { return this.AskMaySetMaxedDesiredEnchants(maxEnchantsCallbackInfo) })
-    this.renameTooElemJQ = $('#desired #renameToo')
+    this.sourceItemTable = new SourceItemTable(document.querySelector('#sources table'), document.getElementById('addSourceItem'))
+    this.desiredItemSection = new DesiredItemSection(document.querySelector('#desired .item'), (maxEnchantsCallbackInfo) => { return this.AskMaySetMaxedDesiredEnchants(maxEnchantsCallbackInfo) })
+    this.renameTooElem = document.getElementById('renameToo')
 
     let ShowDetailsCallback = (item) => {
       this.ShowRecipePage(item)
     }
-    this.combineItemTable = new CombinedItemTable($('#combined table'), ShowDetailsCallback)
+    this.combineItemTable = new CombinedItemTable(document.querySelector('#combined table'), ShowDetailsCallback)
   }
 
 
   HookUpGUI() {
-    $('#autoFillSources').click(() => {
+    document.querySelector('#autoFillSources').addEventListener('click', () => {
       this.AutoFillSources()
     })
 
-    $('#divine').click(() => {
+    document.querySelector('#divine').addEventListener('click', () => {
       this.PerformDivine()
     })
 
-    $('#makeBookmark').click(() => {
+    document.querySelector('#makeBookmark').addEventListener('click', () => {
       if (!this.Save(true))
         this.formHandler.TellFailedToSaveOnRequest()
     })
@@ -202,27 +201,35 @@ class MainForm {
 
 
   InitializeNotesSection() {
-    let notesElemJQ = $('#notes')
-    let hideNotesElemJQ = $('#hideNotes')
-    let showNotesElemJQ = $('#showNotes')
+    let notesElem = document.getElementById('notes')
+    let hideNotesElem = document.getElementById('hideNotes')
+    let showNotesElem = document.getElementById('showNotes')
 
-    let hideNotes = localStorage.getItem('hideNotes') != null
-    if (hideNotes) {
-      notesElemJQ.hide()
-      showNotesElemJQ.show()
+    let notesHeight = notesElem.clientHeight
+
+    let HideNotes = (withRefocus) => {
+      HideElemAnimated(notesElem, g_mfSettings.showHideSpeedMS)
+      ShowElemAnimated(showNotesElem, 'block', g_mfSettings.showHideSpeedMS)
+      if (withRefocus)
+        showNotesElem.focus()
+    }
+    let ShowNotes = () => {
+      ShowElemAnimated(notesElem, 'block', g_mfSettings.showHideSpeedMS)
+      HideElemAnimated(showNotesElem, g_mfSettings.showHideSpeedMS)
     }
 
-    let showHideOptions = {
-      'duration': g_mfSettings.showHideSpeedMS
-    }
-    hideNotesElemJQ.click(() => {
-      notesElemJQ.hide(showHideOptions)
-      showNotesElemJQ.show(showHideOptions)
+    let mustHideNotes = localStorage.getItem('hideNotes') != null
+    if (mustHideNotes)
+      HideNotes(false)
+    else
+      ShowNotes()
+
+    hideNotesElem.addEventListener('click', () => {
+      HideNotes(true)
       localStorage.setItem('hideNotes', '1')
     })
-    showNotesElemJQ.click(() => {
-      notesElemJQ.show(showHideOptions)
-      showNotesElemJQ.hide(showHideOptions)
+    showNotesElem.addEventListener('click', () => {
+      ShowNotes()
       localStorage.removeItem('hideNotes')
     })
   }
@@ -252,7 +259,7 @@ class MainForm {
     else
       sourceItemsResult = this.sourceItemTable.ExtractItems(new SourceItemCollector(mergeSourceItems))
     let desiredItem = this.desiredItemSection.GetItem()
-    let renameToo = this.renameTooElemJQ.prop('checked')
+    let renameToo = this.renameTooElem.checked
 
     let data = new MainFormData()
     data.AddSourceItems(sourceItemsResult.items)
@@ -271,7 +278,7 @@ class MainForm {
     this.ClearResult()
     this.sourceItemTable.SetItems(data.sourceItems)
     this.desiredItemSection.SetItem(data.desiredItem)
-    this.renameTooElemJQ.prop('checked', data.renameToo)
+    this.renameTooElem.checked = data.renameToo
   }
 
 

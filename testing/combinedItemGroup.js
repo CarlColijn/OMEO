@@ -3,7 +3,7 @@ function GetCombinedItemGroupTemplate() {
     click: () => {}
   }
 
-  return new CombinedItemGroupTemplate($('#combinedItemGroup'), 'group', CallbackHandlerMock)
+  return new CombinedItemGroupTemplate(document.getElementById('combinedItemGroup'), 'group', CallbackHandlerMock)
 }
 
 
@@ -23,16 +23,16 @@ function GetDescriptionForMatch(match) {
 }
 
 
-function GetCombinedItemGroupDescription(itemGroupElemJQ) {
-  return itemGroupElemJQ.find('.heading span:not(".template")').text()
+function GetCombinedItemGroupDescription(itemGroupElem) {
+  let headingElem = itemGroupElem.querySelector('.heading span:not(.template)')
+  return headingElem.textContent
 }
 
 
 function CombinedItemGroupInTable(testContainerID, description) {
   let foundGroup = false
-  $(`#${testContainerID} tbody`).each((groupNr, itemGroupElem) => {
-    let itemGroupElemJQ = $(itemGroupElem)
-    if (description == GetCombinedItemGroupDescription(itemGroupElemJQ)) {
+  document.querySelectorAll(`#${testContainerID} tbody.group:not(.template)`).forEach((itemGroupElem) => {
+    if (description == GetCombinedItemGroupDescription(itemGroupElem)) {
       foundGroup = true
       return false
     }
@@ -75,7 +75,7 @@ jazil.AddTestSet(mainPage, 'CombinedItemGroup', {
     let itemGroup = CreateCombinedItemGroup(templateGroup, g_exactMatch)
 
     let neededDescription = GetDescriptionForMatch(g_exactMatch)
-    let foundDescription = GetCombinedItemGroupDescription(itemGroup.elemJQ)
+    let foundDescription = GetCombinedItemGroupDescription(itemGroup.elem)
 
     jazil.ShouldBe(foundDescription, neededDescription, 'description is off!')
     jazil.ShouldBe(CombinedItemGroupInTable('combinedItemGroup', neededDescription), true, 'added group is not present!')
@@ -91,7 +91,7 @@ jazil.AddTestSet(mainPage, 'CombinedItemGroup', {
       let itemGroup = CreateCombinedItemGroup(templateGroup, match)
 
       let neededDescription = GetDescriptionForMatch(match)
-      let foundDescription = GetCombinedItemGroupDescription(itemGroup.elemJQ)
+      let foundDescription = GetCombinedItemGroupDescription(itemGroup.elem)
 
       jazil.ShouldBe(foundDescription, neededDescription, `description is off for ${foundDescription}!`)
       jazil.ShouldBe(CombinedItemGroupInTable('combinedItemGroup', neededDescription), true, `added group is not present for ${foundDescription}!`)
@@ -105,9 +105,9 @@ jazil.AddTestSet(mainPage, 'CombinedItemGroup', {
     let itemGroup1 = CreateCombinedItemGroup(templateGroup, g_lesserMatch)
     let itemGroup2 = CreateCombinedItemGroup(templateGroup, g_betterMatch)
     let itemGroup3 = CreateCombinedItemGroup(templateGroup, g_mixedMatch)
-    let numGroupsPre = $('#combinedItemGroup .group').length
+    let numGroupsPre = document.querySelectorAll('#combinedItemGroup .group').length
     itemGroup2.Remove()
-    let numGroupsPost = $('#combinedItemGroup .group').length
+    let numGroupsPost = document.querySelectorAll('#combinedItemGroup .group').length
 
     let neededDescription = GetDescriptionForMatch(g_betterMatch)
 

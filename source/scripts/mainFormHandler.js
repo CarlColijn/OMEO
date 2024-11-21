@@ -12,17 +12,17 @@
 
 class MainFormHandler {
   AskLoadFromURLOrLocalStorage(OnLocalStorage, OnURL) {
-    let dialogElemJQ = $('#urlVsLocalStorageConflict')
-    dialogElemJQ.css('display', 'flex')
+    let dialogElem = document.getElementById('urlVsLocalStorageConflict')
+    dialogElem.style.display = 'flex'
 
-    dialogElemJQ.find('.useURL').click(() => {
-      dialogElemJQ.hide()
+    dialogElem.querySelector('.useURL').addEventListener('click', () => {
+      dialogElem.style.display = 'none'
 
       OnURL()
     })
 
-    dialogElemJQ.find('.useLocalStorage').click(() => {
-      dialogElemJQ.hide()
+    dialogElem.querySelector('.useLocalStorage').addEventListener('click', () => {
+      dialogElem.style.display = 'none'
 
       OnLocalStorage()
     })
@@ -30,42 +30,42 @@ class MainFormHandler {
 
 
   FailedToLoad() {
-    new SimpleDialog('#dataInErrorForLoad').HookupButton('.exit')
+    new SimpleDialog('dataInErrorForLoad').HookupButton('.exit')
   }
 
 
   TellFailedToSaveOnRequest() {
-    new SimpleDialog('#dataInErrorForSave').HookupButton('.exit')
+    new SimpleDialog('dataInErrorForSave').HookupButton('.exit')
   }
 
 
   TellDataInErrorForDivine() {
-    new SimpleDialog('#dataInErrorForDivine').HookupButton('.exit')
+    new SimpleDialog('dataInErrorForDivine').HookupButton('.exit')
   }
 
 
   TellDataInErrorForFillSources() {
-    new SimpleDialog('#dataInErrorForFillSources').HookupButton('.exit')
+    new SimpleDialog('dataInErrorForFillSources').HookupButton('.exit')
   }
 
 
   TellItemsMerged(OnExit) {
-    new SimpleDialog('#itemsMerged', OnExit).HookupButton('.exit', OnExit)
+    new SimpleDialog('itemsMerged', OnExit).HookupButton('.exit', OnExit)
   }
 
 
   AskMaySetMaxedDesiredEnchants(maxEnchantsCallbackInfo) {
     let dialogID =
       maxEnchantsCallbackInfo.hasConflictingEnchants && maxEnchantsCallbackInfo.enchantsAlreadyPresent ?
-      '#maySetMaxedDesiredEnchants_askConflictAndReplace' :
+      'maySetMaxedDesiredEnchants_askConflictAndReplace' :
       maxEnchantsCallbackInfo.hasConflictingEnchants ?
-      '#maySetMaxedDesiredEnchants_askConflictOnly' :
-      '#maySetMaxedDesiredEnchants_askReplaceOnly'
+      'maySetMaxedDesiredEnchants_askConflictOnly' :
+      'maySetMaxedDesiredEnchants_askReplaceOnly'
 
     let withEnchantConflictPicker = maxEnchantsCallbackInfo.hasConflictingEnchants
     let enchantConflictPicker =
       withEnchantConflictPicker ?
-      new EnchantConflictPicker($(dialogID), maxEnchantsCallbackInfo.info) :
+      new EnchantConflictPicker(document.getElementById(dialogID), maxEnchantsCallbackInfo.info) :
       undefined
     let OnYesClicked = () => {
       maxEnchantsCallbackInfo.OnContinue(
@@ -80,26 +80,26 @@ class MainFormHandler {
 
 
   AskMayOverwriteSources(OnYesClicked) {
-    new SimpleDialog('#mayOverwriteSources').HookupButton('.no').HookupButton('.yes', OnYesClicked)
+    new SimpleDialog('mayOverwriteSources').HookupButton('.no').HookupButton('.yes', OnYesClicked)
   }
 
 
   TellCombineStarting(OnCancel) {
-    $('#divineTitle').html('Divination is in progress')
-    $('#divineProgress').html('Starting up...')
-    $('#divining .exit').html('Stop')
+    document.getElementById('divineTitle').textContent = 'Divination is in progress'
+    document.getElementById('divineProgress').textContent = 'Starting up...'
+    document.querySelector('#divining .exit').textContent = 'Stop'
 
-    new SimpleDialog('#divining', OnCancel).HookupButton('.exit', OnCancel)
+    new SimpleDialog('divining', OnCancel).HookupButton('.exit', OnCancel)
   }
 
 
   TellCombineFinalizing() {
-    $('#divineProgress').html('Finalizing...')
+    document.getElementById('divineProgress').textContent = 'Finalizing...'
   }
 
 
   TellCombineProgress(progress, maxProgress, timeInMilliseconds) {
-    $('#divineProgress').html(this.GetProgressMessage(progress, maxProgress, timeInMilliseconds))
+    document.getElementById('divineProgress').innerHTML = this.GetProgressMessageHTML(progress, maxProgress, timeInMilliseconds)
   }
 
 
@@ -111,34 +111,34 @@ class MainFormHandler {
     let hasMixedMatches = filteredCombinedItems.ratedItemsByMatch[g_mixedMatch].length > 0
 
     let title = 'Divination is compete!'
-    let message = `${this.GetProgressMessage(maxProgress, maxProgress, timeInMilliseconds)}<br><br>`
+    let messageHTML = `${this.GetProgressMessageHTML(maxProgress, maxProgress, timeInMilliseconds)}<br><br>`
     if (filteredCombinedItems.exactOnlyWithoutRename)
-      message += 'An exact match cannot be made when renaming; it would be too costly.<br><br>Consider not renaming the item to see what is possible.'
+      messageHTML += 'An exact match cannot be made when renaming; it would be too costly.<br><br>Consider not renaming the item to see what is possible.'
 
     if (!hasExactMatches && !hasBetterMatches && !hasLesserMatches && !hasMixedMatches) {
       title = 'Divination is unsuccessful'
       if (!filteredCombinedItems.exactOnlyWithoutRename)
-        message += 'Sorry, I couldn\'t come up with your desired item at all.<br><br>Please look at your source items and desired item and make sure there is some sort of match.'
+        messageHTML += 'Sorry, I couldn\'t come up with your desired item at all.<br><br>Please look at your source items and desired item and make sure there is some sort of match.'
     }
     else if (hasExactMatches) {
       if (hasBetterMatches)
-        message += 'I could also create combinations with even more enchantments.<br><br>I\'ll also show these combinations.'
+        messageHTML += 'I could also create combinations with even more enchantments.<br><br>I\'ll also show these combinations.'
       else
-        message += 'I\'ll show how to get at your desired item.'
+        messageHTML += 'I\'ll show how to get at your desired item.'
     }
     else {
       if (!filteredCombinedItems.exactOnlyWithoutRename)
-        message += 'An exact match cannot be made.'
+        messageHTML += 'An exact match cannot be made.'
 
       if (hasBetterMatches)
-        message += '<br><br>I could create other combinations with even more enchantments; I\'ll show these instead.'
+        messageHTML += '<br><br>I could create other combinations with even more enchantments; I\'ll show these instead.'
       else
-        message += '<br><br>I\'ll show you what can be made.'
+        messageHTML += '<br><br>I\'ll show you what can be made.'
     }
 
-    $('#divineTitle').html(title)
-    $('#divineProgress').html(message)
-    $('#divining .exit').html('OK')
+    document.getElementById('divineTitle').textContent = title
+    document.getElementById('divineProgress').innerHTML = messageHTML
+    document.querySelector('#divining .exit').textContent = 'OK'
   }
 
 
@@ -159,7 +159,7 @@ class MainFormHandler {
 
 
   // returns string
-  GetProgressMessage(progress, maxProgress, timeInMilliseconds) {
+  GetProgressMessageHTML(progress, maxProgress, timeInMilliseconds) {
     let timeInSeconds = Math.round(timeInMilliseconds / 1000)
 
     let percentageText =

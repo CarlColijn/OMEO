@@ -6,7 +6,7 @@
 
   Defined classes:
   - CombinedItemTable
-    - tableElemJQ: the main table's jQuery element
+    - tableElem: the main table's element
 */
 
 
@@ -14,14 +14,14 @@
 
 
 class CombinedItemTable {
-  constructor(tableElemJQ, ShowDetails) {
+  constructor(tableElem, ShowDetails) {
     // ==== PUBLIC ====
-    this.tableElemJQ = tableElemJQ
+    this.tableElem = tableElem
 
     // ==== PRIVATE ====
     this.ShowDetails = ShowDetails
 
-    this.itemTemplateGroup = new CombinedItemGroupTemplate(this.tableElemJQ, 'group', ShowDetails)
+    this.itemTemplateGroup = new CombinedItemGroupTemplate(this.tableElem, 'group', ShowDetails)
   }
 
 

@@ -1,5 +1,5 @@
 function GetEnchantTemplateRow() {
-  return new EnchantRowTemplate($('#enchantRow'), 'enchant')
+  return new EnchantRowTemplate(document.getElementById('enchantRow'), 'enchant')
 }
 
 
@@ -13,23 +13,21 @@ function CreateEnchantRow(templateRow, enchantName, enchantLevel, itemName, allR
 
   return templateRow.CreateNew(
     itemID, enchant, allRows,
-    false, undefined, undefined
+    false, document.getElementById('dummyButton'), undefined
   )
 }
 
 
-function GetEnchantRowDetails(enchantRowElemJQ) {
-  let idElemJQ = enchantRowElemJQ.find('[name=enchantID]')
-  let idText = idElemJQ.val()
-  let id = idText === null ? 0 : parseInt(idText)
-  let levelElemJQ = enchantRowElemJQ.find('.levelInput .selectedButton')
-  let level = parseInt(levelElemJQ.val()) + 1
+function GetEnchantRowDetails(enchantRowElem) {
+  let idElem = enchantRowElem.querySelector('[name=enchantID]')
+  let idText = idElem.value
+  let id = parseInt(idText)
+  let levelElem = enchantRowElem.querySelector('.levelInput .selectedButton')
+  let level = parseInt(levelElem.value) + 1
   let enabledByID = new Map()
-  idElemJQ.find('option').each(function() {
-    let optionElemJQ = $(this)
-    let optionID = parseInt(optionElemJQ.val())
-    let enabled = optionElemJQ.attr('disabled') !== 'disabled'
-    enabledByID.set(optionID, enabled)
+  idElem.querySelectorAll('option').forEach((optionElem) => {
+    let optionID = parseInt(optionElem.value)
+    enabledByID.set(optionID, !optionElem.disabled)
   })
   return {
     id: id,
@@ -42,12 +40,13 @@ function GetEnchantRowDetails(enchantRowElemJQ) {
 
 function EnchantRowInTable(enchantName) {
   let foundRow = false
-  $('#enchantRow tr').each((rowNr, enchantRowElem) => {
-    let enchantRowElemJQ = $(enchantRowElem)
-    let details = GetEnchantRowDetails(enchantRowElemJQ)
-    if (details.name == enchantName) {
-      foundRow = true
-      return false
+  document.querySelectorAll('#enchantRow tr').forEach((enchantRowElem) => {
+    if (enchantRowElem.dataset.real == '1') {
+      let details = GetEnchantRowDetails(enchantRowElem)
+      if (details.name == enchantName) {
+        foundRow = true
+        return false
+      }
     }
     return true
   })
@@ -78,7 +77,7 @@ jazil.AddTestSet(mainPage, 'EnchantRow', {
     let allRows = []
 
     let enchantRow = CreateEnchantRow(templateRow, undefined, undefined, 'Axe', allRows)
-    let details = GetEnchantRowDetails(enchantRow.elemJQ)
+    let details = GetEnchantRowDetails(enchantRow.elem)
 
     jazil.ShouldBe(enchantRow.IsReal(), true, 'IsReal is off!')
     jazil.ShouldBe(enchantRow.GetEnchantID(), details.id, 'id is off!')
@@ -93,7 +92,7 @@ jazil.AddTestSet(mainPage, 'EnchantRow', {
 
     let enchantRow1 = CreateEnchantRow(templateRow, undefined, undefined, 'Axe', allRows)
     let enchantRow2 = CreateEnchantRow(templateRow, undefined, undefined, 'Axe', allRows)
-    let details = GetEnchantRowDetails(enchantRow2.elemJQ)
+    let details = GetEnchantRowDetails(enchantRow2.elem)
 
     jazil.ShouldBe(enchantRow2.IsReal(), true, 'IsReal is off!')
     jazil.ShouldBe(enchantRow2.GetEnchantID(), details.id, 'id is off!')
@@ -107,7 +106,7 @@ jazil.AddTestSet(mainPage, 'EnchantRow', {
     let allRows = []
 
     let enchantRow = CreateEnchantRow(templateRow, 'Unbreaking', 3, 'Axe', allRows)
-    let details = GetEnchantRowDetails(enchantRow.elemJQ)
+    let details = GetEnchantRowDetails(enchantRow.elem)
 
     jazil.ShouldBe(enchantRow.GetEnchantID(), details.id, 'id is off!')
     jazil.ShouldBe(details.name, 'Unbreaking', 'name is off!')
@@ -119,11 +118,11 @@ jazil.AddTestSet(mainPage, 'EnchantRow', {
     let templateRow = GetEnchantTemplateRow()
     let allRows = []
 
-    let numRowsPre = $('#enchantRow tr').length
+    let numRowsPre = document.querySelectorAll('#enchantRow tr').length
     let enchantRow1 = CreateEnchantRow(templateRow, 'Respiration', 1, 'Helmet', allRows)
     let enchantRow2 = CreateEnchantRow(templateRow, 'Aqua Affinity', 1, 'Helmet', allRows)
     let enchantRow3 = CreateEnchantRow(templateRow, 'Blast Protection', 2, 'Helmet', allRows)
-    let numRowsPost = $('#enchantRow tr').length
+    let numRowsPost = document.querySelectorAll('#enchantRow tr').length
 
     jazil.ShouldBe(numRowsPost - numRowsPre, 3, 'amount of rows added is off!')
   },
@@ -135,9 +134,9 @@ jazil.AddTestSet(mainPage, 'EnchantRow', {
     let enchantRow1 = CreateEnchantRow(templateRow, 'Protection', 2, 'Chestplate', allRows)
     let enchantRow2 = CreateEnchantRow(templateRow, 'Mending', 1, 'Chestplate', allRows)
     let enchantRow3 = CreateEnchantRow(templateRow, 'Thorns', 1, 'Chestplate', allRows)
-    let numRowsPre = $('#enchantRow tr').length
+    let numRowsPre = document.querySelectorAll('#enchantRow tr').length
     enchantRow2.Remove()
-    let numRowsPost = $('#enchantRow tr').length
+    let numRowsPost = document.querySelectorAll('#enchantRow tr').length
 
     jazil.ShouldBe(numRowsPost - numRowsPre, -1, 'amount of rows removed is off!')
     jazil.ShouldBe(EnchantRowInTable('Mending'), false, 'removed row is still present!')
@@ -149,7 +148,7 @@ jazil.AddTestSet(mainPage, 'EnchantRow', {
 
     let enchantRow = CreateEnchantRow(templateRow, 'Feather Falling', 2, 'Boots', allRows)
     enchantRow.SetEnchant(BuildEnchant('Depth Strider', 1))
-    let details = GetEnchantRowDetails(enchantRow.elemJQ)
+    let details = GetEnchantRowDetails(enchantRow.elem)
 
     jazil.ShouldBe(enchantRow.GetEnchantID(), details.id, 'id is off!')
     jazil.ShouldBe(details.name, 'Depth Strider', 'name is off!')
@@ -171,9 +170,9 @@ jazil.AddTestSet(mainPage, 'EnchantRow', {
     let infinity = BuildEnchant('Infinity', 1)
     let looting = BuildEnchant('Looting', 1) // unrelated
 
-    let thornsDetails = GetEnchantRowDetails(thornsRow.elemJQ)
-    let smiteDetails = GetEnchantRowDetails(smiteRow.elemJQ)
-    let infinityDetails = GetEnchantRowDetails(infinityRow.elemJQ)
+    let thornsDetails = GetEnchantRowDetails(thornsRow.elem)
+    let smiteDetails = GetEnchantRowDetails(smiteRow.elem)
+    let infinityDetails = GetEnchantRowDetails(infinityRow.elem)
 
     let tests = [
       {

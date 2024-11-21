@@ -14,22 +14,22 @@
 
 
 class EnchantConflictPicker {
-  constructor(dialogElemJQ, itemInfo) {
+  constructor(dialogElem, itemInfo) {
     let ids = [...itemInfo.nonConflictingEnchantIDs]
     let names = ids.reduce((names, id) => {
       return names + (names.length == 0 ? '' : ' &#x2022; ') + g_enchantInfosByID.get(id).name
     }, '')
-    dialogElemJQ.find('.nonConflictEnchants').html(names)
+    dialogElem.querySelector('.nonConflictEnchants').innerHTML = names
 
-    let conflictTemplateElem = new TemplateElement(dialogElemJQ, 'conflictEnchants')
+    let conflictTemplateElem = new TemplateElement(dialogElem, 'conflictEnchants')
 
     conflictTemplateElem.RemoveCreatedElements()
-    this.selectElemJQs = []
+    this.selectElems = []
 
     itemInfo.conflictingEnchantIDSetsList.forEach((idSets) => {
-      let conflictElemJQ = conflictTemplateElem.CreateExtraElement()
-      let selectElemJQ = conflictElemJQ.find('select')
-      this.selectElemJQs.push(selectElemJQ)
+      let conflictElem = conflictTemplateElem.CreateExtraElement()
+      let selectElem = conflictElem.querySelector('select')
+      this.selectElems.push(selectElem)
 
       let optionOptions = idSets.map((idSet) => {
         let ids = [...idSet]
@@ -68,15 +68,18 @@ class EnchantConflictPicker {
       })
 
       optionOptions.forEach((optionOption) => {
-        $(`<option value="${optionOption.idsText}">${optionOption.names}</option>`).appendTo(selectElemJQ)
+        let optionElem = document.createElement('option')
+        optionElem.value = optionOption.idsText
+        optionElem.textContent = optionOption.names
+        selectElem.appendChild(optionElem)
       })
     })
   }
 
 
   GetChosenIDs() {
-    let chosenIDsText = this.selectElemJQs.reduce((idsText, selectElemJQ, selectElemNr) => {
-        return idsText + (selectElemNr == 0 ? '' : ',') + selectElemJQ.val()
+    let chosenIDsText = this.selectElems.reduce((idsText, selectElem, selectElemNr) => {
+        return idsText + (selectElemNr == 0 ? '' : ',') + selectElem.value
     }, '')
 
     return chosenIDsText.split(',').map((idText) => {

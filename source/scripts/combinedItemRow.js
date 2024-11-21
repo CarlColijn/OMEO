@@ -19,8 +19,8 @@
 
 
 class CombinedItemRowTemplate extends TemplateElement {
-  constructor(parentElemJQ, elementClass, ShowDetails) {
-    super(parentElemJQ, elementClass)
+  constructor(parentElem, elementClass, ShowDetails) {
+    super(parentElem, elementClass)
 
     // ==== PRIVATE ====
     this.ShowDetails = ShowDetails
@@ -29,14 +29,15 @@ class CombinedItemRowTemplate extends TemplateElement {
 
   // returns CombinedItemRow
   CreateNew(ratedItem) {
-    let newRowElemJQ = super.CreateExtraElement()
-    let newItemRow = new CombinedItemRow(newRowElemJQ, this.ShowDetails)
+    let newRowElem = super.CreateExtraElement()
+    let newItemRow = new CombinedItemRow(newRowElem, this.ShowDetails)
 
     let item = ratedItem.item
     newItemRow.SetItem(ratedItem)
 
     let hasEnchants = item.enchantsByID.size > 0
-    SetIcon(newItemRow.elemJQ.find('.icon'), item.id, hasEnchants)
+    let iconElem = newItemRow.elem.querySelector('.icon')
+    SetIcon(iconElem, item.id, hasEnchants)
 
     if (hasEnchants)
       newItemRow.SetEnchants(item.enchantsByID)
@@ -49,13 +50,13 @@ class CombinedItemRowTemplate extends TemplateElement {
 
 
 class CombinedItemRow extends RealElement {
-  constructor(rowElemJQ, ShowDetails) {
-    super(rowElemJQ)
+  constructor(rowElem, ShowDetails) {
+    super(rowElem)
 
     // ==== PRIVATE ====
     this.ShowDetails = ShowDetails
 
-    this.enchantTemplateRow = new CombinedEnchantRowTemplate(this.elemJQ, 'enchant')
+    this.enchantTemplateRow = new CombinedEnchantRowTemplate(this.elem, 'enchant')
   }
 
 
@@ -65,15 +66,15 @@ class CombinedItemRow extends RealElement {
   SetItem(ratedItem) {
     let item = ratedItem.item
 
-    this.elemJQ.find('.count').text(item.count)
-    this.elemJQ.find('.type').text(item.info.name)
-    this.elemJQ.find('.priorWork').text(item.priorWork)
-    this.elemJQ.find('.cost').text(item.totalCost + (item.includesRename ? 1 : 0))
-    let showDetailsElemJQ = this.elemJQ.find('[name=show]')
+    this.elem.querySelector('.count').textContent = item.count
+    this.elem.querySelector('.type').textContent = item.info.name
+    this.elem.querySelector('.priorWork').textContent = item.priorWork
+    this.elem.querySelector('.cost').textContent = item.totalCost + (item.includesRename ? 1 : 0)
+    let showDetailsElem = this.elem.querySelector('[name=show]')
     if (item.set === g_source)
-      showDetailsElemJQ.hide()
+      showDetailsElem.style.display = 'none'
     else
-      showDetailsElemJQ.click(() => {
+      showDetailsElem.addEventListener('click', () => {
         this.ShowDetails(item)
       })
   }

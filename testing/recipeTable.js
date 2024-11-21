@@ -2,15 +2,17 @@
 // since RecipeTable itself will not clear out any previous data.
 class RecipeTableTester {
   constructor() {
-    this.tableElemJQ = $('#recipeTable')
-    this.tableElemJQ.find('tr.item:not(.template)').remove()
-    this.numRowsBefore = this.tableElemJQ.find('.item').length
-    this.table = new RecipeTable(this.tableElemJQ)
+    this.tableElem = document.getElementById('recipeTable')
+    this.tableElem.querySelectorAll('tr.item:not(.template)').forEach((rowElem) => {
+      rowElem.remove()
+    })
+    this.numRowsBefore = this.tableElem.querySelectorAll('.item').length
+    this.table = new RecipeTable(this.tableElem)
   }
 
 
   Finalize() {
-    this.numRowsAfter = this.tableElemJQ.find('.item').length
+    this.numRowsAfter = this.tableElem.querySelectorAll('.item').length
     this.numRowsDiff = this.numRowsAfter - this.numRowsBefore
   }
 }
@@ -18,19 +20,17 @@ class RecipeTableTester {
 
 function CheckItemInTable(jazil, item, tester, neededPlacement) {
   let itemFound = false
-  tester.tableElemJQ.find('tr.item').each((rowNr, rowElem) => {
-    let rowElemJQ = $(rowElem)
-    if (!rowElemJQ.hasClass('template')) {
-      let listedPlacement = $(rowElemJQ.find('.placement')).text()
-      let listedDescription = $(rowElemJQ.find('.description')).text()
+  tester.tableElem.querySelectorAll('tr.item').forEach((rowElem) => {
+    if (!rowElem.classList.contains('template')) {
+      let listedPlacement = rowElem.querySelector('.placement').textContent
+      let listedDescription = rowElem.querySelector('.description').textContent
       let listedEnchants = ''
-      $(rowElemJQ.find('.enchant:not(.template)')).each(function(rowNr, rowElem) {
-        let rowElemJQ = $(rowElem)
-        listedEnchants += rowElemJQ.find('.name').text() + ' ' + rowElemJQ.find('.level').text()
+      rowElem.querySelectorAll('.enchant:not(.template)').forEach((rowElem) => {
+        listedEnchants += rowElem.querySelector('.name').textContent + ' ' + rowElem.querySelector('.level').textContent
       })
-      let listedRenameInstructions = $(rowElemJQ.find('.renameInstructions:not(.hidden)')).length > 0
-      let listedCost = $(rowElemJQ.find('.cost')).text().replace(/\s/, '')
-      let listedPriorWork = $(rowElemJQ.find('.priorWork')).text()
+      let listedRenameInstructions = rowElem.querySelectorAll('.renameInstructions:not(.hidden)').length > 0
+      let listedCost = rowElem.querySelector('.cost').textContent.replace(/\s/, '')
+      let listedPriorWork = rowElem.querySelector('.priorWork').textContent
 
       let neededDescription = `${GetSetName(item.set)} ${item.info.name}`
       if (item.set === g_source)

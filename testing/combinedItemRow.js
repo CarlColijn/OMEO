@@ -3,7 +3,7 @@ function GetCombinedItemRowTemplate() {
     click: () => {}
   }
 
-  return new CombinedItemRowTemplate($('#combinedItemRow'), 'item', CallbackHandlerMock)
+  return new CombinedItemRowTemplate(document.getElementById('combinedItemRow'), 'item', CallbackHandlerMock)
 }
 
 
@@ -13,34 +13,32 @@ function CreateCombinedItemRow(templateRow, item) {
 }
 
 
-function GetCombinedItemRowDetails(itemRowElemJQ) {
-  let MakeNumberSafe = (numberElemJQ) => {
-    let value = numberElemJQ.text()
+function GetCombinedItemRowDetails(itemRowElem) {
+  let MakeNumberSafe = (numberElem) => {
+    let value = numberElem.textContent
     return value === '' ? undefined : parseInt(value)
   }
 
-  let cost = MakeNumberSafe(itemRowElemJQ.find('.cost'))
-  let count = MakeNumberSafe(itemRowElemJQ.find('.count'))
-  let type = itemRowElemJQ.find('.type').text()
-  let priorWork = MakeNumberSafe(itemRowElemJQ.find('.priorWork'))
+  let cost = MakeNumberSafe(itemRowElem.querySelector('.cost'))
+  let count = MakeNumberSafe(itemRowElem.querySelector('.count'))
+  let type = itemRowElem.querySelector('.type').textContent
+  let priorWork = MakeNumberSafe(itemRowElem.querySelector('.priorWork'))
   enchantNames = ''
-  itemRowElemJQ.find('.enchant .name').each((enchantNr, nameElem) => {
-    let nameElemJQ = $(nameElem)
-    let rowElem = new DOMElement(nameElemJQ.parent().parent())
+  itemRowElem.querySelectorAll('.enchant .name').forEach((nameElem) => {
+    let rowElem = new DOMElement(nameElem.parentElement.parentElement)
     if (rowElem.IsReal()) {
       if (enchantNames != '')
         enchantNames += '/'
-      enchantNames += nameElemJQ.text()
+      enchantNames += nameElem.textContent
     }
   })
   enchantLevels = ''
-  itemRowElemJQ.find('.enchant .level').each((enchantNr, levelElem) => {
-    let levelElemJQ = $(levelElem)
-    let rowElem = new DOMElement(levelElemJQ.parent().parent())
+  itemRowElem.querySelectorAll('.enchant .level').forEach((levelElem) => {
+    let rowElem = new DOMElement(levelElem.parentElement.parentElement)
     if (rowElem.IsReal()) {
       if (enchantLevels != '')
         enchantLevels += '/'
-      enchantLevels += GetEnchantLevelFromGUIText(levelElemJQ.text())
+      enchantLevels += GetEnchantLevelFromGUIText(levelElem.textContent)
     }
   })
 
@@ -57,9 +55,8 @@ function GetCombinedItemRowDetails(itemRowElemJQ) {
 
 function CombinedItemRowInTable(testContainerID, type) {
   let foundRow = false
-  $(`#${testContainerID} tr.item`).each((rowNr, itemRowElem) => {
-    let itemRowElemJQ = $(itemRowElem)
-    let details = GetCombinedItemRowDetails(itemRowElemJQ)
+  document.querySelectorAll(`#${testContainerID} tr.item`).forEach((itemRowElem) => {
+    let details = GetCombinedItemRowDetails(itemRowElem)
     if (details.type == type) {
       foundRow = true
       return false
@@ -93,7 +90,7 @@ jazil.AddTestSet(mainPage, 'CombinedItemRow', {
     let item = BuildItem({ set:g_combined, name:'Pickaxe', count:9, priorWork:2, cost:15 })
     let itemRow = CreateCombinedItemRow(templateRow, item)
 
-    let details = GetCombinedItemRowDetails(itemRow.elemJQ)
+    let details = GetCombinedItemRowDetails(itemRow.elem)
 
     jazil.ShouldBe(details.cost, item.cost, 'cost is off!')
     jazil.ShouldBe(details.count, item.count, 'count is off!')
@@ -110,7 +107,7 @@ jazil.AddTestSet(mainPage, 'CombinedItemRow', {
     let item = BuildItem({ set:g_combined, name:'Turtle Shell', count:1, priorWork:4, cost:9, enchants:[{ name:'Unbreaking', level:3 }, { name:'Mending', level:1 }] })
     let itemRow = CreateCombinedItemRow(templateRow, item, 15)
 
-    let details = GetCombinedItemRowDetails(itemRow.elemJQ)
+    let details = GetCombinedItemRowDetails(itemRow.elem)
 
     jazil.ShouldBe(details.cost, item.cost, 'cost is off!')
     jazil.ShouldBe(details.count, item.count, 'count is off!')
@@ -123,14 +120,14 @@ jazil.AddTestSet(mainPage, 'CombinedItemRow', {
 
   'Added row count is OK': (jazil) => {
     let templateRow = GetCombinedItemRowTemplate()
-    let numRowsPre = $('#combinedItemRow tr.item').length
+    let numRowsPre = document.querySelectorAll('#combinedItemRow tr.item').length
     let item1 = BuildItem({ set:g_combined, name:'Chestplate', count:14, priorWork:4, cost:3 })
     let item2 = BuildItem({ set:g_combined, name:'Shovel', count:15, priorWork:5, cost:4 })
     let item3 = BuildItem({ set:g_combined, name:'Bow', count:16, priorWork:6, cost:5 })
     let itemRow1 = CreateCombinedItemRow(templateRow, item1)
     let itemRow2 = CreateCombinedItemRow(templateRow, item2)
     let itemRow3 = CreateCombinedItemRow(templateRow, item3)
-    let numRowsPost = $('#combinedItemRow tr.item').length
+    let numRowsPost = document.querySelectorAll('#combinedItemRow tr.item').length
     jazil.ShouldBe(numRowsPost - numRowsPre, 3, 'amount of rows added is off!')
   },
 
@@ -142,9 +139,9 @@ jazil.AddTestSet(mainPage, 'CombinedItemRow', {
     let itemRow1 = CreateCombinedItemRow(templateRow, item1)
     let itemRow2 = CreateCombinedItemRow(templateRow, item2)
     let itemRow3 = CreateCombinedItemRow(templateRow, item3)
-    let numRowsPre = $('#combinedItemRow tr.item').length
+    let numRowsPre = document.querySelectorAll('#combinedItemRow tr.item').length
     itemRow2.Remove()
-    let numRowsPost = $('#combinedItemRow tr.item').length
+    let numRowsPost = document.querySelectorAll('#combinedItemRow tr.item').length
 
     jazil.ShouldBe(numRowsPost - numRowsPre, -1, 'amount of rows removed is off!')
     jazil.ShouldBe(CombinedItemRowInTable('combinedItemRow', item2.info.name), false, 'removed row is still present!')

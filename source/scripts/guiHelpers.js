@@ -1,7 +1,17 @@
-function SetIcon(iconElemJQ, itemID, hasEnchants) {
+function SetIcon(iconElem, itemID, hasEnchants) {
   let itemInfo = g_itemInfosByID.get(itemID)
   let iconIndex = hasEnchants ? itemInfo.iconIndexEnchanted : itemInfo.iconIndexNormal
-  iconElemJQ.attr('style', `--iconIndex:${iconIndex};`)
+  iconElem.style.setProperty('--iconIndex', iconIndex)
 
-  iconElemJQ.find('.glint').css('display', hasEnchants ? 'inline-block' : 'none')
+  iconElem.querySelector('.glint').style.display = hasEnchants ? 'inline-block' : 'none'
+}
+
+
+function HideElemAnimated(elem, speed) {
+  elem.style.display = 'none'
+}
+
+
+function ShowElemAnimated(elem, displayStyle, speed) {
+  elem.style.display = displayStyle
 }

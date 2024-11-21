@@ -1,5 +1,5 @@
 function GetSourceItemTemplateRow() {
-  return new SourceItemRowTemplate($('#sourceItemRow'), 'item')
+  return new SourceItemRowTemplate(document.getElementById('sourceItemRow'), 'item')
 }
 
 
@@ -12,31 +12,30 @@ CreateSourceItemRow = function() {
 }()
 
 
-function GetSourceItemRowDetails(itemRowElemJQ) {
-  let MakeNumberSafe = (numberElemJQ) => {
-    let value = numberElemJQ.text()
+function GetSourceItemRowDetails(itemRowElem) {
+  let MakeNumberSafe = (numberElem) => {
+    let value = numberElem.textContent
     return value === '' ? undefined : parseInt(value)
   }
 
-  let nr = MakeNumberSafe(itemRowElemJQ.find('.nr'))
+  let nr = MakeNumberSafe(itemRowElem.querySelector('.nr'))
 
-  let countElemJQ = itemRowElemJQ.find('[name=count]')
-  let count = parseInt(countElemJQ.val())
+  let countElem = itemRowElem.querySelector('[name=count]')
+  let count = parseInt(countElem.value)
 
-  let typeElemJQ = itemRowElemJQ.find('[name=itemID]')
-  let typeID = typeElemJQ.val()
+  let typeElem = itemRowElem.querySelector('[name=itemID]')
+  let typeID = typeElem.value
   typeID = typeID === undefined ? undefined : parseInt(typeID)
   let type = g_itemInfosByID.get(typeID).name
 
-  let priorWorkElemJQ = itemRowElemJQ.find('.priorWorkInput .selectedButton')
-  let priorWork = parseInt(priorWorkElemJQ.val())
+  let priorWorkElem = itemRowElem.querySelector('.priorWorkInput .selectedButton')
+  let priorWork = parseInt(priorWorkElem.value)
 
   let enchantNames = ''
-  itemRowElemJQ.find('[name=enchantID]').each((inputNr, inputElem) => {
-    let inputElemJQ = $(inputElem)
-    let rowElem = new DOMElement(inputElemJQ.parent().parent())
+  itemRowElem.querySelectorAll('[name=enchantID]').forEach((inputElem) => {
+    let rowElem = new DOMElement(inputElem.parentElement.parentElement)
     if (rowElem.IsReal()) {
-      let enchantID = parseInt(inputElemJQ.val())
+      let enchantID = parseInt(inputElem.value)
       if (enchantNames != '')
         enchantNames += '/'
       enchantNames += g_enchantInfosByID.get(enchantID).name
@@ -44,13 +43,12 @@ function GetSourceItemRowDetails(itemRowElemJQ) {
   })
 
   let enchantLevels = ''
-  itemRowElemJQ.find('.levelInput .selectedButton').each((inputNr, inputElem) => {
-    let inputElemJQ = $(inputElem)
-    let rowElem = new DOMElement(inputElemJQ.parent().parent())
+  itemRowElem.querySelectorAll('.levelInput .selectedButton').forEach((inputElem) => {
+    let rowElem = new DOMElement(inputElem.parentElement.parentElement)
     if (rowElem.IsReal()) {
       if (enchantLevels != '')
         enchantLevels += '/'
-      enchantLevels += parseInt(inputElemJQ.val()) + 1
+      enchantLevels += parseInt(inputElem.value) + 1
     }
   })
 
@@ -67,11 +65,10 @@ function GetSourceItemRowDetails(itemRowElemJQ) {
 
 function SourceItemRowInTable(testContainerID, item) {
   let foundRow = false
-  $(`#${testContainerID} tr.item`).each((rowNr, itemRowElem) => {
-    let itemRowElemJQ = $(itemRowElem)
-    let itemRow = new DOMElement(itemRowElemJQ)
+  document.querySelectorAll(`#${testContainerID} tr.item`).forEach((itemRowElem) => {
+    let itemRow = new DOMElement(itemRowElem)
     if (itemRow.IsReal()) {
-      let details = GetSourceItemRowDetails(itemRowElemJQ)
+      let details = GetSourceItemRowDetails(itemRowElem)
       if (details.type == item.info.name) {
         foundRow = true
         return false
@@ -105,7 +102,7 @@ jazil.AddTestSet(mainPage, 'SourceItemRow', {
     let templateRow = GetSourceItemTemplateRow()
     let itemRow = CreateSourceItemRow(templateRow, undefined, 6)
 
-    let details = GetSourceItemRowDetails(itemRow.elemJQ)
+    let details = GetSourceItemRowDetails(itemRow.elem)
 
     jazil.ShouldBe(details.nr, 6, 'nr is off!')
     jazil.ShouldBe(details.count, 1, 'count is off!')
@@ -120,7 +117,7 @@ jazil.AddTestSet(mainPage, 'SourceItemRow', {
     let item = BuildItem({ set:g_source, name:'Pickaxe', count:9, priorWork:2, cost:15 })
     let itemRow = CreateSourceItemRow(templateRow, item, 5)
 
-    let details = GetSourceItemRowDetails(itemRow.elemJQ)
+    let details = GetSourceItemRowDetails(itemRow.elem)
 
     jazil.ShouldBe(details.nr, 5, 'nr is off!')
     jazil.ShouldBe(details.count, 9, 'count is off!')
@@ -137,7 +134,7 @@ jazil.AddTestSet(mainPage, 'SourceItemRow', {
     let item = BuildItem({ set:g_source, name:'Turtle Shell', count:1, priorWork:4, cost:9, enchants:[{ name:'Unbreaking', level:3 }, { name:'Mending', level:1 }] })
     let itemRow = CreateSourceItemRow(templateRow, item, 15)
 
-    let details = GetSourceItemRowDetails(itemRow.elemJQ)
+    let details = GetSourceItemRowDetails(itemRow.elem)
 
     jazil.ShouldBe(details.nr, 15, 'nr is off!')
     jazil.ShouldBe(details.count, 1, 'count is off!')
@@ -188,7 +185,7 @@ jazil.AddTestSet(mainPage, 'SourceItemRow', {
 
     // Update the item row's count to something non-numeric.
     // Just empty is the most cross-browser way to do so.
-    itemRow.elemJQ.find('[name=count]').val('')
+    itemRow.elem.querySelector('[name=count]').value = ''
 
     let itemDetails = itemRow.GetItem()
     let retrievedItem = itemDetails.item
@@ -215,14 +212,14 @@ jazil.AddTestSet(mainPage, 'SourceItemRow', {
 
   'Added row count is OK': (jazil) => {
     let templateRow = GetSourceItemTemplateRow()
-    let numRowsPre = $('#sourceItemRow tr.item').length
+    let numRowsPre = document.querySelectorAll('#sourceItemRow tr.item').length
     let item1 = BuildItem({ set:g_source, name:'Chestplate', count:14, priorWork:4, cost:3 })
     let item2 = BuildItem({ set:g_source, name:'Shovel', count:15, priorWork:5, cost:4 })
     let item3 = BuildItem({ set:g_source, name:'Bow', count:16, priorWork:6, cost:5 })
     let itemRow1 = CreateSourceItemRow(templateRow, item1)
     let itemRow2 = CreateSourceItemRow(templateRow, item2)
     let itemRow3 = CreateSourceItemRow(templateRow, item3)
-    let numRowsPost = $('#sourceItemRow tr.item').length
+    let numRowsPost = document.querySelectorAll('#sourceItemRow tr.item').length
     jazil.ShouldBe(numRowsPost - numRowsPre, 3, 'amount of rows added is off!')
   },
 
@@ -234,9 +231,9 @@ jazil.AddTestSet(mainPage, 'SourceItemRow', {
     let itemRow1 = CreateSourceItemRow(templateRow, item1)
     let itemRow2 = CreateSourceItemRow(templateRow, item2)
     let itemRow3 = CreateSourceItemRow(templateRow, item3)
-    let numRowsPre = $('#sourceItemRow tr.item').length
+    let numRowsPre = document.querySelectorAll('#sourceItemRow tr.item').length
     itemRow2.Remove()
-    let numRowsPost = $('#sourceItemRow tr.item').length
+    let numRowsPost = document.querySelectorAll('#sourceItemRow tr.item').length
 
     jazil.ShouldBe(numRowsPost - numRowsPre, -1, 'amount of rows removed is off!')
     jazil.ShouldBe(SourceItemRowInTable('sourceItemRow', item2), false, 'removed row is still present!')
@@ -249,7 +246,7 @@ jazil.AddTestSet(mainPage, 'SourceItemRow', {
     let itemRow = CreateSourceItemRow(templateRow, item, 1)
     itemRow.SetNumber(8)
 
-    let details = GetSourceItemRowDetails(itemRow.elemJQ)
+    let details = GetSourceItemRowDetails(itemRow.elem)
 
     jazil.ShouldBe(details.nr, 8, 'nr is off!')
     jazil.ShouldBe(details.count, 4, 'count is off!')
@@ -267,7 +264,7 @@ jazil.AddTestSet(mainPage, 'SourceItemRow', {
     let itemRow = CreateSourceItemRow(templateRow, item, 31)
     itemRow.SetCount(5)
 
-    let details = GetSourceItemRowDetails(itemRow.elemJQ)
+    let details = GetSourceItemRowDetails(itemRow.elem)
 
     jazil.ShouldBe(details.nr, 31, 'nr is off!')
     jazil.ShouldBe(details.count, 5, 'count is off!')
@@ -286,7 +283,7 @@ jazil.AddTestSet(mainPage, 'SourceItemRow', {
     let updatedItem = BuildItem({ set:g_source, name:'Helmet', count:6, priorWork:4, cost:5, enchants:[{ name:'Blast Protection', level:4 }, { name:'Aqua Affinity', level:1 }] })
     itemRow.SetItem(updatedItem)
 
-    let details = GetSourceItemRowDetails(itemRow.elemJQ)
+    let details = GetSourceItemRowDetails(itemRow.elem)
 
     jazil.ShouldBe(details.count, 6, 'count is off!')
     jazil.ShouldBe(details.type, updatedItem.info.name, 'type is off!')

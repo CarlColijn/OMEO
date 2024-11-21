@@ -434,12 +434,6 @@ a:visited {
 }
 
 
-/* Notes */
-#showNotes {
-  display: none;
-}
-
-
 /* Errors */
 .error {
   margin: 0px;

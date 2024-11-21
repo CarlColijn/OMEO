@@ -15,8 +15,8 @@
 
 
 class CombinedItemGroupTemplate extends TemplateElement {
-  constructor(parentElemJQ, elementClass, ShowDetails) {
-    super(parentElemJQ, elementClass)
+  constructor(parentElem, elementClass, ShowDetails) {
+    super(parentElem, elementClass)
 
     this.ShowDetails = ShowDetails
   }
@@ -24,8 +24,8 @@ class CombinedItemGroupTemplate extends TemplateElement {
 
   // returns CombinedItemGroup
   CreateNew(match) {
-    let newTBodyElemJQ = super.CreateExtraElement()
-    let newItemGroup = new CombinedItemGroup(newTBodyElemJQ, this.ShowDetails, match)
+    let newTBodyElem = super.CreateExtraElement()
+    let newItemGroup = new CombinedItemGroup(newTBodyElem, this.ShowDetails, match)
 
     return newItemGroup
   }
@@ -35,12 +35,12 @@ class CombinedItemGroupTemplate extends TemplateElement {
 
 
 class CombinedItemGroup extends RealElement {
-  constructor(tbodyElemJQ, ShowDetails, match) {
-    super(tbodyElemJQ)
+  constructor(tbodyElem, ShowDetails, match) {
+    super(tbodyElem)
 
     this.SetHeading(match)
 
-    this.itemTemplateRow = new CombinedItemRowTemplate(this.elemJQ, 'item', ShowDetails)
+    this.itemTemplateRow = new CombinedItemRowTemplate(this.elem, 'item', ShowDetails)
   }
 
 
@@ -68,6 +68,8 @@ class CombinedItemGroup extends RealElement {
 
 
   SetHeading(match) {
-    this.elemJQ.find(this.GetHeadingClassForMatch(match)).removeClass('template')
+    let headingClass = this.GetHeadingClassForMatch(match)
+    let headingElem = this.elem.querySelector(headingClass)
+    headingElem.classList.remove('template')
   }
 }

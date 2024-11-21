@@ -19,17 +19,17 @@
 
 
 class SourceItemRowTemplate extends TemplateElement {
-  constructor(parentElemJQ, elementClass) {
-    super(parentElemJQ, elementClass)
+  constructor(parentElem, elementClass) {
+    super(parentElem, elementClass)
 
     this.SetupItemOptions()
   }
 
 
   // returns SourceItemRow
-  CreateNew(nr, item, allRows, giveFocus, focusElemJQWhenAllGone) {
-    let newRowElemJQ = super.CreateExtraElement()
-    let newItemRow = new SourceItemRow(newRowElemJQ, allRows)
+  CreateNew(nr, item, allRows, giveFocus, focusElemWhenAllGone) {
+    let newRowElem = super.CreateExtraElement()
+    let newItemRow = new SourceItemRow(newRowElem, allRows)
 
     newItemRow.SetNumber(nr)
 
@@ -38,9 +38,9 @@ class SourceItemRowTemplate extends TemplateElement {
 
     newItemRow.HookUpGUI(item)
 
-    newItemRow.focusElemJQWhenAllGone = focusElemJQWhenAllGone
+    newItemRow.focusElemWhenAllGone = focusElemWhenAllGone
     if (giveFocus)
-      newItemRow.idElemJQ[0].focus()
+      newItemRow.idElem.focus()
 
     return newItemRow
   }
@@ -50,10 +50,13 @@ class SourceItemRowTemplate extends TemplateElement {
 
 
   SetupItemOptions() {
-    let itemSelectElemJQs = this.elemJQ.find('select[name="itemID"]')
+    let itemSelectElem = this.elem.querySelector('select[name="itemID"]')
     for (let itemNr = 0; itemNr < g_numDifferentItems; ++itemNr) {
       let itemInfo = g_itemInfos[itemNr]
-      itemSelectElemJQs.append(`<option value="${itemInfo.id}">${itemInfo.name}</option>`)
+      let optionElem = document.createElement('option')
+      optionElem.value = itemInfo.id
+      optionElem.textContent = itemInfo.name
+      itemSelectElem.appendChild(optionElem)
     }
   }
 }
@@ -62,45 +65,45 @@ class SourceItemRowTemplate extends TemplateElement {
 
 
 class SourceItemRow extends RealElement {
-  constructor(rowElemJQ, allRows) {
-    super(rowElemJQ)
+  constructor(rowElem, allRows) {
+    super(rowElem)
 
     // ==== PUBLIC ====
     this.nr = -1 // to be filled in later
 
     // ==== PRIVATE ====
-    this.nrElemJQ = rowElemJQ.find('.nr')
-    this.countElemJQ = rowElemJQ.find('input[name="count"]')
-    this.countErrorElemJQ = rowElemJQ.find('.error')
-    this.iconElemJQ = rowElemJQ.find('.icon')
-    this.idElemJQ = rowElemJQ.find('select[name="itemID"]')
-    this.priorWorkElem = new ButtonStrip(rowElemJQ.find('.priorWorkInput'))
+    this.nrElem = rowElem.querySelector('.nr')
+    this.countElem = rowElem.querySelector('input[name="count"]')
+    this.countErrorElem = rowElem.querySelector('.error')
+    this.iconElem = rowElem.querySelector('.icon')
+    this.idElem = rowElem.querySelector('select[name="itemID"]')
+    this.priorWorkElem = new ButtonStrip(rowElem.querySelector('.priorWorkInput'))
 
     this.allRows = allRows
 
     let item = this.SyncCurrentItemWithoutEnchants()
 
-    let addEnchantElemJQ = this.elemJQ.find('button[name="addEnchant"]')
+    let addEnchantElem = this.elem.querySelector('button[name="addEnchant"]')
     let EnchantStateChangedHandler = (hasEnchants) => {
       this.EnchantStateChanged(hasEnchants)
     }
-    this.enchantSection = new EnchantSection(item, addEnchantElemJQ, this.elemJQ, EnchantStateChangedHandler)
+    this.enchantSection = new EnchantSection(item, addEnchantElem, this.elem, EnchantStateChangedHandler)
   }
 
 
   Remove() {
-    let focusRowElemJQ = this.elemJQ.next()
-    if (focusRowElemJQ.length == 0)
-      focusRowElemJQ = this.elemJQ.prev()
+    let focusRowElem = this.elem.nextElementSibling
+    if (focusRowElem === null || !new DOMElement(focusRowElem).IsReal())
+      focusRowElem = this.elem.previousElementSibling
 
-    let focusElemJQ
-    if (focusRowElemJQ.length > 0 && new DOMElement(focusRowElemJQ).IsReal())
-      focusElemJQ = focusRowElemJQ.find('button[name="removeItem"]')
+    let focusElem
+    if (focusRowElem !== null && new DOMElement(focusRowElem).IsReal())
+      focusElem = focusRowElem.querySelector('button[name="removeItem"]')
     else
-      focusElemJQ = this.focusElemJQWhenAllGone
+      focusElem = this.focusElemWhenAllGone
 
-    if (focusElemJQ?.length > 0)
-      focusElemJQ[0].focus()
+    if (focusElem)
+      focusElem.focus()
 
     this.enchantSection.RemoveEnchants()
     super.Remove()
@@ -115,14 +118,14 @@ class SourceItemRow extends RealElement {
 
   SetNumber(nr) {
     this.nr = nr
-    this.elemJQ.attr('data-nr', nr)
-    this.nrElemJQ.text(nr)
+    this.elem.dataset.nr = nr
+    this.nrElem.textContent = nr
   }
 
 
   SetCount(newCount) {
-    this.countElemJQ.val(newCount)
-    this.countErrorElemJQ.hide()
+    this.countElem.value = newCount
+    this.countErrorElem.style.display = 'none'
   }
 
 
@@ -130,15 +133,15 @@ class SourceItemRow extends RealElement {
   // - item: Item
   // - withCountError: bool
   GetItem() {
-    let count = parseInt(this.countElemJQ.val())
+    let count = parseInt(this.countElem.value)
     let withCountError = isNaN(count)
-    let itemID = parseInt(this.idElemJQ.val())
+    let itemID = parseInt(this.idElem.value)
     let priorWork = this.priorWorkElem.GetSelectionNr()
 
     let item = new Item(withCountError ? 1 : count, g_source, itemID, priorWork)
     this.enchantSection.AddEnchantsToItem(item)
 
-    item.nr = parseInt(this.elemJQ.attr('data-nr'))
+    item.nr = parseInt(this.elem.dataset.nr)
 
     return {
       item: item,
@@ -151,7 +154,7 @@ class SourceItemRow extends RealElement {
     this.itemID = item.id
 
     this.SetCount(item.count)
-    this.idElemJQ.val(item.id)
+    this.idElem.value = item.id
     this.SetupPriorWorkOptions()
     this.priorWorkElem.SetSelectionNr(item.priorWork)
 
@@ -164,7 +167,7 @@ class SourceItemRow extends RealElement {
 
   // returns Item
   SyncCurrentItemWithoutEnchants() {
-    this.itemID = parseInt(this.idElemJQ.val())
+    this.itemID = parseInt(this.idElem.value)
     return new Item(
       1,
       g_source,
@@ -185,7 +188,7 @@ class SourceItemRow extends RealElement {
       item = new Item(
         1,
         g_source,
-        parseInt(this.idElemJQ.val()),
+        parseInt(this.idElem.value),
         0
       )
     }
@@ -195,19 +198,19 @@ class SourceItemRow extends RealElement {
 
 
   HookUpGUI(item) {
-    this.elemJQ.find('button[name="removeItem"]').click(() => {
+    this.elem.querySelector('button[name="removeItem"]').addEventListener('click', () => {
       this.Remove()
     })
 
-    this.countElemJQ.on('focusout', () => {
-      let count = parseInt(this.countElemJQ.val())
+    this.countElem.addEventListener('focusout', () => {
+      let count = parseInt(this.countElem.value)
       if (isNaN(count))
-        this.countErrorElemJQ.show()
+        this.countErrorElem.style.display = 'block'
       else
-        this.countErrorElemJQ.hide()
+        this.countErrorElem.style.display = 'none'
     })
 
-    this.idElemJQ.change(() => {
+    this.idElem.addEventListener('change', () => {
       let item = this.SyncCurrentItemWithoutEnchants()
       this.enchantSection.ChangeItem(item)
     })
@@ -215,6 +218,6 @@ class SourceItemRow extends RealElement {
 
 
   EnchantStateChanged(hasEnchants) {
-    SetIcon(this.iconElemJQ, this.itemID, hasEnchants)
+    SetIcon(this.iconElem, this.itemID, hasEnchants)
   }
 }

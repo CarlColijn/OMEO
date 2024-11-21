@@ -136,10 +136,10 @@ class DataStream {
 
   SaveToBookmarkLink() {
     let bookmarkLink = this.GetAsURL(location)
-    let bookmarkElemJQ = $('#bookmark')
-    bookmarkElemJQ.show()
-    let bookmarkLinkElemJQ = bookmarkElemJQ.find('a')
-    bookmarkLinkElemJQ.attr('href', bookmarkLink)
+    let bookmarkElem = document.getElementById('bookmark')
+    bookmarkElem.style.display = 'inline'
+    let bookmarkLinkElem = bookmarkElem.querySelector('a')
+    bookmarkLinkElem.setAttribute('href', bookmarkLink)
   }
 
 

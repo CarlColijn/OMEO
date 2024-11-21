@@ -12,14 +12,14 @@
 
 
 class DOMElement {
-  constructor(elemJQ) {
+  constructor(elem) {
     // ==== PUBLIC ====
-    this.elemJQ = elemJQ
+    this.elem = elem
   }
 
 
   IsReal() {
-    return this.elemJQ.attr('data-real') != 0
+    return this.elem.dataset.real === '1'
   }
 }
 
@@ -28,47 +28,54 @@ class DOMElement {
 
 
 class TemplateElement extends DOMElement {
-  constructor(parentElemJQ, elementClass) {
-    super(parentElemJQ.find(`.template.${elementClass}`))
+  constructor(parentElem, elementClass) {
+    super(parentElem.querySelector(`.template.${elementClass}`))
 
-    this.elemJQ.attr('data-real', 0)
+    this.elem.dataset.real = 0
 
-    this.parentElemJQ = parentElemJQ
     this.elementClass = elementClass
   }
 
 
-  // returns jQuery-wrapped DOM object
+  // returns the new DOM object
   CreateExtraElement() {
-    let newElemJQ = this.elemJQ.clone()
-    newElemJQ.insertBefore(this.elemJQ)
+    let newElem = this.elem.cloneNode(true)
+    this.elem.parentNode.insertBefore(newElem, this.elem)
 
-    newElemJQ.removeClass('template')
-    newElemJQ.attr('data-real', 1)
+    newElem.classList.remove('template')
+    newElem.dataset.real = 1
 
-    return newElemJQ
+    return newElem
   }
 
 
   // returns bool
   ElementsPresent() {
-    return this.parentElemJQ.find(`.${this.elementClass}[data-real="1"]`).length > 0
+    return this.GetElements().length > 0
   }
 
 
   RemoveCreatedElements() {
-    this.parentElemJQ.find(`.${this.elementClass}[data-real="1"]`).remove()
+    this.GetElements().forEach((element) => {
+      element.remove()
+    })
+  }
+
+
+  // ==== PRIVATE ====
+  GetElements() {
+    return this.elem.parentNode.querySelectorAll(`.${this.elementClass}[data-real="1"]`)
   }
 }
 
 
 class RealElement extends DOMElement {
-  constructor(elemJQ) {
-    super(elemJQ)
+  constructor(elem) {
+    super(elem)
   }
 
 
   Remove() {
-    this.elemJQ.remove()
+    this.elem.remove()
   }
 }

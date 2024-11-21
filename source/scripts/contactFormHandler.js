@@ -11,11 +11,11 @@
 
 class ContactFormHandler {
   FeedbackSent() {
-    new SimpleDialog('#feedbackSent').HookupButton('.exit')
+    new SimpleDialog('feedbackSent').HookupButton('.exit')
   }
 
 
   FeedbackFailure() {
-    new SimpleDialog('#feedbackFailure').HookupButton('.exit')
+    new SimpleDialog('feedbackFailure').HookupButton('.exit')
   }
 }

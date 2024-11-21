@@ -14,13 +14,13 @@
 
 
 class EnchantSection {
-  constructor(item, addEnchantElemJQ, parentElemJQ, EnchantStateChangedHandler) {
+  constructor(item, addEnchantElem, parentElem, EnchantStateChangedHandler) {
     // ==== PRIVATE ====
-    this.addEnchantElemJQ = addEnchantElemJQ
+    this.addEnchantElem = addEnchantElem
     this.EnchantStateChangedHandler = EnchantStateChangedHandler
     this.HookUpGUI()
 
-    this.enchantRowTemplate = new EnchantRowTemplate(parentElemJQ, 'enchant')
+    this.enchantRowTemplate = new EnchantRowTemplate(parentElem, 'enchant')
     this.enchantRows = []
 
     this.ChangeItem(item)
@@ -83,7 +83,7 @@ class EnchantSection {
 
 
   HookUpGUI() {
-    this.addEnchantElemJQ.click(() => {
+    this.addEnchantElem.addEventListener('click', () => {
       this.AddEnchant(undefined, true)
 
       this.UpdateGUIState(true, false)
@@ -97,7 +97,7 @@ class EnchantSection {
       this.UpdateGUIState(hasEnchants, false)
     }
 
-    let enchantRow = this.enchantRowTemplate.CreateNew(this.itemID, enchant, this.enchantRows, giveFocus, this.addEnchantElemJQ, ChangeEnchantCallback)
+    let enchantRow = this.enchantRowTemplate.CreateNew(this.itemID, enchant, this.enchantRows, giveFocus, this.addEnchantElem, ChangeEnchantCallback)
   }
 
 
@@ -140,6 +140,6 @@ class EnchantSection {
       true :
       this.CanCreateNew(this.enchantRows)
 
-    this.addEnchantElemJQ.prop('disabled', !mayAddEnchants)
+    this.addEnchantElem.disabled = !mayAddEnchants
   }
 }

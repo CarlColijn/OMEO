@@ -1,10 +1,10 @@
 let GetSourceItemTable
 function MakeGetSourceItemTableAvailable() {
-  let addItemElemJQMock = {
-    click: () => {},
+  let addItemElemMock = {
+    addEventListener: () => {},
     focus: () => {}
   }
-  table = new SourceItemTable($('#sourceItemTable'), addItemElemJQMock)
+  table = new SourceItemTable(document.getElementById('sourceItemTable'), addItemElemMock)
 
   GetSourceItemTable = () => {
     return table
@@ -23,20 +23,20 @@ jazil.AddTestSet(mainPage, 'SourceItemTable', {
     let table = GetSourceItemTable()
 
     jazil.ShouldBe(table.HasItems(), false, 'table is not empty!')
-    jazil.ShouldBe(table.tableElemJQ.find('tr.template.item').length, 1, 'no template row found!')
-    jazil.ShouldBe(table.tableElemJQ.find('tr.item').length, 1, 'wrong number of rows by default!')
+    jazil.ShouldBe(table.tableElem.querySelectorAll('tr.template.item').length, 1, 'no template row found!')
+    jazil.ShouldBe(table.tableElem.querySelectorAll('tr.item').length, 1, 'wrong number of rows by default!')
   },
 
   'Adding an empty row works': (jazil) => {
     let table = GetSourceItemTable()
 
-    let numRowsPre = table.tableElemJQ.find('tr.item').length
+    let numRowsPre = table.tableElem.querySelectorAll('tr.item').length
     let newRow = table.AddRow()
-    let numRowsPost = table.tableElemJQ.find('tr.item').length
+    let numRowsPost = table.tableElem.querySelectorAll('tr.item').length
     jazil.ShouldBe(numRowsPost - numRowsPre, 1, 'wrong number of rows added!')
     jazil.ShouldBe(table.HasItems(), true, 'table is empty!')
 
-    let newRowDetails = GetSourceItemRowDetails(newRow.elemJQ, g_source)
+    let newRowDetails = GetSourceItemRowDetails(newRow.elem, g_source)
     jazil.ShouldBe(newRowDetails.nr, 1, 'wrong row nrs assigned!')
   },
 
@@ -52,9 +52,9 @@ jazil.AddTestSet(mainPage, 'SourceItemTable', {
       testItem3,
     ]
 
-    let numRowsPre = table.tableElemJQ.find('tr.item').length
+    let numRowsPre = table.tableElem.querySelectorAll('tr.item').length
     table.SetItems(testItems)
-    let numRowsPost = table.tableElemJQ.find('tr.item').length
+    let numRowsPost = table.tableElem.querySelectorAll('tr.item').length
 
     // Note: the previous test left 1 row in there
     jazil.ShouldBe(numRowsPost - numRowsPre, 3 - 1, 'wrong number of rows added!')
@@ -79,10 +79,10 @@ jazil.AddTestSet(mainPage, 'SourceItemTable', {
       testItem2
     ]
 
-    let numRowsPre = table.tableElemJQ.find('tr.item').length
+    let numRowsPre = table.tableElem.querySelectorAll('tr.item').length
     table.SetItems(testItems)
     table.SetItems([])
-    let numRowsPost = table.tableElemJQ.find('tr.item').length
+    let numRowsPost = table.tableElem.querySelectorAll('tr.item').length
 
     // Note: the previous test left 3 rows in there
     jazil.ShouldBe(numRowsPost - numRowsPre, 0 - 3, 'rows are still present!')
@@ -175,7 +175,7 @@ jazil.AddTestSet(mainPage, 'SourceItemTable', {
     // Update the middle item row's count to something non-numeric.
     // Just empty is the most cross-browser way to do so.
     // (note: the template row comes only after the real rows, so index is ok)
-    $(table.tableElemJQ.find('[name=count]')[1]).val('')
+    table.tableElem.querySelectorAll('[name=count]')[1].value = ''
     let collectedItemDetails = table.ExtractItems(new SourceItemCollector(false))
 
     jazil.ShouldBe(collectedItemDetails.withCountErrors, true, 'table says there were no count errors!')
