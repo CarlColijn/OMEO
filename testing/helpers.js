@@ -33,6 +33,8 @@ let recipePage = jazil.AddPageToTest('Recipe', recipeURL, recipeAccessObjectName
 
 let mainURL = '../source/index.html'
 let mainAccessObjectNames = [
+  'AnimateElementVisibility',
+  'AnimateElementsVisibility',
   'BitRestorer',
   'BitStorer',
   'ButtonStrip',

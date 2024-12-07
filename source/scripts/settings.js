@@ -34,7 +34,7 @@ const g_rtSettings = {
   noCost: '-',
   singleCost: '#s',
   compoundCost: '#s<br>#t&nbsp;total',
-  expandCollapseSpeedMS: 100,
+  expandCollapseSpeedMS: 200,
   expandGlyph: '&boxplus;',
   collapseGlyph: '&boxminus;',
 }

@@ -100,15 +100,24 @@ class RecipeTable {
   }
 
 
-  SetChildHideState(rowInfo, hide) {
+  GatherAnimationInfos(hide, rowInfo, rowElemInfos, tdElemInfos) {
     rowInfo.numHides += (hide ? 1 : -1)
-    if (rowInfo.numHides > 0)
-      HideElemAnimated(rowInfo.rowElem, g_rtSettings.expandCollapseSpeedMS)
-    else
-      ShowElemAnimated(rowInfo.rowElem, '', g_rtSettings.expandCollapseSpeedMS)
+    let mustShow = rowInfo.numHides == 0
 
     rowInfo.childRowInfos.forEach((childRowInfo) => {
-      this.SetChildHideState(childRowInfo, hide)
+      rowElemInfos.push({
+        elem: childRowInfo.rowElem,
+        mustShow: mustShow
+      })
+      childRowInfo.rowElem.querySelectorAll('.sizer').forEach((tdElem) => {
+        tdElemInfos.push({
+          elem: tdElem,
+          mustShow: mustShow,
+          displayStyle: 'block'
+        })
+      })
+
+      this.GatherAnimationInfos(hide, childRowInfo, rowElemInfos, tdElemInfos)
     })
   }
 
@@ -116,17 +125,34 @@ class RecipeTable {
   NodeClicked(rowInfo) {
     rowInfo.isUserCollapsed = !rowInfo.isUserCollapsed
 
-    if (rowInfo.isUserCollapsed) {
-      rowInfo.mainTDElem.innerHTML = g_rtSettings.expandGlyph
-      rowInfo.mainTDElem.classList.remove('treeLeft')
-    }
-    else {
-      rowInfo.mainTDElem.innerHTML = g_rtSettings.collapseGlyph
-      rowInfo.mainTDElem.classList.add('treeLeft')
-    }
+    rowInfo.expanderElem.innerHTML =
+      rowInfo.isUserCollapsed ?
+      g_rtSettings.expandGlyph :
+      g_rtSettings.collapseGlyph
 
-    rowInfo.childRowInfos.forEach((childRowInfo) => {
-      this.SetChildHideState(childRowInfo, rowInfo.isUserCollapsed)
+    let rowElemInfos = []
+    let tdElemInfos = []
+    this.GatherAnimationInfos(rowInfo.isUserCollapsed, rowInfo, rowElemInfos, tdElemInfos)
+
+    AnimateElementsVisibility(tdElemInfos, g_rtSettings.expandCollapseSpeedMS, (started) => {
+      if (started) {
+        if (!rowInfo.isUserCollapsed)
+          rowInfo.mainTDElem.classList.add('treeLeft')
+
+        rowElemInfos.forEach((rowElemInfo) => {
+          if (rowElemInfo.mustShow)
+            rowElemInfo.elem.style.display = 'table-row'
+        })
+      }
+      else {
+        if (rowInfo.isUserCollapsed)
+          rowInfo.mainTDElem.classList.remove('treeLeft')
+
+        rowElemInfos.forEach((rowElemInfo) => {
+          if (!rowElemInfo.mustShow)
+            rowElemInfo.elem.style.display = 'none'
+        })
+      }
     })
   }
 
@@ -173,8 +199,9 @@ class RecipeTable {
 
       if (isExpandableLeafNode) {
         isExpandableNode = true
+        newRowInfo.expanderElem = tdElem.querySelector('.expander')
         tdElem.classList.add('treeClick')
-        tdElem.innerHTML = g_rtSettings.collapseGlyph
+        newRowInfo.expanderElem.innerHTML = g_rtSettings.collapseGlyph
         newRowInfo.mainTDElem.addEventListener('click', () => {
           this.NodeClicked(newRowInfo)
         })

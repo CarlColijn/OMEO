@@ -207,29 +207,29 @@ class MainForm {
 
     let notesHeight = notesElem.clientHeight
 
-    let HideNotes = (withRefocus) => {
-      HideElemAnimated(notesElem, g_mfSettings.showHideSpeedMS)
-      ShowElemAnimated(showNotesElem, 'block', g_mfSettings.showHideSpeedMS)
-      if (withRefocus)
-        showNotesElem.focus()
-    }
-    let ShowNotes = () => {
-      ShowElemAnimated(notesElem, 'block', g_mfSettings.showHideSpeedMS)
-      HideElemAnimated(showNotesElem, g_mfSettings.showHideSpeedMS)
+    let SetNotesVisibility = (mustShow, interactive) => {
+      hideNotesElem.style.display = mustShow ? 'inline-block' : 'none'
+      showNotesElem.style.display = mustShow ? 'none' : 'inline-block'
+      if (!interactive)
+        notesElem.style.display = mustShow ? 'block' : 'none'
+      else {
+        if (mustShow)
+          hideNotesElem.focus()
+        else
+          showNotesElem.focus()
+        AnimateElementVisibility(notesElem, mustShow, 'block', g_mfSettings.showHideSpeedMS)
+      }
     }
 
-    let mustHideNotes = localStorage.getItem('hideNotes') != null
-    if (mustHideNotes)
-      HideNotes(false)
-    else
-      ShowNotes()
+    let mustShowNotes = localStorage.getItem('hideNotes') == null
+    SetNotesVisibility(mustShowNotes, false)
 
     hideNotesElem.addEventListener('click', () => {
-      HideNotes(true)
+      SetNotesVisibility(false, true)
       localStorage.setItem('hideNotes', '1')
     })
     showNotesElem.addEventListener('click', () => {
-      ShowNotes()
+      SetNotesVisibility(true, true)
       localStorage.removeItem('hideNotes')
     })
   }

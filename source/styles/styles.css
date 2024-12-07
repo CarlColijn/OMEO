@@ -252,7 +252,21 @@ td.noSpaceRight {
 }
 
 
+/* Notes */
+#notes p:first-of-type {
+  /* This way the dynamic animation of the #notes element won't have
+     a jump due to the first p element adding to the spacing above it. */
+  margin-top: 0px;
+}
+
+
 /* Recipe table node tree */
+#recipe .item > td {
+  padding: 0px !important;
+}
+#recipe .item .sizer {
+  padding: 0.2em 0.4em;
+}
 .treeClick {
   cursor: pointer;
 }
@@ -265,9 +279,10 @@ td.noSpaceRight {
 .treeTop.treeLeft {
   box-shadow: inset 3px 2px var(--headerColor), inset 4px 3px #00000080, inset 5px 4px #00000040;
 }
-.treeNode {
+.treeNode .sizer {
   width: 1em;
-  padding: 0.0em 0.0em 0.0em 0.6em;
+  /* For best alignment with text in next column. */
+  padding: 0px 0px 0px 0.6em !important;
 }
 
 

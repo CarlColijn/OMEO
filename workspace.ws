@@ -95,6 +95,7 @@
             <File name="testing\enchantInfo.js" />
             <File name="testing\enchantRow.js" />
             <File name="testing\enchantSection.js" />
+            <File name="testing\guiHelpers.js" />
             <File name="testing\helpers.js" />
             <File name="testing\item.js" />
             <File name="testing\itemCombineList.js" />
