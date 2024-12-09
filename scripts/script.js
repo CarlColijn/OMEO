@@ -4599,8 +4599,25 @@ class MainForm {
       this.StartUp()
     })
 
+    // Note: to be deprecated Soon, already not available everywhere...
     window.addEventListener('unload', () => {
-      this.ShutDown()
+      this.Save(false)
+    })
+
+    window.addEventListener('beforeunload', () => {
+      this.Save(false)
+    })
+
+    // Note: also fires on tab switch, but better safe than sorry.
+    document.addEventListener('visibilitychange', () => {
+      console.log('vischage')
+      if (document.visibilityState == 'hidden')
+        this.Save(false)
+    })
+
+    window.addEventListener('pagehide', () => {
+      console.log('pagehide')
+      this.Save(false)
     })
   }
 
@@ -4616,11 +4633,6 @@ class MainForm {
     this.InitializeNotesSection()
 
     this.StartLoading()
-  }
-
-
-  ShutDown() {
-    this.Save(false)
   }
 
 
@@ -4704,7 +4716,7 @@ class MainForm {
     })
 
     // Note: the path should be relative to the html document loading us!
-    this.combineWorker = new Worker('scripts/itemCombineWorker.js?v=3e78fc17')
+    this.combineWorker = new Worker('scripts/itemCombineWorker.js?v=90c7d6de')
 
     this.combineWorker.onmessage = (e) => {
       switch (e.data.type) {
