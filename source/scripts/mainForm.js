@@ -34,8 +34,23 @@ class MainForm {
       this.StartUp()
     })
 
+    // Note: to be deprecated Soon, already not available everywhere...
     window.addEventListener('unload', () => {
-      this.ShutDown()
+      this.Save(false)
+    })
+
+    window.addEventListener('beforeunload', () => {
+      this.Save(false)
+    })
+
+    // Note: also fires on tab switch, but better safe than sorry.
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState == 'hidden')
+        this.Save(false)
+    })
+
+    window.addEventListener('pagehide', () => {
+      this.Save(false)
     })
   }
 
@@ -51,11 +66,6 @@ class MainForm {
     this.InitializeNotesSection()
 
     this.StartLoading()
-  }
-
-
-  ShutDown() {
-    this.Save(false)
   }
 
 
