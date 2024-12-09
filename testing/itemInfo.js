@@ -100,10 +100,14 @@ jazil.AddTestSet(mainPage, 'ItemInfo', {
       })
     })
 
-    jazil.ShouldBe(bookInfo.nonConflictingEnchantIDs.size, g_enchantInfosByID.size - conflictingIDs.size, 'number of non-conflicting enchants is off!')
+    jazil.ShouldBe(bookInfo.nonConflictingNormalEnchantIDs.size + bookInfo.nonConflictingCursedEnchantIDs.size, g_enchantInfosByID.size - conflictingIDs.size, 'number of non-conflicting enchants is off!')
     g_enchantInfosByID.forEach((info, id) => {
-      if (!conflictingIDs.has(id))
-        jazil.Assert(bookInfo.nonConflictingEnchantIDs.has(id), `${info.name} not marked as non-conflicting!`)
+      if (!conflictingIDs.has(id)) {
+        if (info.isCurse)
+          jazil.Assert(bookInfo.nonConflictingCursedEnchantIDs.has(id), `${info.name} not marked as non-conflicting cursed enchant!`)
+        else
+          jazil.Assert(bookInfo.nonConflictingNormalEnchantIDs.has(id), `${info.name} not marked as non-conflicting normal enchant!`)
+      }
     })
   },
 
@@ -119,11 +123,14 @@ jazil.AddTestSet(mainPage, 'ItemInfo', {
       })
     })
 
-    jazil.ShouldBe(pickaxeInfo.nonConflictingEnchantIDs.size, pickaxeInfo.allowedEnchantIDs.size - conflictingIDs.size, 'number of non-conflicting enchants is off!')
+    jazil.ShouldBe(pickaxeInfo.nonConflictingNormalEnchantIDs.size + pickaxeInfo.nonConflictingCursedEnchantIDs.size, pickaxeInfo.allowedEnchantIDs.size - conflictingIDs.size, 'number of non-conflicting enchants is off!')
     pickaxeInfo.allowedEnchantIDs.forEach((id) => {
       if (!conflictingIDs.has(id)) {
         let info = g_enchantInfosByID.get(id)
-        jazil.Assert(pickaxeInfo.nonConflictingEnchantIDs.has(id), `${info.name} not marked as non-conflicting!`)
+        if (info.isCurse)
+          jazil.Assert(pickaxeInfo.nonConflictingCursedEnchantIDs.has(id), `${info.name} not marked as non-conflicting cursed enchant!`)
+        else
+          jazil.Assert(pickaxeInfo.nonConflictingNormalEnchantIDs.has(id), `${info.name} not marked as non-conflicting normal enchant!`)
       }
     })
   },

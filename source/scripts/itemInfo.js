@@ -14,7 +14,8 @@
     - isBook: bool
     - allowedEnchantIDs: Set(int)
     - conflictingEnchantIDSetsList: Array(Array(Set(int)))
-    - nonConflictingEnchantIDs: Set(int)
+    - nonConflictingNormalEnchantIDs: Set(int)
+    - nonConflictingCursedEnchantIDs: Set(int)
     - CanHaveEnchant(enchantID: int) -> bool
 
   Defined globals:
@@ -42,9 +43,9 @@ class ItemInfo {
     this.iconIndexEnchanted = iconIndexEnchanted
     this.isBook = name == 'Book'
     this.name = name
-    this.allowedEnchantIDs = this.GetAllowedEnchantIDs(enchantNames)
+    this.GatherAllowedEnchantIDs(enchantNames)
     this.conflictingEnchantIDSetsList = GetConflictingEnchantIDSetsListForIDs(this.allowedEnchantIDs)
-    this.nonConflictingEnchantIDs = this.GetNonConflictingEnchantIDs(this.allowedEnchantIDs, this.conflictingEnchantIDSetsList)
+    this.GatherNonConflictingEnchantIDs()
 
     // ==== PRIVATE ====
     if (this.isBook)
@@ -63,9 +64,8 @@ class ItemInfo {
   // ==== PRIVATE ====
 
 
-  // returns Set(int)
-  GetAllowedEnchantIDs(enchantNames) {
-    return new Set(
+  GatherAllowedEnchantIDs(enchantNames) {
+    this.allowedEnchantIDs = new Set(
       this.isBook ?
       g_enchantInfos.map((enchantInfo) => { return enchantInfo.id }) :
       enchantNames.map((enchantName) => { return g_enchantIDsByName.get(enchantName) })
@@ -73,15 +73,24 @@ class ItemInfo {
   }
 
 
-  // returns Set(int)
-  GetNonConflictingEnchantIDs(allowedEnchantIDs, conflictingEnchantIDSetsList) {
-    return new Set([...allowedEnchantIDs].filter((id) => {
-      return conflictingEnchantIDSetsList.every((idSets) => {
+  GatherNonConflictingEnchantIDs() {
+    this.nonConflictingNormalEnchantIDs = new Set()
+    this.nonConflictingCursedEnchantIDs = new Set()
+
+    return this.allowedEnchantIDs.forEach((id) => {
+      let isNonConflictingID = this.conflictingEnchantIDSetsList.every((idSets) => {
         return idSets.every((idSet) => {
           return !idSet.has(id)
         })
       })
-    }))
+
+      if (isNonConflictingID) {
+        if (g_enchantInfosByID.get(id).isCurse)
+          this.nonConflictingCursedEnchantIDs.add(id)
+        else
+          this.nonConflictingNormalEnchantIDs.add(id)
+      }
+    })
   }
 }
 

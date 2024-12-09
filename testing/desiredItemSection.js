@@ -223,7 +223,7 @@ jazil.AddTestSet(mainPage, 'DesiredItemSection', {
     }
     itemSection.AddMaxEnchants(AskMaySetMaxedDesiredEnchantsMock)
 
-    let allEnchantIDs = [...item.info.nonConflictingEnchantIDs, ...chosenEnchantIDs]
+    let allEnchantIDs = [...item.info.nonConflictingNormalEnchantIDs, ...chosenEnchantIDs]
     item.DropAllEnchants()
     allEnchantIDs.forEach((id) => {
       let info = g_enchantInfosByID.get(id)

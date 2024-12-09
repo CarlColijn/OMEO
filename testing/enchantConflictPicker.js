@@ -44,7 +44,7 @@ function GetNamesForItem(itemName) {
 
   let nonConflictingNames = GetCanonicalReducedStringList(
     ',',
-    [...itemInfo.nonConflictingEnchantIDs].map((id) => {
+    [...itemInfo.nonConflictingNormalEnchantIDs].map((id) => {
       return g_enchantInfosByID.get(id).name
     })
   )

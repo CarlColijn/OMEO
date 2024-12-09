@@ -112,7 +112,7 @@ class DesiredItemSection {
       hasConflictingEnchants: item.info.conflictingEnchantIDSetsList.length > 0,
       info: item.info,
       OnContinue: (maxEnchantsCallbackInfo, chosenConflictingIDs) => {
-        this.SetMaxEnchants(maxEnchantsCallbackInfo.info.nonConflictingEnchantIDs, chosenConflictingIDs)
+        this.SetMaxEnchants(maxEnchantsCallbackInfo.info.nonConflictingNormalEnchantIDs, chosenConflictingIDs)
       }
     }
 

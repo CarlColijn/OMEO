@@ -15,7 +15,7 @@
 
 class EnchantConflictPicker {
   constructor(dialogElem, itemInfo) {
-    let ids = [...itemInfo.nonConflictingEnchantIDs]
+    let ids = [...itemInfo.nonConflictingNormalEnchantIDs]
     let names = ids.reduce((names, id) => {
       return names + (names.length == 0 ? '' : ' &#x2022; ') + g_enchantInfosByID.get(id).name
     }, '')
