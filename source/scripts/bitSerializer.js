@@ -14,7 +14,13 @@
 // ======== PRIVATE ========
 
 
-let g_streamSerializationChars = '_abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-'
+const g_numBitsPerBatch = 6
+// note: applying |0 creates real uint32s
+const g_allZeroBits = 0|0
+const g_allOneBits = 0x3f|0
+
+
+const g_streamSerializationChars = '_abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-'
 
 
 // ======== PUBLIC ========
@@ -34,7 +40,7 @@ class BitStorer {
       let upcomingNumBits = numBitsToGo - batchNumBits
 
       this.storedBits <<= batchNumBits
-      let bitMask = (0x3f|0) >>> (6 - batchNumBits)
+      let bitMask = g_allOneBits >>> (g_numBitsPerBatch - batchNumBits)
       this.storedBits |= (bits >>> upcomingNumBits) & bitMask
 
       numBitsToGo -= batchNumBits
@@ -50,7 +56,7 @@ class BitStorer {
   // returns string (the final stream data)
   Finalize() {
     // flush out any remaining data by pushing enough 0 bits
-    this.AddBits(0|0, this.numBitsToStore)
+    this.AddBits(g_allZeroBits, this.numBitsToStore)
 
     return this.serialized
   }
@@ -60,8 +66,8 @@ class BitStorer {
 
 
   StartNewChar() {
-    this.storedBits = 0|0 // real uint32
-    this.numBitsToStore = 6
+    this.storedBits = g_allZeroBits
+    this.numBitsToStore = g_numBitsPerBatch
   }
 }
 
@@ -80,7 +86,7 @@ class BitRestorer {
 
   // returns int
   GetBits(numBitsToGo) {
-    let bits = 0|0
+    let bits = g_allZeroBits
     while (numBitsToGo > 0) {
       if (this.numBitsToRestore == 0)
         this.LoadNextBits()
@@ -89,7 +95,7 @@ class BitRestorer {
       let upcomingNumBits = this.numBitsToRestore - batchNumBits
 
       bits <<= batchNumBits
-      let bitMask = (0x3f|0) >>> (6 - batchNumBits)
+      let bitMask = g_allOneBits >>> (g_numBitsPerBatch - batchNumBits)
       bits |= (this.restoredBits >>> upcomingNumBits) & bitMask
 
       numBitsToGo -= batchNumBits
@@ -105,7 +111,7 @@ class BitRestorer {
 
   LoadNextBits() {
     if (this.nextCharNr >= this.serialized.length) {
-      this.restoredBits = 0|0 // past end of stream... just play along
+      this.restoredBits = g_allZeroBits // past end of stream... just play along
       this.overflow = true
     }
     else {
@@ -119,6 +125,6 @@ class BitRestorer {
       this.restoredBits = charNr|0
     }
 
-    this.numBitsToRestore = 6
+    this.numBitsToRestore = g_numBitsPerBatch
   }
 }
