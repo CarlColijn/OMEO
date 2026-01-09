@@ -324,10 +324,10 @@ let g_enchantInfos = [
   new EnchantInfo(26, 1, 2, 4, false, 'Mending'),
   new EnchantInfo(27, 1, 4, 8, true,  'Curse of Binding'),
   new EnchantInfo(28, 1, 4, 8, true,  'Curse of Vanishing'),
-  // Bedrock: multipliers are 1 & 2 instead of 2 & 4
+  // Bedrock: Impaling multipliers are 1 & 2 instead of 2 & 4
   new EnchantInfo(29, 5, 2, 4, false, 'Impaling'),
   new EnchantInfo(30, 3, 2, 4, false, 'Riptide'),
-  new EnchantInfo(31, 3, 1, 1, false, 'Loyalty'),
+  new EnchantInfo(31, 3, 1, 2, false, 'Loyalty'),
   new EnchantInfo(32, 1, 4, 8, false, 'Channeling'),
   new EnchantInfo(33, 1, 2, 4, false, 'Multishot'),
   new EnchantInfo(34, 4, 1, 1, false, 'Piercing'),
@@ -4731,7 +4731,7 @@ class MainForm {
     })
 
     // Note: the path should be relative to the html document loading us!
-    this.combineWorker = new Worker('scripts/itemCombineWorker.js?v=5d99cd8c')
+    this.combineWorker = new Worker('scripts/itemCombineWorker.js?v=d1c4847d')
 
     this.combineWorker.onmessage = (e) => {
       switch (e.data.type) {
