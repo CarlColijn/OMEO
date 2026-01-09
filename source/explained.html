@@ -110,24 +110,52 @@
             <ul>
               <li>Target cannot have the enchantment: the enchantment is dropped, costing <em>no XP levels</em>. Example: looting on a chestplate.</li>
               <li>Target already has an incompatible enchantment: the sacrifice's enchantment is lost, but still adds <em>1 XP level</em>. Except when combining books with Silk Touch and Luck of the Sea or Looting, which is impossible.</li>
-              <li>Target can have the enchantment: this costs <em>the final enchantment level multiplied by the matching multiplier</em> for the sacrifice's type. The final level depends on the enchantment level the target already has compared to the sacrifice item;
+              <li>Target can have the enchantment: this costs <em>the final enchantment level</em>, multiplied by <em>the matching multiplier</em> for the sacrifice's type (whether it's a book or an item).
                 <ul>
-                  <li>Target doesn't have the enchantment or has it at a lower level than the sacrifice item: the final level will be the same as the sacrifice item's level.</li>
-                  <li>Target has the enchantment at the same level: the final level will be one higher than the target and sacrifice item's level (keeping the enchantment's max level in mind).</li>
-                  <li>Target has the enchantment at a higher level: the final level is the same as the target item's level.</li>
+                  <li>The final level depends on the enchantment level the target already has compared to the sacrifice item;
+                    <ul>
+                      <li>Target doesn't have the enchantment or has it at a lower level than the sacrifice item: the final level will be the same as the sacrifice item's level.</li>
+                      <li>Target has the enchantment at the same level: the final level will be one higher than the target and sacrifice item's level (keeping the enchantment's max level in mind).</li>
+                      <li>Target has the enchantment at a higher level: the final level is the same as the target item's level.</li>
+                    </ul>
+                  </li>
+                  <li>The multipliers are:
+                    <table class="table">
+                      <thead>
+                        <tr><th>Book multiplier</th><th>Item multiplier</th><th>Applicable to enchantments</th></tr>
+                      </thead>
+                      <tbody>
+                        <tr><td>1</td><td>1</td><td>Efficiency, Piercing, Power, Protection, Sharpness</td></tr>
+                        <tr><td>1</td><td>2</td><td>Bane of Arthropods, Density, Feather Falling, Fire Protection, Knockback, Loyalty, Lunge, Projectile Protection, Quick Charge, Smite, Unbreaking</td></tr>
+                        <tr><td>2</td><td>4</td><td>Aqua Affinity, Blast Protection, Breach, Depth Strider, Fire Aspect, Flame, Fortune, Frost Walker, Impaling, Looting, Luck of the Sea, Lure, Mending, Multishot, Punch, Respiration, Riptide, Sweeping Edge, Wind Burst</td></tr>
+                        <tr><td>4</td><td>8</td><td>Channeling, Curse of Binding, Curse of Vanishing, Infinity, Silk Touch, Soul Speed, Swift Sneak, Thorns</td></tr>
+                      </tbody>
+                    </table>
+                    <p>From Minecraft 1.21 onward, these multipliers can be found in the original game files. On Windows, go to your %appdata% folder, then browse to <code>.minecraft/versions/[version nr]/[version nr].jar</code>. This is actually a zip file; open or extract it, and browse to the folder <code>data/minecraft/enchantment</code>. An alternative is to view this content on the <a target="_blank" href="https://mcasset.cloud/1.21.11/data/minecraft/enchantment">Minecraft Assets Explorer</a> site (do note that that link is to a specific version of Minecraft).<br>
+                    In that folder you will find one json file per enchantment, and in those files you will find the <code>anvil_cost</code>. This is actually the Item multiplier from the table above; the Book multiplier can be obtained by halving it if it is bigger than 1.</p>
+                    <p>To test the multipliers in-game, you can <code>/give</code> yourself clean items (without prior work penalties etc.), place them on an anvil, and note the cost it would give. To e.g. test the multipliers for Thorns, give yourself some unenchanted leggings, some pre-enchanted leggings with Thorns, and some books with only Thorns;
+                      <pre>/give @p diamond_leggings 1
+/give @p diamond_leggings[enchantments={thorns:1}] 2
+/give @p diamond_leggings[enchantments={thorns:2}] 2
+/give @p enchanted_book[stored_enchantments={thorns:1}] 2
+/give @p enchanted_book[stored_enchantments={thorns:2}] 2</pre>
+                      After this, you can test combinations to deduce the multipliers; these should all line up. The multiplier is the observed cost, divided by the final level.
+                      <table class="table">
+                        <thead>
+                          <tr><td>Multiplier</td><td>Target item</td><td>Sacrifice item</td><td>Final level</td><td>Cost</td><td>Multiplier</td></tr>
+                        </thead>
+                        <tbody>
+                          <tr><td>Book</td><td>Leggings</td><td>Book Thorns I</td><td>1</td><td>4</td><td>4</td></tr>
+                          <tr><td>Book</td><td>Leggings</td><td>Book Thorns II</td><td>2</td><td>8</td><td>4</td></tr>
+                          <tr><td>Book</td><td>Book Thorns I</td><td>Book Thorns I</td><td>2</td><td>8</td><td>4</td></tr>
+                          <tr><td>Book</td><td>Book Thorns II</td><td>Book Thorns II</td><td>3</td><td>12</td><td>4</td></tr>
+                          <tr><td>Item</td><td>Leggings Thorns I</td><td>Leggings Thorns I</td><td>2</td><td>16</td><td>8</td></tr>
+                          <tr><td>Item</td><td>Leggings Thorns II</td><td>Leggings Thorns II</td><td>3</td><td>24</td><td>8</td></tr>
+                        </tbody>
+                      </table>
+                    </p>
+                  </li>
                 </ul>
-                The multipliers are:
-                <table class="table">
-                  <thead>
-                    <tr><th>Book multiplier</th><th>Item multiplier</th><th>Applicable to enchantments</th></tr>
-                  </thead>
-                  <tbody>
-                    <tr><td>1</td><td>1</td><td>Efficiency, Loyalty, Piercing, Power, Protection, Sharpness</td></tr>
-                    <tr><td>1</td><td>2</td><td>Bane of Arthropods, Density, Feather Falling, Fire Protection, Knockback, Lunge, Projectile Protection, Quick Charge, Smite, Unbreaking</td></tr>
-                    <tr><td>2</td><td>4</td><td>Aqua Affinity, Blast Protection, Breach, Depth Strider, Fire Aspect, Flame, Fortune, Frost Walker, Impaling, Looting, Luck of the Sea, Lure, Mending, Multishot, Punch, Respiration, Riptide, Sweeping Edge, Wind Burst</td></tr>
-                    <tr><td>4</td><td>8</td><td>Channeling, Curse of Binding, Curse of Vanishing, Infinity, Silk Touch, Soul Speed, Swift Sneak, Thorns</td></tr>
-                  </tbody>
-                </table>
               </li>
             </ul>
           </dd>
