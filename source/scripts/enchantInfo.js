@@ -112,7 +112,8 @@ let g_enchantInfos = [
   new EnchantInfo(38, 3, 2, 4, false, 'Sweeping Edge'),
   new EnchantInfo(39, 4, 2, 4, false, 'Breach'),
   new EnchantInfo(40, 5, 1, 2, false, 'Density'),
-  new EnchantInfo(41, 3, 2, 4, false, 'Wind Burst')
+  new EnchantInfo(41, 3, 2, 4, false, 'Wind Burst'),
+  new EnchantInfo(42, 3, 1, 2, false, 'Lunge')
 ].sort((a, b) => { return a.name < b.name ? -1 : a.name > b.name ? +1 : 0; })
 
 

@@ -125,7 +125,8 @@ let g_itemInfos = [
   new ItemInfo(21, 'Pumpkin', 22,22, ['Curse of Binding','Curse of Vanishing']),
   new ItemInfo(22, 'Head', 23,23, ['Curse of Binding','Curse of Vanishing']),
   new ItemInfo(23, 'Brush', 24,24, ['Curse of Vanishing','Mending','Unbreaking']),
-  new ItemInfo(24, 'Mace', 25,25, ['Bane of Arthropods','Breach','Curse of Vanishing','Density','Fire Aspect','Mending','Smite','Unbreaking','Wind Burst'])
+  new ItemInfo(24, 'Mace', 25,25, ['Bane of Arthropods','Breach','Curse of Vanishing','Density','Fire Aspect','Mending','Smite','Unbreaking','Wind Burst']),
+  new ItemInfo(25, 'Spear', 26,26, ['Bane of Arthropods','Curse of Vanishing','Fire Aspect','Knockback','Looting','Lunge','Mending','Sharpness','Smite','Unbreaking'])
 ].sort((a, b) => { return a.name < b.name ? -1 : a.name > b.name ? +1 : 0; })
 
 
