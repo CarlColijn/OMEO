@@ -24,7 +24,7 @@
 */
 
 
-importScripts('script.js?v=c6c9ca18')
+importScripts('script.js?v=126fe05a')
 
 
 // ======== PUBLIC ========

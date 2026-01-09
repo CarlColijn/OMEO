@@ -338,7 +338,8 @@ let g_enchantInfos = [
   new EnchantInfo(38, 3, 2, 4, false, 'Sweeping Edge'),
   new EnchantInfo(39, 4, 2, 4, false, 'Breach'),
   new EnchantInfo(40, 5, 1, 2, false, 'Density'),
-  new EnchantInfo(41, 3, 2, 4, false, 'Wind Burst')
+  new EnchantInfo(41, 3, 2, 4, false, 'Wind Burst'),
+  new EnchantInfo(42, 3, 1, 2, false, 'Lunge')
 ].sort((a, b) => { return a.name < b.name ? -1 : a.name > b.name ? +1 : 0; })
 
 
@@ -593,7 +594,8 @@ let g_itemInfos = [
   new ItemInfo(21, 'Pumpkin', 22,22, ['Curse of Binding','Curse of Vanishing']),
   new ItemInfo(22, 'Head', 23,23, ['Curse of Binding','Curse of Vanishing']),
   new ItemInfo(23, 'Brush', 24,24, ['Curse of Vanishing','Mending','Unbreaking']),
-  new ItemInfo(24, 'Mace', 25,25, ['Bane of Arthropods','Breach','Curse of Vanishing','Density','Fire Aspect','Mending','Smite','Unbreaking','Wind Burst'])
+  new ItemInfo(24, 'Mace', 25,25, ['Bane of Arthropods','Breach','Curse of Vanishing','Density','Fire Aspect','Mending','Smite','Unbreaking','Wind Burst']),
+  new ItemInfo(25, 'Spear', 26,26, ['Bane of Arthropods','Curse of Vanishing','Fire Aspect','Knockback','Looting','Lunge','Mending','Sharpness','Smite','Unbreaking'])
 ].sort((a, b) => { return a.name < b.name ? -1 : a.name > b.name ? +1 : 0; })
 
 
@@ -1034,7 +1036,13 @@ class Item {
 // ======== PRIVATE ========
 
 
-let g_streamSerializationChars = '_abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-'
+const g_numBitsPerBatch = 6
+// note: applying |0 creates real uint32s
+const g_allZeroBits = 0|0
+const g_allOneBits = 0x3f|0
+
+
+const g_streamSerializationChars = '_abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-'
 
 
 // ======== PUBLIC ========
@@ -1054,7 +1062,7 @@ class BitStorer {
       let upcomingNumBits = numBitsToGo - batchNumBits
 
       this.storedBits <<= batchNumBits
-      let bitMask = (0x3f|0) >>> (6 - batchNumBits)
+      let bitMask = g_allOneBits >>> (g_numBitsPerBatch - batchNumBits)
       this.storedBits |= (bits >>> upcomingNumBits) & bitMask
 
       numBitsToGo -= batchNumBits
@@ -1070,7 +1078,7 @@ class BitStorer {
   // returns string (the final stream data)
   Finalize() {
     // flush out any remaining data by pushing enough 0 bits
-    this.AddBits(0|0, this.numBitsToStore)
+    this.AddBits(g_allZeroBits, this.numBitsToStore)
 
     return this.serialized
   }
@@ -1080,8 +1088,8 @@ class BitStorer {
 
 
   StartNewChar() {
-    this.storedBits = 0|0 // real uint32
-    this.numBitsToStore = 6
+    this.storedBits = g_allZeroBits
+    this.numBitsToStore = g_numBitsPerBatch
   }
 }
 
@@ -1100,7 +1108,7 @@ class BitRestorer {
 
   // returns int
   GetBits(numBitsToGo) {
-    let bits = 0|0
+    let bits = g_allZeroBits
     while (numBitsToGo > 0) {
       if (this.numBitsToRestore == 0)
         this.LoadNextBits()
@@ -1109,7 +1117,7 @@ class BitRestorer {
       let upcomingNumBits = this.numBitsToRestore - batchNumBits
 
       bits <<= batchNumBits
-      let bitMask = (0x3f|0) >>> (6 - batchNumBits)
+      let bitMask = g_allOneBits >>> (g_numBitsPerBatch - batchNumBits)
       bits |= (this.restoredBits >>> upcomingNumBits) & bitMask
 
       numBitsToGo -= batchNumBits
@@ -1125,7 +1133,7 @@ class BitRestorer {
 
   LoadNextBits() {
     if (this.nextCharNr >= this.serialized.length) {
-      this.restoredBits = 0|0 // past end of stream... just play along
+      this.restoredBits = g_allZeroBits // past end of stream... just play along
       this.overflow = true
     }
     else {
@@ -1139,7 +1147,7 @@ class BitRestorer {
       this.restoredBits = charNr|0
     }
 
-    this.numBitsToRestore = 6
+    this.numBitsToRestore = g_numBitsPerBatch
   }
 }
 
@@ -4723,7 +4731,7 @@ class MainForm {
     })
 
     // Note: the path should be relative to the html document loading us!
-    this.combineWorker = new Worker('scripts/itemCombineWorker.js?v=359599e1')
+    this.combineWorker = new Worker('scripts/itemCombineWorker.js?v=5d99cd8c')
 
     this.combineWorker.onmessage = (e) => {
       switch (e.data.type) {
