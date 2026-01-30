@@ -2,10 +2,22 @@
 
 <html lang="en">
   <head>
+    <!-- CSP -->
+    <meta http-equiv="Content-Security-Policy" content="
+      default-src 'self';
+      script-src 'self' 'unsafe-inline';
+      style-src 'self';
+      connect-src 'self';
+      img-src 'self';
+      font-src 'self';
+      object-src 'none';
+      base-uri 'self';
+      form-action 'self';
+      frame-ancestors 'none';
+    ">
+
     <!-- search engines -->
     <link rel="canonical" href="https://omeo.one/recipe.html">
-
-    <meta http-equiv="Content-Security-Policy" content="default-src * 'self' blob: data: gap:; style-src * 'self' 'unsafe-inline' blob: data: gap:; script-src * 'self' 'unsafe-eval' 'unsafe-inline' blob: data: gap:; object-src * 'self' blob: data: gap:; img-src * 'self' 'unsafe-inline' blob: data: gap:; connect-src 'self' * 'unsafe-inline' blob: data: gap:; frame-src * 'self' blob: data: gap:; worker-src * 'self' 'unsafe-eval' 'unsafe-inline' blob:">
 
     <!-- https://developer.mozilla.org/en-US/docs/Web/HTML/Element/meta -->
     <meta charset="utf-8">
