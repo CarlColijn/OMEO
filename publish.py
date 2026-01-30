@@ -131,6 +131,7 @@ class Publisher:
     self.ProcessIncludes()
     self.CombineIncludeFiles()
     self.ApplyFileHashes()
+    self.ActivateCSPHeaders()
     self.FinalizeAllFileTypes()
     self.KillRemovedFiles()
     committed = self.MakeGitCommit()
@@ -372,6 +373,14 @@ class Publisher:
     self.HashFiles(reffedFileInfosByFileInfo)
 
     self.ApplyFileHashesForFiles(reffedFileInfosByFileInfo)
+
+
+  def ActivateCSPHeaders(self):
+    for fileInfo in self.fileInfosByName.values():
+      if fileInfo.file.name.endswith('.html'):
+        fileContent = fileInfo.GetContent()
+        fileContent = fileContent.replace(' CSP -->', '').replace('<!-- CSP', '<!-- CSP -->')
+        fileInfo.SetContent(fileContent)
 
 
   def FinalizeFileTypes(self, fileInfos, includedFileNames):
